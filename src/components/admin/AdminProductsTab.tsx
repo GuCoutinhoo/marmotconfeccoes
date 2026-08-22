@@ -399,9 +399,13 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
   // Quick Stock update directly from list
   const handleQuickStockChange = async (productId: string, newStock: number) => {
-    const status = newStock <= 0 ? 'out_of_stock' : 'active';
-    await updateProduct(productId, { stockCount: newStock, status });
-    showToast('Estoque Atualizado', `Novo saldo: ${newStock} unidades`, 'info');
+    try {
+      const status = newStock <= 0 ? 'out_of_stock' : 'active';
+      await updateProduct(productId, { stockCount: newStock, status });
+      showToast('Estoque Atualizado', `Novo saldo: ${newStock} unidades`, 'info');
+    } catch (err: any) {
+      showToast('Erro ao Atualizar Estoque', err?.message || 'Falha ao atualizar estoque no banco.', 'error');
+    }
   };
 
   // Save Add / Edit
@@ -474,7 +478,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           isBestSeller: formIsBestSeller,
           composition: formComposition,
         });
-        showToast('Produto Atualizado!', `${formTitle} salvo com sucesso.`, 'success');
+        showToast('Produto Atualizado!', `${formTitle} salvo no banco de dados com sucesso.`, 'success');
         setEditingProduct(null);
       } else {
         await addProduct({
@@ -506,20 +510,24 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           composition: formComposition,
           careInstructions: ['Lavar do avesso em água fria', 'Não usar secadora', 'Secar na sombra'],
         });
-        showToast('Produto Cadastrado!', `${formTitle} adicionado ao e-commerce.`, 'success');
+        showToast('Produto Cadastrado!', `${formTitle} adicionado e persistido no banco com sucesso.`, 'success');
         setIsAddOpen(false);
       }
-    } catch (err) {
-      showToast('Erro', 'Ocorreu um erro ao salvar o produto.', 'error');
+    } catch (err: any) {
+      showToast('Erro ao Salvar', err?.message || 'Ocorreu um erro ao salvar o produto no banco.', 'error');
     }
   };
 
   // Confirm delete
   const handleConfirmDelete = async () => {
     if (!deletingId) return;
-    await deleteProduct(deletingId);
-    showToast('Produto Removido', 'Peça excluída do catálogo.', 'info');
-    setDeletingId(null);
+    try {
+      await deleteProduct(deletingId);
+      showToast('Produto Removido', 'Peça excluída do catálogo e do banco de dados com sucesso.', 'info');
+      setDeletingId(null);
+    } catch (err: any) {
+      showToast('Erro ao Excluir', err?.message || 'Falha ao remover produto do banco de dados.', 'error');
+    }
   };
 
   // Discount percentage calculator

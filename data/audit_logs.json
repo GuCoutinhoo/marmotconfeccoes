@@ -1,5 +1,21 @@
 [
   {
+    "id": "log-1787424956789-qvxew",
+    "timestamp": "2026-08-22T18:55:56.789Z",
+    "eventType": "ADMIN_UNAUTHORIZED_ACCESS",
+    "ip": "127.0.0.1",
+    "status": "failure",
+    "details": "Tentativa de acesso não autorizada a endpoint administrativo."
+  },
+  {
+    "id": "log-1787424956125-t6fi6",
+    "timestamp": "2026-08-22T18:55:56.125Z",
+    "eventType": "ADMIN_UNAUTHORIZED_ACCESS",
+    "ip": "127.0.0.1",
+    "status": "failure",
+    "details": "Tentativa de acesso não autorizada a endpoint administrativo."
+  },
+  {
     "id": "log-1786990746644-1d5ev",
     "timestamp": "2026-08-17T18:19:06.644Z",
     "eventType": "PRODUCT_DELETED",

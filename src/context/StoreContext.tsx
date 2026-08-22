@@ -197,28 +197,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const created: Category = await res.json();
-
-      // Direct Supabase sync
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('categories').upsert({
-            id: created.id,
-            slug: created.slug,
-            name: created.name,
-            tagline: created.tagline,
-            description: created.description,
-            image: created.image,
-            subcategories: created.subcategories,
-            product_count: created.productCount,
-            order: created.order,
-            active: created.active,
-            data: created,
-          });
-        } catch (sbSyncErr) {
-          console.warn('[Store] Supabase category direct sync notice:', sbSyncErr);
-        }
-      }
-
       setCategories((prev) => {
         const exists = prev.some((c) => c.id === created.id);
         if (exists) {
@@ -248,28 +226,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const updated: Category = await res.json();
-
-      // Direct Supabase sync
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('categories').upsert({
-            id: updated.id,
-            slug: updated.slug,
-            name: updated.name,
-            tagline: updated.tagline,
-            description: updated.description,
-            image: updated.image,
-            subcategories: updated.subcategories,
-            product_count: updated.productCount,
-            order: updated.order,
-            active: updated.active,
-            data: updated,
-          });
-        } catch (sbSyncErr) {
-          console.warn('[Store] Supabase category direct sync notice:', sbSyncErr);
-        }
-      }
-
       setCategories((prev) => prev.map((c) => (c.id === id || c.slug === id ? updated : c)));
       return updated;
     } catch (error) {
@@ -289,15 +245,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({ error: 'Erro ao excluir categoria' }));
         throw new Error(errJson.error || 'Erro ao excluir categoria');
-      }
-
-      // Direct Supabase sync
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('categories').delete().or(`id.eq.${id},slug.eq.${id}`);
-        } catch (sbSyncErr) {
-          console.warn('[Store] Supabase category direct delete notice:', sbSyncErr);
-        }
       }
 
       setCategories((prev) => prev.filter((c) => c.id !== id && c.slug !== id));
@@ -364,49 +311,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const created: Product = await res.json();
-
-      // Direct Supabase sync
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('products').upsert({
-            id: created.id,
-            slug: created.slug,
-            title: created.title,
-            subtitle: created.subtitle,
-            description: created.description,
-            price: created.price,
-            promo_price: created.promoPrice,
-            category: created.category,
-            subcategory: created.subcategory,
-            collection: created.collection,
-            tags: created.tags,
-            rating: created.rating,
-            review_count: created.reviewCount,
-            stock_count: created.stockCount,
-            sku: created.sku,
-            sizes: created.sizes,
-            colors: created.colors,
-            image: created.image,
-            images: created.images,
-            details: created.details,
-            care_instructions: created.careInstructions,
-            composition: created.composition,
-            weight: created.weight,
-            height: created.height,
-            width: created.width,
-            length: created.length,
-            is_new_release: created.isNewRelease,
-            is_best_seller: created.isBestSeller,
-            featured: created.featured,
-            status: created.status,
-            data: created,
-          });
-        } catch (sbSyncErr) {
-          console.warn('[Store] Supabase product direct sync notice:', sbSyncErr);
-        }
-      }
-
-      setProducts((prev) => [created, ...prev]);
+      setProducts((prev) => [created, ...prev.filter((p) => p.id !== created.id && p.slug !== created.slug)]);
       return created;
     } catch (error) {
       console.error('Add product error:', error);
@@ -429,48 +334,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const updated: Product = await res.json();
-
-      // Direct Supabase sync
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('products').upsert({
-            id: updated.id,
-            slug: updated.slug,
-            title: updated.title,
-            subtitle: updated.subtitle,
-            description: updated.description,
-            price: updated.price,
-            promo_price: updated.promoPrice,
-            category: updated.category,
-            subcategory: updated.subcategory,
-            collection: updated.collection,
-            tags: updated.tags,
-            rating: updated.rating,
-            review_count: updated.reviewCount,
-            stock_count: updated.stockCount,
-            sku: updated.sku,
-            sizes: updated.sizes,
-            colors: updated.colors,
-            image: updated.image,
-            images: updated.images,
-            details: updated.details,
-            care_instructions: updated.careInstructions,
-            composition: updated.composition,
-            weight: updated.weight,
-            height: updated.height,
-            width: updated.width,
-            length: updated.length,
-            is_new_release: updated.isNewRelease,
-            is_best_seller: updated.isBestSeller,
-            featured: updated.featured,
-            status: updated.status,
-            data: updated,
-          });
-        } catch (sbSyncErr) {
-          console.warn('[Store] Supabase product direct update notice:', sbSyncErr);
-        }
-      }
-
       setProducts((prev) => prev.map((p) => (p.id === id || p.slug === id ? updated : p)));
       return updated;
     } catch (error) {
@@ -488,13 +351,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         body: JSON.stringify({ stockCount }),
       });
 
-      if (res.ok) {
-        const updated = await res.json();
-        setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, stockCount: updated.stockCount } : p)));
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao atualizar estoque' }));
+        throw new Error(errJson.error || 'Erro ao atualizar estoque');
       }
+
+      const updated = await res.json();
+      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, stockCount: updated.stockCount, status: updated.status } : p)));
     } catch (error) {
       console.error('Update stock error:', error);
-      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, stockCount } : p)));
+      throw error;
     }
   };
 
@@ -509,15 +375,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({ error: 'Erro ao excluir produto' }));
         throw new Error(errJson.error || 'Erro ao excluir produto');
-      }
-
-      // Direct Supabase sync
-      if (isSupabaseConfigured()) {
-        try {
-          await supabase.from('products').delete().or(`id.eq.${id},slug.eq.${id}`);
-        } catch (sbSyncErr) {
-          console.warn('[Store] Supabase product direct delete notice:', sbSyncErr);
-        }
       }
 
       setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
