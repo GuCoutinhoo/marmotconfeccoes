@@ -1,0 +1,30 @@
+[
+  {
+    "code": "FIRSTAURA",
+    "description": "10% OFF na sua primeira compra acima de R$ 150",
+    "discountType": "percentage",
+    "discountValue": 10,
+    "minOrderValue": 150
+  },
+  {
+    "code": "STREET20",
+    "description": "20% OFF em compras acima de R$ 400",
+    "discountType": "percentage",
+    "discountValue": 20,
+    "minOrderValue": 400
+  },
+  {
+    "code": "VIPAURA",
+    "description": "15% OFF para membros da comunidade",
+    "discountType": "percentage",
+    "discountValue": 15,
+    "minOrderValue": 250
+  },
+  {
+    "code": "FRETEGRATIS",
+    "description": "Frete Grátis para todo o Brasil",
+    "discountType": "fixed",
+    "discountValue": 30,
+    "minOrderValue": 200
+  }
+]

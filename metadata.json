@@ -1,0 +1,6 @@
+{
+  "name": "MARMOT | Streetwear Autoral & E-commerce",
+  "description": "E-commerce completo de moda streetwear autoral com catálogo dinâmico, checkout seguro via Mercado Pago, cotação de frete Melhor Envio, autenticação e painel administrativo com persistência em banco de dados.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

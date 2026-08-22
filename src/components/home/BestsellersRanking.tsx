@@ -1,0 +1,69 @@
+import React from 'react';
+import { Product } from '../../types';
+import { ProductCard } from '../ProductCard';
+import { Trophy, TrendingUp, ArrowRight } from 'lucide-react';
+
+interface BestsellersRankingProps {
+  products: Product[];
+  onQuickView: (product: Product) => void;
+  onNavigate: (page: string, param?: string) => void;
+}
+
+export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
+  products,
+  onQuickView,
+  onNavigate,
+}) => {
+  let bestsellers = products.filter((p) => p.isBestSeller || p.tags.includes('Mais Vendido'));
+  if (bestsellers.length < 8) {
+    bestsellers = [...bestsellers, ...products.filter((p) => !bestsellers.includes(p))].slice(0, 8);
+  } else {
+    bestsellers = bestsellers.slice(0, 8);
+  }
+
+  return (
+    <section className="py-20 bg-[#111113] border-b border-[#27272A]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#C5A869] mb-1.5">
+              <Trophy className="w-3.5 h-3.5" />
+              <span>FAVORITOS DA COMUNIDADE</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#F4F4F5]">
+              OS MAIS PROCURADOS
+            </h2>
+            <p className="text-xs text-[#A1A1AA] mt-1 max-w-lg">
+              As peças com maior índice de recompra e destaque pela durabilidade da malha pesada.
+            </p>
+          </div>
+
+          <button
+            onClick={() => onNavigate('shop')}
+            className="text-xs font-bold uppercase text-[#C5A869] hover:underline flex items-center gap-1.5"
+          >
+            Ver Todo o Catálogo <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* 8 Bestsellers Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {bestsellers.map((product, index) => (
+            <div key={product.id} className="relative group flex flex-col h-full">
+              {/* Discrete Leaderboard Badge */}
+              <div className="absolute top-3 left-3 z-20 bg-[#18181B]/95 text-[#C5A869] font-mono font-black text-xs px-2.5 py-1 rounded-md border border-[#2D2D34] backdrop-blur-md shadow-md flex items-center gap-1">
+                <TrendingUp className="w-3 h-3 text-[#C5A869]" /> #{String(index + 1).padStart(2, '0')}
+              </div>
+
+              <ProductCard
+                product={product}
+                onQuickView={onQuickView}
+                onProductClick={(id) => onNavigate('product', id)}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};

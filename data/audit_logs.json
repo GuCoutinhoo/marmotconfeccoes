@@ -1,0 +1,82 @@
+[
+  {
+    "id": "log-1786990746644-1d5ev",
+    "timestamp": "2026-08-17T18:19:06.644Z",
+    "eventType": "PRODUCT_DELETED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-731694-218 removido do catálogo por Administrador Marmot."
+  },
+  {
+    "id": "log-1786990744508-sdqw7",
+    "timestamp": "2026-08-17T18:19:04.508Z",
+    "eventType": "PRODUCT_DELETED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-734083-123 removido do catálogo por Administrador Marmot."
+  },
+  {
+    "id": "log-1786990742166-x6ugs",
+    "timestamp": "2026-08-17T18:19:02.166Z",
+    "eventType": "PRODUCT_DELETED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-734121-988 removido do catálogo por Administrador Marmot."
+  },
+  {
+    "id": "log-1786990739279-9w9wq",
+    "timestamp": "2026-08-17T18:18:59.279Z",
+    "eventType": "PRODUCT_DELETED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-734700-538 removido do catálogo por Administrador Marmot."
+  },
+  {
+    "id": "log-1786990736716-x3ax5",
+    "timestamp": "2026-08-17T18:18:56.716Z",
+    "eventType": "PRODUCT_CREATED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-734700-538 \"wasd\" criado por Administrador Marmot."
+  },
+  {
+    "id": "log-1786990735458-ee0ag",
+    "timestamp": "2026-08-17T18:18:55.458Z",
+    "eventType": "PRODUCT_CREATED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-734121-988 \"wasd\" criado por Administrador Marmot."
+  },
+  {
+    "id": "log-1786990735449-hdyls",
+    "timestamp": "2026-08-17T18:18:55.449Z",
+    "eventType": "PRODUCT_CREATED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-734083-123 \"wasd\" criado por Administrador Marmot."
+  },
+  {
+    "id": "log-1786990733614-ye6oz",
+    "timestamp": "2026-08-17T18:18:53.614Z",
+    "eventType": "PRODUCT_CREATED",
+    "email": "admin@marmot.com",
+    "userId": "usr-admin-marmot",
+    "ip": "127.0.0.1",
+    "status": "success",
+    "details": "Produto #prod-731694-218 \"wasd\" criado por Administrador Marmot."
+  }
+]

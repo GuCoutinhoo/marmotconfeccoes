@@ -1,0 +1,37 @@
+[
+  {
+    "id": "usr-admin-marmot",
+    "name": "Administrador Marmot",
+    "email": "admin@marmot.com",
+    "passwordHash": "$2b$10$cvjBnFcSn9HPwp907BUc1eOfwOidDbARMBHj/tCltAQrg3AQ7ZdYK",
+    "role": "admin",
+    "isVerified": true,
+    "phone": "(11) 99999-0000",
+    "cpf": "000.000.000-00",
+    "addresses": [],
+    "createdAt": "2026-08-17T17:53:15.316Z",
+    "lastLogin": "2026-08-17T22:44:53.694Z"
+  },
+  {
+    "id": "4781b2d7-ead7-49a0-b5fa-cc2106ff2064",
+    "name": "gustavohcsantos.mm2020",
+    "email": "gustavohcsantos.mm2020@gmail.com",
+    "passwordHash": "",
+    "role": "customer",
+    "isVerified": true,
+    "addresses": [],
+    "createdAt": "2026-08-17T18:07:34.432Z",
+    "lastLogin": "2026-08-17T18:07:34.432Z"
+  },
+  {
+    "id": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "name": "cliente",
+    "email": "cliente@marmot.com",
+    "passwordHash": "",
+    "role": "customer",
+    "isVerified": true,
+    "addresses": [],
+    "createdAt": "2026-08-17T20:25:05.384Z",
+    "lastLogin": "2026-08-17T20:25:05.384Z"
+  }
+]

@@ -1,0 +1,1552 @@
+[
+  {
+    "id": "prod-001",
+    "slug": "camiseta-oversized-heavyweight-cyber-dystopia-black",
+    "title": "T-Shirt Oversized Heavyweight \"Cyber Dystopia\"",
+    "subtitle": "Algodão 260g/m² | Boxy Fit Especial",
+    "description": "Camiseta oversized desenvolvida com algodão puro 260g/m² de toque encorpado. Possui gola ribana de 3cm com reforço ombro a ombro e estampa em silk-screen em relevo tátil nas costas.",
+    "price": 189.9,
+    "promoPrice": 159.9,
+    "category": "oversized",
+    "subcategory": "Heavyweight 260g",
+    "collection": "Vol. 04: Cyber Dystopia",
+    "tags": [
+      "Lançamento",
+      "Mais Vendido"
+    ],
+    "rating": 4.9,
+    "reviewCount": 42,
+    "stockCount": 18,
+    "sku": "AUR-TSH-001-BLK",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#121212",
+        "colorName": "Obsidian Black"
+      },
+      {
+        "color": "grey",
+        "colorHex": "#3A3A3C",
+        "colorName": "Washed Charcoal"
+      },
+      {
+        "color": "white",
+        "colorHex": "#F0EFEA",
+        "colorName": "Raw Bone"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "100% Algodão Pima Penteado Heavyweight (260g/m²)",
+      "Modelagem Boxy Fit exclusiva AURA com ombro caído",
+      "Gola canelada de 3cm pespontada",
+      "Estampa em Silk-screen alta densidade resistente a lavagens",
+      "Etiqueta tecida na barra e tag emborrachada interna"
+    ],
+    "careInstructions": [
+      "Lavar à mão ou em ciclo delicado com água fria",
+      "Não usar alvejante ou produtos com cloro",
+      "Passar do avesso em temperatura média",
+      "Não secar em tambor giratório"
+    ],
+    "composition": [],
+    "reviews": [
+      {
+        "id": "rev-1",
+        "date": "10/08/2026",
+        "likes": 12,
+        "title": "Sensacional! Malha muito pesada.",
+        "rating": 5,
+        "comment": "A qualidade dessa camiseta é bizarra. A gola não laceia de jeito nenhum e o caimento no ombro fica perfeito no corpo. Tenho 1,82m e 80kg, o tamanho G ficou no ponto exato.",
+        "userName": "Lucas M. Vasconcelos",
+        "verifiedPurchase": true
+      },
+      {
+        "id": "rev-2",
+        "date": "02/08/2026",
+        "likes": 8,
+        "title": "Melhor t-shirt streetwear nacional",
+        "rating": 5,
+        "comment": "Chegou em 2 dias em SP capital. Embalagem com cheiro característico impecável. Padrão gringo.",
+        "userName": "Thiago R.",
+        "verifiedPurchase": true
+      }
+    ],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:26.839219+00:00"
+  },
+  {
+    "id": "prod-002",
+    "slug": "camiseta-oversized-raw-archive-vintage-grey",
+    "title": "Camiseta Boxy \"RAW ARCHIVE\" Vintage Washed",
+    "subtitle": "Estonado em lavanderia industrial | 100% Algodão",
+    "description": "Processo de tingimento artesanal e lavagem acid wash que atribui visual retró e textura ultra macia. Modelagem ampla desenvolvida para movimentação livre.",
+    "price": 179.9,
+    "category": "oversized",
+    "subcategory": "Garment Dye",
+    "collection": "Core Archive",
+    "tags": [
+      "Lançamento",
+      "Exclusivo"
+    ],
+    "rating": 4.8,
+    "reviewCount": 29,
+    "stockCount": 12,
+    "sku": "AUR-TSH-002-GRY",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "grey",
+        "colorHex": "#4A4B4D",
+        "colorName": "Acid Wash Grey"
+      },
+      {
+        "color": "olive",
+        "colorHex": "#485044",
+        "colorName": "Dusty Olive"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Algodão 100% 220g/m² com lavagem stone wash",
+      "Acabamento com costura reforçada nas laterais",
+      "Gola estruturada 2.8cm",
+      "Prints frontais com efeito cracked vintage"
+    ],
+    "careInstructions": [
+      "Lavar separadamente nas primeiras vezes",
+      "Secar à sombra"
+    ],
+    "composition": [],
+    "reviews": [
+      {
+        "id": "rev-3",
+        "date": "05/08/2026",
+        "title": "A lavagem é ainda mais bonita pessoalmente",
+        "rating": 5,
+        "comment": "Comprei a M e ficou excelente. Caimento solto sem parecer desleixado.",
+        "userName": "Gabriel F.",
+        "verifiedPurchase": true
+      }
+    ],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:27.059367+00:00"
+  },
+  {
+    "id": "prod-003",
+    "slug": "camiseta-grafica-subterranean-aura-white",
+    "title": "Camiseta Graphic \"Subterranean Aura\" Off-White",
+    "subtitle": "Knit Heavyweight | Graphic Print Exclusivo",
+    "description": "Estampa conceitual em alta resolução inspirada na arquitetura brutalista e arte underground. Tecido pré-encolhido que garante tamanho estável pós-lavagem.",
+    "price": 169.9,
+    "promoPrice": 139.9,
+    "category": "camisetas",
+    "subcategory": "Graphic Tees",
+    "collection": "Vol. 04: Cyber Dystopia",
+    "tags": [
+      "Oferta",
+      "Mais Vendido"
+    ],
+    "rating": 4.7,
+    "reviewCount": 38,
+    "stockCount": 25,
+    "sku": "AUR-TSH-003-WHT",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "white",
+        "colorHex": "#F5F3EF",
+        "colorName": "Off White"
+      },
+      {
+        "color": "black",
+        "colorHex": "#101010",
+        "colorName": "Pitch Black"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "100% Algodão Premium",
+      "Estampa Silk Screen de 6 cores",
+      "Toque macio"
+    ],
+    "careInstructions": [
+      "Lavar do avesso",
+      "Não passar ferro direto na estampa"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": true,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:27.259615+00:00"
+  },
+  {
+    "id": "prod-004",
+    "slug": "hoodie-heavyweight-400g-cyber-archive-black",
+    "title": "Hoodie Heavyweight 400g \"Cyber Archive\" Black",
+    "subtitle": "Moletom 3 Cabos 400g/m² | Touca Dupla Pespontada",
+    "description": "O carro-chefe da nossa linha de frio. Confeccionado em moletom pesado 3 cabos com interior flanelado macio e denso. Capuz anatômico duplo com reforço estrutural, bolso canguru com custura tripla e bordado AURA no peito.",
+    "price": 399.9,
+    "promoPrice": 349.9,
+    "category": "moletons",
+    "subcategory": "Hoodie Heavy 400g",
+    "collection": "Core Archive",
+    "tags": [
+      "Lançamento",
+      "Mais Vendido",
+      "Exclusivo"
+    ],
+    "rating": 5,
+    "reviewCount": 64,
+    "stockCount": 8,
+    "sku": "AUR-HD-004-BLK",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#0D0D0E",
+        "colorName": "Obsidian Black"
+      },
+      {
+        "color": "grey",
+        "colorHex": "#71717A",
+        "colorName": "Concrete Grey"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Moletom 3 Cabos Heavyweight 400g/m² (50% Algodão / 50% Poliéster)",
+      "Capuz duplo estruturado sem cordão (visual clean moderno)",
+      "Punhos e barra em ribana pesada com elastano",
+      "Bordado frontal em alto relevo 3D",
+      "Bolso Canguru frontal reforçado com travetes de segurança"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em ciclo suave",
+      "Não secar em máquina",
+      "Secar no varal à sombra"
+    ],
+    "composition": [],
+    "reviews": [
+      {
+        "id": "rev-4",
+        "date": "11/08/2026",
+        "likes": 19,
+        "title": "O hoodie mais pesado que já tive!",
+        "rating": 5,
+        "comment": "A touca fica em pé sem cair nos ombros, o moletom esquenta demais e o caimento oversized é absurdo. Vale cada centavo investido.",
+        "userName": "Matheus B. Sampaio",
+        "verifiedPurchase": true
+      }
+    ],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:27.483918+00:00"
+  },
+  {
+    "id": "prod-005",
+    "slug": "zip-hoodie-tactical-heavy-charcoal",
+    "title": "Zip Hoodie Tactical \"Matrix\" Washed Charcoal",
+    "subtitle": "Zíper duplo YKK® | Moletom 380g",
+    "description": "Moletom com fecho em zíper metálico bidirecional YKK, permitindo regulagem superior e inferior para composições em camadas. Possui bolso interno para smartphone.",
+    "price": 429.9,
+    "category": "moletons",
+    "subcategory": "Zip Hoodie",
+    "collection": "Vol. 04: Cyber Dystopia",
+    "tags": [
+      "Últimas Peças"
+    ],
+    "rating": 4.9,
+    "reviewCount": 19,
+    "stockCount": 4,
+    "sku": "AUR-ZIP-005-CHR",
+    "sizes": [
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "grey",
+        "colorHex": "#2B2C2E",
+        "colorName": "Washed Charcoal"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Moletom Flanelado 380g/m²",
+      "Zíper YKKBidirecional Inox",
+      "Puxador de couro com gravação AURA"
+    ],
+    "careInstructions": [
+      "Fechar o zíper antes de lavar",
+      "Lavar em água fria"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:27.696916+00:00"
+  },
+  {
+    "id": "prod-006",
+    "slug": "jaqueta-puffer-tactical-stealth-black",
+    "title": "Puffer Jacket \"Stealth Tech\" Waterproof",
+    "subtitle": "Enchimento Thermo-Insulated 300g | Tecido Ripstop",
+    "description": "Jaqueta Puffer desenvolvida para baixas temperaturas e clima urbano chuvoso. Exterior em Ripstop impermeável com isolamento sintético de alta retenção térmica. Conta com ajuste nos punhos, barra com cordão e bolso interno.",
+    "price": 589.9,
+    "promoPrice": 499.9,
+    "category": "jaquetas",
+    "subcategory": "Puffer Jacket",
+    "collection": "Winter Special Drop",
+    "tags": [
+      "Lançamento",
+      "Exclusivo",
+      "Mais Vendido"
+    ],
+    "rating": 5,
+    "reviewCount": 31,
+    "stockCount": 9,
+    "sku": "AUR-PUF-006-BLK",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#151516",
+        "colorName": "Matte Obsidian"
+      },
+      {
+        "color": "silver",
+        "colorHex": "#8E9196",
+        "colorName": "Cyber Metallic"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Membrana exterior repelente à água e vento",
+      "Enchimento em fibra sintética reciclada ultra leve e quente",
+      "Zíperes selados contra chuva",
+      "Patch AURA emborrachado refletivo na manga esquerda"
+    ],
+    "careInstructions": [
+      "Limpar com pano úmido ou lavagem a seco"
+    ],
+    "composition": [],
+    "reviews": [
+      {
+        "id": "rev-5",
+        "date": "08/08/2026",
+        "title": "Impressionante!",
+        "rating": 5,
+        "comment": "Corta totalmente o vento frio. Usei numa viagem recente para o sul e segurou 5°C tranquilamente só com uma t-shirt por baixo.",
+        "userName": "Fernando K.",
+        "verifiedPurchase": true
+      }
+    ],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:27.894665+00:00"
+  },
+  {
+    "id": "prod-007",
+    "slug": "jaqueta-windbreaker-cyber-tactical-olive",
+    "title": "Windbreaker Utility \"Cyber Shell\" Olive Drab",
+    "subtitle": "Tecido Nylon Tech Ripstop | Leve & Impermeável",
+    "description": "Jaqueta corta-vento tática dobrável com capuz ajustável e múltiplos bolsos selados. Ideal para sobreposições leves do dia a dia.",
+    "price": 349.9,
+    "category": "jaquetas",
+    "subcategory": "Windbreaker",
+    "collection": "Vol. 04: Cyber Dystopia",
+    "tags": [
+      "Lançamento"
+    ],
+    "rating": 4.8,
+    "reviewCount": 15,
+    "stockCount": 14,
+    "sku": "AUR-WND-007-OLV",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "olive",
+        "colorHex": "#3E4438",
+        "colorName": "Olive Drab"
+      },
+      {
+        "color": "black",
+        "colorHex": "#121212",
+        "colorName": "Obsidian Black"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Nylon Ripstop 100% poliamida",
+      "Repelente à água",
+      "Forro interno em mesh transpirável"
+    ],
+    "careInstructions": [
+      "Lavar à mão com sabão neutro"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:28.097633+00:00"
+  },
+  {
+    "id": "prod-008",
+    "slug": "calca-cargo-tactical-ripstop-multi-pocket-black",
+    "title": "Calça Cargo Tactical \"Multi-Pocket\" Ripstop Black",
+    "subtitle": "8 Bolsos Utilitários | Ajuste no Tornozelo",
+    "description": "A calça cargo definitiva para o streetwear funcional. Tecido Ripstop reforçado contra rasgões, corte levemente afunilado com regulador elástico na barra que permite usá-la solta ou no estilo jogger.",
+    "price": 329.9,
+    "promoPrice": 289.9,
+    "category": "cargos",
+    "subcategory": "Ripstop Tactical",
+    "collection": "Core Archive",
+    "tags": [
+      "Mais Vendido",
+      "Oferta"
+    ],
+    "rating": 4.9,
+    "reviewCount": 53,
+    "stockCount": 22,
+    "sku": "AUR-CRG-008-BLK",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#111111",
+        "colorName": "Obsidian Black"
+      },
+      {
+        "color": "khaki",
+        "colorHex": "#A3937B",
+        "colorName": "Desert Khaki"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Tecido Ripstop Utilitário (65% Poliéster / 35% Algodão)",
+      "8 Bolsos amplos com fechamento em velcro tático e botões de pressão",
+      "Cintura com elástico e passantes para cinto",
+      "Regulador de barra com cordão elástico e stoppers metálicos"
+    ],
+    "careInstructions": [
+      "Lavar do avesso",
+      "Não utilizar secadora"
+    ],
+    "composition": [],
+    "reviews": [
+      {
+        "id": "rev-6",
+        "date": "04/08/2026",
+        "title": "Caimento absurdo",
+        "rating": 5,
+        "comment": "Corta muito bem no corpo e os bolsos são super práticos para carteira, chave e celular sem deformar a peça. Nota 10.",
+        "userName": "Rodrigo A. C.",
+        "verifiedPurchase": true
+      }
+    ],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:28.308944+00:00"
+  },
+  {
+    "id": "prod-009",
+    "slug": "calca-jeans-wide-leg-baggy-fit-vintage-blue",
+    "title": "Calça Jeans Wide Leg \"Baggy 90s\" Vintage Blue",
+    "subtitle": "Denim 14oz | 100% Algodão Sem Elastano",
+    "description": "Denim pesado 14oz com lavagem vintage stonewashed. Modelagem inspirada nos ícones do skate dos anos 90, com pernas largas e caimento reto impecável.",
+    "price": 319.9,
+    "category": "calcas",
+    "subcategory": "Baggy Denim",
+    "collection": "Core Archive",
+    "tags": [
+      "Lançamento",
+      "Mais Vendido"
+    ],
+    "rating": 4.8,
+    "reviewCount": 37,
+    "stockCount": 11,
+    "sku": "AUR-JNS-009-BLU",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "blue",
+        "colorHex": "#4C6B8B",
+        "colorName": "Vintage Washed Blue"
+      },
+      {
+        "color": "black",
+        "colorHex": "#222326",
+        "colorName": "Raw Washed Black"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Jeans 100% Algodão Denso 14oz",
+      "Botão e rebites metálicos personalizados AURA",
+      "Etiqueta traseira em couro legítimo gravado a laser"
+    ],
+    "careInstructions": [
+      "Lavar com água fria e do avesso"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:28.523075+00:00"
+  },
+  {
+    "id": "prod-010",
+    "slug": "shorts-mesh-basketball-cyber-aura-black",
+    "title": "Shorts Mesh \"Pro Hoops\" Double Layer",
+    "subtitle": "Camada dupla em Mesh Respirável | Cordão com ponteira em metal",
+    "description": "Bermuda inspirada na cultura do basquete de rua dos anos 90. Tecido perfurado duplo com forro suave, bolsos laterais com zíper invisível e cós elástico anatômico.",
+    "price": 189.9,
+    "promoPrice": 159.9,
+    "category": "shorts",
+    "subcategory": "Basketball Mesh Shorts",
+    "collection": "Summer Drop",
+    "tags": [
+      "Oferta",
+      "Mais Vendido"
+    ],
+    "rating": 4.9,
+    "reviewCount": 28,
+    "stockCount": 19,
+    "sku": "AUR-SHR-010-BLK",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#121212",
+        "colorName": "Black & White"
+      },
+      {
+        "color": "red",
+        "colorHex": "#8B0000",
+        "colorName": "Bulls Red"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "100% Poliéster Mesh Técnico",
+      "Comprimento acima do joelho",
+      "Cós reforçado"
+    ],
+    "careInstructions": [
+      "Não utilizar alvejantes"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:28.744659+00:00"
+  },
+  {
+    "id": "prod-011",
+    "slug": "bone-5-panel-strapback-tactical-cyber-black",
+    "title": "Boné 5 Panel Strapback \"AURA Core\" Black",
+    "subtitle": "Aba reta maleável | Fivela em nylon tático",
+    "description": "Boné 5 Panel em sarja pesada de algodão. Aba levemente maleável, fechamento traseiro ajustável em fita de nylon com fivela tática e bordado frontal discreto.",
+    "price": 129.9,
+    "category": "bones",
+    "subcategory": "5 Panel Strapback",
+    "collection": "Core Archive",
+    "tags": [
+      "Mais Vendido"
+    ],
+    "rating": 4.9,
+    "reviewCount": 45,
+    "stockCount": 30,
+    "sku": "AUR-CAP-011-BLK",
+    "sizes": [
+      "Único (Ajustável)"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#0F0F10",
+        "colorName": "Black"
+      },
+      {
+        "color": "olive",
+        "colorHex": "#3B4234",
+        "colorName": "Army Olive"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "100% Sarja de Algodão Heavy",
+      "Ilhóses bordados para respiração",
+      "Ajuste de 54cm a 62cm"
+    ],
+    "careInstructions": [
+      "Limpar com escova macia seca"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:28.964235+00:00"
+  },
+  {
+    "id": "prod-012",
+    "slug": "beanie-knit-heavy-raw-archive-black",
+    "title": "Gorro Beanie Heavy Knit \"Raw Archive\"",
+    "subtitle": "Tricô Encorpado Duplo | Etiqueta Tecida Frontal",
+    "description": "Toca Beanie de dobra larga confeccionada em acrílico térmico com toque ultra denso. Mantém a cabeça aquecida sem amassar os cabelos.",
+    "price": 99.9,
+    "promoPrice": 89.9,
+    "category": "bones",
+    "subcategory": "Heavy Knit Beanie",
+    "collection": "Core Archive",
+    "tags": [
+      "Oferta"
+    ],
+    "rating": 4.8,
+    "reviewCount": 33,
+    "stockCount": 25,
+    "sku": "AUR-BEN-012-BLK",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#121212",
+        "colorName": "Deep Black"
+      },
+      {
+        "color": "grey",
+        "colorHex": "#77787B",
+        "colorName": "Melange Grey"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "100% Acrílico Térmico Premium",
+      "Modelagem dobrável e adaptável"
+    ],
+    "careInstructions": [
+      "Lavar à mão"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:29.17283+00:00"
+  },
+  {
+    "id": "prod-013",
+    "slug": "shoulder-bag-tactical-modular-black",
+    "title": "Shoulder Bag Tactical Modular \"Crossbody\"",
+    "subtitle": "Nylon Cordura® 1000D | 3 Compartimentos com Zíper",
+    "description": "Bolsa transversal utilitária em Nylon Cordura militar resistente a abrasão e rasgos. Alça regulável e removível com mosquetões em polímero reforçado.",
+    "price": 189.9,
+    "category": "acessorios",
+    "subcategory": "Shoulder & Chest Bags",
+    "collection": "Core Archive",
+    "tags": [
+      "Mais Vendido",
+      "Lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 58,
+    "stockCount": 16,
+    "sku": "AUR-BAG-013-BLK",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#141414",
+        "colorName": "Cordura Black"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Nylon Cordura® 1000D à prova d'água",
+      "Capacidade: 2.5 Litros",
+      "Chaveiro interno com mola"
+    ],
+    "careInstructions": [
+      "Limpar com pano umedecido"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": true,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:29.407385+00:00"
+  },
+  {
+    "id": "prod-014",
+    "slug": "corrente-colar-cuban-chain-316l-silver",
+    "title": "Colar Cuban Link Chain 8mm \"Heavy Stainless\"",
+    "subtitle": "Aço Inoxidável 316L Cirúrgico | Antialérgico",
+    "description": "Corrente modelo Grumet Cuban Link em aço cirúrgico 316L com elos sólidos maciços de 8mm. Não descasca, não enferruja e não escurece com suor ou mar.",
+    "price": 149.9,
+    "promoPrice": 129.9,
+    "category": "acessorios",
+    "subcategory": "Correntes & Colares",
+    "collection": "Core Archive",
+    "tags": [
+      "Oferta"
+    ],
+    "rating": 4.9,
+    "reviewCount": 39,
+    "stockCount": 20,
+    "sku": "AUR-ACC-014-SLV",
+    "sizes": [
+      "50cm",
+      "60cm"
+    ],
+    "colors": [
+      {
+        "color": "silver",
+        "colorHex": "#D1D5DB",
+        "colorName": "Silver Chrome"
+      },
+      {
+        "color": "black",
+        "colorHex": "#27272A",
+        "colorName": "Black Gunmetal"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1611591475179-42cd3428e481?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Aço Inoxidável 316L",
+      "Fecho gaveta com trava dupla de segurança",
+      "Espessura: 8mm"
+    ],
+    "careInstructions": [
+      "Pode ser usado no banho, praia e piscina"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:29.622091+00:00"
+  },
+  {
+    "id": "prod-015",
+    "slug": "meia-cano-alto-pack-3-aura-crew-socks",
+    "title": "Kit 3 Pares Meias Cano Alto \"AURA Crew Socks\"",
+    "subtitle": "Algodão Atoalhado Extra Denso | Cano de 20cm",
+    "description": "Três pares de meias de cano alto com sola atoalhada macia que absorve o impacto da caminhada. Jacquard AURA na parte superior e suporte no arco do pé.",
+    "price": 89.9,
+    "category": "acessorios",
+    "subcategory": "Meias Atoalhadas",
+    "collection": "Core Archive",
+    "tags": [
+      "Mais Vendido"
+    ],
+    "rating": 4.8,
+    "reviewCount": 71,
+    "stockCount": 50,
+    "sku": "AUR-SCK-015-MIX",
+    "sizes": [
+      "38-43"
+    ],
+    "colors": [
+      {
+        "color": "mix",
+        "colorHex": "#555555",
+        "colorName": "Pack Triplo (Preto/Branco/Cinza)"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "78% Algodão / 19% Poliamida / 3% Elastano",
+      "Sola atoalhada anatômica"
+    ],
+    "careInstructions": [
+      "Lavar na máquina em água fria"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:29.84364+00:00"
+  },
+  {
+    "id": "prod-016",
+    "slug": "tenis-chunky-platform-phantom-runner-black",
+    "title": "Tênis Chunky \"Phantom Runner\" Tactical Sole",
+    "subtitle": "Couro Bovino Suede + Solado Tratorado em EVA High-Density",
+    "description": "Silhueta robusta com cabedal multicamadas em camurça genuína, couro nappa e tramas em mesh. Solado tratorado em borracha vulcânica de altíssima tração e palmilha OrthoLite® de 1.5cm.",
+    "price": 649.9,
+    "promoPrice": 549.9,
+    "category": "tenis",
+    "subcategory": "Chunky Platform",
+    "collection": "Footwear Archive 2026",
+    "tags": [
+      "Lançamento",
+      "Exclusivo",
+      "Mais Vendido"
+    ],
+    "rating": 5,
+    "reviewCount": 23,
+    "stockCount": 7,
+    "sku": "AUR-SNK-016-BLK",
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#09090B",
+        "colorName": "Triple Black"
+      },
+      {
+        "color": "bone",
+        "colorHex": "#E5E2DA",
+        "colorName": "Bone & Chalk"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Cabedal em Couro Suede Legítimo e Mesh Reforçado",
+      "Entressola em EVA injetado super macio",
+      "Solado em Borracha Tratorada Antiderrapante",
+      "Passadores de cadarço em metal tático durável"
+    ],
+    "careInstructions": [
+      "Limpar camurça com escova própria e spray protetor de umidade"
+    ],
+    "composition": [],
+    "reviews": [
+      {
+        "id": "rev-7",
+        "date": "09/08/2026",
+        "title": "Estilo incomparável!",
+        "rating": 5,
+        "comment": "Tênis pesado de aparência, mas extremamente leve e macio no pé. O design tratorado chama atenção em qualquer lugar.",
+        "userName": "Vinicius B.",
+        "verifiedPurchase": true
+      }
+    ],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:30.043791+00:00"
+  },
+  {
+    "id": "prod-017",
+    "slug": "slides-chunky-pillow-foam-bone",
+    "title": "Chunky Slides \"Pillow Foam\" Bone White",
+    "subtitle": "Monobloco em EVA Expansivo de alta absorção",
+    "description": "Chinelos Slide estilo futurista com sola plataforma anatômica de 4cm. Projetado para proporcionar sensação de andar nas nuvens.",
+    "price": 199.9,
+    "promoPrice": 169.9,
+    "category": "tenis",
+    "subcategory": "Chunky Slides",
+    "collection": "Summer Drop",
+    "tags": [
+      "Oferta",
+      "Mais Vendido"
+    ],
+    "rating": 4.8,
+    "reviewCount": 41,
+    "stockCount": 15,
+    "sku": "AUR-SLD-017-BNE",
+    "sizes": [
+      "37/38",
+      "39/40",
+      "41/42",
+      "43/44"
+    ],
+    "colors": [
+      {
+        "color": "bone",
+        "colorHex": "#E2DEC8",
+        "colorName": "Bone White"
+      },
+      {
+        "color": "black",
+        "colorHex": "#18181B",
+        "colorName": "Onyx Black"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1603808033192-082d6919d3e1?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Injeção direta EVA cirúrgico",
+      "Sola antiderrapante estriada",
+      "Resistente à água"
+    ],
+    "careInstructions": [
+      "Lavar com água e sabão neutro"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:30.247959+00:00"
+  },
+  {
+    "id": "prod-018",
+    "slug": "camiseta-oversized-acid-skull-vintage-black",
+    "title": "T-Shirt Oversized \"Acid Skull\" Vintage Washed",
+    "subtitle": "Estampa em Relevo | Algodão 240g/m²",
+    "description": "Estampa frontal de crânio estilizado em traço brutalista com acabamento em lavagem estonada. Caimento solto e estruturado.",
+    "price": 179.9,
+    "category": "oversized",
+    "subcategory": "Boxy Fit",
+    "collection": "Vol. 04: Cyber Dystopia",
+    "tags": [
+      "Lançamento"
+    ],
+    "rating": 4.7,
+    "reviewCount": 18,
+    "stockCount": 14,
+    "sku": "AUR-TSH-018-BLK",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#222224",
+        "colorName": "Washed Black"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "100% Algodão Premium",
+      "Silk-screen tátil"
+    ],
+    "careInstructions": [
+      "Lavar à mão"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:30.455138+00:00"
+  },
+  {
+    "id": "prod-019",
+    "slug": "hoodie-zip-oversized-minimal-grey",
+    "title": "Hoodie Zip Oversized \"Essential Studio\" Heather Grey",
+    "subtitle": "Moletom Melange 360g | Design Clean sem estampas",
+    "description": "Moletom cinza mescla sem estampa frontal, focando puramente em modelagem atemporal e qualidade superior da matéria-prima.",
+    "price": 369.9,
+    "promoPrice": 329.9,
+    "category": "moletons",
+    "subcategory": "Crewneck Sweatshirt",
+    "collection": "Core Archive",
+    "tags": [
+      "Oferta"
+    ],
+    "rating": 4.9,
+    "reviewCount": 22,
+    "stockCount": 10,
+    "sku": "AUR-HD-019-GRY",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "grey",
+        "colorHex": "#9E9E9E",
+        "colorName": "Heather Grey"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Moletom 3 cabos 360g",
+      "Interior flanelado"
+    ],
+    "careInstructions": [
+      "Secar à sombra"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:30.653036+00:00"
+  },
+  {
+    "id": "prod-020",
+    "slug": "jaqueta-work-canvas-brutalism-tan",
+    "title": "Work Jacket \"Brutalism Canvas\" Tan Sand",
+    "subtitle": "Lona de Algodão 12oz | Gola em Veludo Cotelê",
+    "description": "Jaqueta utilitária estilo caixa em lona de algodão denso com gola contrastante em veludo cotelê marrom escuro. Zíper de metal maciço e 4 bolsos frontais de carga.",
+    "price": 499.9,
+    "category": "jaquetas",
+    "subcategory": "Work Jacket Canvas",
+    "collection": "Core Archive",
+    "tags": [
+      "Lançamento",
+      "Exclusivo"
+    ],
+    "rating": 4.9,
+    "reviewCount": 14,
+    "stockCount": 6,
+    "sku": "AUR-JCK-020-TAN",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "tan",
+        "colorHex": "#C2B280",
+        "colorName": "Tan Sand"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Lona de Algodão 12oz",
+      "Forro flanelado xadrez"
+    ],
+    "careInstructions": [
+      "Lavagem profissional"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:30.862191+00:00"
+  },
+  {
+    "id": "prod-021",
+    "slug": "calca-cargo-parachute-tech-khaki",
+    "title": "Calça Cargo Parachute Tech \"AERO\" Khaki",
+    "subtitle": "Nylon Tático Leve | Joelhos Articulados",
+    "description": "Calça estilo paraquedas em nylon super macio e resistente. Joelhos com pregas técnicas para articulação fácil.",
+    "price": 339.9,
+    "category": "cargos",
+    "subcategory": "Parachute Cargo",
+    "collection": "Vol. 04: Cyber Dystopia",
+    "tags": [
+      "Lançamento"
+    ],
+    "rating": 4.8,
+    "reviewCount": 19,
+    "stockCount": 11,
+    "sku": "AUR-CRG-021-KHK",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44"
+    ],
+    "colors": [
+      {
+        "color": "khaki",
+        "colorHex": "#BDB395",
+        "colorName": "Khaki Sand"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Nylon Tech leve",
+      "Passantes para mosquetão"
+    ],
+    "careInstructions": [
+      "Não passar a ferro quente"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:31.063898+00:00"
+  },
+  {
+    "id": "prod-022",
+    "slug": "dad-hat-washed-vintage-aura-khaki",
+    "title": "Dad Hat Vintage \"AURA Core\" Washed Khaki",
+    "subtitle": "Sarja 100% Algodão | Aba Curva Tradicional",
+    "description": "Boné modelo Dad Hat desconstruído em sarja de algodão macio estonado. Fivela de ajuste em metal envelhecido.",
+    "price": 119.9,
+    "category": "bones",
+    "subcategory": "Dad Hat Vintage",
+    "collection": "Core Archive",
+    "tags": [
+      "Mais Vendido"
+    ],
+    "rating": 4.8,
+    "reviewCount": 26,
+    "stockCount": 18,
+    "sku": "AUR-CAP-022-KHK",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "khaki",
+        "colorHex": "#C5B39B",
+        "colorName": "Washed Khaki"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "100% Algodão",
+      "Fivela de latão envelhecido"
+    ],
+    "careInstructions": [
+      "Limpar a seco"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:31.273028+00:00"
+  },
+  {
+    "id": "prod-023",
+    "slug": "carteira-leather-tactical-bifold-black",
+    "title": "Carteira Bifold \"Leather Minimalist\" Black",
+    "subtitle": "Couro Bovino Genuíno | Proteção RFID",
+    "description": "Carteira compacta dobrável em couro preto fosco com gravação baixo relevo do logo AURA. Possui bloqueio magnético de RFID contra clonagem de cartões.",
+    "price": 139.9,
+    "promoPrice": 119.9,
+    "category": "acessorios",
+    "subcategory": "Cintos & Carteiras",
+    "collection": "Core Archive",
+    "tags": [
+      "Oferta"
+    ],
+    "rating": 4.9,
+    "reviewCount": 31,
+    "stockCount": 14,
+    "sku": "AUR-WLT-023-BLK",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#121212",
+        "colorName": "Matte Black"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Couro Legítimo",
+      "Proteção RFID",
+      "Cabe 6 cartões + CNH"
+    ],
+    "careInstructions": [
+      "Hidratar o couro anualmente"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:31.490763+00:00"
+  },
+  {
+    "id": "prod-024",
+    "slug": "tenis-skate-leather-retro-court-white-green",
+    "title": "Tênis Retro Court \"AURA Skate Low\" Off-White/Green",
+    "subtitle": "Couro Nappa Premium + Solado Cupsole Costurado",
+    "description": "Silhueta retró clássica dos anos 80 reconstruída com materiais nobres. Cabedal em couro integral off-white com detalhes em verde escuro profundo.",
+    "price": 529.9,
+    "category": "tenis",
+    "subcategory": "Skate Leather",
+    "collection": "Footwear Archive 2026",
+    "tags": [
+      "Lançamento",
+      "Exclusivo"
+    ],
+    "rating": 4.9,
+    "reviewCount": 17,
+    "stockCount": 8,
+    "sku": "AUR-SNK-024-WHT",
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "color": "white",
+        "colorHex": "#F0EFEA",
+        "colorName": "Off White / Dark Green"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Couro Nappa Integral",
+      "Solado Cupsole 100% borracha natural costurado 360°"
+    ],
+    "careInstructions": [
+      "Usar pasta limpa-couro"
+    ],
+    "composition": [],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 20,
+    "length": 25,
+    "isNewRelease": false,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-15T17:16:31.697418+00:00"
+  },
+  {
+    "id": "prod-391816-729",
+    "slug": "camiseta",
+    "title": "Camiseta",
+    "subtitle": "Streetwear Autoral Heavyweight",
+    "description": "Peça exclusiva desenvolvida com malha pesada e acabamento premium.",
+    "price": 199.9,
+    "category": "camisetas",
+    "subcategory": "Geral",
+    "collection": "Vol. 04: Cyber Dystopia",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 40,
+    "sku": "AURA-7634",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorHex": "#181818",
+        "colorName": "Preto Stone"
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80"
+    ],
+    "details": [
+      "100% Algodão Heavyweight 260g/m²",
+      "Gola canelada 3cm"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora",
+      "Secar na sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight 260g/m²",
+      "Modelagem Boxy Fit"
+    ],
+    "reviews": [],
+    "weight": 1,
+    "height": 4,
+    "width": 12,
+    "length": 17,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-17T23:13:12.163341+00:00"
+  }
+]

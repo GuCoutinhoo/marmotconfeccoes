@@ -1,0 +1,146 @@
+[
+  {
+    "id": "camisetas",
+    "slug": "camisetas",
+    "name": "Camisetas",
+    "tagline": "Heavyweight 260g & Boxy Fit",
+    "description": "Camisetas streetwear com cortes ajustados e estampas exclusivas em silk-screen.",
+    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Graphic Tees",
+      "Basic Essential",
+      "Acid Wash",
+      "Vintage Fit"
+    ],
+    "productCount": 14,
+    "order": 0,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:23.476097+00:00"
+  },
+  {
+    "id": "moletons",
+    "slug": "moletons",
+    "name": "Moletons",
+    "tagline": "Hoodies Densos 400g/m²",
+    "description": "Hoodies pesados 400g, toucas duplas, bordados em alto relevo e bolso canguru reforçado.",
+    "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Hoodie Heavy 400g",
+      "Zip Hoodie",
+      "Crewneck Sweatshirt",
+      "Fleece Tactical"
+    ],
+    "productCount": 12,
+    "order": 1,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:23.765237+00:00"
+  },
+  {
+    "id": "jaquetas",
+    "slug": "jaquetas",
+    "name": "Jaquetas",
+    "tagline": "Puffers & Windbreakers",
+    "description": "Puffers, windbreakers impermeáveis e work jackets para sobreposições de alto impacto.",
+    "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Puffer Jacket",
+      "Windbreaker",
+      "Work Jacket Canvas",
+      "Vara Bomber"
+    ],
+    "productCount": 10,
+    "order": 2,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:24.42034+00:00"
+  },
+  {
+    "id": "calcas",
+    "slug": "calcas",
+    "name": "Calças",
+    "tagline": "Baggy Denim & Wide Leg",
+    "description": "Jeans com lavagens vintage, calças wide leg e baggy fit com caimento solto.",
+    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Baggy Denim",
+      "Wide Leg Pants",
+      "Track Pants",
+      "Carpenter Denim"
+    ],
+    "productCount": 11,
+    "order": 3,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:24.987976+00:00"
+  },
+  {
+    "id": "cargos",
+    "slug": "cargos",
+    "name": "Cargos",
+    "tagline": "Utilitárias Ripstop Multi-bolsos",
+    "description": "Cargos táticas multi-bolsos em ripstop, fit utilitário e barras com ajustador em cordão.",
+    "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Ripstop Tactical",
+      "Parachute Cargo",
+      "Multi-pocket Tech",
+      "Relaxed Cargo"
+    ],
+    "productCount": 15,
+    "order": 4,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:25.570533+00:00"
+  },
+  {
+    "id": "shorts",
+    "slug": "shorts",
+    "name": "Shorts",
+    "tagline": "Mesh Basketball & Sweat Shorts",
+    "description": "Shorts em mesh respirável, denim utilitário e moletom pesado para os dias quentes.",
+    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Basketball Mesh Shorts",
+      "Cargo Shorts",
+      "Sweat Shorts Heavy",
+      "Swim Tech"
+    ],
+    "productCount": 8,
+    "order": 5,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:26.168372+00:00"
+  },
+  {
+    "id": "tenis",
+    "slug": "tenis",
+    "name": "Tênis",
+    "tagline": "Sneakers Chunky & Solados Tratorados",
+    "description": "Silhuetas chunky, solados tratorados, slides e sneakers exclusivos para o lifestyle urbano.",
+    "image": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Chunky Platform",
+      "Retro Runner",
+      "Skate Leather",
+      "Chunky Slides"
+    ],
+    "productCount": 10,
+    "order": 6,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:26.408423+00:00"
+  },
+  {
+    "id": "acessorios",
+    "slug": "acessorios",
+    "name": "Acessórios",
+    "tagline": "Shoulder Bags, Correntes & Headwear",
+    "description": "Shoulder bags, correntes em aço inoxidável 316L, meias de algodão atoalhado e cintos.",
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
+    "subcategories": [
+      "Shoulder & Chest Bags",
+      "Correntes & Colares",
+      "Meias Atoalhadas",
+      "Cintos & Carteiras"
+    ],
+    "productCount": 16,
+    "order": 7,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:26.618103+00:00"
+  }
+]

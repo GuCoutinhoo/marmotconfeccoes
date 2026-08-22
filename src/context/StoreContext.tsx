@@ -1,0 +1,568 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { Category, Product } from '../types';
+import {
+  fetchProductsFromSupabaseDirect,
+  fetchCategoriesFromSupabaseDirect,
+  isSupabaseConfigured,
+  supabase,
+} from '../lib/supabaseClient';
+
+interface StoreContextType {
+  categories: Category[];
+  products: Product[];
+  isLoading: boolean;
+  isInitialized: boolean;
+  fetchStoreData: () => Promise<void>;
+  
+  // Category Actions
+  addCategory: (categoryData: Partial<Category>) => Promise<Category>;
+  updateCategory: (id: string, categoryData: Partial<Category>) => Promise<Category>;
+  deleteCategory: (id: string) => Promise<boolean>;
+  reorderCategories: (orderedIds: string[]) => Promise<Category[]>;
+  getCategoryBySlug: (slug: string) => Category | undefined;
+  
+  // Product Actions
+  addProduct: (productData: Partial<Product>) => Promise<Product>;
+  updateProduct: (id: string, productData: Partial<Product>) => Promise<Product>;
+  updateStock: (id: string, stockCount: number) => Promise<void>;
+  deleteProduct: (id: string) => Promise<boolean>;
+  getProductById: (idOrSlug: string) => Product | undefined;
+  
+  // Upload Helper
+  uploadImage: (imageFileOrBase64: File | string, filename?: string) => Promise<string>;
+}
+
+const StoreContext = createContext<StoreContextType | undefined>(undefined);
+
+export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+
+  // Helper to build headers with active auth token
+  const getAuthHeaders = useCallback((isJson = true) => {
+    const token = localStorage.getItem('@marmot_auth_token');
+    const headers: Record<string, string> = {};
+    if (isJson) {
+      headers['Content-Type'] = 'application/json';
+    }
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+      headers['x-admin-token'] = token;
+    }
+    return headers;
+  }, []);
+
+  const fetchStoreData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      let loadedCategories: Category[] = [];
+      let loadedProducts: Product[] = [];
+
+      // Tier 1: Query server API endpoints
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          fetch('/api/categories', { credentials: 'include' }).catch((err) => {
+            console.warn('[Store API] Fetch /api/categories notice:', err);
+            return null;
+          }),
+          fetch('/api/products', { credentials: 'include' }).catch((err) => {
+            console.warn('[Store API] Fetch /api/products notice:', err);
+            return null;
+          }),
+        ]);
+
+        if (catRes && catRes.ok) {
+          const catData = await catRes.json();
+          if (Array.isArray(catData) && catData.length > 0) {
+            loadedCategories = catData;
+          }
+        }
+
+        if (prodRes && prodRes.ok) {
+          const prodData = await prodRes.json();
+          if (prodData && Array.isArray(prodData.products) && prodData.products.length > 0) {
+            loadedProducts = prodData.products;
+          }
+        }
+      } catch (apiError) {
+        console.warn('[Store API] Server API query notice:', apiError);
+      }
+
+      // Tier 2: If products or categories are empty, fetch directly from Supabase client
+      if (loadedProducts.length === 0 || loadedCategories.length === 0) {
+        try {
+          if (loadedProducts.length === 0) {
+            const { products: sbProducts, error: sbProdErr } = await fetchProductsFromSupabaseDirect();
+            if (sbProducts && sbProducts.length > 0) {
+              loadedProducts = sbProducts;
+              console.log(`[Store] Direct Supabase loaded ${sbProducts.length} products.`);
+            } else if (sbProdErr) {
+              console.error('Erro ao carregar produtos do Supabase:', sbProdErr.message || sbProdErr);
+            }
+          }
+
+          if (loadedCategories.length === 0) {
+            const { categories: sbCategories, error: sbCatErr } = await fetchCategoriesFromSupabaseDirect();
+            if (sbCategories && sbCategories.length > 0) {
+              loadedCategories = sbCategories;
+              console.log(`[Store] Direct Supabase loaded ${sbCategories.length} categories.`);
+            } else if (sbCatErr) {
+              console.error('Erro ao carregar categorias do Supabase:', sbCatErr.message || sbCatErr);
+            }
+          }
+        } catch (sbDirectError) {
+          console.error('[Store] Direct Supabase query exception:', sbDirectError);
+        }
+      }
+
+      if (loadedCategories.length > 0) {
+        setCategories(loadedCategories);
+      }
+      if (loadedProducts.length > 0) {
+        setProducts(loadedProducts);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+    } finally {
+      setIsLoading(false);
+      setIsInitialized(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStoreData();
+  }, [fetchStoreData]);
+
+  // Upload helper for real file or base64 to server storage
+  const uploadImage = async (imageFileOrBase64: File | string, filename?: string): Promise<string> => {
+    try {
+      let base64String = '';
+      let fname = filename || 'upload';
+
+      if (typeof imageFileOrBase64 === 'string') {
+        if (imageFileOrBase64.startsWith('http://') || imageFileOrBase64.startsWith('https://')) {
+          return imageFileOrBase64;
+        }
+        if (imageFileOrBase64.startsWith('/uploads/')) {
+          return imageFileOrBase64;
+        }
+        base64String = imageFileOrBase64;
+      } else if (imageFileOrBase64 instanceof File) {
+        fname = imageFileOrBase64.name;
+        base64String = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(imageFileOrBase64);
+        });
+      }
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify({ image: base64String, filename: fname }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Falha no upload' }));
+        throw new Error(errJson.error || 'Falha no upload de imagem');
+      }
+
+      const data = await res.json();
+      return data.url;
+    } catch (error) {
+      console.error('Upload error:', error);
+      throw error;
+    }
+  };
+
+  // ==========================================
+  // Category Actions (Server Authoritative)
+  // ==========================================
+  const addCategory = async (categoryData: Partial<Category>): Promise<Category> => {
+    try {
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(categoryData),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao adicionar categoria' }));
+        throw new Error(errJson.error || 'Erro ao adicionar categoria no servidor');
+      }
+
+      const created: Category = await res.json();
+
+      // Direct Supabase sync
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase.from('categories').upsert({
+            id: created.id,
+            slug: created.slug,
+            name: created.name,
+            tagline: created.tagline,
+            description: created.description,
+            image: created.image,
+            subcategories: created.subcategories,
+            product_count: created.productCount,
+            order: created.order,
+            active: created.active,
+            data: created,
+          });
+        } catch (sbSyncErr) {
+          console.warn('[Store] Supabase category direct sync notice:', sbSyncErr);
+        }
+      }
+
+      setCategories((prev) => {
+        const exists = prev.some((c) => c.id === created.id);
+        if (exists) {
+          return prev.map((c) => (c.id === created.id ? created : c));
+        }
+        return [...prev, created];
+      });
+      return created;
+    } catch (error) {
+      console.error('Add category error:', error);
+      throw error;
+    }
+  };
+
+  const updateCategory = async (id: string, categoryData: Partial<Category>): Promise<Category> => {
+    try {
+      const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(categoryData),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao atualizar categoria' }));
+        throw new Error(errJson.error || 'Erro ao atualizar categoria no servidor');
+      }
+
+      const updated: Category = await res.json();
+
+      // Direct Supabase sync
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase.from('categories').upsert({
+            id: updated.id,
+            slug: updated.slug,
+            name: updated.name,
+            tagline: updated.tagline,
+            description: updated.description,
+            image: updated.image,
+            subcategories: updated.subcategories,
+            product_count: updated.productCount,
+            order: updated.order,
+            active: updated.active,
+            data: updated,
+          });
+        } catch (sbSyncErr) {
+          console.warn('[Store] Supabase category direct sync notice:', sbSyncErr);
+        }
+      }
+
+      setCategories((prev) => prev.map((c) => (c.id === id || c.slug === id ? updated : c)));
+      return updated;
+    } catch (error) {
+      console.error('Update category error:', error);
+      throw error;
+    }
+  };
+
+  const deleteCategory = async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao excluir categoria' }));
+        throw new Error(errJson.error || 'Erro ao excluir categoria');
+      }
+
+      // Direct Supabase sync
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase.from('categories').delete().or(`id.eq.${id},slug.eq.${id}`);
+        } catch (sbSyncErr) {
+          console.warn('[Store] Supabase category direct delete notice:', sbSyncErr);
+        }
+      }
+
+      setCategories((prev) => prev.filter((c) => c.id !== id && c.slug !== id));
+      return true;
+    } catch (error) {
+      console.error('Delete category error:', error);
+      throw error;
+    }
+  };
+
+  const reorderCategories = async (orderedIds: string[]): Promise<Category[]> => {
+    try {
+      const res = await fetch('/api/categories-reorder', {
+        method: 'PUT',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify({ orderedIds }),
+      });
+
+      if (res.ok) {
+        const reordered = await res.json();
+        setCategories(reordered);
+        return reordered;
+      }
+    } catch (error) {
+      console.error('Error reordering categories:', error);
+    }
+
+    // Local sort if network failed
+    const reordered: Category[] = [];
+    orderedIds.forEach((id, idx) => {
+      const found = categories.find((c) => c.id === id || c.slug === id);
+      if (found) reordered.push({ ...found, order: idx });
+    });
+    categories.forEach((c) => {
+      if (!reordered.find((r) => r.id === c.id)) {
+        reordered.push({ ...c, order: reordered.length });
+      }
+    });
+    setCategories(reordered);
+    return reordered;
+  };
+
+  const getCategoryBySlug = (slug: string): Category | undefined => {
+    const clean = slug.toLowerCase().trim();
+    return categories.find((c) => c.slug?.toLowerCase() === clean || c.id?.toLowerCase() === clean);
+  };
+
+  // ==========================================
+  // Product Actions (Server Authoritative)
+  // ==========================================
+  const addProduct = async (productData: Partial<Product>): Promise<Product> => {
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(productData),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao criar produto' }));
+        throw new Error(errJson.error || 'Erro ao criar produto no servidor');
+      }
+
+      const created: Product = await res.json();
+
+      // Direct Supabase sync
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase.from('products').upsert({
+            id: created.id,
+            slug: created.slug,
+            title: created.title,
+            subtitle: created.subtitle,
+            description: created.description,
+            price: created.price,
+            promo_price: created.promoPrice,
+            category: created.category,
+            subcategory: created.subcategory,
+            collection: created.collection,
+            tags: created.tags,
+            rating: created.rating,
+            review_count: created.reviewCount,
+            stock_count: created.stockCount,
+            sku: created.sku,
+            sizes: created.sizes,
+            colors: created.colors,
+            image: created.image,
+            images: created.images,
+            details: created.details,
+            care_instructions: created.careInstructions,
+            composition: created.composition,
+            weight: created.weight,
+            height: created.height,
+            width: created.width,
+            length: created.length,
+            is_new_release: created.isNewRelease,
+            is_best_seller: created.isBestSeller,
+            featured: created.featured,
+            status: created.status,
+            data: created,
+          });
+        } catch (sbSyncErr) {
+          console.warn('[Store] Supabase product direct sync notice:', sbSyncErr);
+        }
+      }
+
+      setProducts((prev) => [created, ...prev]);
+      return created;
+    } catch (error) {
+      console.error('Add product error:', error);
+      throw error;
+    }
+  };
+
+  const updateProduct = async (id: string, productData: Partial<Product>): Promise<Product> => {
+    try {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(productData),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao atualizar produto' }));
+        throw new Error(errJson.error || 'Erro ao atualizar produto no servidor');
+      }
+
+      const updated: Product = await res.json();
+
+      // Direct Supabase sync
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase.from('products').upsert({
+            id: updated.id,
+            slug: updated.slug,
+            title: updated.title,
+            subtitle: updated.subtitle,
+            description: updated.description,
+            price: updated.price,
+            promo_price: updated.promoPrice,
+            category: updated.category,
+            subcategory: updated.subcategory,
+            collection: updated.collection,
+            tags: updated.tags,
+            rating: updated.rating,
+            review_count: updated.reviewCount,
+            stock_count: updated.stockCount,
+            sku: updated.sku,
+            sizes: updated.sizes,
+            colors: updated.colors,
+            image: updated.image,
+            images: updated.images,
+            details: updated.details,
+            care_instructions: updated.careInstructions,
+            composition: updated.composition,
+            weight: updated.weight,
+            height: updated.height,
+            width: updated.width,
+            length: updated.length,
+            is_new_release: updated.isNewRelease,
+            is_best_seller: updated.isBestSeller,
+            featured: updated.featured,
+            status: updated.status,
+            data: updated,
+          });
+        } catch (sbSyncErr) {
+          console.warn('[Store] Supabase product direct update notice:', sbSyncErr);
+        }
+      }
+
+      setProducts((prev) => prev.map((p) => (p.id === id || p.slug === id ? updated : p)));
+      return updated;
+    } catch (error) {
+      console.error('Update product error:', error);
+      throw error;
+    }
+  };
+
+  const updateStock = async (id: string, stockCount: number): Promise<void> => {
+    try {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
+        method: 'PUT',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify({ stockCount }),
+      });
+
+      if (res.ok) {
+        const updated = await res.json();
+        setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, stockCount: updated.stockCount } : p)));
+      }
+    } catch (error) {
+      console.error('Update stock error:', error);
+      setProducts((prev) => prev.map((p) => (p.id === id ? { ...p, stockCount } : p)));
+    }
+  };
+
+  const deleteProduct = async (id: string): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao excluir produto' }));
+        throw new Error(errJson.error || 'Erro ao excluir produto');
+      }
+
+      // Direct Supabase sync
+      if (isSupabaseConfigured()) {
+        try {
+          await supabase.from('products').delete().or(`id.eq.${id},slug.eq.${id}`);
+        } catch (sbSyncErr) {
+          console.warn('[Store] Supabase product direct delete notice:', sbSyncErr);
+        }
+      }
+
+      setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
+      return true;
+    } catch (error) {
+      console.error('Delete product error:', error);
+      throw error;
+    }
+  };
+
+  const getProductById = (idOrSlug: string): Product | undefined => {
+    const clean = idOrSlug.toLowerCase().trim();
+    return products.find((p) => p.id?.toLowerCase() === clean || p.slug?.toLowerCase() === clean);
+  };
+
+  return (
+    <StoreContext.Provider
+      value={{
+        categories,
+        products,
+        isLoading,
+        isInitialized,
+        fetchStoreData,
+        addCategory,
+        updateCategory,
+        deleteCategory,
+        reorderCategories,
+        getCategoryBySlug,
+        addProduct,
+        updateProduct,
+        updateStock,
+        deleteProduct,
+        getProductById,
+        uploadImage,
+      }}
+    >
+      {children}
+    </StoreContext.Provider>
+  );
+};
+
+export const useStore = () => {
+  const context = useContext(StoreContext);
+  if (!context) {
+    throw new Error('useStore must be used within a StoreProvider');
+  }
+  return context;
+};
