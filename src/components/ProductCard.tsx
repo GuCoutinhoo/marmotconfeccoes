@@ -36,14 +36,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleQuickAddSize = (e: React.MouseEvent, size: string) => {
     e.stopPropagation();
-    addToCart(product, size, product.colors[0], 1);
-    setAddedSize(size);
-    showToast(
-      'Adicionado ao Carrinho',
-      `${product.title} (Tam. ${size}) foi adicionado.`,
-      'success'
-    );
-    setTimeout(() => setAddedSize(null), 1800);
+    const added = addToCart(product, size, product.colors[0], 1);
+    if (added) {
+      setAddedSize(size);
+      setTimeout(() => setAddedSize(null), 1800);
+    }
   };
 
   return (

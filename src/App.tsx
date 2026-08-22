@@ -91,6 +91,16 @@ export function AppContent() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  // Listen to global require-auth event to direct user to account login/register
+  useEffect(() => {
+    const handleRequireAuth = () => {
+      handleNavigate('account', 'login');
+    };
+
+    window.addEventListener('marmot:require-auth', handleRequireAuth);
+    return () => window.removeEventListener('marmot:require-auth', handleRequireAuth);
+  }, []);
+
   // Scroll to top on navigation
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

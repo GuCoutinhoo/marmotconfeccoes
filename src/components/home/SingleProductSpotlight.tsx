@@ -32,15 +32,11 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   const productImage = product.images?.[0] || (product as any).image || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80';
 
   const handleAddToCart = () => {
-    addToCart(product, selectedSize, selectedColor);
-    setAdded(true);
-    showToast(
-      'Adicionado ao Carrinho',
-      `${product.title} (${selectedSize}) foi adicionado com sucesso.`,
-      'success'
-    );
-    openMiniCart();
-    setTimeout(() => setAdded(false), 2500);
+    const success = addToCart(product, selectedSize, selectedColor);
+    if (success) {
+      setAdded(true);
+      setTimeout(() => setAdded(false), 2500);
+    }
   };
 
   const effectivePrice = product.promoPrice || product.price;

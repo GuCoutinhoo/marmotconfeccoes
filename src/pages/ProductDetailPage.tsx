@@ -117,12 +117,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   const handleAddToCart = () => {
     addToCart(product, selectedSize, selectedColor, quantity);
-    showToast(
-      'Adicionado ao Carrinho',
-      `${quantity}x ${product.title} (${selectedSize}) foi adicionado com sucesso.`,
-      'success'
-    );
-    openMiniCart();
   };
 
   const handleToggleWishlist = () => {

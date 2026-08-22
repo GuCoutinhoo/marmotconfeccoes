@@ -43,11 +43,12 @@ export const BundleOutfitBuilder: React.FC<BundleOutfitBuilderProps> = ({
   const finalTotal = originalTotal - discountValue;
 
   const handleAddBundleToCart = () => {
-    activeItems.forEach((item) => {
+    for (const item of activeItems) {
       const defaultSize = item.sizes?.[0] || 'M';
       const defaultColor = item.colors?.[0] || { colorName: 'Black', color: 'black', hex: '#111111' };
-      addToCart(item, defaultSize, defaultColor);
-    });
+      const success = addToCart(item, defaultSize, defaultColor);
+      if (!success) break;
+    }
   };
 
   return (

@@ -22,7 +22,7 @@ interface CartContextData {
   cartItems: CartItem[];
   cartHydrated: boolean;
   isHydrated: boolean;
-  addToCart: (product: Product, selectedSize: string, selectedColor: ProductVariant, quantity?: number) => void;
+  addToCart: (product: Product, selectedSize: string, selectedColor: ProductVariant, quantity?: number) => boolean;
   removeFromCart: (productId: string, size: string, colorName: string) => void;
   updateQuantity: (productId: string, size: string, colorName: string, quantity: number) => void;
   clearCart: () => void;
@@ -54,6 +54,8 @@ interface CartContextData {
   resetShipping: () => void;
   shippingFee: number;
   grandTotal: number;
+  // Auth redirection trigger for cart
+  triggerAuthRequired: (pendingItem?: { product: Product; size: string; color: ProductVariant; quantity: number }) => void;
 }
 
 const CartContext = createContext<CartContextData>({} as CartContextData);
@@ -111,7 +113,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const { showToast } = useToast();
 
-  // Load and synchronize cart strictly per authenticated user vs guest
+  // Load and synchronize cart strictly for authenticated user (Supabase as Source of Truth)
   useEffect(() => {
     let isCancelled = false;
 
@@ -124,38 +126,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const currentUserId = user.id;
         const activeToken = token || localStorage.getItem('@marmot_auth_token');
 
-        // 1. If legitimate guest items exist in localStorage from prior unauthenticated session, merge them into Supabase
-        let guestItems: CartItem[] = [];
+        // Check if there are any pending items to add after login
+        let pendingItemToAdd: { product: Product; selectedSize: string; selectedColor: ProductVariant; quantity: number } | null = null;
         try {
-          const guestRaw = localStorage.getItem('@aura_guest_cart');
-          if (guestRaw) {
-            const parsed = JSON.parse(guestRaw);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              guestItems = parsed;
-            }
+          const pendingRaw = sessionStorage.getItem('@aura_pending_add_to_cart');
+          if (pendingRaw) {
+            sessionStorage.removeItem('@aura_pending_add_to_cart');
+            pendingItemToAdd = JSON.parse(pendingRaw);
           }
         } catch {}
 
-        if (guestItems.length > 0) {
-          try {
-            await mergeGuestCartIntoSupabase(currentUserId, guestItems);
-            fetch('/api/cart/merge', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
-              },
-              body: JSON.stringify({ items: guestItems }),
-            }).catch(() => {});
-          } catch (err) {
-            console.warn('[Cart] Guest merge error:', err);
-          } finally {
-            localStorage.removeItem('@aura_guest_cart');
-            localStorage.removeItem('@aura_cart');
-          }
-        }
-
-        // 2. Fetch authenticated user's latest cart directly from Supabase (Source of Truth)
+        // 1. Fetch authenticated user's latest cart directly from Supabase (Source of Truth)
         let loadedCart: CartItem[] = [];
         try {
           const directSupabaseCart = await fetchUserCartFromSupabase(currentUserId);
@@ -166,7 +147,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           console.warn('[Cart] Direct Supabase fetch warning:', sbErr);
         }
 
-        // 3. Fallback to backend /api/cart if direct Supabase fetch returned empty
+        // 2. Fallback to backend /api/cart if direct Supabase fetch returned empty
         if (!loadedCart || loadedCart.length === 0) {
           try {
             const res = await fetch('/api/cart', {
@@ -185,7 +166,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         }
 
-        // 4. Fallback to user-isolated localStorage cached cart
+        // 3. Fallback to user-isolated localStorage cached cart
         if (!loadedCart || loadedCart.length === 0) {
           try {
             const cached = localStorage.getItem(`@aura_cart_${currentUserId}`);
@@ -193,7 +174,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
               const parsed = JSON.parse(cached);
               if (Array.isArray(parsed) && parsed.length > 0) {
                 loadedCart = parsed;
-                // Re-sync to database and Supabase in background
+                // Re-sync to Supabase in background
                 for (const itm of parsed) {
                   saveCartItemToSupabase(currentUserId, itm);
                 }
@@ -202,32 +183,60 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } catch {}
         }
 
+        let finalCart = loadedCart || [];
+
+        // If a pending item was queued prior to authentication, add it now
+        if (pendingItemToAdd && pendingItemToAdd.product) {
+          const existingIdx = finalCart.findIndex(
+            (i) =>
+              i.product.id === pendingItemToAdd!.product.id &&
+              i.selectedSize === pendingItemToAdd!.selectedSize &&
+              (i.selectedColor.colorName === pendingItemToAdd!.selectedColor.colorName ||
+                i.selectedColor.color === pendingItemToAdd!.selectedColor.color)
+          );
+
+          if (existingIdx > -1) {
+            finalCart = [...finalCart];
+            finalCart[existingIdx] = {
+              ...finalCart[existingIdx],
+              quantity: finalCart[existingIdx].quantity + (pendingItemToAdd.quantity || 1),
+            };
+          } else {
+            const newItem: CartItem = {
+              product: pendingItemToAdd.product,
+              selectedSize: pendingItemToAdd.selectedSize,
+              selectedColor: pendingItemToAdd.selectedColor,
+              quantity: pendingItemToAdd.quantity || 1,
+            };
+            finalCart = [...finalCart, newItem];
+            saveCartItemToSupabase(currentUserId, newItem);
+          }
+
+          try {
+            showToast(
+              'Item Adicionado ao Carrinho!',
+              `${pendingItemToAdd.product.title} (${pendingItemToAdd.selectedSize}) foi incluído após o login.`,
+              'success'
+            );
+            setIsMiniCartOpen(true);
+          } catch {}
+        }
+
         if (!isCancelled) {
-          const finalCart = loadedCart || [];
           setCart(finalCart);
           localStorage.setItem(`@aura_cart_${currentUserId}`, JSON.stringify(finalCart));
           isHydratingRef.current = false;
           setCartHydrated(true);
         }
       } else {
-        // User logged out or guest browsing:
-        // Clear in-memory user state and load guest cart if present
+        // User logged out or unauthenticated visitor:
+        // Clear in-memory cart state completely. NO anonymous/guest persistence.
         activeUserIdRef.current = null;
+        localStorage.removeItem('@aura_guest_cart');
         localStorage.removeItem('@aura_cart');
 
-        let guestItems: CartItem[] = [];
-        try {
-          const guestSaved = localStorage.getItem('@aura_guest_cart');
-          if (guestSaved) {
-            const parsed = JSON.parse(guestSaved);
-            if (Array.isArray(parsed)) {
-              guestItems = parsed;
-            }
-          }
-        } catch {}
-
         if (!isCancelled) {
-          setCart(guestItems);
+          setCart([]);
           isHydratingRef.current = false;
           setCartHydrated(true);
         }
@@ -241,16 +250,47 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, [user?.id, token]);
 
-  // Persist cart to user-isolated storage or guest storage ONLY when hydration is complete
+  // Persist cart to user-isolated storage ONLY when authenticated and hydration is complete
   useEffect(() => {
     if (!cartHydrated || isHydratingRef.current) return;
 
     if (user?.id && activeUserIdRef.current === user.id) {
       localStorage.setItem(`@aura_cart_${user.id}`, JSON.stringify(cart));
-    } else if (!user && activeUserIdRef.current === null) {
-      localStorage.setItem('@aura_guest_cart', JSON.stringify(cart));
     }
   }, [cart, cartHydrated, user?.id]);
+
+  // Trigger login/signup modal or page when authentication is required for cart/checkout
+  const triggerAuthRequired = useCallback((pendingItem?: { product: Product; size: string; color: ProductVariant; quantity: number }) => {
+    if (pendingItem) {
+      try {
+        sessionStorage.setItem(
+          '@aura_pending_add_to_cart',
+          JSON.stringify({
+            product: pendingItem.product,
+            selectedSize: pendingItem.size,
+            selectedColor: pendingItem.color,
+            quantity: pendingItem.quantity,
+          })
+        );
+      } catch {}
+    }
+
+    showToast(
+      'Login Obrigatório',
+      'Faça login ou crie sua conta para adicionar produtos ao carrinho.',
+      'info'
+    );
+
+    // Dispatch global custom event and navigate to account login
+    window.dispatchEvent(
+      new CustomEvent('marmot:require-auth', {
+        detail: {
+          action: 'add_to_cart',
+          message: 'Faça login ou crie sua conta para comprar.',
+        },
+      })
+    );
+  }, [showToast]);
 
   useEffect(() => {
     if (appliedCoupon) {
@@ -426,7 +466,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [cart, shippingPostalCode]
   );
 
-  const addToCart = (product: Product, selectedSize: string, selectedColor: ProductVariant, quantity = 1) => {
+  const addToCart = (product: Product, selectedSize: string, selectedColor: ProductVariant, quantity = 1): boolean => {
+    // 1. Strict Authentication Enforcement: Unauthenticated visitors cannot add items to the cart
+    if (!user || !user.id) {
+      triggerAuthRequired({ product, size: selectedSize, color: selectedColor, quantity });
+      return false;
+    }
+
     // Invalidate old quotes when cart content changes
     setSelectedShippingState(null);
     setShippingOptions([]);
@@ -491,6 +537,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       'success'
     );
     setIsMiniCartOpen(true);
+    return true;
   };
 
   const removeFromCart = (productId: string, size: string, colorName: string) => {
@@ -703,6 +750,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setShippingPostalCode,
         shippingFee,
         grandTotal,
+        triggerAuthRequired,
       }}
     >
       {children}

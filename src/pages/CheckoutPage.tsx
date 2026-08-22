@@ -55,8 +55,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const cartDiscount = discountAmount || 0;
   const isFreeShipping = cartSubtotal >= 399;
 
-  const { user, addOrder, addAddress } = useAuth();
+  const { user, addOrder, addAddress, isLoading: authLoading } = useAuth();
   const { showToast } = useToast();
+
+  // Strict Authentication Guard: Unauthenticated visitors cannot access Checkout
+  useEffect(() => {
+    if (!authLoading && !user) {
+      showToast('Login Obrigatório', 'Faça login ou crie uma conta para finalizar sua compra.', 'info');
+      onNavigate('account', 'login');
+    }
+  }, [user, authLoading, onNavigate, showToast]);
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loadingCepLookup, setLoadingCepLookup] = useState(false);

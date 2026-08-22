@@ -36,8 +36,10 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
   const effectivePrice = product.promoPrice || product.price;
 
   const handleAddToCart = () => {
-    addToCart(product, selectedSize, selectedColor, 1);
-    onClose();
+    const success = addToCart(product, selectedSize, selectedColor, 1);
+    if (success) {
+      onClose();
+    }
   };
 
   return (
