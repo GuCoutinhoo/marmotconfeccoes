@@ -41,7 +41,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
           <div className="max-w-[840px] lg:max-w-[1060px] xl:max-w-[1240px] flex flex-col items-start">
             
             {/* 1. Badge - Scaled Up with Crisp Editorial Presence */}
-            <div className="inline-flex items-center gap-3 px-4.5 py-2 sm:py-2.5 rounded-full bg-[#141418]/95 border border-[#2E2E3C] backdrop-blur-md min-h-[38px] sm:min-h-[42px] shadow-lg">
+            <div className="inline-flex items-center gap-3 px-4.5 py-2 sm:py-2.5 bg-[#141418]/95 border border-[#2E2E3C] backdrop-blur-md min-h-[38px] sm:min-h-[42px] shadow-lg">
               <span className="w-2.5 h-2.5 rounded-full bg-[#F4C400] shrink-0 animate-pulse shadow-[0_0_8px_rgba(244,196,0,0.6)]" />
               <span className="text-[12.5px] sm:text-[14px] font-mono font-bold tracking-[0.22em] uppercase text-[#F4C400]">
                 COLEÇÃO 2026
@@ -89,7 +89,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
             <div className="mt-8 sm:mt-9 lg:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-5 w-full sm:w-auto">
               <button
                 onClick={() => onNavigate('shop')}
-                className="h-[58px] sm:h-[64px] px-9 sm:px-11 rounded-xl bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] font-black text-sm sm:text-[16px] uppercase tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(244,196,0,0.35)] hover:shadow-[0_0_30px_rgba(244,196,0,0.6)] hover:scale-[1.02] active:scale-[0.98] group shrink-0 cursor-pointer border border-[#FFF080]/40"
+                className="h-[58px] sm:h-[64px] px-9 sm:px-11 bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] font-black text-sm sm:text-[16px] uppercase tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-3 shadow-[0_6px_24px_rgba(244,196,0,0.35)] hover:shadow-[0_0_30px_rgba(244,196,0,0.6)] hover:scale-[1.02] active:scale-[0.98] group shrink-0 cursor-pointer border border-[#FFF080]/40"
               >
                 <span>EXPLORAR O DROP</span>
                 <ArrowRight className="w-4.5 h-4.5 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -97,7 +97,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
 
               <button
                 onClick={() => onNavigate('shop', 'oversized')}
-                className="h-[58px] sm:h-[64px] px-8 sm:px-10 rounded-xl bg-[#14141A]/90 hover:bg-[#1E1E26] text-[#F5F5F3] hover:text-white border border-[#323242] hover:border-[#F4C400]/60 font-bold text-sm sm:text-[16px] uppercase tracking-[0.09em] transition-all duration-200 flex items-center justify-center backdrop-blur-md shrink-0 cursor-pointer shadow-md active:scale-[0.98]"
+                className="h-[58px] sm:h-[64px] px-8 sm:px-10 bg-[#14141A]/90 hover:bg-[#1E1E26] text-[#F5F5F3] hover:text-white border border-[#323242] hover:border-[#F4C400]/60 font-bold text-sm sm:text-[16px] uppercase tracking-[0.09em] transition-all duration-200 flex items-center justify-center backdrop-blur-md shrink-0 cursor-pointer shadow-md active:scale-[0.98]"
               >
                 <span>VER CAMISETAS & MOLETONS</span>
               </button>

@@ -14,10 +14,16 @@ import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 // =========================================================================
 
 export interface ProductVariant {
+  id?: string;
   color: string;
   colorName: string;
   colorHex: string;
   image?: string;
+  featuredImage?: string;
+  images?: string[];
+  sku?: string;
+  stockCount?: number;
+  sizes?: string[];
 }
 
 export interface Review {
@@ -649,9 +655,36 @@ const INITIAL_CORE_PRODUCTS: Product[] = [
     sku: 'AUR-TSH-001-BLK',
     sizes: ['P', 'M', 'G', 'GG', 'XG'],
     colors: [
-      { color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' },
-      { color: 'grey', colorName: 'Washed Charcoal', colorHex: '#3A3A3C' },
-      { color: 'white', colorName: 'Raw Bone', colorHex: '#F0EFEA' }
+      {
+        color: 'black',
+        colorName: 'Obsidian Black',
+        colorHex: '#121212',
+        featuredImage: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
+          'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80'
+        ]
+      },
+      {
+        color: 'grey',
+        colorName: 'Washed Charcoal',
+        colorHex: '#3A3A3C',
+        featuredImage: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80',
+          'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80'
+        ]
+      },
+      {
+        color: 'white',
+        colorName: 'Raw Bone (Branco)',
+        colorHex: '#F0EFEA',
+        featuredImage: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80',
+          'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=1000&q=80'
+        ]
+      }
     ],
     image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
     images: [
@@ -693,9 +726,36 @@ const INITIAL_CORE_PRODUCTS: Product[] = [
     sku: 'AUR-HD-002-GRY',
     sizes: ['P', 'M', 'G', 'GG'],
     colors: [
-      { color: 'grey', colorName: 'Raw Concrete Grey', colorHex: '#7D7D7D' },
-      { color: 'black', colorName: 'Pitch Black', colorHex: '#0A0A0A' },
-      { color: 'beige', colorName: 'Desert Dune', colorHex: '#C2B69D' }
+      {
+        color: 'grey',
+        colorName: 'Raw Concrete Grey',
+        colorHex: '#7D7D7D',
+        featuredImage: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
+          'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=1000&q=80'
+        ]
+      },
+      {
+        color: 'black',
+        colorName: 'Pitch Black',
+        colorHex: '#0A0A0A',
+        featuredImage: 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80',
+          'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80'
+        ]
+      },
+      {
+        color: 'beige',
+        colorName: 'Desert Dune (Bege)',
+        colorHex: '#C2B69D',
+        featuredImage: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1000&q=80',
+          'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1000&q=80'
+        ]
+      }
     ],
     image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
     images: [
@@ -1068,7 +1128,29 @@ export class DatabaseManager {
       stockCount: typeof item.stock_count === 'number' ? item.stock_count : parseInt(item.stock_count || d.stockCount || 20, 10),
       sku: item.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
       sizes: Array.isArray(item.sizes) && item.sizes.length > 0 ? item.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
-      colors: Array.isArray(item.colors) && item.colors.length > 0 ? item.colors : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]),
+      colors: (() => {
+        const rawColors = Array.isArray(item.colors) && item.colors.length > 0
+          ? item.colors
+          : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
+        return rawColors.map((c: any) => {
+          const variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
+            ? c.images
+            : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
+          const featured = c.featuredImage || variantImages[0] || c.image || '';
+          return {
+            id: c.id,
+            color: c.color || 'default',
+            colorName: c.colorName || 'Cor Única',
+            colorHex: c.colorHex || '#000000',
+            image: featured,
+            featuredImage: featured,
+            images: variantImages,
+            sku: c.sku,
+            stockCount: c.stockCount,
+            sizes: c.sizes,
+          };
+        });
+      })(),
       image: item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '',
       images: Array.isArray(item.images) && item.images.length > 0 ? item.images : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (item.image ? [item.image] : (d.image ? [d.image] : []))),
       details: Array.isArray(item.details) ? item.details : (Array.isArray(d.details) ? d.details : ['100% Algodão Heavyweight']),
@@ -1546,8 +1628,37 @@ export class DatabaseManager {
 
   public async getProductById(idOrSlug: string): Promise<Product | null> {
     await this.initialize();
-    const clean = idOrSlug.trim();
-    return this.products.find((p) => p.id === clean || p.slug === clean) || null;
+    if (!idOrSlug) return null;
+    const clean = String(idOrSlug).trim();
+    const lower = clean.toLowerCase();
+
+    let prod = this.products.find((p) => 
+      p.id === clean || 
+      p.slug === clean || 
+      p.id?.toLowerCase() === lower || 
+      p.slug?.toLowerCase() === lower
+    );
+
+    if (!prod && this.mode === 'supabase') {
+      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (adminClient) {
+        try {
+          const { data, error } = await adminClient
+            .from('products')
+            .select('*')
+            .or(`id.eq.${clean},slug.eq.${clean}`)
+            .limit(1);
+
+          if (!error && data && data.length > 0) {
+            prod = this.mapSupabaseProduct(data[0]);
+            this.products.unshift(prod);
+            this.writeJsonFile(PRODUCTS_FILE, this.products);
+          }
+        } catch {}
+      }
+    }
+
+    return prod || null;
   }
 
   public async createProduct(productData: Partial<Product>): Promise<Product> {
@@ -1683,8 +1794,34 @@ export class DatabaseManager {
 
   public async updateProduct(idOrSlug: string, updates: Partial<Product>): Promise<Product> {
     await this.initialize();
+    const clean = String(idOrSlug).trim();
+    const lower = clean.toLowerCase();
 
-    const idx = this.products.findIndex((p) => p.id === idOrSlug || p.slug === idOrSlug);
+    let idx = this.products.findIndex((p) => 
+      p.id === clean || 
+      p.slug === clean || 
+      p.id?.toLowerCase() === lower || 
+      p.slug?.toLowerCase() === lower
+    );
+
+    if (idx === -1 && this.mode === 'supabase') {
+      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (adminClient) {
+        try {
+          const { data, error } = await adminClient
+            .from('products')
+            .select('*')
+            .or(`id.eq.${clean},slug.eq.${clean}`)
+            .limit(1);
+          if (!error && data && data.length > 0) {
+            const loaded = this.mapSupabaseProduct(data[0]);
+            this.products.unshift(loaded);
+            idx = 0;
+          }
+        } catch {}
+      }
+    }
+
     if (idx === -1) {
       throw new Error(`Produto não encontrado para "${idOrSlug}"`);
     }
@@ -1788,7 +1925,34 @@ export class DatabaseManager {
 
   public async updateProductStock(id: string, stockCount: number): Promise<Product> {
     await this.initialize();
-    const idx = this.products.findIndex((p) => p.id === id);
+    const clean = String(id).trim();
+    const lower = clean.toLowerCase();
+
+    let idx = this.products.findIndex((p) => 
+      p.id === clean || 
+      p.slug === clean || 
+      p.id?.toLowerCase() === lower || 
+      p.slug?.toLowerCase() === lower
+    );
+
+    if (idx === -1 && this.mode === 'supabase') {
+      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (adminClient) {
+        try {
+          const { data, error } = await adminClient
+            .from('products')
+            .select('*')
+            .or(`id.eq.${clean},slug.eq.${clean}`)
+            .limit(1);
+          if (!error && data && data.length > 0) {
+            const loaded = this.mapSupabaseProduct(data[0]);
+            this.products.unshift(loaded);
+            idx = 0;
+          }
+        } catch {}
+      }
+    }
+
     if (idx === -1) throw new Error(`Produto #${id} não encontrado.`);
 
     const current = this.products[idx];
@@ -1808,7 +1972,7 @@ export class DatabaseManager {
           stock_count: newStock,
           status: status,
           data: updated,
-        }).eq('id', id);
+        }).eq('id', current.id);
 
         if (error) {
           console.error('[DB] Supabase stock update error:', error);
@@ -1825,14 +1989,18 @@ export class DatabaseManager {
 
   public async deleteProduct(id: string): Promise<boolean> {
     await this.initialize();
-    const initialLen = this.products.length;
-    const exists = this.products.some((p) => p.id === id || p.slug === id);
-    if (!exists) return false;
+    const cleanId = String(id || '').trim();
+    if (!cleanId) return false;
+
+    const lowerId = cleanId.toLowerCase();
 
     if (this.mode === 'supabase') {
       const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
       if (adminClient) {
-        const { error } = await adminClient.from('products').delete().or(`id.eq.${id},slug.eq.${id}`);
+        const { error } = await adminClient
+          .from('products')
+          .delete()
+          .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
         if (error) {
           console.error('[DB] Supabase delete product error:', error);
           throw new Error(`Falha ao excluir produto no Supabase: ${error.message}`);
@@ -1840,7 +2008,12 @@ export class DatabaseManager {
       }
     }
 
-    this.products = this.products.filter((p) => p.id !== id && p.slug !== id);
+    this.products = this.products.filter((p) => 
+      p.id !== cleanId && 
+      p.slug !== cleanId && 
+      p.id?.toLowerCase() !== lowerId && 
+      p.slug?.toLowerCase() !== lowerId
+    );
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
     return true;
@@ -1922,13 +2095,41 @@ export class DatabaseManager {
 
   public async updateCategory(id: string, updates: Partial<Category>): Promise<Category> {
     await this.initialize();
-    const idx = this.categories.findIndex((c) => c.id === id || c.slug === id);
+    const cleanId = String(id || '').trim();
+    const lowerId = cleanId.toLowerCase();
+
+    let idx = this.categories.findIndex((c) => 
+      c.id === cleanId || 
+      c.slug === cleanId || 
+      c.id?.toLowerCase() === lowerId || 
+      c.slug?.toLowerCase() === lowerId
+    );
+
+    if (idx === -1 && this.mode === 'supabase') {
+      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (adminClient) {
+        try {
+          const { data, error } = await adminClient
+            .from('categories')
+            .select('*')
+            .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
+            .limit(1);
+          if (!error && data && data.length > 0) {
+            const loaded = this.mapSupabaseCategory(data[0]);
+            this.categories.push(loaded);
+            idx = this.categories.length - 1;
+          }
+        } catch {}
+      }
+    }
+
     if (idx === -1) throw new Error(`Categoria "${id}" não encontrada.`);
 
+    const current = this.categories[idx];
     const updated = {
-      ...this.categories[idx],
+      ...current,
       ...updates,
-      id: this.categories[idx].id,
+      id: current.id,
     };
 
     if (this.mode === 'supabase') {
@@ -1962,14 +2163,15 @@ export class DatabaseManager {
 
   public async deleteCategory(id: string): Promise<boolean> {
     await this.initialize();
-    const initLen = this.categories.length;
-    const exists = this.categories.some((c) => c.id === id || c.slug === id);
-    if (!exists) return false;
+    const cleanId = String(id || '').trim();
+    if (!cleanId) return false;
+
+    const lowerId = cleanId.toLowerCase();
 
     if (this.mode === 'supabase') {
       const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
       if (adminClient) {
-        const { error } = await adminClient.from('categories').delete().or(`id.eq.${id},slug.eq.${id}`);
+        const { error } = await adminClient.from('categories').delete().or(`id.eq.${cleanId},slug.eq.${cleanId}`);
         if (error) {
           console.error('[DB] Supabase category delete error:', error);
           throw new Error(`Falha ao excluir categoria no Supabase: ${error.message}`);
@@ -1977,11 +2179,15 @@ export class DatabaseManager {
       }
     }
 
-    this.categories = this.categories.filter((c) => c.id !== id && c.slug !== id);
+    this.categories = this.categories.filter((c) => 
+      c.id !== cleanId && 
+      c.slug !== cleanId &&
+      c.id?.toLowerCase() !== lowerId &&
+      c.slug?.toLowerCase() !== lowerId
+    );
     this.categories.forEach((c, idx) => {
       c.order = idx;
     });
-
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
     return true;
@@ -5132,7 +5338,8 @@ app.get('/api/products', async (req, res) => {
 
 app.get('/api/products/:id', async (req, res) => {
   try {
-    const product = await db.getProductById(req.params.id);
+    const cleanId = decodeURIComponent(req.params.id || '').trim();
+    const product = await db.getProductById(cleanId);
     if (!product) {
       return res.status(404).json({ error: 'Produto não encontrado no catálogo.' });
     }
@@ -5158,7 +5365,8 @@ app.post('/api/products', requireAdmin, async (req: any, res) => {
 
 app.put('/api/products/:id', requireAdmin, async (req: any, res) => {
   try {
-    const updated = await db.updateProduct(req.params.id, req.body);
+    const cleanId = decodeURIComponent(req.params.id || '').trim();
+    const updated = await db.updateProduct(cleanId, req.body);
     res.json(updated);
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Erro ao atualizar produto.' });
@@ -5171,7 +5379,8 @@ app.put('/api/products/:id/stock', requireAdmin, async (req, res) => {
     if (stockCount === undefined) {
       return res.status(400).json({ error: 'O campo stockCount é obrigatório.' });
     }
-    const updated = await db.updateProductStock(req.params.id, parseInt(stockCount, 10));
+    const cleanId = decodeURIComponent(req.params.id || '').trim();
+    const updated = await db.updateProductStock(cleanId, parseInt(stockCount, 10));
     res.json(updated);
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Erro ao atualizar saldo de estoque.' });
@@ -5180,7 +5389,11 @@ app.put('/api/products/:id/stock', requireAdmin, async (req, res) => {
 
 app.delete('/api/products/:id', requireAdmin, async (req: any, res) => {
   try {
-    const success = await db.deleteProduct(req.params.id);
+    const cleanId = decodeURIComponent(req.params.id || '').trim();
+    if (!cleanId) {
+      return res.status(400).json({ error: 'ID do produto é obrigatório.' });
+    }
+    const success = await db.deleteProduct(cleanId);
     if (!success) {
       return res.status(404).json({ error: 'Produto não encontrado para exclusão.' });
     }
@@ -5202,7 +5415,8 @@ app.get('/api/categories', async (req, res) => {
 
 app.get('/api/categories/:id', async (req, res) => {
   try {
-    const category = await db.getCategoryById(req.params.id);
+    const cleanId = decodeURIComponent(req.params.id || '').trim();
+    const category = await db.getCategoryById(cleanId);
     if (!category) return res.status(404).json({ error: 'Categoria não encontrada.' });
     res.json(category);
   } catch {
@@ -5221,7 +5435,8 @@ app.post('/api/categories', requireAdmin, async (req, res) => {
 
 app.put('/api/categories/:id', requireAdmin, async (req, res) => {
   try {
-    const updated = await db.updateCategory(req.params.id, req.body);
+    const cleanId = decodeURIComponent(req.params.id || '').trim();
+    const updated = await db.updateCategory(cleanId, req.body);
     res.json(updated);
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Erro ao atualizar categoria.' });
@@ -5243,7 +5458,8 @@ app.put('/api/categories-reorder', requireAdmin, async (req, res) => {
 
 app.delete('/api/categories/:id', requireAdmin, async (req, res) => {
   try {
-    const success = await db.deleteCategory(req.params.id);
+    const cleanId = decodeURIComponent(req.params.id || '').trim();
+    const success = await db.deleteCategory(cleanId);
     if (!success) return res.status(404).json({ error: 'Categoria não encontrada.' });
     res.json({ success: true, message: 'Categoria excluída com sucesso.' });
   } catch (error: any) {

@@ -49,7 +49,29 @@ export function mapSupabaseRowToProduct(row: any): Product {
     stockCount: typeof row.stock_count === 'number' ? row.stock_count : parseInt(row.stock_count || d.stockCount || 20, 10),
     sku: row.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
     sizes: Array.isArray(row.sizes) && row.sizes.length > 0 ? row.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
-    colors: Array.isArray(row.colors) && row.colors.length > 0 ? row.colors : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]),
+    colors: (() => {
+      const rawColors = Array.isArray(row.colors) && row.colors.length > 0
+        ? row.colors
+        : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
+      return rawColors.map((c: any) => {
+        const variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
+          ? c.images
+          : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
+        const featured = c.featuredImage || variantImages[0] || c.image || '';
+        return {
+          id: c.id,
+          color: c.color || 'default',
+          colorName: c.colorName || 'Cor Única',
+          colorHex: c.colorHex || '#000000',
+          image: featured,
+          featuredImage: featured,
+          images: variantImages,
+          sku: c.sku,
+          stockCount: c.stockCount,
+          sizes: c.sizes,
+        };
+      });
+    })(),
     image: row.image || d.image || (Array.isArray(row.images) && row.images[0]) || (Array.isArray(d.images) && d.images[0]) || '',
     images: Array.isArray(row.images) && row.images.length > 0 ? row.images : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (row.image ? [row.image] : (d.image ? [d.image] : []))),
     details: Array.isArray(row.details) ? row.details : (Array.isArray(d.details) ? d.details : ['100% Algodão Heavyweight']),

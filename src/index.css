@@ -9,6 +9,18 @@
     background-color: #D6B35A;
     color: #080808;
   }
+
+  /* Instant button responsiveness & zero tap delay */
+  button, 
+  [role="button"],
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+    user-select: none;
+  }
 }
 
 @keyframes marquee {

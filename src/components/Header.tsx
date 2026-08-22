@@ -61,8 +61,8 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
               <span className="text-[#3F3F4A]">•</span>
               <span className="text-[#E4E4E7]">ATÉ 6X SEM JUROS NO CARTÃO</span>
               <span className="text-[#3F3F4A]">•</span>
-              <span className="font-black bg-gradient-to-r from-[#F4C400]/20 to-[#F4C400]/10 text-[#F4C400] border border-[#F4C400]/40 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(244,196,0,0.15)]">
-                <Sparkles className="w-3 h-3 animate-pulse" /> PIX 5% OFF
+              <span className="font-black bg-gradient-to-r from-[#F4C400]/20 to-[#F4C400]/10 text-[#F4C400] border border-[#F4C400]/40 px-2.5 py-0.5 rounded-md text-[10px] flex items-center gap-1.5 shadow-[0_0_12px_rgba(244,196,0,0.15)]">
+                <p> PIX 5% OFF </p>
               </span>
               <span className="text-[#3F3F4A]">•</span>
             </div>
@@ -107,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
         </div>
 
         {/* Center: Desktop Navigation Links with Animated Glow Pill */}
-        <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 px-3 py-1.5 rounded-full bg-[#121217]/80 border border-[#22222E]/80 backdrop-blur-md shadow-inner text-[12.5px] font-bold uppercase tracking-[0.12em] text-[#A1A1AA]">
+        <nav className="hidden lg:flex items-center rounded-md gap-1.5 xl:gap-2 px-3 py-1.5 rounded-x1 bg-[#121217]/80 border border-[#22222E]/80 backdrop-blur-md shadow-inner text-[12.5px] font-bold uppercase tracking-[0.12em] text-[#A1A1AA]">
           <button
             onClick={() => onNavigate('home')}
             className="px-4 py-2 rounded-full hover:text-[#F5F5F3] hover:bg-[#1C1C26] transition-all duration-200 cursor-pointer relative group"
@@ -156,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {/* Search Trigger */}
           <button
             onClick={onOpenSearch}
-            className="h-10 sm:h-11 flex items-center gap-2.5 px-3.5 sm:px-4 rounded-xl bg-[#131318] border border-[#272734] text-[#F4F4F5] hover:border-[#F4C400]/40 hover:bg-[#1A1A22] transition-all shadow-sm group w-10 sm:w-44 md:w-52 lg:w-60 justify-center sm:justify-start cursor-pointer hover:shadow-[0_0_15px_rgba(0,0,0,0.5)]"
+            className="h-10 sm:h-11 flex items-center gap-2.5 px-3.5 sm:px-4  bg-[#131318] border border-[#272734] text-[#F4F4F5] hover:border-[#F4C400]/40 hover:bg-[#1A1A22] transition-all shadow-sm group w-10 sm:w-44 md:w-52 lg:w-60 justify-center sm:justify-start cursor-pointer hover:shadow-[0_0_15px_rgba(0,0,0,0.5)]"
             title="Buscar produtos (Ctrl+K)"
             aria-label="Pesquisar na loja"
           >
@@ -188,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           <div className="relative">
             <button
               onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-              className={`h-10 sm:h-11 px-3 sm:px-4.5 transition-all duration-200 flex items-center gap-2 rounded-xl border text-xs shadow-sm cursor-pointer ${
+              className={`h-10 sm:h-11 px-3 sm:px-4.5 transition-all duration-200 flex items-center gap-2  border text-xs shadow-sm cursor-pointer ${
                 user
                   ? isUserDropdownOpen
                     ? 'border-[#F4C400] bg-[#1E1E28] text-[#F4C400] shadow-[0_0_15px_rgba(244,196,0,0.25)]'
@@ -230,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {user && (
             <button
               onClick={openMiniCart}
-              className="h-10 sm:h-11 px-3.5 sm:px-5 flex items-center gap-2 rounded-xl bg-[#F5F5F3] hover:bg-white text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 shrink-0 cursor-pointer"
+              className="h-10 sm:h-11 px-3.5 sm:px-5 flex items-center gap-2  bg-[#F5F5F3] hover:bg-white text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95 shrink-0 cursor-pointer"
               title="Abrir Carrinho"
             >
               <ShoppingBag className="w-4 h-4 stroke-[2.5]" />

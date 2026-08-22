@@ -1,7 +1,28 @@
 [
   {
-    "code": "FIRSTAURA",
+    "code": "VIPAURA",
+    "description": "15% OFF para membros da comunidade",
+    "discountType": "percentage",
+    "discountValue": 15,
+    "minOrderValue": 250
+  },
+  {
+    "code": "MARMOT10",
     "description": "10% OFF na sua primeira compra acima de R$ 150",
+    "discountType": "percentage",
+    "discountValue": 10,
+    "minOrderValue": 150
+  },
+  {
+    "code": "FIRSTAURA",
+    "description": "10% OFF no primeiro pedido",
+    "discountType": "percentage",
+    "discountValue": 10,
+    "minOrderValue": 150
+  },
+  {
+    "code": "AURA10",
+    "description": "10% OFF no primeiro pedido",
     "discountType": "percentage",
     "discountValue": 10,
     "minOrderValue": 150
@@ -14,8 +35,8 @@
     "minOrderValue": 400
   },
   {
-    "code": "VIPAURA",
-    "description": "15% OFF para membros da comunidade",
+    "code": "VIPMARMOT",
+    "description": "15% OFF para membros da comunidade Marmot",
     "discountType": "percentage",
     "discountValue": 15,
     "minOrderValue": 250

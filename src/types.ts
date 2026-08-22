@@ -1,10 +1,16 @@
 export type CategoryId = string;
 
 export interface ProductVariant {
+  id?: string;
   color: string;
   colorName: string;
   colorHex: string;
   image?: string;
+  featuredImage?: string;
+  images?: string[];
+  sku?: string;
+  stockCount?: number;
+  sizes?: string[];
 }
 
 export interface Review {

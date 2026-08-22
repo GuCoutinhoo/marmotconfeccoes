@@ -47,6 +47,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || 'M');
   const [quantity, setQuantity] = useState<number>(1);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isAddedRecently, setIsAddedRecently] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'measurements' | 'care' | 'shipping'>('details');
 
   // Review Form State
@@ -116,6 +117,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const pixPrice = effectivePrice * 0.95;
 
   const handleAddToCart = () => {
+    setIsAddedRecently(true);
+    setTimeout(() => setIsAddedRecently(false), 1200);
     addToCart(product, selectedSize, selectedColor, quantity);
   };
 
@@ -335,8 +338,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   {product.colors.map((c, idx) => (
                     <button
                       key={idx}
+                      type="button"
                       onClick={() => setSelectedColor(c)}
-                      className={`p-1 rounded-full border-2 transition-all ${
+                      className={`p-1 rounded-full border-2 cursor-pointer select-none touch-manipulation active:scale-90 transition-transform duration-75 ${
                         selectedColor.colorName === c.colorName
                           ? 'border-[#C5A869] scale-110'
                           : 'border-transparent opacity-60 hover:opacity-100'
@@ -360,8 +364,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   Tamanho (Modelagem Boxy)
                 </label>
                 <button
+                  type="button"
                   onClick={() => setIsSizeGuideOpen(true)}
-                  className="text-xs text-[#C5A869] hover:underline font-bold flex items-center gap-1.5"
+                  className="text-xs text-[#C5A869] hover:underline font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform duration-75"
                 >
                   <Ruler className="w-3.5 h-3.5" /> Guia de Medidas
                 </button>
@@ -371,11 +376,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 {(product.sizes || ['P', 'M', 'G', 'GG', 'XG']).map((sz) => (
                   <button
                     key={sz}
+                    type="button"
                     onClick={() => setSelectedSize(sz)}
-                    className={`py-3 rounded-xl text-xs font-black uppercase border transition-all ${
+                    className={`py-3 rounded-xl text-xs font-black uppercase border cursor-pointer select-none touch-manipulation active:scale-95 transition-all duration-75 ${
                       selectedSize === sz
-                        ? 'bg-[#F4F4F5] text-[#0D0D0E] border-[#F4F4F5] shadow-lg'
-                        : 'bg-[#18181B] text-[#A1A1AA] border-[#27272A] hover:border-[#C5A869]/70 hover:text-[#F4F4F5]'
+                        ? 'bg-[#F4F4F5] text-[#0D0D0E] border-[#F4F4F5] shadow-lg scale-[1.02]'
+                        : 'bg-[#18181B] text-[#A1A1AA] border-[#27272A] hover:border-[#C5A869]/70 hover:text-[#F4F4F5] active:bg-[#27272A]'
                     }`}
                   >
                     {sz}
@@ -401,15 +407,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 {/* Quantity Box */}
                 <div className="flex items-center bg-[#141416] border border-[#27272A] rounded-xl p-1 shrink-0">
                   <button
+                    type="button"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2.5 text-[#71717A] hover:text-[#F4F4F5]"
+                    className="p-2.5 text-[#71717A] hover:text-[#F4F4F5] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#F4F4F5] transition-transform duration-75"
+                    aria-label="Diminuir quantidade"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="w-8 text-center font-bold text-xs text-[#F4F4F5]">{quantity}</span>
+                  <span className="w-8 text-center font-bold text-xs text-[#F4F4F5] select-none">{quantity}</span>
                   <button
+                    type="button"
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-2.5 text-[#71717A] hover:text-[#F4F4F5]"
+                    className="p-2.5 text-[#71717A] hover:text-[#F4F4F5] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#F4F4F5] transition-transform duration-75"
+                    aria-label="Aumentar quantidade"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
@@ -417,17 +427,32 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
                 {/* Add to Cart Button */}
                 <button
+                  type="button"
                   onClick={handleAddToCart}
-                  className="flex-1 bg-[#F4F4F5] hover:bg-white text-[#0D0D0E] font-black text-xs uppercase tracking-widest py-4 px-6 rounded-xl transition-all flex items-center justify-center gap-2.5 shadow-xl hover:scale-[1.01] active:scale-[0.99]"
+                  className={`flex-1 font-black text-xs uppercase tracking-widest py-4 px-6 rounded-xl transition-all duration-75 flex items-center justify-center gap-2.5 shadow-xl cursor-pointer select-none touch-manipulation active:scale-95 ${
+                    isAddedRecently
+                      ? 'bg-emerald-500 text-black shadow-emerald-500/20'
+                      : 'bg-[#F4F4F5] hover:bg-white active:bg-[#D6B35A] active:text-black text-[#0D0D0E]'
+                  }`}
                 >
-                  <ShoppingBag className="w-4 h-4 stroke-[2.5]" />
-                  <span>ADICIONAR AO CARRINHO</span>
+                  {isAddedRecently ? (
+                    <>
+                      <Check className="w-4 h-4 stroke-[3]" />
+                      <span>ADICIONADO!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-4 h-4 stroke-[2.5]" />
+                      <span>ADICIONAR AO CARRINHO</span>
+                    </>
+                  )}
                 </button>
 
                 {/* Favorite Button */}
                 <button
+                  type="button"
                   onClick={handleToggleWishlist}
-                  className={`p-4 rounded-xl border transition-all ${
+                  className={`p-4 rounded-xl border transition-all duration-75 cursor-pointer select-none touch-manipulation active:scale-90 ${
                     isFavorite
                       ? 'bg-[#C5A869] text-black border-[#C5A869]'
                       : 'bg-[#141416] text-[#A1A1AA] border-[#27272A] hover:border-[#F4F4F5] hover:text-[#F4F4F5]'
