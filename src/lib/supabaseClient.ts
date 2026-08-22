@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Product, Category, Address, Order } from '../types';
+import { Product, Category, Address, Order, CartItem, ProductVariant } from '../types';
 
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
@@ -596,5 +596,285 @@ export async function fetchOrderByIdDirect(orderId: string): Promise<Order | nul
     return null;
   }
 }
+
+/**
+ * Direct query to fetch the authenticated user's cart items from Supabase.
+ * Strictly acts as the primary source of truth for authenticated users.
+ */
+export async function fetchUserCartFromSupabase(userId: string): Promise<CartItem[]> {
+  if (!userId || !isSupabaseConfigured()) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('cart_items')
+      .select('*')
+      .eq('user_id', userId)
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      console.warn('[Supabase Cart Direct] Erro ao carregar carrinho do usuário:', error.message || error);
+      return [];
+    }
+
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return [];
+    }
+
+    const items: CartItem[] = [];
+    for (const row of data) {
+      const d = (row.data && typeof row.data === 'object') ? row.data : {};
+      
+      let product: Product | null = null;
+      if (d.product && d.product.id) {
+        product = d.product;
+      } else if (row.product && row.product.id) {
+        product = mapSupabaseRowToProduct(row.product);
+      } else if (row.product_id) {
+        try {
+          const { data: prodRow } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', row.product_id)
+            .maybeSingle();
+          if (prodRow) {
+            product = mapSupabaseRowToProduct(prodRow);
+          }
+        } catch {}
+      }
+
+      if (!product || !product.id) {
+        product = {
+          id: row.product_id || d.productId || `prod-${Date.now()}`,
+          title: d.title || row.product_name || 'Produto Streetwear',
+          subtitle: d.subtitle || 'Streetwear Oversized',
+          description: d.description || '',
+          slug: d.slug || 'produto',
+          price: Number(d.price || row.price || 0),
+          promoPrice: d.promoPrice !== undefined ? Number(d.promoPrice) : undefined,
+          category: 'camisetas',
+          subcategory: 'Essenciais',
+          collection: 'Aura Collection',
+          tags: ['Streetwear'],
+          rating: 5,
+          reviewCount: 0,
+          stockCount: 10,
+          sku: d.sku || 'MM-001',
+          sizes: ['P', 'M', 'G', 'GG'],
+          colors: [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }],
+          image: d.image || row.image || '',
+          images: d.images || (row.image ? [row.image] : []),
+          details: [],
+          careInstructions: [],
+          composition: [],
+          reviews: [],
+          weight: 0.35,
+          height: 4,
+          width: 20,
+          length: 25,
+          isNewRelease: false,
+          isBestSeller: false,
+          featured: false,
+          status: 'active',
+          createdAt: new Date().toISOString(),
+        };
+      }
+
+      const selectedSize = String(row.selected_size || d.selectedSize || 'M');
+      const rawColor = row.selected_color || d.selectedColor || { color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' };
+      const selectedColor: ProductVariant = {
+        color: rawColor.color || 'black',
+        colorName: rawColor.colorName || rawColor.color || 'Padrão',
+        colorHex: rawColor.colorHex || '#121212',
+        image: rawColor.image || '',
+      };
+      const quantity = Math.max(1, parseInt(String(row.quantity || d.quantity || 1), 10));
+
+      items.push({
+        product,
+        selectedSize,
+        selectedColor,
+        quantity,
+      });
+    }
+
+    return items;
+  } catch (err) {
+    console.error('[Supabase Cart Direct] Exceção ao buscar carrinho:', err);
+    return [];
+  }
+}
+
+/**
+ * Direct upsert of a cart item to Supabase for the authenticated user.
+ */
+export async function saveCartItemToSupabase(userId: string, item: CartItem): Promise<boolean> {
+  if (!userId || !isSupabaseConfigured()) return false;
+
+  try {
+    const colorName = item.selectedColor?.colorName || item.selectedColor?.color || 'padrao';
+    const cleanSize = item.selectedSize || 'M';
+    const cartItemId = `cart_${userId}_${item.product.id}_${cleanSize}_${colorName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+    const payload = {
+      id: cartItemId,
+      user_id: userId,
+      product_id: item.product.id,
+      selected_size: cleanSize,
+      selected_color: item.selectedColor,
+      quantity: Math.max(1, item.quantity || 1),
+      updated_at: new Date().toISOString(),
+      data: {
+        id: cartItemId,
+        userId,
+        product: item.product,
+        productId: item.product.id,
+        selectedSize: cleanSize,
+        selectedColor: item.selectedColor,
+        quantity: Math.max(1, item.quantity || 1),
+        updatedAt: new Date().toISOString(),
+      },
+    };
+
+    const { error } = await supabase
+      .from('cart_items')
+      .upsert(payload);
+
+    if (error) {
+      console.warn('[Supabase Cart Direct] Erro ao salvar item no banco:', error.message);
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.warn('[Supabase Cart Direct] Exceção ao salvar item:', err);
+    return false;
+  }
+}
+
+/**
+ * Direct update of a cart item's quantity in Supabase for the authenticated user.
+ */
+export async function updateCartItemQuantityInSupabase(
+  userId: string,
+  productId: string,
+  selectedSize: string,
+  colorName: string,
+  quantity: number
+): Promise<boolean> {
+  if (!userId || !isSupabaseConfigured()) return false;
+
+  if (quantity <= 0) {
+    return removeCartItemFromSupabase(userId, productId, selectedSize, colorName);
+  }
+
+  const cleanColor = colorName || 'padrao';
+  const cleanSize = selectedSize || 'M';
+  const cartItemId = `cart_${userId}_${productId}_${cleanSize}_${cleanColor}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  try {
+    const { error } = await supabase
+      .from('cart_items')
+      .update({
+        quantity,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId)
+      .eq('product_id', productId)
+      .eq('selected_size', selectedSize);
+
+    if (error) {
+      await supabase.from('cart_items').update({
+        quantity,
+        updated_at: new Date().toISOString(),
+      }).eq('id', cartItemId);
+    }
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+/**
+ * Direct removal of a cart item from Supabase for the authenticated user.
+ */
+export async function removeCartItemFromSupabase(
+  userId: string,
+  productId: string,
+  selectedSize: string,
+  colorName: string
+): Promise<boolean> {
+  if (!userId || !isSupabaseConfigured()) return false;
+
+  const cleanColor = colorName || 'padrao';
+  const cleanSize = selectedSize || 'M';
+  const cartItemId = `cart_${userId}_${productId}_${cleanSize}_${cleanColor}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  try {
+    const { error } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('user_id', userId)
+      .eq('product_id', productId)
+      .eq('selected_size', selectedSize);
+
+    if (error) {
+      await supabase.from('cart_items').delete().eq('id', cartItemId);
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Direct clear of all cart items from Supabase for the authenticated user.
+ */
+export async function clearUserCartInSupabase(userId: string): Promise<boolean> {
+  if (!userId || !isSupabaseConfigured()) return false;
+
+  try {
+    const { error } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('user_id', userId);
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Merges guest items into the authenticated user's cart in Supabase.
+ */
+export async function mergeGuestCartIntoSupabase(userId: string, guestItems: CartItem[]): Promise<CartItem[]> {
+  if (!userId || !isSupabaseConfigured()) return [];
+  if (!Array.isArray(guestItems) || guestItems.length === 0) {
+    return fetchUserCartFromSupabase(userId);
+  }
+
+  const currentDbCart = await fetchUserCartFromSupabase(userId);
+
+  for (const guestItem of guestItems) {
+    if (!guestItem.product || !guestItem.product.id) continue;
+    const existingIndex = currentDbCart.findIndex(
+      (c) =>
+        c.product.id === guestItem.product.id &&
+        c.selectedSize === guestItem.selectedSize &&
+        (c.selectedColor?.colorName === guestItem.selectedColor?.colorName ||
+          c.selectedColor?.color === guestItem.selectedColor?.color)
+    );
+
+    if (existingIndex > -1) {
+      currentDbCart[existingIndex].quantity += (guestItem.quantity || 1);
+      await saveCartItemToSupabase(userId, currentDbCart[existingIndex]);
+    } else {
+      currentDbCart.push(guestItem);
+      await saveCartItemToSupabase(userId, guestItem);
+    }
+  }
+
+  return currentDbCart;
+}
+
 
 

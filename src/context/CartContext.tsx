@@ -5,7 +5,17 @@ import { useToast } from './ToastContext';
 import { useAuth } from './AuthContext';
 import { validateAndFetchCep, normalizeCep, isValidCepFormat } from '../services/cepService';
 import { filterAndSortShippingQuotes } from '../services/carrierFilter';
-import { supabase, isSupabaseConfigured, mapSupabaseRowToProduct } from '../lib/supabaseClient';
+import {
+  supabase,
+  isSupabaseConfigured,
+  mapSupabaseRowToProduct,
+  fetchUserCartFromSupabase,
+  saveCartItemToSupabase,
+  updateCartItemQuantityInSupabase,
+  removeCartItemFromSupabase,
+  clearUserCartInSupabase,
+  mergeGuestCartIntoSupabase,
+} from '../lib/supabaseClient';
 
 interface CartContextData {
   cart: CartItem[];
@@ -111,9 +121,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (user && user.id) {
         activeUserIdRef.current = user.id;
+        const currentUserId = user.id;
         const activeToken = token || localStorage.getItem('@marmot_auth_token');
 
-        // 1. If legitimate guest items exist in localStorage, merge them into the user's account in the backend
+        // 1. If legitimate guest items exist in localStorage from prior unauthenticated session, merge them into Supabase
         let guestItems: CartItem[] = [];
         try {
           const guestRaw = localStorage.getItem('@aura_guest_cart');
@@ -127,107 +138,63 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (guestItems.length > 0) {
           try {
-            const res = await fetch('/api/cart/merge', {
+            await mergeGuestCartIntoSupabase(currentUserId, guestItems);
+            fetch('/api/cart/merge', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
               },
               body: JSON.stringify({ items: guestItems }),
+            }).catch(() => {});
+          } catch (err) {
+            console.warn('[Cart] Guest merge error:', err);
+          } finally {
+            localStorage.removeItem('@aura_guest_cart');
+            localStorage.removeItem('@aura_cart');
+          }
+        }
+
+        // 2. Fetch authenticated user's latest cart directly from Supabase (Source of Truth)
+        let loadedCart: CartItem[] = [];
+        try {
+          const directSupabaseCart = await fetchUserCartFromSupabase(currentUserId);
+          if (Array.isArray(directSupabaseCart)) {
+            loadedCart = directSupabaseCart;
+          }
+        } catch (sbErr) {
+          console.warn('[Cart] Direct Supabase fetch warning:', sbErr);
+        }
+
+        // Fallback to backend /api/cart only if Supabase not configured or direct fetch returned empty
+        if ((!loadedCart || loadedCart.length === 0) && !isSupabaseConfigured()) {
+          try {
+            const res = await fetch('/api/cart', {
+              headers: {
+                ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
+              },
             });
             if (res.ok) {
-              const merged = await res.json();
-              if (!isCancelled && Array.isArray(merged)) {
-                setCart(merged);
-                localStorage.removeItem('@aura_guest_cart');
-                localStorage.removeItem('@aura_cart');
-                localStorage.setItem(`@aura_cart_${user.id}`, JSON.stringify(merged));
-                isHydratingRef.current = false;
-                setCartHydrated(true);
-                return;
+              const serverCart = await res.json();
+              if (Array.isArray(serverCart)) {
+                loadedCart = serverCart;
               }
             }
           } catch (err) {
-            console.warn('[Cart] Merge notice:', err);
+            console.warn('[Cart] Server fetch fallback warning:', err);
           }
-          localStorage.removeItem('@aura_guest_cart');
-        }
-
-        // 2. Fetch authenticated user's cart from backend
-        let loadedCart: CartItem[] | null = null;
-        try {
-          const res = await fetch('/api/cart', {
-            headers: {
-              ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
-            },
-          });
-          if (res.ok) {
-            const serverCart = await res.json();
-            if (Array.isArray(serverCart)) {
-              loadedCart = serverCart;
-            }
-          }
-        } catch (err) {
-          console.warn('[Cart] Fetch notice:', err);
-        }
-
-        // 3. Direct Supabase query fallback if server cart empty or failed
-        if ((!loadedCart || loadedCart.length === 0) && isSupabaseConfigured()) {
-          try {
-            const { data: sbCart, error: sbCartErr } = await supabase
-              .from('cart_items')
-              .select('*')
-              .eq('user_id', user.id);
-
-            if (!sbCartErr && Array.isArray(sbCart) && sbCart.length > 0) {
-              const mapped = sbCart
-                .map((item: any) => {
-                  if (item.data && item.data.product) return item.data;
-                  const prod = item.product || mapSupabaseRowToProduct(item.products || item);
-                  if (!prod || !prod.id) return null;
-                  return {
-                    product: prod,
-                    selectedSize: item.selected_size || item.selectedSize || 'M',
-                    selectedColor: item.selected_color || item.selectedColor || { color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' },
-                    quantity: item.quantity || 1,
-                  };
-                })
-                .filter(Boolean) as CartItem[];
-
-              if (mapped.length > 0) {
-                loadedCart = mapped;
-              }
-            }
-          } catch (sbErr) {
-            console.warn('[Cart] Supabase direct fallback notice:', sbErr);
-          }
-        }
-
-        // 4. Fallback to user-isolated cached key if exists
-        if (!loadedCart || loadedCart.length === 0) {
-          try {
-            const cached = localStorage.getItem(`@aura_cart_${user.id}`);
-            if (cached) {
-              const parsed = JSON.parse(cached);
-              if (Array.isArray(parsed) && parsed.length > 0) {
-                loadedCart = parsed;
-              }
-            }
-          } catch {}
         }
 
         if (!isCancelled) {
           const finalCart = loadedCart || [];
           setCart(finalCart);
-          if (finalCart.length > 0) {
-            localStorage.setItem(`@aura_cart_${user.id}`, JSON.stringify(finalCart));
-          }
+          localStorage.setItem(`@aura_cart_${currentUserId}`, JSON.stringify(finalCart));
           isHydratingRef.current = false;
           setCartHydrated(true);
         }
       } else {
         // User logged out or guest browsing:
-        // Do NOT overwrite or clear previous user's cart in the DB or user cache!
+        // Clear in-memory user state and load guest cart if present
         activeUserIdRef.current = null;
         localStorage.removeItem('@aura_cart');
 
@@ -449,25 +416,42 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const cleanQty = Math.max(1, quantity);
 
+    const existingIndex = cart.findIndex(
+      (item) =>
+        item.product.id === product.id &&
+        item.selectedSize === selectedSize &&
+        (item.selectedColor.colorName === selectedColor.colorName || item.selectedColor.color === selectedColor.color)
+    );
+
+    const finalQty = existingIndex > -1 ? cart[existingIndex].quantity + cleanQty : cleanQty;
+    const finalItem: CartItem = {
+      product,
+      selectedSize,
+      selectedColor,
+      quantity: finalQty,
+    };
+
     setCart((prev) => {
-      const existingIndex = prev.findIndex(
+      const idx = prev.findIndex(
         (item) =>
           item.product.id === product.id &&
           item.selectedSize === selectedSize &&
-          item.selectedColor.colorName === selectedColor.colorName
+          (item.selectedColor.colorName === selectedColor.colorName || item.selectedColor.color === selectedColor.color)
       );
 
-      if (existingIndex > -1) {
+      if (idx > -1) {
         const updated = [...prev];
-        updated[existingIndex].quantity += cleanQty;
+        updated[idx] = { ...updated[idx], quantity: updated[idx].quantity + cleanQty };
         return updated;
       }
 
       return [...prev, { product, selectedSize, selectedColor, quantity: cleanQty }];
     });
 
-    // Sync to backend if authenticated
-    if (user) {
+    // Sync directly to Supabase as authoritative source
+    if (user?.id) {
+      saveCartItemToSupabase(user.id, finalItem);
+
       const activeToken = token || localStorage.getItem('@marmot_auth_token');
       fetch('/api/cart', {
         method: 'POST',
@@ -481,40 +465,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           selectedColor,
           quantity: cleanQty,
         }),
-      }).catch((err) => console.warn('[Cart] Server add sync error:', err));
-
-      if (isSupabaseConfigured()) {
-        const cartItemId = `cart-${user.id}-${product.id}-${selectedSize}-${selectedColor.colorName || selectedColor.color}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-        supabase
-          .from('cart_items')
-          .upsert({
-            id: cartItemId,
-            user_id: user.id,
-            product_id: product.id,
-            selected_size: selectedSize,
-            selected_color: selectedColor,
-            quantity: cleanQty,
-            updated_at: new Date().toISOString(),
-            data: {
-              id: cartItemId,
-              userId: user.id,
-              product,
-              productId: product.id,
-              selectedSize,
-              selectedColor,
-              quantity: cleanQty,
-              updatedAt: new Date().toISOString(),
-            },
-          })
-          .then(({ error }) => {
-            if (error) console.warn('[Cart] Supabase direct upsert notice:', error.message);
-          });
-      }
+      }).catch((err) => console.warn('[Cart] Server add sync notice:', err));
     }
 
     showToast(
       'Adicionado ao Carrinho',
-      `${product.title} (${selectedSize} / ${selectedColor.colorName})`,
+      `${product.title} (${selectedSize} / ${selectedColor.colorName || selectedColor.color})`,
       'success'
     );
     setIsMiniCartOpen(true);
@@ -530,13 +486,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           !(
             item.product.id === productId &&
             item.selectedSize === size &&
-            item.selectedColor.colorName === colorName
+            (item.selectedColor.colorName === colorName || item.selectedColor.color === colorName)
           )
       )
     );
 
-    // Sync to backend if authenticated
-    if (user) {
+    // Sync to Supabase as authoritative source
+    if (user?.id) {
+      removeCartItemFromSupabase(user.id, productId, size, colorName);
+
       const activeToken = token || localStorage.getItem('@marmot_auth_token');
       fetch('/api/cart/item', {
         method: 'DELETE',
@@ -549,19 +507,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           size,
           colorName,
         }),
-      }).catch((err) => console.warn('[Cart] Server remove sync error:', err));
-
-      if (isSupabaseConfigured()) {
-        supabase
-          .from('cart_items')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('product_id', productId)
-          .eq('selected_size', size)
-          .then(({ error }) => {
-            if (error) console.warn('[Cart] Supabase direct delete notice:', error.message);
-          });
-      }
+      }).catch((err) => console.warn('[Cart] Server remove sync notice:', err));
     }
 
     showToast('Item removido', 'O produto foi removido do carrinho.', 'info');
@@ -581,7 +527,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (
           item.product.id === productId &&
           item.selectedSize === size &&
-          item.selectedColor.colorName === colorName
+          (item.selectedColor.colorName === colorName || item.selectedColor.color === colorName)
         ) {
           return { ...item, quantity };
         }
@@ -589,8 +535,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       })
     );
 
-    // Sync to backend if authenticated
-    if (user) {
+    // Sync to Supabase as authoritative source
+    if (user?.id) {
+      updateCartItemQuantityInSupabase(user.id, productId, size, colorName, quantity);
+
       const activeToken = token || localStorage.getItem('@marmot_auth_token');
       fetch('/api/cart/item', {
         method: 'PUT',
@@ -604,43 +552,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           colorName,
           quantity,
         }),
-      }).catch((err) => console.warn('[Cart] Server update sync error:', err));
-
-      if (isSupabaseConfigured()) {
-        const item = cart.find(
-          (i) =>
-            i.product.id === productId &&
-            i.selectedSize === size &&
-            i.selectedColor.colorName === colorName
-        );
-        if (item) {
-          const cartItemId = `cart-${user.id}-${productId}-${size}-${colorName}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-          supabase
-            .from('cart_items')
-            .upsert({
-              id: cartItemId,
-              user_id: user.id,
-              product_id: productId,
-              selected_size: size,
-              selected_color: item.selectedColor,
-              quantity,
-              updated_at: new Date().toISOString(),
-              data: {
-                id: cartItemId,
-                userId: user.id,
-                product: item.product,
-                productId,
-                selectedSize: size,
-                selectedColor: item.selectedColor,
-                quantity,
-                updatedAt: new Date().toISOString(),
-              },
-            })
-            .then(({ error }) => {
-              if (error) console.warn('[Cart] Supabase direct update notice:', error.message);
-            });
-        }
-      }
+      }).catch((err) => console.warn('[Cart] Server update sync notice:', err));
     }
   };
 
@@ -651,25 +563,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setShippingOptions([]);
     setShippingError(null);
 
-    if (user) {
+    if (user?.id) {
+      clearUserCartInSupabase(user.id);
+      localStorage.removeItem(`@aura_cart_${user.id}`);
+
       const activeToken = token || localStorage.getItem('@marmot_auth_token');
       fetch('/api/cart', {
         method: 'DELETE',
         headers: {
           ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
         },
-      }).catch((err) => console.warn('[Cart] Server clear sync error:', err));
-
-      if (isSupabaseConfigured()) {
-        supabase
-          .from('cart_items')
-          .delete()
-          .eq('user_id', user.id)
-          .then(({ error }) => {
-            if (error) console.warn('[Cart] Supabase clear notice:', error.message);
-          });
-      }
-      localStorage.removeItem(`@aura_cart_${user.id}`);
+      }).catch((err) => console.warn('[Cart] Server clear sync notice:', err));
     } else {
       localStorage.removeItem('@aura_guest_cart');
     }
