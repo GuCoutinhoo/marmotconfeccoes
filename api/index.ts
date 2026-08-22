@@ -2651,7 +2651,7 @@ export class DatabaseManager {
     if (this.mode === 'supabase' && this.supabase) {
       try {
         const { data, error } = await this.supabase.from('cart_items').select('*').eq('user_id', userId);
-        if (!error && data) {
+        if (!error && Array.isArray(data) && data.length > 0) {
           const nonUserItems = this.cartItems.filter((c) => c.userId !== userId);
           const sbItems = data.map((item: any) => item.data || {
             id: item.id,

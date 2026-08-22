@@ -159,15 +159,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         let loadedCart: CartItem[] = [];
         try {
           const directSupabaseCart = await fetchUserCartFromSupabase(currentUserId);
-          if (Array.isArray(directSupabaseCart)) {
+          if (Array.isArray(directSupabaseCart) && directSupabaseCart.length > 0) {
             loadedCart = directSupabaseCart;
           }
         } catch (sbErr) {
           console.warn('[Cart] Direct Supabase fetch warning:', sbErr);
         }
 
-        // Fallback to backend /api/cart only if Supabase not configured or direct fetch returned empty
-        if ((!loadedCart || loadedCart.length === 0) && !isSupabaseConfigured()) {
+        // 3. Fallback to backend /api/cart if direct Supabase fetch returned empty
+        if (!loadedCart || loadedCart.length === 0) {
           try {
             const res = await fetch('/api/cart', {
               headers: {
@@ -176,13 +176,30 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
             if (res.ok) {
               const serverCart = await res.json();
-              if (Array.isArray(serverCart)) {
+              if (Array.isArray(serverCart) && serverCart.length > 0) {
                 loadedCart = serverCart;
               }
             }
           } catch (err) {
             console.warn('[Cart] Server fetch fallback warning:', err);
           }
+        }
+
+        // 4. Fallback to user-isolated localStorage cached cart
+        if (!loadedCart || loadedCart.length === 0) {
+          try {
+            const cached = localStorage.getItem(`@aura_cart_${currentUserId}`);
+            if (cached) {
+              const parsed = JSON.parse(cached);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                loadedCart = parsed;
+                // Re-sync to database and Supabase in background
+                for (const itm of parsed) {
+                  saveCartItemToSupabase(currentUserId, itm);
+                }
+              }
+            }
+          } catch {}
         }
 
         if (!isCancelled) {
