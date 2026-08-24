@@ -32,20 +32,20 @@ import {
 } from 'lucide-react';
 
 const STATUS_COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = {
-  'Aguardando Pagamento': { bg: 'bg-amber-950/40', text: 'text-amber-400', border: 'border-amber-800/60' },
-  'Pagamento Pendente': { bg: 'bg-amber-950/40', text: 'text-amber-400', border: 'border-amber-800/60' },
-  'Pagamento Aprovado': { bg: 'bg-emerald-950/40', text: 'text-emerald-400', border: 'border-emerald-800/60' },
-  'Pedido Confirmado': { bg: 'bg-blue-950/40', text: 'text-blue-400', border: 'border-blue-800/60' },
-  'Em Separação': { bg: 'bg-purple-950/40', text: 'text-purple-400', border: 'border-purple-800/60' },
-  'Preparando Envio': { bg: 'bg-indigo-950/40', text: 'text-indigo-400', border: 'border-indigo-800/60' },
-  'Pronto para Envio': { bg: 'bg-cyan-950/40', text: 'text-cyan-400', border: 'border-cyan-800/60' },
-  'Despachado': { bg: 'bg-[#D6B35A]/10', text: 'text-[#D6B35A]', border: 'border-[#D6B35A]/40' },
-  'Enviado': { bg: 'bg-[#D6B35A]/10', text: 'text-[#D6B35A]', border: 'border-[#D6B35A]/40' },
-  'Em Transporte': { bg: 'bg-sky-950/40', text: 'text-sky-400', border: 'border-sky-800/60' },
-  'Entregue': { bg: 'bg-green-950/40', text: 'text-green-400', border: 'border-green-800/60' },
-  'Cancelado': { bg: 'bg-red-950/40', text: 'text-red-400', border: 'border-red-800/60' },
-  'Pagamento Recusado': { bg: 'bg-red-950/40', text: 'text-red-400', border: 'border-red-800/60' },
-  'Reembolsado': { bg: 'bg-zinc-900', text: 'text-zinc-400', border: 'border-zinc-700' },
+  'Aguardando Pagamento': { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
+  'Pagamento Pendente': { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
+  'Pagamento Aprovado': { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  'Pedido Confirmado': { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  'Em Separação': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  'Preparando Envio': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+  'Pronto para Envio': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200' },
+  'Despachado': { bg: 'bg-[#F0C84B]/20', text: 'text-[#B45309]', border: 'border-[#F0C84B]/50' },
+  'Enviado': { bg: 'bg-[#F0C84B]/20', text: 'text-[#B45309]', border: 'border-[#F0C84B]/50' },
+  'Em Transporte': { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
+  'Entregue': { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300' },
+  'Cancelado': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
+  'Pagamento Recusado': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
+  'Reembolsado': { bg: 'bg-zinc-100', text: 'text-zinc-700', border: 'border-zinc-300' },
 };
 
 export const AdminOrdersTab: React.FC = () => {
@@ -292,21 +292,21 @@ export const AdminOrdersTab: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Top Filter Bar */}
-      <div className="bg-[#141414] border border-[#222222] p-4 sm:p-5 rounded-2xl space-y-4">
+      <div className="bg-white border border-[#E5E5E1] p-4 sm:p-5 rounded-2xl shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#777777] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#6B6B66] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por Pedido #, Nome do Cliente, CPF, E-mail ou Rastreio..."
-              className="w-full bg-[#080808] border border-[#262626] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
+              className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#777777] hover:text-[#EFECE6]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B66] hover:text-[#171717]"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -315,9 +315,9 @@ export const AdminOrdersTab: React.FC = () => {
 
           <button
             onClick={refreshOrders}
-            className="px-4 py-2.5 bg-[#080808] hover:bg-[#1a1a1a] border border-[#262626] rounded-xl text-xs font-bold uppercase text-[#A0A0A0] hover:text-[#EFECE6] transition-all flex items-center justify-center gap-2"
+            className="px-4 py-2.5 bg-[#F9F9F7] hover:bg-[#F0EFEA] border border-[#E5E5E1] rounded-xl text-xs font-bold uppercase text-[#171717] transition-all flex items-center justify-center gap-2"
           >
-            <RefreshCw className="w-3.5 h-3.5 text-[#D6B35A]" /> Atualizar Pedidos
+            <RefreshCw className="w-3.5 h-3.5 text-[#B45309]" /> Atualizar Pedidos
           </button>
         </div>
 
@@ -327,8 +327,8 @@ export const AdminOrdersTab: React.FC = () => {
             onClick={() => setStatusFilter('all')}
             className={`px-3 py-1.5 rounded-lg font-bold uppercase shrink-0 transition-all ${
               statusFilter === 'all'
-                ? 'bg-[#D6B35A] text-black shadow-md'
-                : 'bg-[#080808] border border-[#222222] text-[#888888] hover:text-[#EFECE6]'
+                ? 'bg-[#F0C84B] text-black shadow-sm'
+                : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
             }`}
           >
             Todos ({allOrders.length})
@@ -348,8 +348,8 @@ export const AdminOrdersTab: React.FC = () => {
                 onClick={() => setStatusFilter(st)}
                 className={`px-3 py-1.5 rounded-lg font-bold uppercase shrink-0 transition-all ${
                   statusFilter === st
-                    ? 'bg-[#D6B35A] text-black shadow-md'
-                    : 'bg-[#080808] border border-[#222222] text-[#888888] hover:text-[#EFECE6]'
+                    ? 'bg-[#F0C84B] text-black shadow-sm'
+                    : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                 }`}
               >
                 {st} ({count})
@@ -360,11 +360,11 @@ export const AdminOrdersTab: React.FC = () => {
       </div>
 
       {/* Orders Table */}
-      <div className="bg-[#141414] border border-[#222222] rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-[#E5E5E1] rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[#222222] bg-[#0a0a0a] text-[#777777] font-mono uppercase tracking-wider">
+              <tr className="border-b border-[#E5E5E1] bg-[#F9F9F7] text-[#6B6B66] font-mono uppercase tracking-wider">
                 <th className="p-4">Pedido / Data</th>
                 <th className="p-4">Cliente & Destino</th>
                 <th className="p-4">Itens</th>
@@ -373,12 +373,12 @@ export const AdminOrdersTab: React.FC = () => {
                 <th className="p-4 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1c1c1c]">
+            <tbody className="divide-y divide-[#E5E5E1]">
               {filteredOrders.map((order, idx) => {
                 const badge = STATUS_COLOR_MAP[order.status] || {
-                  bg: 'bg-zinc-900',
-                  text: 'text-zinc-400',
-                  border: 'border-zinc-700',
+                  bg: 'bg-zinc-100',
+                  text: 'text-zinc-700',
+                  border: 'border-zinc-300',
                 };
                 const itemCount = order.items?.reduce((s, i) => s + i.quantity, 0) || 0;
 
@@ -386,24 +386,24 @@ export const AdminOrdersTab: React.FC = () => {
                   <tr
                     key={`${order.id}-${idx}`}
                     onClick={() => setSelectedOrder(order)}
-                    className="hover:bg-[#181818] transition-colors cursor-pointer group"
+                    className="hover:bg-[#F9F9F7] transition-colors cursor-pointer group"
                   >
                     {/* ID & Date */}
                     <td className="p-4 font-mono">
-                      <p className="font-bold text-[#D6B35A] group-hover:underline">
+                      <p className="font-bold text-[#B45309] group-hover:underline">
                         #{order.id.slice(-8).toUpperCase()}
                       </p>
-                      <p className="text-[10px] text-[#777777] mt-0.5">
+                      <p className="text-[10px] text-[#6B6B66] mt-0.5">
                         {order.createdAt ? new Date(order.createdAt).toLocaleDateString('pt-BR') : 'Hoje'}
                       </p>
                     </td>
 
                     {/* Customer & Location */}
                     <td className="p-4">
-                      <p className="font-bold text-[#EFECE6]">
+                      <p className="font-bold text-[#171717]">
                         {order.shippingAddress?.recipientName || order.customerName || 'Cliente'}
                       </p>
-                      <p className="text-[11px] text-[#777777] truncate max-w-[180px]">
+                      <p className="text-[11px] text-[#6B6B66] truncate max-w-[180px]">
                         {order.shippingAddress?.city}/{order.shippingAddress?.state} • {order.customerEmail}
                       </p>
                     </td>
@@ -411,22 +411,22 @@ export const AdminOrdersTab: React.FC = () => {
                     {/* Items */}
                     <td className="p-4">
                       <div className="flex items-center gap-1.5">
-                        <Package className="w-3.5 h-3.5 text-[#777777]" />
-                        <span className="font-mono text-[#EFECE6] font-bold">
+                        <Package className="w-3.5 h-3.5 text-[#6B6B66]" />
+                        <span className="font-mono text-[#171717] font-bold">
                           {itemCount} {itemCount === 1 ? 'item' : 'itens'}
                         </span>
                       </div>
-                      <p className="text-[10px] text-[#777777] truncate max-w-[160px]">
+                      <p className="text-[10px] text-[#6B6B66] truncate max-w-[160px]">
                         {order.items?.[0]?.title || 'Produtos'}
                       </p>
                     </td>
 
                     {/* Payment & Total */}
                     <td className="p-4 font-mono">
-                      <p className="font-bold text-[#EFECE6]">
+                      <p className="font-bold text-[#171717]">
                         R$ {order.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
-                      <p className="text-[10px] text-[#777777] uppercase">
+                      <p className="text-[10px] text-[#6B6B66] uppercase">
                         {order.paymentMethod || 'Mercado Pago'}
                       </p>
                     </td>
@@ -447,7 +447,7 @@ export const AdminOrdersTab: React.FC = () => {
                           e.stopPropagation();
                           setSelectedOrder(order);
                         }}
-                        className="p-2 bg-[#080808] hover:bg-[#262626] border border-[#222222] rounded-lg text-[#D6B35A] transition-all"
+                        className="p-2 bg-[#F9F9F7] hover:bg-[#F0EFEA] border border-[#E5E5E1] rounded-lg text-[#171717] hover:text-[#B45309] transition-all"
                         title="Ver Detalhes do Pedido"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -459,7 +459,7 @@ export const AdminOrdersTab: React.FC = () => {
 
               {filteredOrders.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center text-[#777777] font-mono">
+                  <td colSpan={6} className="p-12 text-center text-[#6B6B66] font-mono">
                     Nenhum pedido encontrado com os filtros selecionados.
                   </td>
                 </tr>
@@ -471,24 +471,24 @@ export const AdminOrdersTab: React.FC = () => {
 
       {/* Deep Order Detail Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="bg-[#141414] border border-[#262626] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6 p-6 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div className="bg-white border border-[#E5E5E1] rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6 p-6 animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
-            <div className="flex items-start justify-between border-b border-[#222222] pb-4">
+            <div className="flex items-start justify-between border-b border-[#E5E5E1] pb-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-bold text-lg text-[#D6B35A]">
+                  <span className="font-mono font-bold text-lg text-[#B45309]">
                     PEDIDO #{selectedOrder.id}
                   </span>
                   <span
                     className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                      (STATUS_COLOR_MAP[selectedOrder.status] || { bg: 'bg-zinc-900', text: 'text-zinc-400', border: 'border-zinc-700' }).bg
-                    } ${(STATUS_COLOR_MAP[selectedOrder.status] || { bg: '', text: 'text-zinc-400', border: '' }).text} ${(STATUS_COLOR_MAP[selectedOrder.status] || { bg: '', text: '', border: 'border-zinc-700' }).border}`}
+                      (STATUS_COLOR_MAP[selectedOrder.status] || { bg: 'bg-zinc-100', text: 'text-zinc-700', border: 'border-zinc-300' }).bg
+                    } ${(STATUS_COLOR_MAP[selectedOrder.status] || { bg: '', text: 'text-zinc-700', border: '' }).text} ${(STATUS_COLOR_MAP[selectedOrder.status] || { bg: '', text: '', border: 'border-zinc-300' }).border}`}
                   >
                     {selectedOrder.status}
                   </span>
                 </div>
-                <p className="text-xs text-[#777777] mt-0.5 font-mono">
+                <p className="text-xs text-[#6B6B66] mt-0.5 font-mono">
                   Criado em: {selectedOrder.createdAt ? new Date(selectedOrder.createdAt).toLocaleString('pt-BR') : 'Data não informada'}
                 </p>
               </div>
@@ -496,14 +496,14 @@ export const AdminOrdersTab: React.FC = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => printPackingSlip(selectedOrder)}
-                  className="px-3 py-1.5 bg-[#080808] hover:bg-[#222] border border-[#333] text-xs font-bold text-[#EFECE6] rounded-xl flex items-center gap-1.5 transition-all"
+                  className="px-3 py-1.5 bg-[#F9F9F7] hover:bg-[#F0EFEA] border border-[#E5E5E1] text-xs font-bold text-[#171717] rounded-xl flex items-center gap-1.5 transition-all shadow-xs"
                   title="Imprimir Guia de Envio"
                 >
-                  <Printer className="w-3.5 h-3.5 text-[#D6B35A]" /> Imprimir Guia
+                  <Printer className="w-3.5 h-3.5 text-[#B45309]" /> Imprimir Guia
                 </button>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="p-1.5 hover:bg-[#222] rounded-lg text-[#777777] hover:text-[#EFECE6] transition-all"
+                  className="p-1.5 hover:bg-[#F9F9F7] rounded-lg text-[#6B6B66] hover:text-[#171717] transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -513,60 +513,60 @@ export const AdminOrdersTab: React.FC = () => {
             {/* Split Info: Customer & Shipping */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Customer */}
-              <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-2">
-                <h4 className="text-xs font-bold uppercase text-[#D6B35A] flex items-center gap-1.5">
+              <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-2">
+                <h4 className="text-xs font-bold uppercase text-[#B45309] flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" /> Cliente
                 </h4>
-                <p className="text-xs font-bold text-[#EFECE6]">
+                <p className="text-xs font-bold text-[#171717]">
                   {selectedOrder.shippingAddress?.recipientName || selectedOrder.customerName || 'Cliente'}
                 </p>
-                <p className="text-xs text-[#777777]">E-mail: {selectedOrder.customerEmail || 'Não informado'}</p>
-                <p className="text-xs text-[#777777]">CPF: {selectedOrder.customerCpf || 'Não informado'}</p>
-                <p className="text-xs text-[#777777]">Telefone: {selectedOrder.customerPhone || 'Não informado'}</p>
+                <p className="text-xs text-[#6B6B66]">E-mail: {selectedOrder.customerEmail || 'Não informado'}</p>
+                <p className="text-xs text-[#6B6B66]">CPF: {selectedOrder.customerCpf || 'Não informado'}</p>
+                <p className="text-xs text-[#6B6B66]">Telefone: {selectedOrder.customerPhone || 'Não informado'}</p>
               </div>
 
               {/* Shipping Address */}
-              <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-2">
-                <h4 className="text-xs font-bold uppercase text-[#D6B35A] flex items-center gap-1.5">
+              <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-2">
+                <h4 className="text-xs font-bold uppercase text-[#B45309] flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5" /> Endereço de Entrega
                 </h4>
-                <p className="text-xs text-[#EFECE6]">
+                <p className="text-xs text-[#171717]">
                   {selectedOrder.shippingAddress?.street}, {selectedOrder.shippingAddress?.number}{' '}
                   {selectedOrder.shippingAddress?.complement ? `(${selectedOrder.shippingAddress.complement})` : ''}
                 </p>
-                <p className="text-xs text-[#777777]">
+                <p className="text-xs text-[#6B6B66]">
                   Bairro: {selectedOrder.shippingAddress?.neighborhood || 'Não informado'}
                 </p>
-                <p className="text-xs text-[#777777]">
+                <p className="text-xs text-[#6B6B66]">
                   {selectedOrder.shippingAddress?.city} - {selectedOrder.shippingAddress?.state} • CEP: {selectedOrder.shippingAddress?.cep}
                 </p>
-                <div className="pt-1 flex items-center gap-2 text-xs font-mono text-[#A0A0A0]">
-                  <Truck className="w-3.5 h-3.5 text-[#D6B35A]" />
+                <div className="pt-1 flex items-center gap-2 text-xs font-mono text-[#6B6B66]">
+                  <Truck className="w-3.5 h-3.5 text-[#B45309]" />
                   <span>{selectedOrder.shippingCarrier || 'Melhor Envio'} ({selectedOrder.shippingService || 'Padrão'})</span>
                 </div>
               </div>
             </div>
 
             {/* Tracking & Shipping Integration Section */}
-            <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-3">
+            <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-3">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold text-[#EFECE6] flex items-center gap-1.5">
-                    <Truck className="w-4 h-4 text-[#D6B35A]" /> Integração Melhor Envio & Rastreamento
+                  <p className="text-xs font-bold text-[#171717] flex items-center gap-1.5">
+                    <Truck className="w-4 h-4 text-[#B45309]" /> Integração Melhor Envio & Rastreamento
                   </p>
                   {selectedOrder.trackingCode ? (
                     <div className="mt-1 flex items-center gap-2">
-                      <span className="font-mono text-sm font-bold text-[#D6B35A]">
+                      <span className="font-mono text-sm font-bold text-[#B45309]">
                         {selectedOrder.trackingCode}
                       </span>
                       {selectedOrder.melhorEnvioShipmentId && (
-                        <span className="text-[10px] bg-[#1a1a1a] text-[#888] px-2 py-0.5 rounded font-mono">
+                        <span className="text-[10px] bg-white text-[#6B6B66] border border-[#E5E5E1] px-2 py-0.5 rounded font-mono">
                           ID: {selectedOrder.melhorEnvioShipmentId}
                         </span>
                       )}
                     </div>
                   ) : (
-                    <p className="text-xs text-[#777777] mt-0.5">Nenhum envio gerado ainda para esta compra.</p>
+                    <p className="text-xs text-[#6B6B66] mt-0.5">Nenhum envio gerado ainda para esta compra.</p>
                   )}
                 </div>
 
@@ -575,7 +575,7 @@ export const AdminOrdersTab: React.FC = () => {
                   <button
                     disabled={isGeneratingShipment}
                     onClick={() => handleGenerateMelhorEnvioShipment(selectedOrder.id)}
-                    className="px-3 py-1.5 bg-[#D6B35A] hover:bg-[#EFECE6] text-black font-bold text-xs uppercase rounded-xl transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                    className="px-3 py-1.5 bg-[#F0C84B] hover:bg-[#F0C84B]/90 text-black font-bold text-xs uppercase rounded-xl transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50"
                     title="Comprar etiqueta e gerar envio oficial no Melhor Envio (Produção)"
                   >
                     <PackageCheck className="w-3.5 h-3.5" />
@@ -586,10 +586,10 @@ export const AdminOrdersTab: React.FC = () => {
                   {(selectedOrder.shippingLabelUrl || selectedOrder.melhorEnvioShipmentId || selectedOrder.trackingCode) && (
                     <button
                       onClick={() => handlePrintLabel(selectedOrder)}
-                      className="px-3 py-1.5 bg-[#161616] hover:bg-[#252525] border border-[#333] text-[#EFECE6] font-bold text-xs uppercase rounded-xl transition-all flex items-center gap-1.5"
+                      className="px-3 py-1.5 bg-white hover:bg-[#F9F9F7] border border-[#E5E5E1] text-[#171717] font-bold text-xs uppercase rounded-xl transition-all flex items-center gap-1.5 shadow-xs"
                       title="Imprimir Etiqueta Oficial"
                     >
-                      <Tag className="w-3.5 h-3.5 text-[#D6B35A]" /> Imprimir Etiqueta
+                      <Tag className="w-3.5 h-3.5 text-[#B45309]" /> Imprimir Etiqueta
                     </button>
                   )}
 
@@ -600,9 +600,9 @@ export const AdminOrdersTab: React.FC = () => {
                         setDispatchCarrier(selectedOrder.shippingCarrier || 'Correios');
                         setDispatchModalOpen(true);
                       }}
-                      className="px-3 py-1.5 bg-[#1a1a1a] hover:bg-[#2a2a2a] text-[#A0A0A0] hover:text-[#EFECE6] border border-[#333] font-bold text-xs uppercase rounded-xl transition-all flex items-center gap-1"
+                      className="px-3 py-1.5 bg-white hover:bg-[#F9F9F7] text-[#171717] border border-[#E5E5E1] font-bold text-xs uppercase rounded-xl transition-all flex items-center gap-1 shadow-xs"
                     >
-                      <Send className="w-3.5 h-3.5" /> Despacho Manual
+                      <Send className="w-3.5 h-3.5 text-[#B45309]" /> Despacho Manual
                     </button>
                   )}
                 </div>
@@ -611,12 +611,12 @@ export const AdminOrdersTab: React.FC = () => {
 
             {/* Items List */}
             <div className="space-y-3">
-              <h4 className="text-xs font-mono font-bold uppercase text-[#777777]">Itens do Pedido</h4>
-              <div className="bg-[#0a0a0a] border border-[#1f1f1f] rounded-xl divide-y divide-[#1c1c1c] overflow-hidden">
+              <h4 className="text-xs font-mono font-bold uppercase text-[#6B6B66]">Itens do Pedido</h4>
+              <div className="bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl divide-y divide-[#E5E5E1] overflow-hidden">
                 {(selectedOrder.items || []).map((it, idx) => (
                   <div key={idx} className="p-3 flex items-center justify-between gap-3 text-xs">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-[#161616] overflow-hidden border border-[#262626] shrink-0">
+                      <div className="w-12 h-12 rounded-lg bg-white overflow-hidden border border-[#E5E5E1] shrink-0">
                         <img
                           src={it.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80'}
                           alt={it.title}
@@ -625,19 +625,19 @@ export const AdminOrdersTab: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <p className="font-bold text-[#EFECE6]">{it.title}</p>
-                        <p className="text-[11px] text-[#777777]">
-                          Tamanho: <span className="text-[#EFECE6] font-bold">{it.size}</span> • Cor: <span className="text-[#EFECE6] font-bold">{it.color}</span>
+                        <p className="font-bold text-[#171717]">{it.title}</p>
+                        <p className="text-[11px] text-[#6B6B66]">
+                          Tamanho: <span className="text-[#171717] font-bold">{it.size}</span> • Cor: <span className="text-[#171717] font-bold">{it.color}</span>
                         </p>
-                        <p className="text-[10px] text-[#555] font-mono">Qtd: {it.quantity}</p>
+                        <p className="text-[10px] text-[#6B6B66] font-mono">Qtd: {it.quantity}</p>
                       </div>
                     </div>
 
                     <div className="text-right font-mono">
-                      <p className="font-bold text-[#EFECE6]">
+                      <p className="font-bold text-[#171717]">
                         R$ {(it.price * it.quantity).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
-                      <p className="text-[10px] text-[#777777]">R$ {it.price.toFixed(2)} un.</p>
+                      <p className="text-[10px] text-[#6B6B66]">R$ {it.price.toFixed(2)} un.</p>
                     </div>
                   </div>
                 ))}
@@ -645,40 +645,40 @@ export const AdminOrdersTab: React.FC = () => {
             </div>
 
             {/* Financial Summary */}
-            <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-2 text-xs font-mono">
-              <div className="flex justify-between text-[#777777]">
+            <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-2 text-xs font-mono">
+              <div className="flex justify-between text-[#6B6B66]">
                 <span>Subtotal:</span>
-                <span>R$ {selectedOrder.subtotal?.toFixed(2)}</span>
+                <span className="text-[#171717]">R$ {selectedOrder.subtotal?.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-[#777777]">
+              <div className="flex justify-between text-[#6B6B66]">
                 <span>Frete ({selectedOrder.shippingCarrier || 'Envio'}):</span>
-                <span>R$ {selectedOrder.shippingFee?.toFixed(2)}</span>
+                <span className="text-[#171717]">R$ {selectedOrder.shippingFee?.toFixed(2)}</span>
               </div>
               {selectedOrder.discount > 0 && (
-                <div className="flex justify-between text-emerald-400">
+                <div className="flex justify-between text-emerald-600 font-semibold">
                   <span>Desconto aplicado:</span>
                   <span>- R$ {selectedOrder.discount?.toFixed(2)}</span>
                 </div>
               )}
-              <div className="flex justify-between font-bold text-sm text-[#D6B35A] border-t border-[#222222] pt-2">
+              <div className="flex justify-between font-bold text-sm text-[#B45309] border-t border-[#E5E5E1] pt-2">
                 <span>TOTAL DO PEDIDO:</span>
                 <span>R$ {selectedOrder.total?.toFixed(2)}</span>
               </div>
             </div>
 
             {/* Change Status Workflow */}
-            <div className="bg-[#0a0a0a] border border-[#222222] p-4 rounded-xl space-y-4">
-              <h4 className="text-xs font-bold uppercase text-[#EFECE6] flex items-center gap-2">
-                <RefreshCw className="w-3.5 h-3.5 text-[#D6B35A]" /> Alterar Status Operacional
+            <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-4">
+              <h4 className="text-xs font-bold uppercase text-[#171717] flex items-center gap-2">
+                <RefreshCw className="w-3.5 h-3.5 text-[#B45309]" /> Alterar Status Operacional
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-mono text-[#777777] block mb-1">Novo Status:</label>
+                  <label className="text-[11px] font-mono text-[#6B6B66] block mb-1">Novo Status:</label>
                   <select
                     value={targetStatus}
                     onChange={(e) => setTargetStatus(e.target.value as OrderStatus)}
-                    className="w-full bg-[#141414] border border-[#262626] rounded-xl px-3 py-2 text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                    className="w-full bg-white border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                   >
                     <option value="">Selecione o próximo status...</option>
                     <option value="Aguardando Pagamento">Aguardando Pagamento</option>
@@ -695,25 +695,25 @@ export const AdminOrdersTab: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-mono text-[#777777] block mb-1">Código de Rastreio (Opcional):</label>
+                  <label className="text-[11px] font-mono text-[#6B6B66] block mb-1">Código de Rastreio (Opcional):</label>
                   <input
                     type="text"
                     value={trackingCodeInput}
                     onChange={(e) => setTrackingCodeInput(e.target.value)}
                     placeholder="Ex: BR123456789BR"
-                    className="w-full bg-[#141414] border border-[#262626] rounded-xl px-3 py-2 text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                    className="w-full bg-white border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-mono text-[#777777] block mb-1">Observação do Histórico:</label>
+                <label className="text-[11px] font-mono text-[#6B6B66] block mb-1">Observação do Histórico:</label>
                 <input
                   type="text"
                   value={statusNote}
                   onChange={(e) => setStatusNote(e.target.value)}
                   placeholder="Ex: Pedido embalado e pronto para coleta..."
-                  className="w-full bg-[#141414] border border-[#262626] rounded-xl px-3 py-2 text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                  className="w-full bg-white border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                 />
               </div>
 
@@ -721,7 +721,7 @@ export const AdminOrdersTab: React.FC = () => {
                 <button
                   onClick={handleStatusChange}
                   disabled={!targetStatus || isUpdatingStatus}
-                  className="px-4 py-2 bg-[#D6B35A] hover:bg-[#EFECE6] text-black font-bold text-xs uppercase rounded-xl transition-all shadow-md disabled:opacity-40 flex items-center gap-2"
+                  className="px-4 py-2 bg-[#F0C84B] hover:bg-[#F0C84B]/90 text-black font-bold text-xs uppercase rounded-xl transition-all shadow-sm disabled:opacity-40 flex items-center gap-2"
                 >
                   {isUpdatingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                   Confirmar Atualização
@@ -731,19 +731,19 @@ export const AdminOrdersTab: React.FC = () => {
 
             {/* Timeline History */}
             <div className="space-y-3">
-              <h4 className="text-xs font-mono font-bold uppercase text-[#777777] flex items-center gap-1.5">
+              <h4 className="text-xs font-mono font-bold uppercase text-[#6B6B66] flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" /> Histórico de Eventos
               </h4>
-              <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-3">
+              <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-3">
                 {(selectedOrder.history || []).map((ev, idx) => (
                   <div key={idx} className="flex items-start gap-3 text-xs">
-                    <div className="w-2 h-2 rounded-full bg-[#D6B35A] mt-1.5 shrink-0" />
+                    <div className="w-2 h-2 rounded-full bg-[#B45309] mt-1.5 shrink-0" />
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-[#EFECE6]">{ev.status}</span>
-                        <span className="text-[10px] text-[#777777] font-mono">{ev.timestamp}</span>
+                        <span className="font-bold text-[#171717]">{ev.status}</span>
+                        <span className="text-[10px] text-[#6B6B66] font-mono">{ev.timestamp}</span>
                       </div>
-                      <p className="text-[11px] text-[#A0A0A0] mt-0.5">{ev.description || (ev as any).note}</p>
+                      <p className="text-[11px] text-[#6B6B66] mt-0.5">{ev.description || (ev as any).note}</p>
                     </div>
                   </div>
                 ))}
@@ -755,20 +755,20 @@ export const AdminOrdersTab: React.FC = () => {
 
       {/* Dispatch Modal */}
       {dispatchModalOpen && selectedOrder && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#141414] border border-[#262626] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-[#E5E5E1] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-sm font-black uppercase text-[#EFECE6] tracking-tight">
+                <h3 className="text-sm font-black uppercase text-[#171717] tracking-tight">
                   Despachar Pedido #{selectedOrder.id}
                 </h3>
-                <p className="text-xs text-[#777777] mt-0.5">
+                <p className="text-xs text-[#6B6B66] mt-0.5">
                   Informe a transportadora e o código de rastreamento oficial.
                 </p>
               </div>
               <button
                 onClick={() => setDispatchModalOpen(false)}
-                className="text-[#777777] hover:text-[#EFECE6]"
+                className="text-[#6B6B66] hover:text-[#171717]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -776,11 +776,11 @@ export const AdminOrdersTab: React.FC = () => {
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-mono text-[#777777] block mb-1">Transportadora:</label>
+                <label className="text-xs font-mono text-[#6B6B66] block mb-1">Transportadora:</label>
                 <select
                   value={dispatchCarrier}
                   onChange={(e) => setDispatchCarrier(e.target.value)}
-                  className="w-full bg-[#080808] border border-[#262626] rounded-xl px-3 py-2 text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                 >
                   <option value="Correios (SEDEX)">Correios (SEDEX)</option>
                   <option value="Correios (PAC)">Correios (PAC)</option>
@@ -793,13 +793,13 @@ export const AdminOrdersTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-mono text-[#777777] block mb-1">Código de Rastreamento *:</label>
+                <label className="text-xs font-mono text-[#6B6B66] block mb-1">Código de Rastreamento *:</label>
                 <input
                   type="text"
                   value={dispatchTrackingCode}
                   onChange={(e) => setDispatchTrackingCode(e.target.value)}
                   placeholder="Ex: NL123456789BR"
-                  className="w-full bg-[#080808] border border-[#262626] rounded-xl px-3 py-2 text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                 />
               </div>
             </div>
@@ -807,14 +807,14 @@ export const AdminOrdersTab: React.FC = () => {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setDispatchModalOpen(false)}
-                className="px-4 py-2 bg-[#080808] hover:bg-[#222] border border-[#262626] text-xs font-bold uppercase text-[#777777] hover:text-[#EFECE6] rounded-xl"
+                className="px-4 py-2 bg-[#F9F9F7] hover:bg-[#F0EFEA] border border-[#E5E5E1] text-xs font-bold uppercase text-[#6B6B66] hover:text-[#171717] rounded-xl"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleDispatchOrder}
                 disabled={isUpdatingStatus || !dispatchTrackingCode.trim()}
-                className="px-4 py-2 bg-[#D6B35A] hover:bg-[#EFECE6] text-black text-xs font-black uppercase rounded-xl transition-all shadow-md disabled:opacity-40 flex items-center gap-2"
+                className="px-4 py-2 bg-[#F0C84B] hover:bg-[#F0C84B]/90 text-black text-xs font-black uppercase rounded-xl transition-all shadow-sm disabled:opacity-40 flex items-center gap-2"
               >
                 {isUpdatingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
                 Confirmar Despacho

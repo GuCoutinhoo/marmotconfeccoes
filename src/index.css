@@ -4,6 +4,9 @@
   body {
     background-color: #F8F9FA;
     color: #18181B;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   ::selection {
     background-color: #F4C400;
@@ -21,25 +24,37 @@
     cursor: pointer;
     user-select: none;
   }
+
+  img {
+    content-visibility: auto;
+  }
 }
 
+/* GPU-accelerated marquee for 60fps scrolling */
 @keyframes marquee {
   0% {
-    transform: translateX(0%);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
 .animate-marquee {
   display: flex;
   width: max-content;
+  will-change: transform;
   animation: marquee 25s linear infinite;
 }
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+/* Off-screen rendering optimization for dense product catalogs */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 380px;
 }
 
 /* Custom scrollbar hiding helper */
@@ -66,3 +81,4 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #A1A1AA;
 }
+

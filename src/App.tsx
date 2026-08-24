@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
@@ -8,20 +8,33 @@ import { StoreProvider, useStore } from './context/StoreContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { MiniCart } from './components/MiniCart';
-import { QuickViewModal } from './components/QuickViewModal';
-import { LiveSearchModal } from './components/LiveSearchModal';
-
 import { HomePage } from './pages/HomePage';
-import { ShopPage } from './pages/ShopPage';
-import { ProductDetailPage } from './pages/ProductDetailPage';
-import { CheckoutPage } from './pages/CheckoutPage';
-import { TrackingPage } from './pages/TrackingPage';
-import { AccountPage } from './pages/AccountPage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { InstitutionalPage } from './pages/InstitutionalPage';
-import { AuthConfirmPage } from './pages/AuthConfirmPage';
 
 import { Product } from './types';
+
+// Code-split pages for instant initial load and low main-thread memory footprint
+const ShopPage = lazy(() => import('./pages/ShopPage').then((m) => ({ default: m.ShopPage })));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage').then((m) => ({ default: m.ProductDetailPage })));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then((m) => ({ default: m.CheckoutPage })));
+const TrackingPage = lazy(() => import('./pages/TrackingPage').then((m) => ({ default: m.TrackingPage })));
+const AccountPage = lazy(() => import('./pages/AccountPage').then((m) => ({ default: m.AccountPage })));
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage').then((m) => ({ default: m.AdminDashboardPage })));
+const InstitutionalPage = lazy(() => import('./pages/InstitutionalPage').then((m) => ({ default: m.InstitutionalPage })));
+const AuthConfirmPage = lazy(() => import('./pages/AuthConfirmPage').then((m) => ({ default: m.AuthConfirmPage })));
+
+// Code-split heavy interactive modals
+const QuickViewModal = lazy(() => import('./components/QuickViewModal').then((m) => ({ default: m.QuickViewModal })));
+const LiveSearchModal = lazy(() => import('./components/LiveSearchModal').then((m) => ({ default: m.LiveSearchModal })));
+
+// Ultra-lightweight non-blocking page loader fallback
+const PageLoadingFallback: React.FC = () => (
+  <div className="min-h-[60vh] flex flex-col items-center justify-center p-8">
+    <div className="w-8 h-8 border-2 border-[#18181B] border-t-[#F4C400] rounded-full animate-spin mb-3" />
+    <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#71717A]">
+      Carregando...
+    </span>
+  </div>
+);
 
 function getInitialRoute(): { page: string; param: string } {
   if (typeof window === 'undefined') return { page: 'home', param: '' };
@@ -106,7 +119,7 @@ export function AppContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage, pageParam]);
 
-  const handleNavigate = (page: string, param: string = '') => {
+  const handleNavigate = useCallback((page: string, param: string = '') => {
     setCurrentPage(page);
     setPageParam(param);
 
@@ -126,11 +139,11 @@ export function AppContent() {
         window.history.pushState({}, '', param ? `/tracking?code=${param}` : '/tracking');
       }
     }
-  };
+  }, []);
 
-  const handleOpenQuickView = (product: Product) => {
+  const handleOpenQuickView = useCallback((product: Product) => {
     setQuickViewProduct(product);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#18181B] flex flex-col font-sans selection:bg-[#F4C400] selection:text-black">
@@ -140,54 +153,56 @@ export function AppContent() {
         onOpenSearch={() => setIsSearchOpen(true)}
       />
 
-      {/* Main Page Body */}
+      {/* Main Page Body with non-blocking Suspense boundaries */}
       <main className="flex-1">
-        {currentPage === 'home' && (
-          <HomePage
-            onNavigate={handleNavigate}
-            onQuickView={handleOpenQuickView}
-          />
-        )}
+        <Suspense fallback={<PageLoadingFallback />}>
+          {currentPage === 'home' && (
+            <HomePage
+              onNavigate={handleNavigate}
+              onQuickView={handleOpenQuickView}
+            />
+          )}
 
-        {currentPage === 'shop' && (
-          <ShopPage
-            initialCategory={pageParam}
-            onNavigate={handleNavigate}
-            onQuickView={handleOpenQuickView}
-          />
-        )}
+          {currentPage === 'shop' && (
+            <ShopPage
+              initialCategory={pageParam}
+              onNavigate={handleNavigate}
+              onQuickView={handleOpenQuickView}
+            />
+          )}
 
-        {currentPage === 'product' && (
-          <ProductDetailPage
-            productId={pageParam}
-            onNavigate={handleNavigate}
-            onQuickView={handleOpenQuickView}
-          />
-        )}
+          {currentPage === 'product' && (
+            <ProductDetailPage
+              productId={pageParam}
+              onNavigate={handleNavigate}
+              onQuickView={handleOpenQuickView}
+            />
+          )}
 
-        {currentPage === 'checkout' && (
-          <CheckoutPage onNavigate={handleNavigate} />
-        )}
+          {currentPage === 'checkout' && (
+            <CheckoutPage onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === 'tracking' && (
-          <TrackingPage initialCode={pageParam} onNavigate={handleNavigate} />
-        )}
+          {currentPage === 'tracking' && (
+            <TrackingPage initialCode={pageParam} onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === 'account' && (
-          <AccountPage initialTab={pageParam} onNavigate={handleNavigate} />
-        )}
+          {currentPage === 'account' && (
+            <AccountPage initialTab={pageParam} onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === 'admin' && (
-          <AdminDashboardPage onNavigate={handleNavigate} />
-        )}
+          {currentPage === 'admin' && (
+            <AdminDashboardPage onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === 'institutional' && (
-          <InstitutionalPage section={pageParam} onNavigate={handleNavigate} />
-        )}
+          {currentPage === 'institutional' && (
+            <InstitutionalPage section={pageParam} onNavigate={handleNavigate} />
+          )}
 
-        {currentPage === 'auth-confirm' && (
-          <AuthConfirmPage onNavigate={handleNavigate} />
-        )}
+          {currentPage === 'auth-confirm' && (
+            <AuthConfirmPage onNavigate={handleNavigate} />
+          )}
+        </Suspense>
       </main>
 
       {/* Persistent Footer */}
@@ -196,27 +211,35 @@ export function AppContent() {
       {/* Global Slide-Over MiniCart */}
       <MiniCart onNavigate={handleNavigate} />
 
-      {/* Global Quick View Modal */}
-      <QuickViewModal
-        product={quickViewProduct}
-        onClose={() => setQuickViewProduct(null)}
-        onNavigateToDetail={(id) => handleNavigate('product', id)}
-      />
+      {/* Global Quick View Modal with Suspense */}
+      {quickViewProduct && (
+        <Suspense fallback={null}>
+          <QuickViewModal
+            product={quickViewProduct}
+            onClose={() => setQuickViewProduct(null)}
+            onNavigateToDetail={(id) => handleNavigate('product', id)}
+          />
+        </Suspense>
+      )}
 
-      {/* Global Live Search Modal */}
-      <LiveSearchModal
-        isOpen={isSearchOpen}
-        products={products}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectProduct={(id) => {
-          setIsSearchOpen(false);
-          handleNavigate('product', id);
-        }}
-        onSearchCategory={(cat) => {
-          setIsSearchOpen(false);
-          handleNavigate('shop', cat);
-        }}
-      />
+      {/* Global Live Search Modal with Suspense */}
+      {isSearchOpen && (
+        <Suspense fallback={null}>
+          <LiveSearchModal
+            isOpen={isSearchOpen}
+            products={products}
+            onClose={() => setIsSearchOpen(false)}
+            onSelectProduct={(id) => {
+              setIsSearchOpen(false);
+              handleNavigate('product', id);
+            }}
+            onSearchCategory={(cat) => {
+              setIsSearchOpen(false);
+              handleNavigate('shop', cat);
+            }}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

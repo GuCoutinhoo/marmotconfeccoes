@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import { Product } from '../types';
 import { Heart, Eye, ShoppingBag, Check } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
@@ -11,7 +11,7 @@ interface ProductCardProps {
   onProductClick: (productId: string) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
+const ProductCardComponent: React.FC<ProductCardProps> = ({
   product,
   onQuickView,
   onProductClick,
@@ -20,13 +20,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const [hoveredColorImage, setHoveredColorImage] = useState<string | null>(null);
   const [addedSize, setAddedSize] = useState<string | null>(null);
   const { toggleWishlist, isInWishlist } = useWishlist();
-  const { addToCart, openMiniCart } = useCart();
-  const { showToast } = useToast();
+  const { addToCart } = useCart();
 
   const isFavorite = isInWishlist(product.id);
   const images = (product.images && product.images.length > 0)
     ? product.images
-    : [(product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'];
+    : [(product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=75'];
   
   const displayImage = hoveredColorImage || images[currentImageIndex] || images[0];
 
@@ -35,17 +34,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const installmentValue = effectivePrice / installmentCount;
   const pixPrice = effectivePrice * 0.95;
 
-  const handleQuickAddSize = (e: React.MouseEvent, size: string) => {
+  const handleQuickAddSize = useCallback((e: React.MouseEvent, size: string) => {
     e.stopPropagation();
     const added = addToCart(product, size, product.colors[0], 1);
     if (added) {
       setAddedSize(size);
       setTimeout(() => setAddedSize(null), 1800);
     }
-  };
+  }, [addToCart, product]);
 
   return (
-    <div className="group relative flex flex-col bg-white border border-[#E4E4E7] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#D4D4D8] hover:shadow-xl">
+    <div className="group relative flex flex-col bg-white border border-[#E4E4E7] rounded-2xl overflow-hidden transition-all duration-300 hover:border-[#D4D4D8] hover:shadow-xl will-change-transform">
       {/* 1. Image Container with Aspect Ratio */}
       <div 
         className="relative aspect-[3/4] w-full bg-[#F4F4F5] overflow-hidden cursor-pointer"
@@ -54,8 +53,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <img
           src={displayImage}
           alt={product.title}
+          loading="lazy"
+          decoding="async"
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+          className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
           onMouseEnter={() => !hoveredColorImage && images.length > 1 && setCurrentImageIndex(1)}
           onMouseLeave={() => !hoveredColorImage && setCurrentImageIndex(0)}
         />
@@ -85,10 +86,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             e.stopPropagation();
             toggleWishlist(product);
           }}
-          className={`absolute top-3 right-3 z-20 p-2.5 rounded-full backdrop-blur-md transition-all ${
+          className={`absolute top-3 right-3 z-20 p-2.5 rounded-full transition-all cursor-pointer ${
             isFavorite
               ? 'bg-[#18181B] text-[#F4C400] shadow-md'
-              : 'bg-white/85 text-[#52525B] hover:bg-white hover:text-black shadow-sm'
+              : 'bg-white/90 text-[#52525B] hover:bg-white hover:text-black shadow-sm'
           }`}
           aria-label="Favoritar produto"
         >
@@ -96,9 +97,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </button>
 
         {/* Quick Size Selector Overlay on Hover */}
-        <div className="absolute bottom-3 left-3 right-3 z-20 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 space-y-2">
+        <div className="absolute bottom-3 left-3 right-3 z-20 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 space-y-2 pointer-events-none group-hover:pointer-events-auto">
           {/* Quick sizes pills */}
-          <div className="bg-white/95 backdrop-blur-md border border-[#E4E4E7] p-2 rounded-xl flex items-center justify-between gap-1 shadow-lg">
+          <div className="bg-white/95 border border-[#E4E4E7] p-2 rounded-xl flex items-center justify-between gap-1 shadow-lg">
             <span className="text-[9px] font-mono font-bold uppercase text-[#71717A] px-1 hidden sm:inline">
               Tam:
             </span>
@@ -107,7 +108,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <button
                   key={sz}
                   onClick={(e) => handleQuickAddSize(e, sz)}
-                  className={`flex-1 py-1 px-1.5 rounded text-[10px] font-bold uppercase transition-all ${
+                  className={`flex-1 py-1 px-1.5 rounded text-[10px] font-bold uppercase transition-all cursor-pointer ${
                     addedSize === sz
                       ? 'bg-emerald-500 text-white'
                       : 'bg-[#F4F4F5] hover:bg-[#18181B] hover:text-white text-[#18181B]'
@@ -126,7 +127,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               e.stopPropagation();
               onQuickView(product);
             }}
-            className="w-full bg-white/95 hover:bg-[#18181B] hover:text-white text-[#18181B] border border-[#E4E4E7] text-[10px] font-bold uppercase tracking-wider py-2 px-3 rounded-lg backdrop-blur-md flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+            className="w-full bg-white/95 hover:bg-[#18181B] hover:text-white text-[#18181B] border border-[#E4E4E7] text-[10px] font-bold uppercase tracking-wider py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer"
           >
             <Eye className="w-3.5 h-3.5" /> Espiada Rápida
           </button>
@@ -197,7 +198,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                     onMouseLeave={() => {
                       setHoveredColorImage(null);
                     }}
-                    className="w-3.5 h-3.5 rounded-full border border-[#D4D4D8] hover:scale-125 hover:border-black transition-transform duration-100 shadow-sm"
+                    className="w-3.5 h-3.5 rounded-full border border-[#D4D4D8] hover:scale-125 hover:border-black transition-transform duration-100 shadow-sm cursor-pointer"
                     style={{ backgroundColor: c.colorHex }}
                     title={c.colorName}
                   />
@@ -213,3 +214,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     </div>
   );
 };
+
+export const ProductCard = memo(ProductCardComponent);
+

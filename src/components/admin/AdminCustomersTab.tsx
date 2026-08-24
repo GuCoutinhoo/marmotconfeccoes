@@ -103,21 +103,21 @@ export const AdminCustomersTab: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Top Filter Bar */}
-      <div className="bg-[#141414] border border-[#222222] p-4 sm:p-5 rounded-2xl space-y-4">
+      <div className="bg-white border border-[#E5E5E1] p-4 sm:p-5 rounded-2xl space-y-4 shadow-xs">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#777777] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#6B6B66] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Buscar por Nome, E-mail, CPF ou Cidade..."
-              className="w-full bg-[#080808] border border-[#262626] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
+              className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
             />
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#777777] hover:text-[#EFECE6]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6B6B66] hover:text-[#171717]"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -127,9 +127,9 @@ export const AdminCustomersTab: React.FC = () => {
           <button
             onClick={fetchCustomers}
             disabled={isLoading}
-            className="px-4 py-2.5 bg-[#080808] hover:bg-[#1a1a1a] border border-[#262626] rounded-xl text-xs font-bold uppercase text-[#A0A0A0] hover:text-[#EFECE6] transition-all flex items-center justify-center gap-2"
+            className="px-4 py-2.5 bg-white hover:bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl text-xs font-bold uppercase text-[#171717] transition-all flex items-center justify-center gap-2 shadow-xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#D6B35A] ${isLoading ? 'animate-spin' : ''}`} /> Atualizar Clientes
+            <RefreshCw className={`w-3.5 h-3.5 text-[#B45309] ${isLoading ? 'animate-spin' : ''}`} /> Atualizar Clientes
           </button>
         </div>
 
@@ -139,8 +139,8 @@ export const AdminCustomersTab: React.FC = () => {
             onClick={() => setStatusFilter('all')}
             className={`px-3 py-1.5 rounded-lg font-bold uppercase transition-all ${
               statusFilter === 'all'
-                ? 'bg-[#D6B35A] text-black shadow-md'
-                : 'bg-[#080808] border border-[#222222] text-[#888888] hover:text-[#EFECE6]'
+                ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] hover:border-[#B45309]'
             }`}
           >
             Todos ({customers.length})
@@ -149,8 +149,8 @@ export const AdminCustomersTab: React.FC = () => {
             onClick={() => setStatusFilter('active')}
             className={`px-3 py-1.5 rounded-lg font-bold uppercase transition-all ${
               statusFilter === 'active'
-                ? 'bg-[#D6B35A] text-black shadow-md'
-                : 'bg-[#080808] border border-[#222222] text-[#888888] hover:text-[#EFECE6]'
+                ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] hover:border-[#B45309]'
             }`}
           >
             Ativos ({customers.filter((c) => c.status !== 'blocked').length})
@@ -159,8 +159,8 @@ export const AdminCustomersTab: React.FC = () => {
             onClick={() => setStatusFilter('blocked')}
             className={`px-3 py-1.5 rounded-lg font-bold uppercase transition-all ${
               statusFilter === 'blocked'
-                ? 'bg-[#D6B35A] text-black shadow-md'
-                : 'bg-[#080808] border border-[#222222] text-[#888888] hover:text-[#EFECE6]'
+                ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] hover:border-[#B45309]'
             }`}
           >
             Bloqueados ({customers.filter((c) => c.status === 'blocked').length})
@@ -169,11 +169,11 @@ export const AdminCustomersTab: React.FC = () => {
       </div>
 
       {/* Customers Table */}
-      <div className="bg-[#141414] border border-[#222222] rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-[#E5E5E1] rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-[#222222] bg-[#0a0a0a] text-[#777777] font-mono uppercase tracking-wider">
+              <tr className="border-b border-[#E5E5E1] bg-[#F9F9F7] text-[#6B6B66] font-mono uppercase tracking-wider">
                 <th className="p-4">Cliente</th>
                 <th className="p-4">Contato / Localização</th>
                 <th className="p-4">Total de Pedidos</th>
@@ -182,25 +182,25 @@ export const AdminCustomersTab: React.FC = () => {
                 <th className="p-4 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#1c1c1c]">
+            <tbody className="divide-y divide-[#E5E5E1]">
               {filteredCustomers.map((customer) => {
                 const isBlocked = customer.status === 'blocked';
                 return (
                   <tr
                     key={customer.id}
                     onClick={() => setSelectedCustomer(customer)}
-                    className="hover:bg-[#181818] transition-colors cursor-pointer group"
+                    className="hover:bg-[#F9F9F7] transition-colors cursor-pointer group"
                   >
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#222] border border-[#333] flex items-center justify-center font-bold text-[#D6B35A]">
+                        <div className="w-9 h-9 rounded-xl bg-[#F0C84B]/20 border border-[#F0C84B]/40 flex items-center justify-center font-bold text-[#B45309]">
                           {customer.name.slice(0, 2).toUpperCase()}
                         </div>
                         <div>
-                          <p className="font-bold text-[#EFECE6] group-hover:text-[#D6B35A] transition-colors">
+                          <p className="font-bold text-[#171717] group-hover:text-[#B45309] transition-colors">
                             {customer.name}
                           </p>
-                          <p className="text-[10px] text-[#777777] font-mono">
+                          <p className="text-[10px] text-[#6B6B66] font-mono">
                             {customer.role === 'admin' ? 'Administrador' : 'Cliente Marmot'}
                           </p>
                         </div>
@@ -208,26 +208,26 @@ export const AdminCustomersTab: React.FC = () => {
                     </td>
 
                     <td className="p-4">
-                      <p className="text-[#EFECE6]">{customer.email}</p>
-                      <p className="text-[10px] text-[#777777] font-mono">
+                      <p className="text-[#171717]">{customer.email}</p>
+                      <p className="text-[10px] text-[#6B6B66] font-mono">
                         {customer.city ? `${customer.city}/${customer.state}` : 'Endereço pendente'}
                       </p>
                     </td>
 
                     <td className="p-4 font-mono">
-                      <span className="font-bold text-[#EFECE6]">{customer.totalOrders || 0} pedidos</span>
+                      <span className="font-bold text-[#171717]">{customer.totalOrders || 0} pedidos</span>
                       {customer.lastOrderDate && (
-                        <p className="text-[10px] text-[#777777]">
+                        <p className="text-[10px] text-[#6B6B66]">
                           Último: {new Date(customer.lastOrderDate).toLocaleDateString('pt-BR')}
                         </p>
                       )}
                     </td>
 
                     <td className="p-4 font-mono">
-                      <p className="font-black text-[#D6B35A]">
+                      <p className="font-black text-[#B45309]">
                         R$ {(customer.totalSpent || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
-                      <p className="text-[10px] text-[#777777]">
+                      <p className="text-[10px] text-[#6B6B66]">
                         Ticket Médio: R$ {(customer.averageTicket || 0).toFixed(2)}
                       </p>
                     </td>
@@ -236,8 +236,8 @@ export const AdminCustomersTab: React.FC = () => {
                       <span
                         className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${
                           isBlocked
-                            ? 'bg-red-950/40 text-red-400 border-red-800/60'
-                            : 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60'
+                            ? 'bg-red-50 text-red-700 border-red-200'
+                            : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                         }`}
                       >
                         {isBlocked ? 'Bloqueado' : 'Ativo'}
@@ -250,7 +250,7 @@ export const AdminCustomersTab: React.FC = () => {
                           e.stopPropagation();
                           setSelectedCustomer(customer);
                         }}
-                        className="p-2 bg-[#080808] hover:bg-[#262626] border border-[#222222] rounded-lg text-[#D6B35A] transition-all"
+                        className="p-2 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] hover:border-[#B45309] rounded-lg text-[#B45309] transition-all shadow-xs"
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>
@@ -261,7 +261,7 @@ export const AdminCustomersTab: React.FC = () => {
 
               {filteredCustomers.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-12 text-center text-[#777777] font-mono">
+                  <td colSpan={6} className="p-12 text-center text-[#6B6B66] font-mono">
                     Nenhum cliente cadastrado correspondente aos filtros.
                   </td>
                 </tr>
@@ -273,19 +273,19 @@ export const AdminCustomersTab: React.FC = () => {
 
       {/* Customer Profile Modal */}
       {selectedCustomer && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          <div className="bg-[#141414] border border-[#262626] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6 p-6 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div className="bg-white border border-[#E5E5E1] rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl space-y-6 p-6 animate-in zoom-in-95 duration-200">
             {/* Header */}
-            <div className="flex items-start justify-between border-b border-[#222222] pb-4">
+            <div className="flex items-start justify-between border-b border-[#E5E5E1] pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#222] border border-[#333] flex items-center justify-center font-black text-xl text-[#D6B35A]">
+                <div className="w-12 h-12 rounded-2xl bg-[#F0C84B]/20 border border-[#F0C84B]/40 flex items-center justify-center font-black text-xl text-[#B45309]">
                   {selectedCustomer.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="text-base font-black uppercase text-[#EFECE6] tracking-tight">
+                  <h3 className="text-base font-black uppercase text-[#171717] tracking-tight">
                     {selectedCustomer.name}
                   </h3>
-                  <p className="text-xs text-[#777777] font-mono">ID: {selectedCustomer.id}</p>
+                  <p className="text-xs text-[#6B6B66] font-mono">ID: {selectedCustomer.id}</p>
                 </div>
               </div>
 
@@ -296,7 +296,7 @@ export const AdminCustomersTab: React.FC = () => {
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all flex items-center gap-1.5 ${
                     selectedCustomer.status === 'blocked'
                       ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                      : 'bg-red-950 hover:bg-red-900 border border-red-800 text-red-400'
+                      : 'bg-red-50 hover:bg-red-100 border border-red-200 text-red-700'
                   }`}
                 >
                   {selectedCustomer.status === 'blocked' ? (
@@ -312,7 +312,7 @@ export const AdminCustomersTab: React.FC = () => {
 
                 <button
                   onClick={() => setSelectedCustomer(null)}
-                  className="p-1.5 hover:bg-[#222] rounded-lg text-[#777777] hover:text-[#EFECE6] transition-all"
+                  className="p-1.5 hover:bg-[#F9F9F7] rounded-lg text-[#6B6B66] hover:text-[#171717] transition-all"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -321,42 +321,42 @@ export const AdminCustomersTab: React.FC = () => {
 
             {/* Metrics Snapshot */}
             <div className="grid grid-cols-3 gap-3 font-mono">
-              <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl text-center">
-                <p className="text-[10px] text-[#777777] uppercase font-bold">Total Gasto (LTV)</p>
-                <p className="text-base font-black text-[#D6B35A] mt-1">
+              <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl text-center">
+                <p className="text-[10px] text-[#6B6B66] uppercase font-bold">Total Gasto (LTV)</p>
+                <p className="text-base font-black text-[#B45309] mt-1">
                   R$ {(selectedCustomer.totalSpent || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
 
-              <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl text-center">
-                <p className="text-[10px] text-[#777777] uppercase font-bold">Pedidos Realizados</p>
-                <p className="text-base font-black text-[#EFECE6] mt-1">
+              <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl text-center">
+                <p className="text-[10px] text-[#6B6B66] uppercase font-bold">Pedidos Realizados</p>
+                <p className="text-base font-black text-[#171717] mt-1">
                   {selectedCustomer.totalOrders || 0}
                 </p>
               </div>
 
-              <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl text-center">
-                <p className="text-[10px] text-[#777777] uppercase font-bold">Ticket Médio</p>
-                <p className="text-base font-black text-emerald-400 mt-1">
+              <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl text-center">
+                <p className="text-[10px] text-[#6B6B66] uppercase font-bold">Ticket Médio</p>
+                <p className="text-base font-black text-emerald-600 mt-1">
                   R$ {(selectedCustomer.averageTicket || 0).toFixed(2)}
                 </p>
               </div>
             </div>
 
             {/* Contact Details */}
-            <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl space-y-2 text-xs">
-              <h4 className="font-bold uppercase text-[#D6B35A] font-mono">Dados de Contato & Cadastro</h4>
-              <p className="text-[#EFECE6] flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-[#777777]" /> {selectedCustomer.email}
+            <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-2 text-xs">
+              <h4 className="font-bold uppercase text-[#B45309] font-mono">Dados de Contato & Cadastro</h4>
+              <p className="text-[#171717] flex items-center gap-2">
+                <Mail className="w-3.5 h-3.5 text-[#6B6B66]" /> {selectedCustomer.email}
               </p>
-              <p className="text-[#EFECE6] flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-[#777777]" /> {selectedCustomer.phone || 'Telefone não cadastrado'}
+              <p className="text-[#171717] flex items-center gap-2">
+                <Phone className="w-3.5 h-3.5 text-[#6B6B66]" /> {selectedCustomer.phone || 'Telefone não cadastrado'}
               </p>
-              <p className="text-[#EFECE6] flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5 text-[#777777]" /> {selectedCustomer.city ? `${selectedCustomer.city} - ${selectedCustomer.state}` : 'Sem endereço padrão'}
+              <p className="text-[#171717] flex items-center gap-2">
+                <MapPin className="w-3.5 h-3.5 text-[#6B6B66]" /> {selectedCustomer.city ? `${selectedCustomer.city} - ${selectedCustomer.state}` : 'Sem endereço padrão'}
               </p>
-              <p className="text-[#777777] flex items-center gap-2 font-mono text-[11px]">
-                <Calendar className="w-3.5 h-3.5 text-[#777777]" /> Cadastrado em: {new Date(selectedCustomer.createdAt).toLocaleDateString('pt-BR')}
+              <p className="text-[#6B6B66] flex items-center gap-2 font-mono text-[11px]">
+                <Calendar className="w-3.5 h-3.5 text-[#6B6B66]" /> Cadastrado em: {new Date(selectedCustomer.createdAt).toLocaleDateString('pt-BR')}
               </p>
             </div>
           </div>

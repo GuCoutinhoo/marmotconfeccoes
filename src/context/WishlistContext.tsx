@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Product } from '../types';
 import { useToast } from './ToastContext';
 import { useAuth } from './AuthContext';
@@ -141,12 +141,14 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [wishlist, isHydrated, user?.id]);
 
-  const isInWishlist = (productId: string) => {
-    return wishlist.some((item) => item.id === productId);
-  };
+  const wishlistSet = useMemo(() => new Set(wishlist.map((item) => item.id)), [wishlist]);
 
-  const toggleWishlist = (product: Product) => {
-    const exists = isInWishlist(product.id);
+  const isInWishlist = useCallback((productId: string) => {
+    return wishlistSet.has(productId);
+  }, [wishlistSet]);
+
+  const toggleWishlist = useCallback((product: Product) => {
+    const exists = wishlistSet.has(product.id);
     if (exists) {
       setWishlist((prev) => prev.filter((p) => p.id !== product.id));
       showToast('Removido dos Favoritos', `${product.title} foi removido.`, 'info');
@@ -193,17 +195,17 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         }
       }
     }
-  };
+  }, [wishlistSet, user, token, showToast]);
+
+  const value = useMemo(() => ({
+    wishlist,
+    toggleWishlist,
+    isInWishlist,
+    wishlistCount: wishlist.length,
+  }), [wishlist, toggleWishlist, isInWishlist]);
 
   return (
-    <WishlistContext.Provider
-      value={{
-        wishlist,
-        toggleWishlist,
-        isInWishlist,
-        wishlistCount: wishlist.length,
-      }}
-    >
+    <WishlistContext.Provider value={value}>
       {children}
     </WishlistContext.Provider>
   );

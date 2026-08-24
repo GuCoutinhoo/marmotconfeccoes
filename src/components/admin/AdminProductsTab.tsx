@@ -741,37 +741,37 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
   return (
     <div className="space-y-6">
       {/* Top Banner & Action Header */}
-      <div className="bg-[#161616] border border-[#262626] p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#D6B35A] uppercase">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase">
             <Package className="w-4 h-4" /> Gestão de Inventário & Catálogo
           </div>
-          <h2 className="text-xl font-black uppercase text-[#EFECE6] mt-1">
+          <h2 className="text-xl font-black uppercase text-[#171717] mt-1">
             Produtos ({products.length})
           </h2>
-          <p className="text-xs text-[#777777] mt-0.5">
+          <p className="text-xs text-[#6B6B66] mt-0.5">
             Cadastre, edite fotos, configure variações de cores/tamanhos e controle o estoque em tempo real.
           </p>
         </div>
 
         <button
           onClick={handleOpenAdd}
-          className="bg-[#D6B35A] text-black font-extrabold text-xs uppercase px-5 py-3 rounded hover:bg-[#EFECE6] transition-colors flex items-center gap-2 shadow-lg whitespace-nowrap"
+          className="bg-[#F0C84B] text-black font-extrabold text-xs uppercase px-5 py-3 rounded hover:bg-[#F0C84B]/90 transition-colors flex items-center gap-2 shadow-sm whitespace-nowrap"
         >
           <Plus className="w-4 h-4" /> Cadastrar Produto
         </button>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-[#161616] border border-[#262626] p-4 rounded-xl flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white border border-[#E5E5E1] p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 shadow-sm">
         <div className="flex-1 min-w-[240px] relative">
-          <Search className="w-4 h-4 text-[#777777] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#6B6B66] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por título, SKU ou categoria..."
-            className="w-full bg-[#080808] border border-[#262626] pl-10 pr-4 py-2.5 rounded-lg text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+            className="w-full bg-[#F9F9F7] border border-[#E5E5E1] pl-10 pr-4 py-2.5 rounded-lg text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
           />
         </div>
 
@@ -780,7 +780,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           <select
             value={selectedCategoryFilter}
             onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-            className="bg-[#080808] border border-[#262626] text-[#EFECE6] text-xs font-bold px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#D6B35A]"
+            className="bg-[#F9F9F7] border border-[#E5E5E1] text-[#171717] text-xs font-bold px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#B45309]"
           >
             <option value="">Todas as Categorias</option>
             {categories.map((c) => (
@@ -794,7 +794,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           <select
             value={selectedStatusFilter}
             onChange={(e) => setSelectedStatusFilter(e.target.value)}
-            className="bg-[#080808] border border-[#262626] text-[#EFECE6] text-xs font-bold px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#D6B35A]"
+            className="bg-[#F9F9F7] border border-[#E5E5E1] text-[#171717] text-xs font-bold px-3 py-2.5 rounded-lg focus:outline-none focus:border-[#B45309]"
           >
             <option value="all">Todos os Status</option>
             <option value="active">Ativos</option>
@@ -805,10 +805,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
       </div>
 
       {/* Products Table */}
-      <div className="bg-[#161616] border border-[#262626] rounded-2xl overflow-hidden shadow-lg">
+      <div className="bg-white border border-[#E5E5E1] rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-[#EFECE6]">
-            <thead className="bg-[#080808] text-[#777777] font-black uppercase text-[10px] tracking-wider border-b border-[#262626]">
+          <table className="w-full text-left text-xs text-[#171717]">
+            <thead className="bg-[#F9F9F7] text-[#6B6B66] font-black uppercase text-[10px] tracking-wider border-b border-[#E5E5E1]">
               <tr>
                 <th className="p-4">Produto</th>
                 <th className="p-4">Categoria</th>
@@ -818,20 +818,20 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                 <th className="p-4 text-right">Ações</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#262626]">
+            <tbody className="divide-y divide-[#E5E5E1]">
               {filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-[#777777]">
+                  <td colSpan={6} className="p-8 text-center text-[#6B6B66]">
                     Nenhum produto encontrado com os filtros aplicados.
                   </td>
                 </tr>
               ) : (
                 filteredProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-[#1a1a1a] transition-colors">
+                  <tr key={p.id} className="hover:bg-[#F9F9F7] transition-colors">
                     {/* Image & Title */}
                     <td className="p-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-14 rounded-lg bg-[#080808] overflow-hidden border border-[#262626] shrink-0">
+                        <div className="w-12 h-14 rounded-lg bg-[#F9F9F7] overflow-hidden border border-[#E5E5E1] shrink-0">
                           <img
                             src={p.image || (p.images && p.images[0])}
                             alt={p.title}
@@ -840,18 +840,18 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           />
                         </div>
                         <div>
-                          <span className="text-[10px] font-mono text-[#D6B35A] uppercase block">
+                          <span className="text-[10px] font-mono text-[#B45309] font-bold uppercase block">
                             SKU: {p.sku || p.id}
                           </span>
-                          <span className="font-bold text-sm text-[#EFECE6] block">{p.title}</span>
-                          <span className="text-[11px] text-[#777777] line-clamp-1">{p.collection}</span>
+                          <span className="font-bold text-sm text-[#171717] block">{p.title}</span>
+                          <span className="text-[11px] text-[#6B6B66] line-clamp-1">{p.collection}</span>
                         </div>
                       </div>
                     </td>
 
                     {/* Category */}
                     <td className="p-4">
-                      <span className="bg-[#080808] text-[#EFECE6] border border-[#262626] px-2.5 py-1 rounded-full text-[11px] font-bold uppercase">
+                      <span className="bg-[#F9F9F7] text-[#171717] border border-[#E5E5E1] px-2.5 py-1 rounded-full text-[11px] font-bold uppercase">
                         {p.category}
                       </span>
                     </td>
@@ -861,15 +861,15 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       <div>
                         {p.promoPrice ? (
                           <>
-                            <span className="font-extrabold text-[#D6B35A] text-sm block">
+                            <span className="font-extrabold text-[#B45309] text-sm block">
                               R$ {p.promoPrice.toFixed(2).replace('.', ',')}
                             </span>
-                            <span className="text-[11px] text-[#777777] line-through">
+                            <span className="text-[11px] text-[#6B6B66] line-through">
                               R$ {p.price.toFixed(2).replace('.', ',')}
                             </span>
                           </>
                         ) : (
-                          <span className="font-bold text-sm text-[#EFECE6]">
+                          <span className="font-bold text-sm text-[#171717]">
                             R$ {p.price.toFixed(2).replace('.', ',')}
                           </span>
                         )}
@@ -884,10 +884,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           min={0}
                           defaultValue={p.stockCount ?? 20}
                           onBlur={(e) => handleQuickStockChange(p.id, parseInt(e.target.value) || 0)}
-                          className="w-16 bg-[#080808] border border-[#262626] px-2 py-1 rounded text-center text-xs font-mono font-bold text-[#EFECE6] focus:border-[#D6B35A] focus:outline-none"
+                          className="w-16 bg-[#F9F9F7] border border-[#E5E5E1] px-2 py-1 rounded text-center text-xs font-mono font-bold text-[#171717] focus:border-[#B45309] focus:outline-none"
                         />
                         {(p.stockCount ?? 20) < 10 && (
-                          <span className="text-[10px] text-amber-400 font-bold bg-amber-950/40 px-1.5 py-0.5 rounded border border-amber-500/30">
+                          <span className="text-[10px] text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                             Baixo
                           </span>
                         )}
@@ -900,23 +900,23 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         <span
                           className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
                             p.status === 'active' || !p.status
-                              ? 'bg-emerald-950/50 text-emerald-400 border border-emerald-500/30'
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                               : p.status === 'out_of_stock'
-                              ? 'bg-red-950/50 text-red-400 border border-red-500/30'
-                              : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                              ? 'bg-red-50 text-red-800 border border-red-200'
+                              : 'bg-zinc-100 text-zinc-700 border border-zinc-300'
                           }`}
                         >
                           {p.status === 'out_of_stock' ? 'Esgotado' : p.status === 'draft' ? 'Rascunho' : 'Ativo'}
                         </span>
 
                         {p.isNewRelease && (
-                          <span className="text-[10px] font-bold bg-[#D6B35A]/10 text-[#D6B35A] px-2 py-0.5 rounded border border-[#D6B35A]/30">
+                          <span className="text-[10px] font-bold bg-[#F0C84B]/20 text-[#B45309] px-2 py-0.5 rounded border border-[#F0C84B]/50">
                             Novidade
                           </span>
                         )}
 
                         {p.isBestSeller && (
-                          <span className="text-[10px] font-bold bg-orange-950/40 text-orange-400 px-2 py-0.5 rounded border border-orange-500/30">
+                          <span className="text-[10px] font-bold bg-orange-50 text-orange-800 px-2 py-0.5 rounded border border-orange-200">
                             Top 1
                           </span>
                         )}
@@ -928,15 +928,15 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => handleOpenEdit(p)}
-                          className="p-2 bg-[#080808] hover:bg-[#262626] text-[#EFECE6] border border-[#262626] hover:border-[#D6B35A] rounded transition-colors"
+                          className="p-2 bg-white hover:bg-[#F9F9F7] text-[#171717] border border-[#E5E5E1] hover:border-[#B45309] rounded transition-colors shadow-xs"
                           title="Editar Produto"
                         >
-                          <Edit2 className="w-3.5 h-3.5 text-[#D6B35A]" />
+                          <Edit2 className="w-3.5 h-3.5 text-[#B45309]" />
                         </button>
 
                         <button
                           onClick={() => handleDuplicate(p)}
-                          className="p-2 bg-[#080808] hover:bg-[#262626] text-[#777777] hover:text-[#EFECE6] border border-[#262626] rounded transition-colors"
+                          className="p-2 bg-white hover:bg-[#F9F9F7] text-[#6B6B66] hover:text-[#171717] border border-[#E5E5E1] rounded transition-colors shadow-xs"
                           title="Duplicar Produto"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -944,7 +944,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
                         <button
                           onClick={() => setDeletingId(p.id)}
-                          className="p-2 bg-[#080808] hover:bg-red-950/40 text-[#777777] hover:text-red-400 border border-[#262626] hover:border-red-500/40 rounded transition-colors"
+                          className="p-2 bg-white hover:bg-red-50 text-[#6B6B66] hover:text-red-700 border border-[#E5E5E1] hover:border-red-200 rounded transition-colors shadow-xs"
                           title="Excluir Produto"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -961,15 +961,15 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
       {/* ADD / EDIT PRODUCT MODAL */}
       {(editingProduct || isAddOpen) && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-2.5 sm:p-4 md:p-6 bg-black/85 backdrop-blur-sm animate-fadeIn overflow-hidden">
-          <div className="bg-[#161616] border border-[#262626] rounded-2xl max-w-4xl w-full max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-2xl overflow-hidden min-w-0 box-border">
+        <div className="fixed inset-0 z-[130] flex items-center justify-center p-2.5 sm:p-4 md:p-6 bg-black/50 backdrop-blur-xs animate-fadeIn overflow-hidden">
+          <div className="bg-white border border-[#E5E5E1] rounded-2xl max-w-4xl w-full max-h-[92vh] sm:max-h-[88vh] flex flex-col shadow-2xl overflow-hidden min-w-0 box-border">
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-[#262626] px-5 py-4 sm:px-8 sm:py-5 shrink-0 bg-[#161616]">
+            <div className="flex items-center justify-between border-b border-[#E5E5E1] px-5 py-4 sm:px-8 sm:py-5 shrink-0 bg-white">
               <div className="min-w-0 pr-4">
-                <span className="text-[10px] font-mono font-bold text-[#D6B35A] uppercase block">
+                <span className="text-[10px] font-mono font-bold text-[#B45309] uppercase block">
                   {editingProduct ? 'Modo de Edição' : 'Novo Produto'}
                 </span>
-                <h3 className="text-lg sm:text-xl font-black uppercase text-[#EFECE6] truncate">
+                <h3 className="text-lg sm:text-xl font-black uppercase text-[#171717] truncate">
                   {editingProduct ? `Editar: ${editingProduct.title}` : 'Cadastrar Novo Produto'}
                 </h3>
               </div>
@@ -979,7 +979,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                   setEditingProduct(null);
                   setIsAddOpen(false);
                 }}
-                className="p-1.5 text-[#777777] hover:text-[#EFECE6] hover:bg-[#262626] rounded-lg transition-colors shrink-0"
+                className="p-1.5 text-[#6B6B66] hover:text-[#171717] hover:bg-[#F9F9F7] rounded-lg transition-colors shrink-0"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -990,53 +990,53 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
               <div className="flex-1 overflow-y-auto overflow-x-hidden p-5 sm:p-8 space-y-6 min-w-0">
                 {/* 1. Basic Info */}
                 <div className="space-y-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-[#D6B35A] border-b border-[#262626] pb-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#B45309] border-b border-[#E5E5E1] pb-2">
                     1. Informações Básicas
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">Título do Produto *</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Título do Produto *</label>
                       <input
                         type="text"
                         value={formTitle}
                         onChange={(e) => handleTitleChange(e.target.value)}
                         placeholder="Ex: Hoodie Heavyweight Cyber Dystopia"
                         required
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">Subtítulo / Destaque</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Subtítulo / Destaque</label>
                       <input
                         type="text"
                         value={formSubtitle}
                         onChange={(e) => setFormSubtitle(e.target.value)}
                         placeholder="Ex: 400g/m² French Terry Algodão Pesado"
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">SKU / Código</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">SKU / Código</label>
                       <input
                         type="text"
                         value={formSku}
                         onChange={(e) => setFormSku(e.target.value)}
                         placeholder="AURA-HD-001"
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">Categoria *</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Categoria *</label>
                       <select
                         value={formCategory}
                         onChange={(e) => setFormCategory(e.target.value)}
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs font-bold text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs font-bold text-[#171717] focus:outline-none focus:border-[#B45309]"
                       >
                         {categories.map((c) => (
                           <option key={c.id || c.slug} value={c.slug}>
@@ -1047,38 +1047,38 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">Coleção / Drop</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Coleção / Drop</label>
                       <input
                         type="text"
                         value={formCollection}
                         onChange={(e) => setFormCollection(e.target.value)}
                         placeholder="Vol. 04: Cyber Dystopia"
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-[#777777] block mb-1">Descrição Comercial</label>
+                    <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Descrição Comercial</label>
                     <textarea
                       rows={3}
                       value={formDescription}
                       onChange={(e) => setFormDescription(e.target.value)}
                       placeholder="Detalhes completos sobre caimento, proposta estética e corte..."
-                      className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                      className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                     />
                   </div>
                 </div>
 
                 {/* 2. Pricing, Stock & Status */}
                 <div className="space-y-4">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-[#D6B35A] border-b border-[#262626] pb-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#B45309] border-b border-[#E5E5E1] pb-2">
                     2. Preços, Estoque & Status
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-w-0">
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">Preço Normal (R$) *</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Preço Normal (R$) *</label>
                       <input
                         type="text"
                         inputMode="decimal"
@@ -1086,13 +1086,13 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         onChange={(e) => setFormPrice(e.target.value)}
                         placeholder="199.90"
                         required
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">
-                        Preço Promo (R$) {discountPercent && <span className="text-[#D6B35A]">(-{discountPercent}%)</span>}
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">
+                        Preço Promo (R$) {discountPercent && <span className="text-[#B45309]">(-{discountPercent}%)</span>}
                       </label>
                       <input
                         type="text"
@@ -1100,28 +1100,28 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         value={formPromoPrice ?? ''}
                         onChange={(e) => setFormPromoPrice(e.target.value)}
                         placeholder="Opcional"
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">Estoque Total</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Estoque Total</label>
                       <input
                         type="text"
                         inputMode="numeric"
                         value={formStock}
                         onChange={(e) => setFormStock(e.target.value)}
                         placeholder="30"
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-bold text-[#777777] block mb-1">Status de Publicação</label>
+                      <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Status de Publicação</label>
                       <select
                         value={formStatus}
                         onChange={(e) => setFormStatus(e.target.value as any)}
-                        className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs font-bold text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                        className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs font-bold text-[#171717] focus:outline-none focus:border-[#B45309]"
                       >
                         <option value="active">Ativo no Catálogo</option>
                         <option value="draft">Rascunho (Oculto)</option>
@@ -1132,22 +1132,22 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
                   {/* Flags toggles */}
                   <div className="flex flex-wrap gap-6 pt-2">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#EFECE6]">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#171717]">
                       <input
                         type="checkbox"
                         checked={formIsNewRelease}
                         onChange={(e) => setFormIsNewRelease(e.target.checked)}
-                        className="accent-[#D6B35A] w-4 h-4"
+                        className="accent-[#B45309] w-4 h-4"
                       />
                       <span>Marcar como Lançamento / Novo Drop</span>
                     </label>
 
-                    <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#EFECE6]">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-[#171717]">
                       <input
                         type="checkbox"
                         checked={formIsBestSeller}
                         onChange={(e) => setFormIsBestSeller(e.target.checked)}
-                        className="accent-[#D6B35A] w-4 h-4"
+                        className="accent-[#B45309] w-4 h-4"
                       />
                       <span>Marcar como Mais Vendido / Bestseller</span>
                     </label>
@@ -1156,18 +1156,18 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
               {/* 3. Photos Gallery */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-[#262626] pb-2">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-[#D6B35A]">
+                <div className="flex items-center justify-between border-b border-[#E5E5E1] pb-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#B45309]">
                     3. Galeria de Fotos ({formImages.length})
                   </h4>
-                  <span className="text-[10px] text-[#777777]">A primeira foto é a capa principal</span>
+                  <span className="text-[10px] text-[#6B6B66]">A primeira foto é a capa principal</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
                   {/* Caixa 1: Foto Principal / Capa (À esquerda) */}
                   {formImages.length > 0 && formImages[0] ? (
                     <div
-                      className="relative group rounded-xl overflow-hidden border-2 border-[#D6B35A] ring-2 ring-[#D6B35A]/30 aspect-[3/4] bg-[#080808] transition-all"
+                      className="relative group rounded-xl overflow-hidden border-2 border-[#F0C84B] ring-2 ring-[#F0C84B]/30 aspect-[3/4] bg-[#F9F9F7] transition-all"
                     >
                       <img
                         src={formImages[0]}
@@ -1176,12 +1176,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         className="w-full h-full object-cover"
                       />
 
-                      <div className="absolute top-1.5 left-1.5 bg-[#D6B35A] text-black text-[8px] font-mono font-black uppercase px-1.5 py-0.5 rounded shadow z-10">
+                      <div className="absolute top-1.5 left-1.5 bg-[#F0C84B] text-black text-[8px] font-mono font-black uppercase px-1.5 py-0.5 rounded shadow-xs z-10">
                         ★ Capa
                       </div>
 
                       {/* Overlay Controls */}
-                      <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity p-2 flex flex-col justify-between z-20">
+                      <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity p-2 flex flex-col justify-between z-20">
                         <div className="flex items-center justify-between">
                           <button
                             type="button"
@@ -1192,7 +1192,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                 setFormImages(next);
                               })
                             }
-                            className="p-1 bg-[#1C180F] border border-[#D6B35A]/50 text-[#D6B35A] rounded hover:bg-[#282215] transition-colors"
+                            className="p-1 bg-white/20 text-white rounded hover:bg-white/30 transition-colors"
                             title="Ajustar / Recortar Foto"
                           >
                             <Crop className="w-3.5 h-3.5" />
@@ -1211,7 +1211,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         <button
                           type="button"
                           onClick={() => coverFileInputRef.current?.click()}
-                          className="bg-[#D6B35A] hover:bg-[#EFECE6] text-black text-[9px] font-black uppercase py-1.5 px-2 rounded text-center transition-colors shadow-sm flex items-center justify-center gap-1"
+                          className="bg-[#F0C84B] hover:bg-white text-black text-[9px] font-black uppercase py-1.5 px-2 rounded text-center transition-colors shadow-xs flex items-center justify-center gap-1"
                         >
                           <Plus className="w-3 h-3" />
                           <span>Substituir</span>
@@ -1221,11 +1221,11 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                   ) : (
                     <div
                       onClick={() => coverFileInputRef.current?.click()}
-                      className="border-2 border-dashed border-[#262626] hover:border-[#D6B35A] rounded-xl flex flex-col items-center justify-center p-3 cursor-pointer text-[#777777] hover:text-[#EFECE6] transition-colors aspect-[3/4] text-center group bg-[#080808]"
+                      className="border-2 border-dashed border-[#E5E5E1] hover:border-[#B45309] rounded-xl flex flex-col items-center justify-center p-3 cursor-pointer text-[#6B6B66] hover:text-[#171717] transition-colors aspect-[3/4] text-center group bg-[#F9F9F7]"
                       title="Adicione a foto principal do produto"
                     >
-                      <Plus className="w-6 h-6 mb-1.5 text-[#D6B35A] group-hover:scale-110 transition-transform" />
-                      <span className="text-[10px] font-bold text-center leading-tight px-1 text-[#CCCCCC] group-hover:text-[#EFECE6] transition-colors">
+                      <Plus className="w-6 h-6 mb-1.5 text-[#B45309] group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] font-bold text-center leading-tight px-1 text-[#6B6B66] group-hover:text-[#171717] transition-colors">
                         Adicione uma foto do produto
                       </span>
                     </div>
@@ -1234,10 +1234,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                   {/* Caixa 2: Upload Galeria (Imediatamente à direita da foto principal) */}
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border-2 border-dashed border-[#262626] hover:border-[#D6B35A] rounded-xl flex flex-col items-center justify-center p-4 cursor-pointer text-[#777777] hover:text-[#EFECE6] transition-colors aspect-[3/4] text-center group bg-[#080808]"
+                    className="border-2 border-dashed border-[#E5E5E1] hover:border-[#B45309] rounded-xl flex flex-col items-center justify-center p-4 cursor-pointer text-[#6B6B66] hover:text-[#171717] transition-colors aspect-[3/4] text-center group bg-[#F9F9F7]"
                     title="Upload de fotos adicionais da galeria"
                   >
-                    <Upload className="w-6 h-6 mb-1 text-[#D6B35A] group-hover:scale-110 transition-transform" />
+                    <Upload className="w-6 h-6 mb-1 text-[#B45309] group-hover:scale-110 transition-transform" />
                     <span className="text-[10px] font-bold text-center">
                       {isUploading ? 'Enviando...' : '+ Upload'}
                     </span>
@@ -1249,7 +1249,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                     return (
                       <div
                         key={index}
-                        className="relative group rounded-xl overflow-hidden border border-[#262626] hover:border-[#D6B35A]/50 aspect-[3/4] bg-[#080808] transition-all"
+                        className="relative group rounded-xl overflow-hidden border border-[#E5E5E1] hover:border-[#B45309] aspect-[3/4] bg-[#F9F9F7] transition-all"
                       >
                         <img
                           src={imgUrl}
@@ -1270,7 +1270,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                   setFormImages(next);
                                 })
                               }
-                              className="p-1 bg-[#1C180F] border border-[#D6B35A]/50 text-[#D6B35A] rounded hover:bg-[#282215] transition-colors"
+                              className="p-1 bg-white/20 text-white rounded hover:bg-white/30 transition-colors"
                               title="Ajustar / Recortar Foto"
                             >
                               <Crop className="w-3.5 h-3.5" />
@@ -1289,7 +1289,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           <button
                             type="button"
                             onClick={() => handleSetCover(index)}
-                            className="bg-[#D6B35A] text-black text-[9px] font-black uppercase py-1 px-1.5 rounded text-center hover:bg-[#EFECE6] transition-colors"
+                            className="bg-[#F0C84B] text-black text-[9px] font-black uppercase py-1 px-1.5 rounded text-center hover:bg-white transition-colors"
                           >
                             Tornar Capa
                           </button>
@@ -1324,12 +1324,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                     value={imageUrlInput}
                     onChange={(e) => setImageUrlInput(e.target.value)}
                     placeholder="Ou cole a URL direta de uma foto (Unsplash, CDN...)"
-                    className="flex-1 bg-[#080808] border border-[#262626] px-3 py-2 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                    className="flex-1 bg-[#F9F9F7] border border-[#E5E5E1] px-3 py-2 rounded text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                   />
                   <button
                     type="button"
                     onClick={handleAddImageUrl}
-                    className="bg-[#080808] hover:bg-[#262626] text-[#D6B35A] border border-[#262626] px-3.5 py-2 rounded text-xs font-bold uppercase"
+                    className="bg-white hover:bg-[#F9F9F7] text-[#B45309] border border-[#E5E5E1] px-3.5 py-2 rounded text-xs font-bold uppercase transition-colors"
                   >
                     Adicionar URL
                   </button>
@@ -1338,19 +1338,19 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
               {/* 4. Variantes do Produto */}
               <div className="space-y-4">
-                <h4 className="text-xs font-black uppercase tracking-wider text-[#D6B35A] border-b border-[#262626] pb-2">
+                <h4 className="text-xs font-black uppercase tracking-wider text-[#B45309] border-b border-[#E5E5E1] pb-2">
                   4. Variantes do Produto
                 </h4>
 
                 {/* TAMANHOS */}
                 <div className="space-y-3">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#EFECE6] block">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#171717] block">
                     Tamanhos Disponíveis
                   </span>
 
                   {/* Grupo: Roupas */}
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold text-[#777777] uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-[#6B6B66] uppercase tracking-wider">
                       Roupas
                     </span>
                     <div className="flex flex-wrap items-center gap-2">
@@ -1363,8 +1363,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                             onClick={() => handleToggleSize(sz)}
                             className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all select-none min-w-[42px] ${
                               isSelected
-                                ? 'bg-[#D6B35A] text-black border-[#D6B35A] font-extrabold shadow-sm'
-                                : 'bg-[#0a0a0a] text-[#888888] border-[#222222] hover:text-[#EFECE6] hover:border-[#383838]'
+                                ? 'bg-[#F0C84B] text-black border-[#F0C84B] font-extrabold shadow-xs'
+                                : 'bg-[#F9F9F7] text-[#6B6B66] border-[#E5E5E1] hover:text-[#171717] hover:border-[#B45309]'
                             }`}
                           >
                             <span>{sz}</span>
@@ -1383,8 +1383,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                               key={sz}
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all select-none ${
                                 isSelected
-                                  ? 'bg-[#D6B35A] text-black border-[#D6B35A] font-extrabold shadow-sm'
-                                  : 'bg-[#0a0a0a] text-[#888888] border-[#222222] hover:text-[#EFECE6] hover:border-[#383838]'
+                                  ? 'bg-[#F0C84B] text-black border-[#F0C84B] font-extrabold shadow-xs'
+                                  : 'bg-[#F9F9F7] text-[#6B6B66] border-[#E5E5E1] hover:text-[#171717] hover:border-[#B45309]'
                               }`}
                             >
                               <button
@@ -1404,7 +1404,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                 className={`p-0.5 rounded transition-colors ${
                                   isSelected
                                     ? 'text-black/70 hover:text-red-700 hover:bg-black/10'
-                                    : 'text-[#666666] hover:text-red-400'
+                                    : 'text-[#6B6B66] hover:text-red-600'
                                 }`}
                                 title={`Remover tamanho ${sz}`}
                               >
@@ -1418,7 +1418,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
                   {/* Grupo: Numeração */}
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold text-[#777777] uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-[#6B6B66] uppercase tracking-wider">
                       Numeração
                     </span>
                     <div className="flex flex-wrap items-center gap-2">
@@ -1431,8 +1431,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                             onClick={() => handleToggleSize(sz)}
                             className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all select-none min-w-[42px] ${
                               isSelected
-                                ? 'bg-[#D6B35A] text-black border-[#D6B35A] font-extrabold shadow-sm'
-                                : 'bg-[#0a0a0a] text-[#888888] border-[#222222] hover:text-[#EFECE6] hover:border-[#383838]'
+                                ? 'bg-[#F0C84B] text-black border-[#F0C84B] font-extrabold shadow-xs'
+                                : 'bg-[#F9F9F7] text-[#6B6B66] border-[#E5E5E1] hover:text-[#171717] hover:border-[#B45309]'
                             }`}
                           >
                             <span>{sz}</span>
@@ -1451,8 +1451,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                               key={sz}
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all select-none ${
                                 isSelected
-                                  ? 'bg-[#D6B35A] text-black border-[#D6B35A] font-extrabold shadow-sm'
-                                  : 'bg-[#0a0a0a] text-[#888888] border-[#222222] hover:text-[#EFECE6] hover:border-[#383838]'
+                                  ? 'bg-[#F0C84B] text-black border-[#F0C84B] font-extrabold shadow-xs'
+                                  : 'bg-[#F9F9F7] text-[#6B6B66] border-[#E5E5E1] hover:text-[#171717] hover:border-[#B45309]'
                               }`}
                             >
                               <button
@@ -1472,7 +1472,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                 className={`p-0.5 rounded transition-colors ${
                                   isSelected
                                     ? 'text-black/70 hover:text-red-700 hover:bg-black/10'
-                                    : 'text-[#666666] hover:text-red-400'
+                                    : 'text-[#6B6B66] hover:text-red-600'
                                 }`}
                                 title={`Remover tamanho ${sz}`}
                               >
@@ -1486,7 +1486,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
                   {/* Grupo: Outros */}
                   <div className="space-y-1.5">
-                    <span className="text-[10px] font-bold text-[#777777] uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-[#6B6B66] uppercase tracking-wider">
                       Outros
                     </span>
                     <div className="flex flex-wrap items-center gap-2">
@@ -1499,8 +1499,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                             onClick={() => handleToggleSize(sz)}
                             className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all select-none min-w-[42px] ${
                               isSelected
-                                ? 'bg-[#D6B35A] text-black border-[#D6B35A] font-extrabold shadow-sm'
-                                : 'bg-[#0a0a0a] text-[#888888] border-[#222222] hover:text-[#EFECE6] hover:border-[#383838]'
+                                ? 'bg-[#F0C84B] text-black border-[#F0C84B] font-extrabold shadow-xs'
+                                : 'bg-[#F9F9F7] text-[#6B6B66] border-[#E5E5E1] hover:text-[#171717] hover:border-[#B45309]'
                             }`}
                           >
                             <span>{sz}</span>
@@ -1519,8 +1519,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                               key={sz}
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all select-none ${
                                 isSelected
-                                  ? 'bg-[#D6B35A] text-black border-[#D6B35A] font-extrabold shadow-sm'
-                                  : 'bg-[#0a0a0a] text-[#888888] border-[#222222] hover:text-[#EFECE6] hover:border-[#383838]'
+                                  ? 'bg-[#F0C84B] text-black border-[#F0C84B] font-extrabold shadow-xs'
+                                  : 'bg-[#F9F9F7] text-[#6B6B66] border-[#E5E5E1] hover:text-[#171717] hover:border-[#B45309]'
                               }`}
                             >
                               <button
@@ -1540,7 +1540,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                 className={`p-0.5 rounded transition-colors ${
                                   isSelected
                                     ? 'text-black/70 hover:text-red-700 hover:bg-black/10'
-                                    : 'text-[#666666] hover:text-red-400'
+                                    : 'text-[#6B6B66] hover:text-red-600'
                                 }`}
                                 title={`Remover tamanho ${sz}`}
                               >
@@ -1556,8 +1556,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         onClick={() => setIsCustomSizeOpen(!isCustomSizeOpen)}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-all border ${
                           isCustomSizeOpen
-                            ? 'bg-[#D6B35A]/15 text-[#D6B35A] border-[#D6B35A]'
-                            : 'bg-[#0a0a0a] hover:bg-[#16140d] text-[#D6B35A] border-[#D6B35A]/40 hover:border-[#D6B35A]'
+                            ? 'bg-[#F0C84B]/20 text-[#B45309] border-[#B45309]'
+                            : 'bg-[#F9F9F7] hover:bg-white text-[#B45309] border-[#E5E5E1] hover:border-[#B45309]'
                         }`}
                       >
                         <Plus className="w-3.5 h-3.5" />
@@ -1581,12 +1581,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           }}
                           placeholder="Ex: 48 (número), XXG (roupa), Infantil..."
                           autoFocus
-                          className="bg-[#080808] border border-[#2a2a2a] px-3.5 py-1.5 rounded-lg text-xs text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A] w-56 sm:w-64"
+                          className="bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-1.5 rounded-lg text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309] w-56 sm:w-64"
                         />
                         <button
                           type="button"
                           onClick={() => handleAddCustomSize()}
-                          className="bg-[#D6B35A] hover:bg-[#EFECE6] text-black font-extrabold px-3.5 py-1.5 rounded-lg text-xs uppercase transition-colors shrink-0 shadow-sm"
+                          className="bg-[#F0C84B] hover:bg-[#F0C84B]/90 text-black font-extrabold px-3.5 py-1.5 rounded-lg text-xs uppercase transition-colors shrink-0 shadow-xs"
                         >
                           Adicionar
                         </button>
@@ -1596,7 +1596,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                             setIsCustomSizeOpen(false);
                             setNewSizeInput('');
                           }}
-                          className="p-1.5 text-[#777777] hover:text-[#EFECE6] transition-colors"
+                          className="p-1.5 text-[#6B6B66] hover:text-[#171717] transition-colors"
                           title="Cancelar"
                         >
                           <X className="w-4 h-4" />
@@ -1606,14 +1606,14 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                   </div>
 
                   {/* Resumo discreto */}
-                  <div className="pt-1 text-xs text-[#777777] flex flex-wrap items-center gap-2">
-                    <span className="font-semibold text-[#888888]">
+                  <div className="pt-1 text-xs text-[#6B6B66] flex flex-wrap items-center gap-2">
+                    <span className="font-semibold text-[#171717]">
                       {formSizes.length} {formSizes.length === 1 ? 'tamanho selecionado' : 'tamanhos selecionados'}
                     </span>
                     {formSizes.length > 0 && (
                       <>
-                        <span className="text-[#444]">•</span>
-                        <span className="text-[#EFECE6] font-bold">
+                        <span className="text-[#E5E5E1]">•</span>
+                        <span className="text-[#B45309] font-bold">
                           {formSizes.join(' • ')}
                         </span>
                       </>
@@ -1622,20 +1622,20 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                 </div>
 
                 {/* Linha divisória */}
-                <div className="border-t border-[#222222] my-4" />
+                <div className="border-t border-[#E5E5E1] my-4" />
 
                 {/* CORES & VARIANTES COM GALERIA PRÓPRIA */}
                 <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#222222] pb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#E5E5E1] pb-2">
                     <div>
-                      <span className="text-xs font-black uppercase tracking-wider text-[#D6B35A] flex items-center gap-1.5">
+                      <span className="text-xs font-black uppercase tracking-wider text-[#B45309] flex items-center gap-1.5">
                         <ImageIcon className="w-3.5 h-3.5" /> Variantes por Cor & Galerias Específicas
                       </span>
-                      <p className="text-[11px] text-[#888888] mt-0.5">
+                      <p className="text-[11px] text-[#6B6B66] mt-0.5">
                         Cadastre cada cor e faça o upload das fotos correspondentes. Ao cliente selecionar uma cor no site, a galeria mudará automaticamente para as fotos desta cor.
                       </p>
                     </div>
-                    <span className="text-[10px] font-mono text-[#888888] shrink-0">
+                    <span className="text-[10px] font-mono text-[#6B6B66] shrink-0 font-bold">
                       {formColors.length} {formColors.length === 1 ? 'cor cadastrada' : 'cores cadastradas'}
                     </span>
                   </div>
@@ -1649,15 +1649,15 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       return (
                         <div
                           key={variantIdx}
-                          className="bg-[#0b0b0d] border border-[#24242c] hover:border-[#383844] rounded-xl p-4 space-y-3.5 transition-all shadow-md"
+                          className="bg-[#F9F9F7] border border-[#E5E5E1] hover:border-[#B45309]/50 rounded-xl p-4 space-y-3.5 transition-all shadow-xs"
                         >
                           {/* Top bar do card da cor */}
-                          <div className="flex flex-wrap items-center justify-between gap-3 bg-[#111116] p-3 rounded-lg border border-[#1e1e26]">
+                          <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-lg border border-[#E5E5E1]">
                             <div className="flex items-center gap-2.5 flex-1 min-w-[240px]">
                               {/* Swatch Picker */}
                               <div className="relative flex items-center justify-center">
                                 <span
-                                  className="w-7 h-7 rounded-full border border-white/20 shadow-inner block shrink-0"
+                                  className="w-7 h-7 rounded-full border border-black/10 shadow-inner block shrink-0"
                                   style={{ backgroundColor: col.colorHex }}
                                 />
                                 <input
@@ -1683,7 +1683,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                     })
                                   }
                                   placeholder="Ex: Obsidian Black, Off-White, Bege Areia..."
-                                  className="w-full bg-[#08080a] border border-[#2a2a36] px-3 py-1.5 rounded-lg text-xs font-bold text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
+                                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3 py-1.5 rounded-lg text-xs font-bold text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                                 />
                               </div>
 
@@ -1696,14 +1696,14 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                     handleVariantUpdateInfo(variantIdx, { colorHex: e.target.value })
                                   }
                                   placeholder="#121212"
-                                  className="w-full bg-[#08080a] border border-[#2a2a36] px-2.5 py-1.5 rounded-lg text-xs font-mono text-[#D6B35A] uppercase focus:outline-none focus:border-[#D6B35A] text-center"
+                                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-2.5 py-1.5 rounded-lg text-xs font-mono text-[#B45309] font-bold uppercase focus:outline-none focus:border-[#B45309] text-center"
                                 />
                               </div>
                             </div>
 
                             {/* Ações da variante */}
                             <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-mono font-semibold text-[#888888]">
+                              <span className="text-[11px] font-mono font-bold text-[#6B6B66]">
                                 {variantImages.length} {variantImages.length === 1 ? 'foto' : 'fotos'}
                               </span>
 
@@ -1711,7 +1711,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveColor(variantIdx)}
-                                  className="text-[#777777] hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                                  className="text-[#6B6B66] hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors"
                                   title={`Remover cor "${col.colorName}"`}
                                 >
                                   <Trash2 className="w-4 h-4" />
@@ -1723,11 +1723,11 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           {/* Galeria de Fotos da Variante */}
                           <div className="space-y-3">
                             <div className="flex items-center justify-between">
-                              <span className="text-[11px] font-bold text-[#A1A1AA] uppercase tracking-wider flex items-center gap-1">
+                              <span className="text-[11px] font-bold text-[#171717] uppercase tracking-wider flex items-center gap-1">
                                 Fotos desta cor ({col.colorName || 'Sem nome'}):
                               </span>
                               {variantImages.length === 0 && (
-                                <span className="text-[10px] text-amber-400 font-medium">
+                                <span className="text-[10px] text-amber-700 font-medium">
                                   Nenhuma foto específica. Usará a galeria geral como reserva.
                                 </span>
                               )}
@@ -1741,10 +1741,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                   return (
                                     <div
                                       key={imgIdx}
-                                      className={`group/img relative aspect-[3/4] bg-[#141418] border rounded-lg overflow-hidden transition-all ${
+                                      className={`group/img relative aspect-[3/4] bg-white border rounded-lg overflow-hidden transition-all ${
                                         isCover
-                                          ? 'border-[#D6B35A] ring-1 ring-[#D6B35A]/50 shadow-md'
-                                          : 'border-[#262630] hover:border-[#3e3e4c]'
+                                          ? 'border-[#F0C84B] ring-1 ring-[#F0C84B]/50 shadow-xs'
+                                          : 'border-[#E5E5E1] hover:border-[#B45309]'
                                       }`}
                                     >
                                       <img
@@ -1756,13 +1756,13 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
                                       {/* Badge Capa */}
                                       {isCover && (
-                                        <div className="absolute top-1.5 left-1.5 bg-[#D6B35A] text-black font-black text-[9px] uppercase px-1.5 py-0.5 rounded shadow">
+                                        <div className="absolute top-1.5 left-1.5 bg-[#F0C84B] text-black font-black text-[9px] uppercase px-1.5 py-0.5 rounded shadow-xs">
                                           CAPA
                                         </div>
                                       )}
 
                                       {/* Overlay com Ações */}
-                                      <div className="absolute inset-0 bg-black/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col justify-between p-1.5 backdrop-blur-[2px]">
+                                      <div className="absolute inset-0 bg-black/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col justify-between p-1.5 backdrop-blur-xs">
                                         <div className="flex justify-end gap-1">
                                           <button
                                             type="button"
@@ -1781,7 +1781,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                                 }
                                               )
                                             }
-                                            className="p-1 bg-[#1a1a22] text-[#EFECE6] hover:text-[#D6B35A] rounded transition-colors"
+                                            className="p-1 bg-white/20 text-white hover:text-[#F0C84B] rounded transition-colors"
                                             title="Ajustar / Cortar Foto"
                                           >
                                             <Crop className="w-3 h-3" />
@@ -1800,7 +1800,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                           <button
                                             type="button"
                                             onClick={() => handleVariantSetCover(variantIdx, imgIdx)}
-                                            className="w-full bg-[#D6B35A] hover:bg-white text-black font-black text-[9px] uppercase py-1 rounded transition-colors shadow"
+                                            className="w-full bg-[#F0C84B] hover:bg-white text-black font-black text-[9px] uppercase py-1 rounded transition-colors shadow-xs"
                                           >
                                             Definir Capa
                                           </button>
@@ -1815,8 +1815,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                             {/* Controles de Upload para esta Variante */}
                             <div className="flex flex-wrap items-center gap-2 pt-1">
                               {/* Botão Upload de Arquivos */}
-                              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#14141c] hover:bg-[#1e1e28] text-[#EFECE6] hover:text-white border border-[#2a2a38] rounded-lg text-xs font-semibold cursor-pointer transition-all shadow-sm">
-                                <Upload className="w-3.5 h-3.5 text-[#D6B35A]" />
+                              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F9F9F7] text-[#171717] border border-[#E5E5E1] rounded-lg text-xs font-semibold cursor-pointer transition-all shadow-xs">
+                                <Upload className="w-3.5 h-3.5 text-[#B45309]" />
                                 <span>Upload Fotos ({col.colorName || 'Cor'})</span>
                                 <input
                                   type="file"
@@ -1842,7 +1842,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                       input.value = '';
                                     }
                                   }}
-                                  className="flex-1 bg-[#08080a] border border-[#262632] px-3 py-1.5 rounded-lg text-xs text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
+                                  className="flex-1 bg-white border border-[#E5E5E1] px-3 py-1.5 rounded-lg text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                                 />
                                 <button
                                   type="button"
@@ -1853,7 +1853,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                       input.value = '';
                                     }
                                   }}
-                                  className="px-2.5 py-1.5 bg-[#161620] hover:bg-[#20202c] text-[#D6B35A] border border-[#2a2a38] rounded-lg text-xs font-bold transition-colors shrink-0"
+                                  className="px-2.5 py-1.5 bg-white hover:bg-[#F9F9F7] text-[#B45309] border border-[#E5E5E1] rounded-lg text-xs font-bold transition-colors shrink-0 shadow-xs"
                                 >
                                   + URL
                                 </button>
@@ -1866,8 +1866,8 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                   </div>
 
                   {/* Adicionar Nova Cor */}
-                  <div className="bg-[#121217] border border-[#262632] p-3.5 rounded-xl space-y-2">
-                    <span className="text-[11px] font-bold text-[#EFECE6] uppercase tracking-wider block">
+                  <div className="bg-white border border-[#E5E5E1] p-3.5 rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#171717] uppercase tracking-wider block">
                       + Adicionar Nova Cor / Variante
                     </span>
                     <div className="flex flex-wrap items-center gap-2">
@@ -1883,9 +1883,9 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           }
                         }}
                         placeholder="Nome da cor (Ex: Raw Bone, Branco, Moletom Cinza...)"
-                        className="flex-1 min-w-[200px] bg-[#08080a] border border-[#2a2a38] px-3.5 py-2 rounded-lg text-xs text-[#EFECE6] placeholder-[#666] focus:outline-none focus:border-[#D6B35A]"
+                        className="flex-1 min-w-[200px] bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2 rounded-lg text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
                       />
-                      <div className="flex items-center gap-2 bg-[#08080a] border border-[#2a2a38] px-2.5 py-1.5 rounded-lg">
+                      <div className="flex items-center gap-2 bg-[#F9F9F7] border border-[#E5E5E1] px-2.5 py-1.5 rounded-lg">
                         <input
                           type="color"
                           value={newColorHex}
@@ -1893,12 +1893,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           className="w-6 h-6 rounded bg-transparent border-0 cursor-pointer p-0"
                           title="Escolher tom da nova cor"
                         />
-                        <span className="text-[11px] font-mono text-[#D6B35A] uppercase font-bold">{newColorHex}</span>
+                        <span className="text-[11px] font-mono text-[#B45309] uppercase font-bold">{newColorHex}</span>
                       </div>
                       <button
                         type="button"
                         onClick={handleAddColor}
-                        className="bg-[#D6B35A] hover:bg-[#e4c46c] text-black font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition-colors shrink-0 flex items-center gap-1.5 shadow-md"
+                        className="bg-[#F0C84B] hover:bg-[#F0C84B]/90 text-black font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition-colors shrink-0 flex items-center gap-1.5 shadow-sm"
                       >
                         <Plus className="w-4 h-4 stroke-[3]" />
                         <span>Adicionar Cor</span>
@@ -1910,16 +1910,16 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
               {/* 5. Logistics & Packaging (Melhor Envio) */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-[#262626] pb-2">
-                  <h4 className="text-xs font-black uppercase tracking-wider text-[#D6B35A]">
+                <div className="flex items-center justify-between border-b border-[#E5E5E1] pb-2">
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#B45309]">
                     5. Dimensões & Peso para Frete (Melhor Envio)
                   </h4>
-                  <span className="text-[10px] text-[#777777]">Utilizado para cotação e geração de etiquetas reais</span>
+                  <span className="text-[10px] text-[#6B6B66]">Utilizado para cotação e geração de etiquetas reais</span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 min-w-0">
                   <div>
-                    <label className="text-[11px] font-bold text-[#777777] block mb-1">Peso (kg) *</label>
+                    <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Peso (kg) *</label>
                     <input
                       type="text"
                       inputMode="decimal"
@@ -1927,12 +1927,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       onChange={(e) => setFormWeight(e.target.value)}
                       required
                       placeholder="0.35"
-                      className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] font-mono focus:outline-none focus:border-[#D6B35A]"
+                      className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] font-mono focus:outline-none focus:border-[#B45309]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-[#777777] block mb-1">Altura (cm) *</label>
+                    <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Altura (cm) *</label>
                     <input
                       type="text"
                       inputMode="decimal"
@@ -1940,12 +1940,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       onChange={(e) => setFormHeight(e.target.value)}
                       required
                       placeholder="4"
-                      className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] font-mono focus:outline-none focus:border-[#D6B35A]"
+                      className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] font-mono focus:outline-none focus:border-[#B45309]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-[#777777] block mb-1">Largura (cm) *</label>
+                    <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Largura (cm) *</label>
                     <input
                       type="text"
                       inputMode="decimal"
@@ -1953,12 +1953,12 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       onChange={(e) => setFormWidth(e.target.value)}
                       required
                       placeholder="20"
-                      className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] font-mono focus:outline-none focus:border-[#D6B35A]"
+                      className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] font-mono focus:outline-none focus:border-[#B45309]"
                     />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-[#777777] block mb-1">Comprimento (cm) *</label>
+                    <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Comprimento (cm) *</label>
                     <input
                       type="text"
                       inputMode="decimal"
@@ -1966,7 +1966,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       onChange={(e) => setFormLength(e.target.value)}
                       required
                       placeholder="25"
-                      className="w-full bg-[#080808] border border-[#262626] px-3.5 py-2.5 rounded text-xs text-[#EFECE6] font-mono focus:outline-none focus:border-[#D6B35A]"
+                      className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3.5 py-2.5 rounded text-xs text-[#171717] font-mono focus:outline-none focus:border-[#B45309]"
                     />
                   </div>
                 </div>
@@ -1974,20 +1974,20 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
             </div>
 
             {/* Sticky Modal Action Buttons */}
-            <div className="flex flex-col-reverse sm:flex-row gap-3 px-5 py-4 sm:px-8 sm:py-4 border-t border-[#262626] bg-[#161616] shrink-0">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 px-5 py-4 sm:px-8 sm:py-4 border-t border-[#E5E5E1] bg-white shrink-0">
               <button
                 type="button"
                 onClick={() => {
                   setEditingProduct(null);
                   setIsAddOpen(false);
                 }}
-                className="w-full sm:flex-1 bg-[#080808] border border-[#262626] text-[#777777] hover:text-[#EFECE6] py-3 rounded-xl text-xs font-bold uppercase transition-colors"
+                className="w-full sm:flex-1 bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] py-3 rounded-xl text-xs font-bold uppercase transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="w-full sm:flex-1 bg-[#D6B35A] text-black font-extrabold py-3 rounded-xl text-xs uppercase hover:bg-[#EFECE6] transition-colors shadow-md"
+                className="w-full sm:flex-1 bg-[#F0C84B] text-black font-extrabold py-3 rounded-xl text-xs uppercase hover:bg-[#F0C84B]/90 transition-colors shadow-sm"
               >
                 {editingProduct ? 'Salvar Alterações' : 'Publicar Produto'}
               </button>
@@ -1999,19 +1999,19 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
       {/* DELETE CONFIRMATION MODAL */}
       {deletingId && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-[#161616] border border-[#262626] p-6 rounded-2xl max-w-md w-full space-y-4 text-center">
-            <div className="w-12 h-12 rounded-full bg-red-950/60 text-red-400 flex items-center justify-center mx-auto border border-red-500/30">
+        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white border border-[#E5E5E1] p-6 rounded-2xl max-w-md w-full space-y-4 text-center shadow-xl">
+            <div className="w-12 h-12 rounded-full bg-red-50 text-red-700 flex items-center justify-center mx-auto border border-red-200">
               <AlertCircle className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-black uppercase text-[#EFECE6]">Excluir Produto?</h3>
-            <p className="text-xs text-[#777777]">
+            <h3 className="text-base font-black uppercase text-[#171717]">Excluir Produto?</h3>
+            <p className="text-xs text-[#6B6B66]">
               Tem certeza que deseja remover esta peça do inventário? Esta ação não pode ser desfeita.
             </p>
             <div className="flex gap-3 pt-2">
               <button
                 onClick={() => setDeletingId(null)}
-                className="flex-1 bg-[#080808] border border-[#262626] text-[#777777] hover:text-[#EFECE6] py-2.5 rounded-xl text-xs font-bold uppercase"
+                className="flex-1 bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] py-2.5 rounded-xl text-xs font-bold uppercase"
               >
                 Cancelar
               </button>

@@ -41,22 +41,22 @@ export const AdminCouponsTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-[#161616] border border-[#262626] p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#D6B35A] uppercase">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase">
             <Tag className="w-4 h-4" /> Cupons Promocionais & Descontos
           </div>
-          <h2 className="text-xl font-black uppercase text-[#EFECE6] mt-1">
+          <h2 className="text-xl font-black uppercase text-[#171717] mt-1">
             Gestão de Cupons ({coupons.length})
           </h2>
-          <p className="text-xs text-[#777777] mt-0.5">
+          <p className="text-xs text-[#6B6B66] mt-0.5">
             Crie códigos promocionais para influenciadores, campanhas de e-mail ou frete com desconto.
           </p>
         </div>
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="bg-[#D6B35A] text-black font-extrabold text-xs uppercase px-5 py-3 rounded hover:bg-[#EFECE6] transition-colors flex items-center gap-2 shadow-lg whitespace-nowrap"
+          className="bg-[#F0C84B] text-black font-extrabold text-xs uppercase px-5 py-3 rounded-xl hover:bg-amber-400 transition-colors flex items-center gap-2 shadow-xs whitespace-nowrap"
         >
           <Plus className="w-4 h-4" /> Novo Cupom
         </button>
@@ -66,17 +66,17 @@ export const AdminCouponsTab: React.FC = () => {
         {coupons.map((c) => (
           <div
             key={c.code}
-            className="bg-[#161616] border border-[#262626] hover:border-[#333] p-5 rounded-xl flex flex-col justify-between space-y-4"
+            className="bg-white border border-[#E5E5E1] hover:border-[#B45309] p-5 rounded-2xl flex flex-col justify-between space-y-4 shadow-xs transition-colors"
           >
             <div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono font-black text-base text-[#D6B35A] tracking-wider uppercase">
+                  <span className="font-mono font-black text-base text-[#B45309] tracking-wider uppercase">
                     {c.code}
                   </span>
                   <button
                     onClick={() => handleCopy(c.code)}
-                    className="text-[#777777] hover:text-[#EFECE6] p-1"
+                    className="text-[#6B6B66] hover:text-[#171717] p-1"
                     title="Copiar código"
                   >
                     <Copy className="w-3.5 h-3.5" />
@@ -84,30 +84,30 @@ export const AdminCouponsTab: React.FC = () => {
                 </div>
 
                 <span
-                  className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                  className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full border ${
                     c.active
-                      ? 'bg-emerald-950/50 text-emerald-400 border border-emerald-500/30'
-                      : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : 'bg-zinc-100 text-zinc-600 border-zinc-200'
                   }`}
                 >
                   {c.active ? 'Ativo' : 'Pausado'}
                 </span>
               </div>
 
-              <p className="text-xs text-[#EFECE6] font-semibold mt-2">{c.description}</p>
-              <div className="text-[11px] text-[#777777] mt-1 space-y-0.5 font-mono">
-                <div>Desconto: <strong className="text-[#D6B35A]">{c.discountPercentage}% OFF</strong></div>
+              <p className="text-xs text-[#171717] font-semibold mt-2">{c.description}</p>
+              <div className="text-[11px] text-[#6B6B66] mt-1 space-y-0.5 font-mono">
+                <div>Desconto: <strong className="text-[#B45309]">{c.discountPercentage}% OFF</strong></div>
                 {c.minOrderValue && <div>Pedido mínimo: R$ {c.minOrderValue.toFixed(2)}</div>}
               </div>
             </div>
 
-            <div className="pt-3 border-t border-[#262626] flex items-center justify-between">
+            <div className="pt-3 border-t border-[#E5E5E1] flex items-center justify-between">
               <button
                 onClick={() => {
                   toggleCoupon(c.code);
                   showToast(c.active ? 'Cupom Pausado' : 'Cupom Ativado', c.code, 'info');
                 }}
-                className="text-xs font-bold text-[#EFECE6] hover:text-[#D6B35A] underline"
+                className="text-xs font-bold text-[#171717] hover:text-[#B45309] underline"
               >
                 {c.active ? 'Pausar Cupom' : 'Reativar Cupom'}
               </button>
@@ -117,7 +117,7 @@ export const AdminCouponsTab: React.FC = () => {
                   deleteCoupon(c.code);
                   showToast('Cupom Removido', c.code, 'info');
                 }}
-                className="p-1.5 text-[#777777] hover:text-red-400 rounded transition-colors"
+                className="p-1.5 text-[#6B6B66] hover:text-red-600 rounded transition-colors"
                 title="Excluir"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -129,25 +129,25 @@ export const AdminCouponsTab: React.FC = () => {
 
       {/* Add Modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-[#161616] border border-[#262626] p-6 rounded-2xl max-w-md w-full space-y-4">
-            <h3 className="text-base font-black uppercase text-[#EFECE6]">Criar Novo Cupom</h3>
+        <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white border border-[#E5E5E1] p-6 rounded-2xl max-w-md w-full space-y-4 shadow-xl">
+            <h3 className="text-base font-black uppercase text-[#171717]">Criar Novo Cupom</h3>
             <form onSubmit={handleAddCoupon} className="space-y-3">
               <div>
-                <label className="text-[11px] font-bold text-[#777777] block mb-1">Código do Cupom *</label>
+                <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Código do Cupom *</label>
                 <input
                   type="text"
                   value={formCode}
                   onChange={(e) => setFormCode(e.target.value.toUpperCase())}
                   placeholder="EX: CYBER15, DROP20..."
                   required
-                  className="w-full bg-[#080808] border border-[#262626] px-3 py-2 rounded text-xs font-mono font-bold text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3 py-2 rounded-xl text-xs font-mono font-bold text-[#171717] focus:outline-none focus:border-[#B45309]"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-bold text-[#777777] block mb-1">Desconto (%) *</label>
+                  <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Desconto (%) *</label>
                   <input
                     type="number"
                     min={1}
@@ -155,30 +155,30 @@ export const AdminCouponsTab: React.FC = () => {
                     value={formDiscount}
                     onChange={(e) => setFormDiscount(parseInt(e.target.value) || 0)}
                     required
-                    className="w-full bg-[#080808] border border-[#262626] px-3 py-2 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                    className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3 py-2 rounded-xl text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-[#777777] block mb-1">Pedido Mínimo (R$)</label>
+                  <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Pedido Mínimo (R$)</label>
                   <input
                     type="number"
                     min={0}
                     value={formMinOrder}
                     onChange={(e) => setFormMinOrder(parseFloat(e.target.value) || 0)}
-                    className="w-full bg-[#080808] border border-[#262626] px-3 py-2 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                    className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3 py-2 rounded-xl text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-[#777777] block mb-1">Descrição</label>
+                <label className="text-[11px] font-bold text-[#6B6B66] block mb-1">Descrição</label>
                 <input
                   type="text"
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
                   placeholder="Ex: 15% OFF de lançamento do Drop"
-                  className="w-full bg-[#080808] border border-[#262626] px-3 py-2 rounded text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] px-3 py-2 rounded-xl text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                 />
               </div>
 
@@ -186,13 +186,13 @@ export const AdminCouponsTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAddOpen(false)}
-                  className="flex-1 bg-[#080808] border border-[#262626] text-[#777777] hover:text-[#EFECE6] py-2.5 rounded-xl text-xs font-bold uppercase"
+                  className="flex-1 bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] py-2.5 rounded-xl text-xs font-bold uppercase shadow-xs"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 bg-[#D6B35A] text-black font-extrabold py-2.5 rounded-xl text-xs uppercase hover:bg-[#EFECE6] transition-colors"
+                  className="flex-1 bg-[#F0C84B] text-black font-extrabold py-2.5 rounded-xl text-xs uppercase hover:bg-amber-400 transition-colors shadow-xs"
                 >
                   Salvar Cupom
                 </button>

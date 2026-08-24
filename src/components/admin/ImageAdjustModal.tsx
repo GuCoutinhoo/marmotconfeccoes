@@ -307,22 +307,22 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md animate-fadeIn">
-      <div className="bg-[#141414] border border-[#2A2A2A] rounded-2xl max-w-4xl w-full flex flex-col max-h-[92vh] shadow-2xl overflow-hidden text-[#EFECE6]">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+      <div className="bg-white border border-[#E5E5E1] rounded-2xl max-w-4xl w-full flex flex-col max-h-[92vh] shadow-2xl overflow-hidden text-[#171717]">
         {/* MODAL HEADER */}
-        <div className="p-4 sm:p-5 border-b border-[#242424] flex items-center justify-between bg-[#0C0C0C]">
+        <div className="p-4 sm:p-5 border-b border-[#E5E5E1] flex items-center justify-between bg-[#F9F9F7]">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#D6B35A]/10 border border-[#D6B35A]/30 flex items-center justify-center text-[#D6B35A]">
+            <div className="w-8 h-8 rounded-lg bg-[#F0C84B]/20 border border-[#F0C84B]/40 flex items-center justify-center text-[#B45309]">
               <Crop className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-black uppercase text-[#EFECE6] tracking-tight">{title}</h3>
-              <p className="text-[11px] text-[#777777]">Enquadre, recorte e trate a imagem antes de salvar</p>
+              <h3 className="text-sm sm:text-base font-black uppercase text-[#171717] tracking-tight">{title}</h3>
+              <p className="text-[11px] text-[#6B6B66]">Enquadre, recorte e trate a imagem antes de salvar</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#777777] hover:text-[#EFECE6] hover:bg-[#222222] transition-colors"
+            className="p-1.5 rounded-lg text-[#6B6B66] hover:text-[#171717] hover:bg-[#E5E5E1] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -333,7 +333,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
           {/* CANVAS PREVIEW AREA (LEFT / TOP) */}
           <div
             ref={containerRef}
-            className="lg:col-span-7 bg-[#080808] p-4 sm:p-6 flex flex-col items-center justify-center relative min-h-[320px] sm:min-h-[420px] select-none border-b lg:border-b-0 lg:border-r border-[#242424]"
+            className="lg:col-span-7 bg-[#1A1A1A] p-4 sm:p-6 flex flex-col items-center justify-center relative min-h-[320px] sm:min-h-[420px] select-none border-b lg:border-b-0 lg:border-r border-[#E5E5E1]"
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
@@ -341,19 +341,19 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
             onTouchEnd={handleMouseUp}
           >
             {/* Guide Grid overlay info */}
-            <div className="absolute top-3 left-3 z-10 font-mono text-[9px] uppercase tracking-wider text-[#666666] bg-black/60 px-2 py-1 rounded backdrop-blur border border-white/5 flex items-center gap-1.5">
-              <Move className="w-3 h-3 text-[#D6B35A]" />
+            <div className="absolute top-3 left-3 z-10 font-mono text-[9px] uppercase tracking-wider text-zinc-400 bg-black/70 px-2 py-1 rounded backdrop-blur border border-white/10 flex items-center gap-1.5">
+              <Move className="w-3 h-3 text-[#F0C84B]" />
               <span>Arraste para reposicionar</span>
             </div>
 
             {/* Quick zoom badge */}
-            <div className="absolute top-3 right-3 z-10 font-mono text-[9px] uppercase text-[#D6B35A] bg-[#1A160D] px-2 py-1 rounded border border-[#D6B35A]/30">
+            <div className="absolute top-3 right-3 z-10 font-mono text-[9px] uppercase text-[#F0C84B] bg-black/70 px-2 py-1 rounded border border-[#F0C84B]/40">
               Zoom: {Math.round(zoom * 100)}%
             </div>
 
             {/* Canvas Container with Frame */}
             <div
-              className={`relative overflow-hidden rounded-xl border-2 border-[#333333] shadow-2xl bg-black ${
+              className={`relative overflow-hidden rounded-xl border-2 border-zinc-700 shadow-2xl bg-black ${
                 isDragging ? 'cursor-grabbing' : 'cursor-grab'
               }`}
               style={{
@@ -392,7 +392,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
 
               {!imageLoaded && !loadError && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/80 text-xs text-[#888888] gap-2">
-                  <RefreshCw className="w-4 h-4 animate-spin text-[#D6B35A]" />
+                  <RefreshCw className="w-4 h-4 animate-spin text-[#F0C84B]" />
                   <span>Carregando imagem...</span>
                 </div>
               )}
@@ -400,7 +400,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               {loadError && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 p-4 text-center">
                   <p className="text-xs text-red-400 font-bold mb-1">Não foi possível carregar a imagem</p>
-                  <p className="text-[10px] text-[#777777]">Verifique a URL ou faça upload de um arquivo direto.</p>
+                  <p className="text-[10px] text-zinc-400">Verifique a URL ou faça upload de um arquivo direto.</p>
                 </div>
               )}
             </div>
@@ -410,7 +410,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               <button
                 type="button"
                 onClick={() => setZoom((z) => Math.max(0.5, Number((z - 0.1).toFixed(1))))}
-                className="p-2 rounded-lg bg-[#181818] hover:bg-[#222222] border border-[#2C2C2C] text-[#AAAAAA] hover:text-[#EFECE6] text-xs transition-colors"
+                className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-white text-xs transition-colors"
                 title="Reduzir Zoom"
               >
                 <ZoomOut className="w-3.5 h-3.5" />
@@ -423,24 +423,24 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                 step="0.05"
                 value={zoom}
                 onChange={(e) => setZoom(parseFloat(e.target.value))}
-                className="w-28 sm:w-36 accent-[#D6B35A] cursor-pointer"
+                className="w-28 sm:w-36 accent-[#F0C84B] cursor-pointer"
               />
 
               <button
                 type="button"
                 onClick={() => setZoom((z) => Math.min(3, Number((z + 0.1).toFixed(1))))}
-                className="p-2 rounded-lg bg-[#181818] hover:bg-[#222222] border border-[#2C2C2C] text-[#AAAAAA] hover:text-[#EFECE6] text-xs transition-colors"
+                className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-white text-xs transition-colors"
                 title="Aumentar Zoom"
               >
                 <ZoomIn className="w-3.5 h-3.5" />
               </button>
 
-              <div className="h-4 w-px bg-[#262626] mx-1" />
+              <div className="h-4 w-px bg-zinc-700 mx-1" />
 
               <button
                 type="button"
                 onClick={() => setRotation((r) => (r - 90) % 360)}
-                className="p-2 rounded-lg bg-[#181818] hover:bg-[#222222] border border-[#2C2C2C] text-[#AAAAAA] hover:text-[#EFECE6] text-xs transition-colors"
+                className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-white text-xs transition-colors"
                 title="Girar 90° à esquerda"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -449,7 +449,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               <button
                 type="button"
                 onClick={() => setRotation((r) => (r + 90) % 360)}
-                className="p-2 rounded-lg bg-[#181818] hover:bg-[#222222] border border-[#2C2C2C] text-[#AAAAAA] hover:text-[#EFECE6] text-xs transition-colors"
+                className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-white text-xs transition-colors"
                 title="Girar 90° à direita"
               >
                 <RotateCw className="w-3.5 h-3.5" />
@@ -460,8 +460,8 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                 onClick={() => setFlipH((f) => !f)}
                 className={`p-2 rounded-lg border text-xs transition-colors ${
                   flipH
-                    ? 'bg-[#1C180F] border-[#D6B35A] text-[#D6B35A]'
-                    : 'bg-[#181818] hover:bg-[#222222] border-[#2C2C2C] text-[#AAAAAA] hover:text-[#EFECE6]'
+                    ? 'bg-amber-500/20 border-[#F0C84B] text-[#F0C84B]'
+                    : 'bg-zinc-800 hover:bg-zinc-700 border-zinc-700 text-zinc-300 hover:text-white'
                 }`}
                 title="Espelhar Horizontalmente"
               >
@@ -471,20 +471,20 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
           </div>
 
           {/* CONTROLS & SETTINGS PANEL (RIGHT) */}
-          <div className="lg:col-span-5 p-4 sm:p-5 flex flex-col justify-between bg-[#121212] space-y-4">
+          <div className="lg:col-span-5 p-4 sm:p-5 flex flex-col justify-between bg-white space-y-4">
             <div>
               {/* Tab Navigation */}
-              <div className="grid grid-cols-3 gap-1.5 p-1 bg-[#0A0A0A] rounded-xl border border-[#222222] mb-4">
+              <div className="grid grid-cols-3 gap-1.5 p-1 bg-[#F9F9F7] rounded-xl border border-[#E5E5E1] mb-4">
                 <button
                   type="button"
                   onClick={() => setActiveControlTab('crop')}
                   className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
                     activeControlTab === 'crop'
-                      ? 'bg-[#222222] text-[#D6B35A] shadow-sm'
-                      : 'text-[#888888] hover:text-[#EFECE6]'
+                      ? 'bg-white text-[#171717] shadow-xs border border-[#E5E5E1]'
+                      : 'text-[#6B6B66] hover:text-[#171717]'
                   }`}
                 >
-                  <Crop className="w-3.5 h-3.5" />
+                  <Crop className="w-3.5 h-3.5 text-[#B45309]" />
                   <span>Corte</span>
                 </button>
 
@@ -493,11 +493,11 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                   onClick={() => setActiveControlTab('adjust')}
                   className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
                     activeControlTab === 'adjust'
-                      ? 'bg-[#222222] text-[#D6B35A] shadow-sm'
-                      : 'text-[#888888] hover:text-[#EFECE6]'
+                      ? 'bg-white text-[#171717] shadow-xs border border-[#E5E5E1]'
+                      : 'text-[#6B6B66] hover:text-[#171717]'
                   }`}
                 >
-                  <Sliders className="w-3.5 h-3.5" />
+                  <Sliders className="w-3.5 h-3.5 text-[#B45309]" />
                   <span>Ajustes</span>
                 </button>
 
@@ -506,11 +506,11 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                   onClick={() => setActiveControlTab('filters')}
                   className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all ${
                     activeControlTab === 'filters'
-                      ? 'bg-[#222222] text-[#D6B35A] shadow-sm'
-                      : 'text-[#888888] hover:text-[#EFECE6]'
+                      ? 'bg-white text-[#171717] shadow-xs border border-[#E5E5E1]'
+                      : 'text-[#6B6B66] hover:text-[#171717]'
                   }`}
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#B45309]" />
                   <span>Filtros</span>
                 </button>
               </div>
@@ -519,7 +519,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               {activeControlTab === 'crop' && (
                 <div className="space-y-4">
                   <div>
-                    <label className="text-[11px] font-bold text-[#888888] uppercase block mb-2 font-mono">
+                    <label className="text-[11px] font-bold text-[#6B6B66] uppercase block mb-2 font-mono">
                       Proporção do Enquadramento
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -528,12 +528,12 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                         onClick={() => setAspectRatio('1:1')}
                         className={`p-2.5 rounded-xl border text-left flex flex-col gap-0.5 transition-all ${
                           aspectRatio === '1:1'
-                            ? 'bg-[#1C180F] border-[#D6B35A] text-[#D6B35A]'
-                            : 'bg-[#181818] border-[#262626] text-[#AAAAAA] hover:border-[#383838]'
+                            ? 'bg-amber-50/60 border-amber-300 text-amber-950 shadow-xs'
+                            : 'bg-[#F9F9F7] border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                         }`}
                       >
                         <span className="text-xs font-bold uppercase">1:1 Quadrado</span>
-                        <span className="text-[10px] text-[#666666]">Ideal para Categorias</span>
+                        <span className="text-[10px] text-[#6B6B66]">Ideal para Categorias</span>
                       </button>
 
                       <button
@@ -541,12 +541,12 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                         onClick={() => setAspectRatio('4:5')}
                         className={`p-2.5 rounded-xl border text-left flex flex-col gap-0.5 transition-all ${
                           aspectRatio === '4:5'
-                            ? 'bg-[#1C180F] border-[#D6B35A] text-[#D6B35A]'
-                            : 'bg-[#181818] border-[#262626] text-[#AAAAAA] hover:border-[#383838]'
+                            ? 'bg-amber-50/60 border-amber-300 text-amber-950 shadow-xs'
+                            : 'bg-[#F9F9F7] border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                         }`}
                       >
                         <span className="text-xs font-bold uppercase">4:5 Retrato Moda</span>
-                        <span className="text-[10px] text-[#666666]">Streetwear Lookbook</span>
+                        <span className="text-[10px] text-[#6B6B66]">Streetwear Lookbook</span>
                       </button>
 
                       <button
@@ -554,12 +554,12 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                         onClick={() => setAspectRatio('16:9')}
                         className={`p-2.5 rounded-xl border text-left flex flex-col gap-0.5 transition-all ${
                           aspectRatio === '16:9'
-                            ? 'bg-[#1C180F] border-[#D6B35A] text-[#D6B35A]'
-                            : 'bg-[#181818] border-[#262626] text-[#AAAAAA] hover:border-[#383838]'
+                            ? 'bg-amber-50/60 border-amber-300 text-amber-950 shadow-xs'
+                            : 'bg-[#F9F9F7] border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                         }`}
                       >
                         <span className="text-xs font-bold uppercase">16:9 Panorâmico</span>
-                        <span className="text-[10px] text-[#666666]">Banners & Hero</span>
+                        <span className="text-[10px] text-[#6B6B66]">Banners & Hero</span>
                       </button>
 
                       <button
@@ -567,18 +567,18 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                         onClick={() => setAspectRatio('free')}
                         className={`p-2.5 rounded-xl border text-left flex flex-col gap-0.5 transition-all ${
                           aspectRatio === 'free'
-                            ? 'bg-[#1C180F] border-[#D6B35A] text-[#D6B35A]'
-                            : 'bg-[#181818] border-[#262626] text-[#AAAAAA] hover:border-[#383838]'
+                            ? 'bg-amber-50/60 border-amber-300 text-amber-950 shadow-xs'
+                            : 'bg-[#F9F9F7] border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                         }`}
                       >
                         <span className="text-xs font-bold uppercase">Original Livre</span>
-                        <span className="text-[10px] text-[#666666]">Manter formato</span>
+                        <span className="text-[10px] text-[#6B6B66]">Manter formato</span>
                       </button>
                     </div>
                   </div>
 
-                  <div className="p-3 bg-[#0C0C0C] border border-[#222222] rounded-xl text-[11px] text-[#888888] space-y-1">
-                    <p className="font-bold text-[#EFECE6]">Dica de Enquadramento:</p>
+                  <div className="p-3 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl text-[11px] text-[#6B6B66] space-y-1">
+                    <p className="font-bold text-[#171717]">Dica de Enquadramento:</p>
                     <p>Clique e arraste a imagem na caixa de pré-visualização para centralizar o produto ou modelo.</p>
                   </div>
                 </div>
@@ -590,10 +590,10 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                   {/* Brightness */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-[#AAAAAA] font-bold">
-                        <SunMedium className="w-3.5 h-3.5 text-[#D6B35A]" /> Brilho
+                      <span className="flex items-center gap-1.5 text-[#171717] font-bold">
+                        <SunMedium className="w-3.5 h-3.5 text-[#B45309]" /> Brilho
                       </span>
-                      <span className="font-mono text-[#D6B35A]">{brightness}%</span>
+                      <span className="font-mono text-[#B45309] font-bold">{brightness}%</span>
                     </div>
                     <input
                       type="range"
@@ -601,17 +601,17 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                       max="150"
                       value={brightness}
                       onChange={(e) => setBrightness(parseInt(e.target.value))}
-                      className="w-full accent-[#D6B35A] cursor-pointer"
+                      className="w-full accent-[#F0C84B] cursor-pointer"
                     />
                   </div>
 
                   {/* Contrast */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-[#AAAAAA] font-bold">
-                        <Contrast className="w-3.5 h-3.5 text-[#D6B35A]" /> Contraste
+                      <span className="flex items-center gap-1.5 text-[#171717] font-bold">
+                        <Contrast className="w-3.5 h-3.5 text-[#B45309]" /> Contraste
                       </span>
-                      <span className="font-mono text-[#D6B35A]">{contrast}%</span>
+                      <span className="font-mono text-[#B45309] font-bold">{contrast}%</span>
                     </div>
                     <input
                       type="range"
@@ -619,17 +619,17 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                       max="180"
                       value={contrast}
                       onChange={(e) => setContrast(parseInt(e.target.value))}
-                      className="w-full accent-[#D6B35A] cursor-pointer"
+                      className="w-full accent-[#F0C84B] cursor-pointer"
                     />
                   </div>
 
                   {/* Saturation */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs">
-                      <span className="flex items-center gap-1.5 text-[#AAAAAA] font-bold">
-                        <Palette className="w-3.5 h-3.5 text-[#D6B35A]" /> Saturação de Cor
+                      <span className="flex items-center gap-1.5 text-[#171717] font-bold">
+                        <Palette className="w-3.5 h-3.5 text-[#B45309]" /> Saturação de Cor
                       </span>
-                      <span className="font-mono text-[#D6B35A]">{saturation}%</span>
+                      <span className="font-mono text-[#B45309] font-bold">{saturation}%</span>
                     </div>
                     <input
                       type="range"
@@ -637,7 +637,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                       max="200"
                       value={saturation}
                       onChange={(e) => setSaturation(parseInt(e.target.value))}
-                      className="w-full accent-[#D6B35A] cursor-pointer"
+                      className="w-full accent-[#F0C84B] cursor-pointer"
                     />
                   </div>
                 </div>
@@ -646,7 +646,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               {/* TAB 3: PRESET FILTERS */}
               {activeControlTab === 'filters' && (
                 <div className="space-y-3">
-                  <label className="text-[11px] font-bold text-[#888888] uppercase block font-mono">
+                  <label className="text-[11px] font-bold text-[#6B6B66] uppercase block font-mono">
                     Presets Visuais da Marca
                   </label>
                   <div className="grid grid-cols-1 gap-2">
@@ -657,15 +657,15 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
                         onClick={() => handleSelectPreset(preset)}
                         className={`p-3 rounded-xl border flex items-center justify-between text-xs transition-all ${
                           activePreset === preset.id
-                            ? 'bg-[#1C180F] border-[#D6B35A] text-[#D6B35A] font-bold'
-                            : 'bg-[#161616] border-[#262626] text-[#AAAAAA] hover:border-[#383838] hover:text-[#EFECE6]'
+                            ? 'bg-amber-50/60 border-amber-300 text-amber-950 font-bold shadow-xs'
+                            : 'bg-[#F9F9F7] border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                         }`}
                       >
                         <span className="flex items-center gap-2">
-                          <Sparkles className="w-3.5 h-3.5 text-[#D6B35A]" />
+                          <Sparkles className="w-3.5 h-3.5 text-[#B45309]" />
                           {preset.name}
                         </span>
-                        {activePreset === preset.id && <Check className="w-4 h-4 text-[#D6B35A]" />}
+                        {activePreset === preset.id && <Check className="w-4 h-4 text-[#B45309]" />}
                       </button>
                     ))}
                   </div>
@@ -674,21 +674,21 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
             </div>
 
             {/* ACTION BUTTONS */}
-            <div className="pt-3 border-t border-[#222222] flex items-center gap-2.5">
+            <div className="pt-3 border-t border-[#E5E5E1] flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={handleResetAll}
-                className="p-3 rounded-xl bg-[#1A1A1A] hover:bg-[#242424] border border-[#2C2C2C] text-[#888888] hover:text-[#EFECE6] text-xs font-bold transition-colors flex items-center gap-1.5"
+                className="p-3 rounded-xl bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
                 title="Restaurar valores padrão"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
+                <RefreshCw className="w-3.5 h-3.5 text-[#B45309]" />
                 <span className="hidden sm:inline">Resetar</span>
               </button>
 
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#181818] hover:bg-[#222222] border border-[#282828] text-[#888888] hover:text-[#EFECE6] text-xs font-bold uppercase transition-colors"
+                className="flex-1 py-3 px-4 rounded-xl bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] text-xs font-bold uppercase transition-colors shadow-xs"
               >
                 Cancelar
               </button>
@@ -696,7 +696,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               <button
                 type="button"
                 onClick={handleConfirmSave}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#D6B35A] hover:bg-[#EFECE6] text-black text-xs font-black uppercase shadow-lg shadow-[#D6B35A]/20 transition-all flex items-center justify-center gap-2"
+                className="flex-1 py-3 px-4 rounded-xl bg-[#F0C84B] hover:bg-amber-400 text-black text-xs font-black uppercase shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <Check className="w-4 h-4 stroke-[3]" />
                 <span>Aplicar Ajustes</span>

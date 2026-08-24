@@ -46,8 +46,10 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               <img
                 src={cat.image}
                 alt={cat.name}
+                loading="lazy"
+                decoding="async"
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 brightness-[0.98] group-hover:brightness-100"
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 brightness-[0.98] group-hover:brightness-100"
               />
 
               {/* Gradient Vignette for Text Contrast */}

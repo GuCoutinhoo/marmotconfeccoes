@@ -202,21 +202,21 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
   ];
 
   return (
-    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-6">
+    <div className="bg-[#F6F6F3] text-[#171717] min-h-screen py-6">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <Breadcrumb items={[{ label: 'Painel ERP Admin', onClick: () => onNavigate('admin') }]} />
 
         {/* Top Header Bar */}
-        <div className="bg-white border border-[#E4E4E7] p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
+        <div className="bg-white border border-[#E5E5E1] p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#F4C400] text-[#0B0B0E] flex items-center justify-center font-black text-lg">
+            <div className="w-11 h-11 rounded-xl bg-[#F0C84B] text-[#171717] flex items-center justify-center font-black text-lg shadow-xs">
               M
             </div>
             <div>
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase">
                 <ShieldCheck className="w-3.5 h-3.5" /> MARMOT ERP • SISTEMA DE GESTÃO INTEGRADA
               </div>
-              <h1 className="text-xl sm:text-2xl font-black uppercase text-[#18181B] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black uppercase text-[#171717] tracking-tight">
                 PAINEL OPERACIONAL & ADMINISTRATIVO
               </h1>
             </div>
@@ -225,9 +225,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
           <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
             <button
               onClick={() => onNavigate('home')}
-              className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#18181B] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+              className="bg-[#F9F9F7] hover:bg-[#F0F0ED] border border-[#E5E5E1] text-[#171717] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <Store className="w-3.5 h-3.5 text-[#B45309]" /> Ver Loja <ExternalLink className="w-3 h-3 text-[#71717A]" />
+              <Store className="w-3.5 h-3.5 text-[#B45309]" /> Ver Loja <ExternalLink className="w-3 h-3 text-[#6B6B66]" />
             </button>
 
             <button
@@ -235,7 +235,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                 await logout();
                 onNavigate('home');
               }}
-              className="bg-[#F8F9FA] hover:bg-red-50 text-[#71717A] hover:text-red-600 border border-[#E4E4E7] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+              className="bg-[#F9F9F7] hover:bg-red-50 text-[#6B6B66] hover:text-red-600 border border-[#E5E5E1] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
               <LogOut className="w-3.5 h-3.5" /> Sair
             </button>
@@ -245,10 +245,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
         {/* ERP Main Layout: Left Sidebar Navigation + Content Area */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Navigation Sidebar */}
-          <div className="lg:col-span-3 bg-white border border-[#E4E4E7] rounded-2xl p-4 space-y-6 shadow-xs sticky top-24">
+          <div className="lg:col-span-3 bg-white border border-[#E5E5E1] rounded-2xl p-4 space-y-6 shadow-sm sticky top-24">
             {menuGroups.map((group, gIdx) => (
               <div key={gIdx} className="space-y-1.5">
-                <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#71717A] px-3">
+                <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6B6B66] px-3">
                   {group.label}
                 </p>
                 <div className="space-y-0.5">
@@ -261,12 +261,12 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                         onClick={() => setActiveTab(item.id)}
                         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase transition-all text-left cursor-pointer ${
                           isActive
-                            ? 'bg-[#0B0B0E] text-white font-black shadow-xs'
-                            : 'text-[#71717A] hover:text-[#18181B] hover:bg-[#F8F9FA]'
+                            ? 'bg-[#171717] text-white font-black shadow-xs'
+                            : 'text-[#6B6B66] hover:text-[#171717] hover:bg-[#F9F9F7]'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-[#71717A]'}`} />
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-[#F0C84B]' : 'text-[#6B6B66]'}`} />
                           <span className="truncate">{item.label}</span>
                         </div>
 
@@ -275,7 +275,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                             <span
                               className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
                                 isActive
-                                  ? 'bg-[#F4C400] text-black'
+                                  ? 'bg-[#F0C84B] text-[#171717]'
                                   : 'bg-red-50 text-red-600 border border-red-200'
                               }`}
                             >
@@ -287,7 +287,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                               className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
                                 isActive
                                   ? 'bg-zinc-800 text-zinc-300'
-                                  : 'bg-[#F8F9FA] text-[#71717A] border border-[#E4E4E7]'
+                                  : 'bg-[#F9F9F7] text-[#6B6B66] border border-[#E5E5E1]'
                               }`}
                             >
                               {item.count}
@@ -303,7 +303,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
           </div>
 
           {/* Right Main Content Panel */}
-          <div className="lg:col-span-9 bg-white border border-[#E4E4E7] rounded-2xl p-6 shadow-xs">
+          <div className="lg:col-span-9 bg-white border border-[#E5E5E1] rounded-2xl p-6 shadow-sm">
             {activeTab === 'overview' && (
               <AdminOverviewTab onNavigateTab={(tab) => setActiveTab(tab as AdminTab)} />
             )}

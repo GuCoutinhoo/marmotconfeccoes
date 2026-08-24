@@ -127,14 +127,14 @@ export const AdminInventoryTab: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Subtab Toggle */}
-      <div className="flex items-center justify-between bg-[#141414] border border-[#222222] p-2 rounded-2xl">
+      <div className="flex items-center justify-between bg-white border border-[#E5E5E1] p-2 rounded-2xl shadow-xs">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveSubTab('catalog')}
             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all flex items-center gap-2 ${
               activeSubTab === 'catalog'
-                ? 'bg-[#D6B35A] text-black shadow-md'
-                : 'text-[#888888] hover:text-[#EFECE6]'
+                ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                : 'text-[#6B6B66] hover:text-[#171717]'
             }`}
           >
             <Package className="w-4 h-4" /> Estoque por Produto
@@ -143,8 +143,8 @@ export const AdminInventoryTab: React.FC = () => {
             onClick={() => setActiveSubTab('movements')}
             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase transition-all flex items-center gap-2 ${
               activeSubTab === 'movements'
-                ? 'bg-[#D6B35A] text-black shadow-md'
-                : 'text-[#888888] hover:text-[#EFECE6]'
+                ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                : 'text-[#6B6B66] hover:text-[#171717]'
             }`}
           >
             <History className="w-4 h-4" /> Histórico de Movimentações
@@ -153,12 +153,12 @@ export const AdminInventoryTab: React.FC = () => {
 
         <div className="flex items-center gap-4 px-3 text-xs font-mono">
           {lowStockCount > 0 && (
-            <span className="text-amber-400 font-bold flex items-center gap-1">
+            <span className="text-amber-700 font-bold flex items-center gap-1">
               <AlertTriangle className="w-3.5 h-3.5" /> {lowStockCount} com estoque baixo
             </span>
           )}
           {outOfStockCount > 0 && (
-            <span className="text-red-400 font-bold flex items-center gap-1">
+            <span className="text-red-600 font-bold flex items-center gap-1">
               <AlertTriangle className="w-3.5 h-3.5" /> {outOfStockCount} esgotados
             </span>
           )}
@@ -168,15 +168,15 @@ export const AdminInventoryTab: React.FC = () => {
       {activeSubTab === 'catalog' ? (
         <>
           {/* Filter Bar */}
-          <div className="bg-[#141414] border border-[#222222] p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="bg-white border border-[#E5E5E1] p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-xs">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 text-[#777777] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#6B6B66] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar produto por nome, ID ou SKU..."
-                className="w-full bg-[#080808] border border-[#262626] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
+                className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
               />
             </div>
 
@@ -185,8 +185,8 @@ export const AdminInventoryTab: React.FC = () => {
                 onClick={() => setStockStatusFilter('all')}
                 className={`px-3 py-2 rounded-xl font-bold uppercase transition-all ${
                   stockStatusFilter === 'all'
-                    ? 'bg-[#D6B35A] text-black'
-                    : 'bg-[#080808] border border-[#262626] text-[#777]'
+                    ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                    : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                 }`}
               >
                 Todos ({products.length})
@@ -195,8 +195,8 @@ export const AdminInventoryTab: React.FC = () => {
                 onClick={() => setStockStatusFilter('low')}
                 className={`px-3 py-2 rounded-xl font-bold uppercase transition-all ${
                   stockStatusFilter === 'low'
-                    ? 'bg-[#D6B35A] text-black'
-                    : 'bg-[#080808] border border-[#262626] text-[#777]'
+                    ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                    : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                 }`}
               >
                 Estoque Baixo ({lowStockCount})
@@ -205,8 +205,8 @@ export const AdminInventoryTab: React.FC = () => {
                 onClick={() => setStockStatusFilter('out')}
                 className={`px-3 py-2 rounded-xl font-bold uppercase transition-all ${
                   stockStatusFilter === 'out'
-                    ? 'bg-[#D6B35A] text-black'
-                    : 'bg-[#080808] border border-[#262626] text-[#777]'
+                    ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
+                    : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717]'
                 }`}
               >
                 Esgotados ({outOfStockCount})
@@ -215,11 +215,11 @@ export const AdminInventoryTab: React.FC = () => {
           </div>
 
           {/* Inventory Table */}
-          <div className="bg-[#141414] border border-[#222222] rounded-2xl overflow-hidden shadow-xl">
+          <div className="bg-white border border-[#E5E5E1] rounded-2xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-[#222222] bg-[#0a0a0a] text-[#777777] font-mono uppercase tracking-wider">
+                  <tr className="border-b border-[#E5E5E1] bg-[#F9F9F7] text-[#6B6B66] font-mono uppercase tracking-wider">
                     <th className="p-4">Produto</th>
                     <th className="p-4">SKU / Categoria</th>
                     <th className="p-4">Preço Base</th>
@@ -228,17 +228,17 @@ export const AdminInventoryTab: React.FC = () => {
                     <th className="p-4 text-right">Ajuste</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#1c1c1c]">
+                <tbody className="divide-y divide-[#E5E5E1]">
                   {filteredProducts.map((prod) => {
                     const stock = prod.stockCount ?? 20;
                     const isOut = stock <= 0;
                     const isLow = stock > 0 && stock <= 5;
 
                     return (
-                      <tr key={prod.id} className="hover:bg-[#181818] transition-colors">
+                      <tr key={prod.id} className="hover:bg-[#F9F9F7] transition-colors">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#161616] border border-[#262626] shrink-0">
+                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#F9F9F7] border border-[#E5E5E1] shrink-0">
                               <img
                                 src={prod.images?.[0] || prod.image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80'}
                                 alt={prod.title}
@@ -247,36 +247,36 @@ export const AdminInventoryTab: React.FC = () => {
                               />
                             </div>
                             <div>
-                              <p className="font-bold text-[#EFECE6]">{prod.title}</p>
-                              <p className="text-[10px] text-[#777777] font-mono">{prod.id}</p>
+                              <p className="font-bold text-[#171717]">{prod.title}</p>
+                              <p className="text-[10px] text-[#6B6B66] font-mono">{prod.id}</p>
                             </div>
                           </div>
                         </td>
 
                         <td className="p-4 font-mono">
-                          <p className="text-[#EFECE6]">{prod.sku || 'SKU-MARMOT'}</p>
-                          <p className="text-[10px] text-[#777777] uppercase">{prod.category || 'Geral'}</p>
+                          <p className="text-[#171717]">{prod.sku || 'SKU-MARMOT'}</p>
+                          <p className="text-[10px] text-[#6B6B66] uppercase">{prod.category || 'Geral'}</p>
                         </td>
 
                         <td className="p-4 font-mono">
-                          <p className="font-bold text-[#EFECE6]">
+                          <p className="font-bold text-[#171717]">
                             R$ {prod.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                           </p>
                         </td>
 
                         <td className="p-4 font-mono">
-                          <p className="text-base font-black text-[#D6B35A]">{stock} un.</p>
-                          <p className="text-[10px] text-[#777777]">Min: 5 un.</p>
+                          <p className="text-base font-black text-[#B45309]">{stock} un.</p>
+                          <p className="text-[10px] text-[#6B6B66]">Min: 5 un.</p>
                         </td>
 
                         <td className="p-4">
                           <span
                             className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${
                               isOut
-                                ? 'bg-red-950/40 text-red-400 border-red-800/60'
+                                ? 'bg-red-50 text-red-700 border-red-200'
                                 : isLow
-                                ? 'bg-amber-950/40 text-amber-400 border-amber-800/60'
-                                : 'bg-emerald-950/40 text-emerald-400 border-emerald-800/60'
+                                ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             }`}
                           >
                             {isOut ? 'Esgotado' : isLow ? 'Estoque Baixo' : 'Em Estoque'}
@@ -290,7 +290,7 @@ export const AdminInventoryTab: React.FC = () => {
                               setQuantityChange(0);
                               setAdjustmentNote('');
                             }}
-                            className="px-3 py-1.5 bg-[#080808] hover:bg-[#262626] border border-[#222222] rounded-xl text-xs font-bold text-[#D6B35A] uppercase transition-all flex items-center gap-1.5 ml-auto"
+                            className="px-3 py-1.5 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] hover:border-[#B45309] rounded-xl text-xs font-bold text-[#B45309] uppercase transition-all flex items-center gap-1.5 ml-auto shadow-xs"
                           >
                             <Edit2 className="w-3.5 h-3.5" /> Ajustar
                           </button>
@@ -305,24 +305,24 @@ export const AdminInventoryTab: React.FC = () => {
         </>
       ) : (
         /* Movements Audit Table */
-        <div className="bg-[#141414] border border-[#222222] rounded-2xl overflow-hidden shadow-xl">
-          <div className="p-4 bg-[#0a0a0a] border-b border-[#222222] flex justify-between items-center">
-            <h3 className="text-xs font-bold uppercase text-[#EFECE6] font-mono flex items-center gap-2">
-              <History className="w-4 h-4 text-[#D6B35A]" /> Registro de Movimentações de Estoque
+        <div className="bg-white border border-[#E5E5E1] rounded-2xl overflow-hidden shadow-xs">
+          <div className="p-4 bg-[#F9F9F7] border-b border-[#E5E5E1] flex justify-between items-center">
+            <h3 className="text-xs font-bold uppercase text-[#171717] font-mono flex items-center gap-2">
+              <History className="w-4 h-4 text-[#B45309]" /> Registro de Movimentações de Estoque
             </h3>
             <button
               onClick={fetchMovements}
               disabled={loadingMovements}
-              className="p-1.5 hover:bg-[#222] rounded-lg text-[#777] hover:text-[#EFECE6] transition-all"
+              className="p-1.5 hover:bg-white border border-[#E5E5E1] rounded-lg text-[#6B6B66] hover:text-[#171717] transition-all shadow-xs"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loadingMovements ? 'animate-spin text-[#D6B35A]' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingMovements ? 'animate-spin text-[#B45309]' : ''}`} />
             </button>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>
-                <tr className="border-b border-[#222222] bg-[#0a0a0a] text-[#777777] font-mono uppercase tracking-wider">
+                <tr className="border-b border-[#E5E5E1] bg-[#F9F9F7] text-[#6B6B66] font-mono uppercase tracking-wider">
                   <th className="p-4">Data / Hora</th>
                   <th className="p-4">Produto</th>
                   <th className="p-4">Tipo / Motivo</th>
@@ -331,36 +331,36 @@ export const AdminInventoryTab: React.FC = () => {
                   <th className="p-4">Responsável</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1c1c1c]">
+              <tbody className="divide-y divide-[#E5E5E1]">
                 {movements.map((mov) => {
                   const isPositive = mov.quantityChange > 0;
                   return (
-                    <tr key={mov.id} className="hover:bg-[#181818] transition-colors">
-                      <td className="p-4 font-mono text-[#777777]">
+                    <tr key={mov.id} className="hover:bg-[#F9F9F7] transition-colors">
+                      <td className="p-4 font-mono text-[#6B6B66]">
                         {new Date(mov.timestamp).toLocaleString('pt-BR')}
                       </td>
                       <td className="p-4">
-                        <p className="font-bold text-[#EFECE6]">{mov.productTitle}</p>
-                        <p className="text-[10px] text-[#777777] font-mono">ID: {mov.productId}</p>
+                        <p className="font-bold text-[#171717]">{mov.productTitle}</p>
+                        <p className="text-[10px] text-[#6B6B66] font-mono">ID: {mov.productId}</p>
                       </td>
                       <td className="p-4">
-                        <span className="font-bold uppercase text-[#EFECE6]">{mov.reason}</span>
-                        {mov.note && <p className="text-[10px] text-[#777777] italic">{mov.note}</p>}
+                        <span className="font-bold uppercase text-[#171717]">{mov.reason}</span>
+                        {mov.note && <p className="text-[10px] text-[#6B6B66] italic">{mov.note}</p>}
                       </td>
                       <td className="p-4 font-mono">
                         <span
                           className={`font-black text-sm flex items-center gap-0.5 ${
-                            isPositive ? 'text-emerald-400' : 'text-red-400'
+                            isPositive ? 'text-emerald-600' : 'text-red-600'
                           }`}
                         >
                           {isPositive ? '+' : ''}
                           {mov.quantityChange} un.
                         </span>
                       </td>
-                      <td className="p-4 font-mono font-bold text-[#D6B35A]">
+                      <td className="p-4 font-mono font-bold text-[#B45309]">
                         {mov.newStock} un.
                       </td>
-                      <td className="p-4 text-[#777777] font-mono">
+                      <td className="p-4 text-[#6B6B66] font-mono">
                         {mov.userOrAdmin}
                       </td>
                     </tr>
@@ -369,7 +369,7 @@ export const AdminInventoryTab: React.FC = () => {
 
                 {movements.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="p-12 text-center text-[#777777] font-mono">
+                    <td colSpan={6} className="p-12 text-center text-[#6B6B66] font-mono">
                       Nenhuma movimentação registrada no inventário.
                     </td>
                   </tr>
@@ -382,34 +382,34 @@ export const AdminInventoryTab: React.FC = () => {
 
       {/* Manual Stock Adjustment Modal */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#141414] border border-[#262626] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-150">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white border border-[#E5E5E1] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-xl animate-in zoom-in-95 duration-150">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-sm font-black uppercase text-[#EFECE6] tracking-tight">
+                <h3 className="text-sm font-black uppercase text-[#171717] tracking-tight">
                   Ajuste de Estoque Manual
                 </h3>
-                <p className="text-xs text-[#777777] mt-0.5">{selectedProduct.title}</p>
+                <p className="text-xs text-[#6B6B66] mt-0.5">{selectedProduct.title}</p>
               </div>
-              <button onClick={() => setSelectedProduct(null)} className="text-[#777777] hover:text-[#EFECE6]">
+              <button onClick={() => setSelectedProduct(null)} className="text-[#6B6B66] hover:text-[#171717]">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="bg-[#0a0a0a] border border-[#1f1f1f] p-4 rounded-xl flex items-center justify-between font-mono text-xs">
-              <span className="text-[#777]">Estoque Atual:</span>
-              <span className="font-black text-[#D6B35A] text-sm">{selectedProduct.stockCount ?? 20} un.</span>
+            <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl flex items-center justify-between font-mono text-xs">
+              <span className="text-[#6B6B66]">Estoque Atual:</span>
+              <span className="font-black text-[#B45309] text-sm">{selectedProduct.stockCount ?? 20} un.</span>
             </div>
 
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-mono text-[#777777] block mb-1">
+                <label className="text-xs font-mono text-[#6B6B66] block mb-1">
                   Quantidade a Adicionar (+) ou Subtrair (-):
                 </label>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setQuantityChange((prev) => prev - 1)}
-                    className="p-2.5 bg-[#080808] hover:bg-[#222] border border-[#262626] rounded-xl text-[#EFECE6]"
+                    className="p-2.5 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] rounded-xl text-[#171717] shadow-xs"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
@@ -417,29 +417,29 @@ export const AdminInventoryTab: React.FC = () => {
                     type="number"
                     value={quantityChange}
                     onChange={(e) => setQuantityChange(parseInt(e.target.value, 10) || 0)}
-                    className="flex-1 bg-[#080808] border border-[#262626] rounded-xl px-3 py-2 text-center text-sm font-mono font-bold text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                    className="flex-1 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-center text-sm font-mono font-bold text-[#171717] focus:outline-none focus:border-[#B45309]"
                   />
                   <button
                     onClick={() => setQuantityChange((prev) => prev + 1)}
-                    className="p-2.5 bg-[#080808] hover:bg-[#222] border border-[#262626] rounded-xl text-[#EFECE6]"
+                    className="p-2.5 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] rounded-xl text-[#171717] shadow-xs"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
-                <p className="text-[11px] text-[#777] font-mono mt-1 text-center">
+                <p className="text-[11px] text-[#6B6B66] font-mono mt-1 text-center">
                   Novo estoque resultante:{' '}
-                  <strong className="text-[#EFECE6]">
+                  <strong className="text-[#171717]">
                     {Math.max(0, (selectedProduct.stockCount ?? 20) + quantityChange)} un.
                   </strong>
                 </p>
               </div>
 
               <div>
-                <label className="text-xs font-mono text-[#777777] block mb-1">Motivo do Ajuste:</label>
+                <label className="text-xs font-mono text-[#6B6B66] block mb-1">Motivo do Ajuste:</label>
                 <select
                   value={adjustmentReason}
                   onChange={(e) => setAdjustmentReason(e.target.value)}
-                  className="w-full bg-[#080808] border border-[#262626] rounded-xl px-3 py-2 text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                 >
                   <option value="purchase_restock">Reposição de Compra / Fornecedor</option>
                   <option value="manual_adjustment">Ajuste de Balanço / Inventário Físico</option>
@@ -449,13 +449,13 @@ export const AdminInventoryTab: React.FC = () => {
               </div>
 
               <div>
-                <label className="text-xs font-mono text-[#777777] block mb-1">Observação do Registro:</label>
+                <label className="text-xs font-mono text-[#6B6B66] block mb-1">Observação do Registro:</label>
                 <input
                   type="text"
                   value={adjustmentNote}
                   onChange={(e) => setAdjustmentNote(e.target.value)}
                   placeholder="Ex: Recebimento lote #402..."
-                  className="w-full bg-[#080808] border border-[#262626] rounded-xl px-3 py-2 text-xs text-[#EFECE6] focus:outline-none focus:border-[#D6B35A]"
+                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
                 />
               </div>
             </div>
@@ -463,14 +463,14 @@ export const AdminInventoryTab: React.FC = () => {
             <div className="flex justify-end gap-2 pt-2">
               <button
                 onClick={() => setSelectedProduct(null)}
-                className="px-4 py-2 bg-[#080808] hover:bg-[#222] border border-[#262626] text-xs font-bold uppercase text-[#777777] rounded-xl"
+                className="px-4 py-2 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-xs font-bold uppercase text-[#6B6B66] rounded-xl shadow-xs"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleSaveAdjustment}
                 disabled={isSaving || quantityChange === 0}
-                className="px-4 py-2 bg-[#D6B35A] hover:bg-[#EFECE6] text-black text-xs font-black uppercase rounded-xl transition-all shadow-md disabled:opacity-40 flex items-center gap-2"
+                className="px-4 py-2 bg-[#F0C84B] hover:bg-amber-400 text-black text-xs font-extrabold uppercase rounded-xl transition-all shadow-xs disabled:opacity-40 flex items-center gap-2"
               >
                 {isSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
                 Salvar Estoque

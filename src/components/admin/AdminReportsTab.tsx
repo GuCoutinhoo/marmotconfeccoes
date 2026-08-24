@@ -86,22 +86,22 @@ export const AdminReportsTab: React.FC = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Filter Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#141414] border border-[#222222] p-4 sm:p-5 rounded-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-[#E5E5E1] p-4 sm:p-5 rounded-2xl shadow-xs">
         <div>
-          <h3 className="text-base font-black uppercase text-[#EFECE6] tracking-tight flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-[#D6B35A]" /> Relatórios & Inteligência Financeira
+          <h3 className="text-base font-black uppercase text-[#171717] tracking-tight flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-[#B45309]" /> Relatórios & Inteligência Financeira
           </h3>
-          <p className="text-xs text-[#777777] mt-0.5">
+          <p className="text-xs text-[#6B6B66] mt-0.5">
             Análise aprofundada de receitas, ticket médio, meios de pagamento e produtos
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-[#080808] border border-[#262626] p-1 rounded-xl flex items-center gap-1 text-xs">
+          <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-1 rounded-xl flex items-center gap-1 text-xs">
             <button
               onClick={() => setPeriod('today')}
               className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                period === 'today' ? 'bg-[#D6B35A] text-black shadow-md' : 'text-[#888] hover:text-[#EFECE6]'
+                period === 'today' ? 'bg-[#F0C84B] text-black shadow-xs' : 'text-[#6B6B66] hover:text-[#171717]'
               }`}
             >
               Hoje
@@ -109,7 +109,7 @@ export const AdminReportsTab: React.FC = () => {
             <button
               onClick={() => setPeriod('7days')}
               className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                period === '7days' ? 'bg-[#D6B35A] text-black shadow-md' : 'text-[#888] hover:text-[#EFECE6]'
+                period === '7days' ? 'bg-[#F0C84B] text-black shadow-xs' : 'text-[#6B6B66] hover:text-[#171717]'
               }`}
             >
               7D
@@ -117,7 +117,7 @@ export const AdminReportsTab: React.FC = () => {
             <button
               onClick={() => setPeriod('30days')}
               className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                period === '30days' ? 'bg-[#D6B35A] text-black shadow-md' : 'text-[#888] hover:text-[#EFECE6]'
+                period === '30days' ? 'bg-[#F0C84B] text-black shadow-xs' : 'text-[#6B6B66] hover:text-[#171717]'
               }`}
             >
               30D
@@ -125,7 +125,7 @@ export const AdminReportsTab: React.FC = () => {
             <button
               onClick={() => setPeriod('this_month')}
               className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                period === 'this_month' ? 'bg-[#D6B35A] text-black shadow-md' : 'text-[#888] hover:text-[#EFECE6]'
+                period === 'this_month' ? 'bg-[#F0C84B] text-black shadow-xs' : 'text-[#6B6B66] hover:text-[#171717]'
               }`}
             >
               Este Mês
@@ -133,7 +133,7 @@ export const AdminReportsTab: React.FC = () => {
             <button
               onClick={() => setPeriod('year')}
               className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
-                period === 'year' ? 'bg-[#D6B35A] text-black shadow-md' : 'text-[#888] hover:text-[#EFECE6]'
+                period === 'year' ? 'bg-[#F0C84B] text-black shadow-xs' : 'text-[#6B6B66] hover:text-[#171717]'
               }`}
             >
               Ano
@@ -142,66 +142,66 @@ export const AdminReportsTab: React.FC = () => {
 
           <button
             onClick={exportCSV}
-            className="px-3.5 py-2 bg-[#080808] hover:bg-[#222] border border-[#333] text-xs font-bold text-[#EFECE6] rounded-xl flex items-center gap-1.5 transition-all"
+            className="px-3.5 py-2 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-xs font-bold text-[#171717] rounded-xl flex items-center gap-1.5 transition-all shadow-xs"
             title="Exportar dados em CSV"
           >
-            <Download className="w-3.5 h-3.5 text-[#D6B35A]" /> Exportar CSV
+            <Download className="w-3.5 h-3.5 text-[#B45309]" /> Exportar CSV
           </button>
 
           <button
             onClick={fetchReport}
             disabled={isLoading}
-            className="p-2 bg-[#080808] hover:bg-[#222] border border-[#333] rounded-xl text-[#777] hover:text-[#EFECE6]"
+            className="p-2 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] rounded-xl text-[#6B6B66] hover:text-[#171717] shadow-xs"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#D6B35A]' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#B45309]' : ''}`} />
           </button>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-mono">
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-1">
-          <p className="text-[10px] text-[#777777] uppercase font-bold">Receita Bruta</p>
-          <p className="text-2xl font-black text-[#EFECE6]">
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-1 shadow-xs">
+          <p className="text-[10px] text-[#6B6B66] uppercase font-bold">Receita Bruta</p>
+          <p className="text-2xl font-black text-[#171717]">
             R$ {(report?.grossRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
-          <p className="text-[11px] text-[#777]">{report?.totalOrders ?? 0} pedidos faturados</p>
+          <p className="text-[11px] text-[#6B6B66]">{report?.totalOrders ?? 0} pedidos faturados</p>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-1">
-          <p className="text-[10px] text-[#777777] uppercase font-bold">Receita Líquida Estimada</p>
-          <p className="text-2xl font-black text-emerald-400">
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-1 shadow-xs">
+          <p className="text-[10px] text-[#6B6B66] uppercase font-bold">Receita Líquida Estimada</p>
+          <p className="text-2xl font-black text-emerald-700">
             R$ {(report?.netRevenue ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
-          <p className="text-[11px] text-[#777]">Deduzidos fretes e taxas</p>
+          <p className="text-[11px] text-[#6B6B66]">Deduzidos fretes e taxas</p>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-1">
-          <p className="text-[10px] text-[#777777] uppercase font-bold">Ticket Médio</p>
-          <p className="text-2xl font-black text-[#D6B35A]">
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-1 shadow-xs">
+          <p className="text-[10px] text-[#6B6B66] uppercase font-bold">Ticket Médio</p>
+          <p className="text-2xl font-black text-[#B45309]">
             R$ {(report?.averageTicket ?? 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
           </p>
-          <p className="text-[11px] text-[#777]">Por transação aprovada</p>
+          <p className="text-[11px] text-[#6B6B66]">Por transação aprovada</p>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-1">
-          <p className="text-[10px] text-[#777777] uppercase font-bold">Taxa de Cancelamento</p>
-          <p className="text-2xl font-black text-amber-400">
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-1 shadow-xs">
+          <p className="text-[10px] text-[#6B6B66] uppercase font-bold">Taxa de Cancelamento</p>
+          <p className="text-2xl font-black text-amber-700">
             {(report?.cancellationRate ?? 0).toFixed(1)}%
           </p>
-          <p className="text-[11px] text-[#777]">Devoluções: {(report?.returnRate ?? 0).toFixed(1)}%</p>
+          <p className="text-[11px] text-[#6B6B66]">Devoluções: {(report?.returnRate ?? 0).toFixed(1)}%</p>
         </div>
       </div>
 
       {/* Sales Evolution Chart */}
-      <div className="bg-[#141414] border border-[#222222] p-6 rounded-2xl space-y-4">
-        <h4 className="text-sm font-black uppercase text-[#EFECE6] tracking-tight flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-[#D6B35A]" /> Linha do Tempo de Faturamento
+      <div className="bg-white border border-[#E5E5E1] p-6 rounded-2xl space-y-4 shadow-xs">
+        <h4 className="text-sm font-black uppercase text-[#171717] tracking-tight flex items-center gap-2">
+          <TrendingUp className="w-4 h-4 text-[#B45309]" /> Linha do Tempo de Faturamento
         </h4>
 
         <div className="relative w-full overflow-x-auto">
           {salesData.length === 0 ? (
-            <div className="h-44 flex items-center justify-center text-xs text-[#777777] font-mono">
+            <div className="h-44 flex items-center justify-center text-xs text-[#6B6B66] font-mono">
               Sem movimentações no período selecionado.
             </div>
           ) : (
@@ -209,8 +209,8 @@ export const AdminReportsTab: React.FC = () => {
               <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-52 overflow-visible">
                 <defs>
                   <linearGradient id="repGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#D6B35A" stopOpacity="0.4" />
-                    <stop offset="100%" stopColor="#D6B35A" stopOpacity="0.0" />
+                    <stop offset="0%" stopColor="#F0C84B" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#F0C84B" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
 
@@ -219,8 +219,8 @@ export const AdminReportsTab: React.FC = () => {
                   const value = Math.round(maxRevenue * (1 - ratio));
                   return (
                     <g key={i}>
-                      <line x1={paddingX} y1={y} x2={svgWidth - paddingX} y2={y} stroke="#222" strokeDasharray="3 3" />
-                      <text x={paddingX - 8} y={y + 3} fill="#555" fontSize="9" fontFamily="monospace" textAnchor="end">
+                      <line x1={paddingX} y1={y} x2={svgWidth - paddingX} y2={y} stroke="#E5E5E1" strokeDasharray="3 3" />
+                      <text x={paddingX - 8} y={y + 3} fill="#999" fontSize="9" fontFamily="monospace" textAnchor="end">
                         R${value}
                       </text>
                     </g>
@@ -228,12 +228,12 @@ export const AdminReportsTab: React.FC = () => {
                 })}
 
                 {areaD && <path d={areaD} fill="url(#repGrad)" />}
-                {pathD && <path d={pathD} fill="none" stroke="#D6B35A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />}
+                {pathD && <path d={pathD} fill="none" stroke="#B45309" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />}
 
                 {points.map((pt, idx) => (
                   <g key={idx}>
-                    <circle cx={pt.x} cy={pt.y} r="3.5" fill="#080808" stroke="#D6B35A" strokeWidth="2" />
-                    <text x={pt.x} y={svgHeight - 8} fill="#666" fontSize="9" fontFamily="monospace" textAnchor="middle">
+                    <circle cx={pt.x} cy={pt.y} r="3.5" fill="#FFFFFF" stroke="#B45309" strokeWidth="2" />
+                    <text x={pt.x} y={svgHeight - 8} fill="#6B6B66" fontSize="9" fontFamily="monospace" textAnchor="middle">
                       {pt.date.slice(5).replace('-', '/')}
                     </text>
                   </g>
@@ -247,52 +247,52 @@ export const AdminReportsTab: React.FC = () => {
       {/* Split: Payment Methods Breakdown & Top Categories */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Payment Methods */}
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-4">
-          <h4 className="text-sm font-black uppercase text-[#EFECE6] tracking-tight flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-[#D6B35A]" /> Meios de Pagamento
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-4 shadow-xs">
+          <h4 className="text-sm font-black uppercase text-[#171717] tracking-tight flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-[#B45309]" /> Meios de Pagamento
           </h4>
 
           <div className="space-y-3 font-mono text-xs">
             {(report?.paymentMethodsBreakdown || []).map((pm, idx) => (
-              <div key={idx} className="p-3 bg-[#0a0a0a] border border-[#1f1f1f] rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-2 font-bold uppercase text-[#EFECE6]">
+              <div key={idx} className="p-3 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold uppercase text-[#171717]">
                   {pm.method === 'pix' ? (
-                    <QrCode className="w-4 h-4 text-emerald-400" />
+                    <QrCode className="w-4 h-4 text-emerald-600" />
                   ) : (
-                    <CreditCard className="w-4 h-4 text-[#D6B35A]" />
+                    <CreditCard className="w-4 h-4 text-[#B45309]" />
                   )}
                   <span>{pm.method}</span>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-[#EFECE6]">
+                  <p className="font-bold text-[#171717]">
                     R$ {pm.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
-                  <p className="text-[10px] text-[#777]">{pm.count} transações ({pm.percentage.toFixed(1)}%)</p>
+                  <p className="text-[10px] text-[#6B6B66]">{pm.count} transações ({pm.percentage.toFixed(1)}%)</p>
                 </div>
               </div>
             ))}
 
             {(!report?.paymentMethodsBreakdown || report.paymentMethodsBreakdown.length === 0) && (
-              <p className="text-xs text-[#777] font-mono text-center py-4">Sem dados de pagamento no período.</p>
+              <p className="text-xs text-[#6B6B66] font-mono text-center py-4">Sem dados de pagamento no período.</p>
             )}
           </div>
         </div>
 
         {/* Top Categories */}
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-4">
-          <h4 className="text-sm font-black uppercase text-[#EFECE6] tracking-tight flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#D6B35A]" /> Categorias Mais Vendidas
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-4 shadow-xs">
+          <h4 className="text-sm font-black uppercase text-[#171717] tracking-tight flex items-center gap-2">
+            <Layers className="w-4 h-4 text-[#B45309]" /> Categorias Mais Vendidas
           </h4>
 
           <div className="space-y-3 font-mono text-xs">
             {(report?.topCategories || []).map((cat, idx) => (
-              <div key={idx} className="p-3 bg-[#0a0a0a] border border-[#1f1f1f] rounded-xl flex items-center justify-between">
+              <div key={idx} className="p-3 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl flex items-center justify-between">
                 <div>
-                  <p className="font-bold uppercase text-[#EFECE6]">{cat.category}</p>
-                  <p className="text-[10px] text-[#777]">{cat.count} unidades vendidas</p>
+                  <p className="font-bold uppercase text-[#171717]">{cat.category}</p>
+                  <p className="text-[10px] text-[#6B6B66]">{cat.count} unidades vendidas</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-[#D6B35A]">
+                  <p className="font-bold text-[#B45309]">
                     R$ {cat.revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
                 </div>
@@ -300,7 +300,7 @@ export const AdminReportsTab: React.FC = () => {
             ))}
 
             {(!report?.topCategories || report.topCategories.length === 0) && (
-              <p className="text-xs text-[#777] font-mono text-center py-4">Sem dados de categorias no período.</p>
+              <p className="text-xs text-[#6B6B66] font-mono text-center py-4">Sem dados de categorias no período.</p>
             )}
           </div>
         </div>

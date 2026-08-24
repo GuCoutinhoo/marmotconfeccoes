@@ -25,6 +25,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [sortBy, setSortBy] = useState<string>('featured');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [gridCols, setGridCols] = useState<3 | 4>(4);
+  const [displayCount, setDisplayCount] = useState<number>(24);
+
+  // Reset pagination when any filter changes
+  const handleFilterChange = () => {
+    setDisplayCount(24);
+  };
 
   // Filter logic
   const filteredProducts = useMemo(() => {
@@ -62,16 +68,22 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     return result;
   }, [products, selectedCategory, selectedCollection, selectedSizes, selectedTags, priceRange, sortBy]);
 
+  const visibleProducts = useMemo(() => {
+    return filteredProducts.slice(0, displayCount);
+  }, [filteredProducts, displayCount]);
+
   const toggleSize = (size: string) => {
     setSelectedSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
     );
+    handleFilterChange();
   };
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
+    handleFilterChange();
   };
 
   const resetFilters = () => {
@@ -81,6 +93,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     setSelectedTags([]);
     setPriceRange(700);
     setSortBy('featured');
+    setDisplayCount(24);
   };
 
   const activeFiltersCount =
@@ -283,21 +296,39 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 </button>
               </div>
             ) : (
-              <div
-                className={`grid gap-5 sm:gap-6 ${
-                  gridCols === 3
-                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                    : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-                }`}
-              >
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onQuickView={onQuickView}
-                    onProductClick={(id) => onNavigate('product', id)}
-                  />
-                ))}
+              <div className="space-y-8">
+                <div
+                  className={`grid gap-5 sm:gap-6 ${
+                    gridCols === 3
+                      ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                      : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+                  }`}
+                >
+                  {visibleProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      product={product}
+                      onQuickView={onQuickView}
+                      onProductClick={(id) => onNavigate('product', id)}
+                    />
+                  ))}
+                </div>
+
+                {/* Progressive Load Button & Counter */}
+                <div className="pt-8 border-t border-[#E4E4E7] flex flex-col items-center justify-center gap-3">
+                  <span className="text-xs font-mono text-[#71717A]">
+                    Exibindo <strong>{visibleProducts.length}</strong> de <strong>{filteredProducts.length}</strong> peças autorais
+                  </span>
+                  
+                  {visibleProducts.length < filteredProducts.length && (
+                    <button
+                      onClick={() => setDisplayCount((prev) => prev + 24)}
+                      className="py-3 px-8 bg-[#18181B] text-white hover:bg-[#27272A] font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
+                    >
+                      Carregar Mais Peças (+24)
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </main>

@@ -124,67 +124,67 @@ export const AdminNewsletterTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header & Stats */}
-      <div className="bg-[#141414] border border-[#222222] p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
+      <div className="bg-white border border-[#E5E5E1] p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#D6B35A] uppercase">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase">
             <Mail className="w-3.5 h-3.5" /> MARKETING & NOTIFICAÇÕES DE DROP
           </div>
-          <h2 className="text-xl font-black uppercase text-[#EFECE6] mt-1">
+          <h2 className="text-xl font-black uppercase text-[#171717] mt-1">
             Newsletter & Disparos de Drop Exclusivos
           </h2>
-          <p className="text-xs text-[#888888] mt-0.5">
+          <p className="text-xs text-[#6B6B66] mt-0.5">
             Gerencie inscritos da newsletter, envie comunicados de novos lançamentos e acompanhe o histórico.
           </p>
         </div>
 
         <button
           onClick={fetchNewsletterData}
-          className="bg-[#080808] hover:bg-[#222] text-[#EFECE6] text-xs font-bold uppercase px-4 py-2.5 rounded-xl border border-[#262626] transition-all flex items-center gap-2"
+          className="bg-[#F9F9F7] hover:bg-white text-[#171717] text-xs font-bold uppercase px-4 py-2.5 rounded-xl border border-[#E5E5E1] transition-all flex items-center gap-2 shadow-xs"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} /> Atualizar
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#B45309]' : ''}`} /> Atualizar
         </button>
       </div>
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-1">
-          <div className="flex items-center justify-between text-[#888888]">
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-1 shadow-xs">
+          <div className="flex items-center justify-between text-[#6B6B66]">
             <span className="text-xs font-mono font-bold uppercase">Total de Inscritos</span>
-            <Users className="w-4 h-4 text-[#D6B35A]" />
+            <Users className="w-4 h-4 text-[#B45309]" />
           </div>
-          <p className="text-2xl font-black text-[#EFECE6]">{subscribers.length}</p>
-          <p className="text-[11px] text-[#666666]">Contas cadastradas no portal</p>
+          <p className="text-2xl font-black text-[#171717]">{subscribers.length}</p>
+          <p className="text-[11px] text-[#6B6B66]">Contas cadastradas no portal</p>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-1">
-          <div className="flex items-center justify-between text-[#888888]">
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-1 shadow-xs">
+          <div className="flex items-center justify-between text-[#6B6B66]">
             <span className="text-xs font-mono font-bold uppercase">Ativos para Receber</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           </div>
-          <p className="text-2xl font-black text-emerald-400">{activeSubscribers.length}</p>
-          <p className="text-[11px] text-[#666666]">Prontos para disparos de novos drops</p>
+          <p className="text-2xl font-black text-emerald-700">{activeSubscribers.length}</p>
+          <p className="text-[11px] text-[#6B6B66]">Prontos para disparos de novos drops</p>
         </div>
 
-        <div className="bg-[#141414] border border-[#222222] p-5 rounded-2xl space-y-1">
-          <div className="flex items-center justify-between text-[#888888]">
+        <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-1 shadow-xs">
+          <div className="flex items-center justify-between text-[#6B6B66]">
             <span className="text-xs font-mono font-bold uppercase">Campanhas Enviadas</span>
-            <Megaphone className="w-4 h-4 text-[#D6B35A]" />
+            <Megaphone className="w-4 h-4 text-[#B45309]" />
           </div>
-          <p className="text-2xl font-black text-[#EFECE6]">{campaigns.length}</p>
-          <p className="text-[11px] text-[#666666]">Disparos transacionais efetuados</p>
+          <p className="text-2xl font-black text-[#171717]">{campaigns.length}</p>
+          <p className="text-[11px] text-[#6B6B66]">Disparos transacionais efetuados</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Drop Composer Column */}
-        <div className="lg:col-span-6 bg-[#141414] border border-[#222222] p-6 rounded-2xl space-y-5 shadow-xl">
-          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#D6B35A] uppercase border-b border-[#222222] pb-3">
-            <Sparkles className="w-4 h-4 text-[#D6B35A]" /> DISPARAR NOTIFICAÇÃO DE NOVO DROP
+        <div className="lg:col-span-6 bg-white border border-[#E5E5E1] p-6 rounded-2xl space-y-5 shadow-xs">
+          <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase border-b border-[#E5E5E1] pb-3">
+            <Sparkles className="w-4 h-4 text-[#B45309]" /> DISPARAR NOTIFICAÇÃO DE NOVO DROP
           </div>
 
           <form onSubmit={handleSendDrop} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-[#A0A0A0]">
+              <label className="text-xs font-bold uppercase text-[#6B6B66]">
                 Título do Drop (Destaque Principal) *
               </label>
               <input
@@ -192,13 +192,13 @@ export const AdminNewsletterTab: React.FC = () => {
                 value={dropTitle}
                 onChange={(e) => setDropTitle(e.target.value)}
                 placeholder="Ex: NOVO DROP // VOL. 04 CYBER DYSTOPIA"
-                className="w-full bg-[#080808] border border-[#262626] rounded-xl px-4 py-2.5 text-xs text-[#EFECE6] focus:border-[#D6B35A] outline-none"
+                className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-4 py-2.5 text-xs text-[#171717] focus:border-[#B45309] outline-none"
                 required
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-[#A0A0A0]">
+              <label className="text-xs font-bold uppercase text-[#6B6B66]">
                 Assunto do E-mail (Subject Line) *
               </label>
               <input
@@ -206,14 +206,14 @@ export const AdminNewsletterTab: React.FC = () => {
                 value={dropSubject}
                 onChange={(e) => setDropSubject(e.target.value)}
                 placeholder="Ex: 🚨 DROP CONFIRMADO: Vol. 04 Cyber Dystopia disponível agora"
-                className="w-full bg-[#080808] border border-[#262626] rounded-xl px-4 py-2.5 text-xs text-[#EFECE6] focus:border-[#D6B35A] outline-none"
+                className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-4 py-2.5 text-xs text-[#171717] focus:border-[#B45309] outline-none"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-[#A0A0A0]">
+                <label className="text-xs font-bold uppercase text-[#6B6B66]">
                   Coleção
                 </label>
                 <input
@@ -221,29 +221,29 @@ export const AdminNewsletterTab: React.FC = () => {
                   value={collectionName}
                   onChange={(e) => setCollectionName(e.target.value)}
                   placeholder="Ex: Vol. 04: Cyber Dystopia"
-                  className="w-full bg-[#080808] border border-[#262626] rounded-xl px-4 py-2.5 text-xs text-[#EFECE6] focus:border-[#D6B35A] outline-none"
+                  className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-4 py-2.5 text-xs text-[#171717] focus:border-[#B45309] outline-none"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase text-[#A0A0A0]">
+                <label className="text-xs font-bold uppercase text-[#6B6B66]">
                   Cupom Exclusivo de Lançamento
                 </label>
                 <div className="relative">
-                  <Tag className="w-3.5 h-3.5 absolute left-3.5 top-3 text-[#666]" />
+                  <Tag className="w-3.5 h-3.5 absolute left-3.5 top-3 text-[#6B6B66]" />
                   <input
                     type="text"
                     value={discountCode}
                     onChange={(e) => setDiscountCode(e.target.value.toUpperCase())}
                     placeholder="FIRSTAURA"
-                    className="w-full bg-[#080808] border border-[#262626] rounded-xl pl-9 pr-4 py-2.5 text-xs font-mono uppercase text-[#EFECE6] focus:border-[#D6B35A] outline-none"
+                    className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl pl-9 pr-4 py-2.5 text-xs font-mono uppercase text-[#171717] focus:border-[#B45309] outline-none"
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase text-[#A0A0A0]">
+              <label className="text-xs font-bold uppercase text-[#6B6B66]">
                 Mensagem Personalizada aos Colecionadores
               </label>
               <textarea
@@ -251,18 +251,18 @@ export const AdminNewsletterTab: React.FC = () => {
                 value={customMessage}
                 onChange={(e) => setCustomMessage(e.target.value)}
                 placeholder="Escreva detalhes sobre o corte, tecido e tiragem..."
-                className="w-full bg-[#080808] border border-[#262626] rounded-xl p-3.5 text-xs text-[#EFECE6] focus:border-[#D6B35A] outline-none resize-none leading-relaxed"
+                className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl p-3.5 text-xs text-[#171717] focus:border-[#B45309] outline-none resize-none leading-relaxed"
               />
             </div>
 
-            <div className="bg-[#080808] border border-[#222222] p-4 rounded-xl flex items-center justify-between text-xs">
-              <div className="text-[#888888]">
-                Destinatários: <strong className="text-emerald-400">{activeSubscribers.length} inscritos</strong>
+            <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl flex items-center justify-between text-xs">
+              <div className="text-[#6B6B66]">
+                Destinatários: <strong className="text-emerald-700">{activeSubscribers.length} inscritos</strong>
               </div>
               <button
                 type="submit"
                 disabled={isSending || activeSubscribers.length === 0}
-                className="bg-[#D6B35A] hover:bg-[#EFECE6] text-black font-extrabold text-xs uppercase px-5 py-2.5 rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-lg"
+                className="bg-[#F0C84B] hover:bg-amber-400 text-black font-extrabold text-xs uppercase px-5 py-2.5 rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 shadow-xs"
               >
                 {isSending ? (
                   <>
@@ -279,28 +279,28 @@ export const AdminNewsletterTab: React.FC = () => {
         </div>
 
         {/* Subscribers List Column */}
-        <div className="lg:col-span-6 bg-[#141414] border border-[#222222] p-6 rounded-2xl space-y-4 shadow-xl flex flex-col justify-between">
+        <div className="lg:col-span-6 bg-white border border-[#E5E5E1] p-6 rounded-2xl space-y-4 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-[#222222] pb-3">
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#D6B35A] uppercase">
-                <Users className="w-4 h-4 text-[#D6B35A]" /> LISTA DE INSCRITOS ({subscribers.length})
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 border-b border-[#E5E5E1] pb-3">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase">
+                <Users className="w-4 h-4 text-[#B45309]" /> LISTA DE INSCRITOS ({subscribers.length})
               </div>
 
               <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#666]" />
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#6B6B66]" />
                 <input
                   type="text"
                   placeholder="Buscar e-mail..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-[#080808] border border-[#262626] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#EFECE6] focus:border-[#D6B35A] outline-none w-48"
+                  className="bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl pl-8 pr-3 py-1.5 text-xs text-[#171717] focus:border-[#B45309] outline-none w-48"
                 />
               </div>
             </div>
 
-            <div className="divide-y divide-[#222222] max-h-[380px] overflow-y-auto mt-2">
+            <div className="divide-y divide-[#E5E5E1] max-h-[380px] overflow-y-auto mt-2">
               {filteredSubscribers.length === 0 ? (
-                <div className="py-12 text-center text-[#666666] space-y-2">
+                <div className="py-12 text-center text-[#6B6B66] space-y-2">
                   <Mail className="w-8 h-8 mx-auto opacity-40" />
                   <p className="text-xs">Nenhum inscrito encontrado.</p>
                 </div>
@@ -308,8 +308,8 @@ export const AdminNewsletterTab: React.FC = () => {
                 filteredSubscribers.map((sub) => (
                   <div key={sub.id} className="py-3 flex items-center justify-between gap-3 text-xs">
                     <div className="min-w-0">
-                      <p className="font-mono font-bold text-[#EFECE6] truncate">{sub.email}</p>
-                      <p className="text-[10px] text-[#666666] flex items-center gap-2 mt-0.5">
+                      <p className="font-mono font-bold text-[#171717] truncate">{sub.email}</p>
+                      <p className="text-[10px] text-[#6B6B66] flex items-center gap-2 mt-0.5">
                         <span>Origem: {sub.source || 'Website'}</span>
                         <span>•</span>
                         <span>{new Date(sub.subscribedAt || sub.createdAt).toLocaleDateString('pt-BR')}</span>
@@ -317,10 +317,10 @@ export const AdminNewsletterTab: React.FC = () => {
                     </div>
 
                     <span
-                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md shrink-0 ${
+                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border shrink-0 ${
                         sub.status === 'subscribed'
-                          ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/50'
-                          : 'bg-zinc-800 text-zinc-400'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                          : 'bg-zinc-100 text-zinc-600 border-zinc-200'
                       }`}
                     >
                       {sub.status === 'subscribed' ? 'Ativo' : 'Cancelado'}
@@ -333,18 +333,18 @@ export const AdminNewsletterTab: React.FC = () => {
 
           {/* Past Campaigns */}
           {campaigns.length > 0 && (
-            <div className="pt-4 border-t border-[#222222]">
-              <p className="text-[11px] font-mono uppercase font-bold text-[#888888] mb-2">
+            <div className="pt-4 border-t border-[#E5E5E1]">
+              <p className="text-[11px] font-mono uppercase font-bold text-[#6B6B66] mb-2">
                 Últimos Disparos Efetuados:
               </p>
               <div className="space-y-1.5 max-h-32 overflow-y-auto">
                 {campaigns.slice(0, 3).map((c) => (
-                  <div key={c.id} className="bg-[#080808] border border-[#222222] p-2.5 rounded-xl flex items-center justify-between text-xs">
+                  <div key={c.id} className="bg-[#F9F9F7] border border-[#E5E5E1] p-2.5 rounded-xl flex items-center justify-between text-xs">
                     <div>
-                      <p className="font-bold text-[#EFECE6] text-[11px]">{c.title}</p>
-                      <p className="text-[10px] text-[#666666]">{new Date(c.createdAt).toLocaleString('pt-BR')}</p>
+                      <p className="font-bold text-[#171717] text-[11px]">{c.title}</p>
+                      <p className="text-[10px] text-[#6B6B66]">{new Date(c.createdAt).toLocaleString('pt-BR')}</p>
                     </div>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-950/30 px-2 py-0.5 rounded border border-emerald-900/40">
+                    <span className="text-[10px] font-mono text-emerald-800 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                       {c.sentCount} entregues
                     </span>
                   </div>
