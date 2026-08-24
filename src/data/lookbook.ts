@@ -20,9 +20,9 @@ export const LOOKBOOK_LOOKS: LookbookLook[] = [
     collection: 'Vol. 04: Cyber Dystopia',
     image: 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1200&q=80',
     hotspots: [
-      { id: 'hs-1', productId: 'prod-004', topPercent: 32, leftPercent: 52 },
-      { id: 'hs-2', productId: 'prod-008', topPercent: 68, leftPercent: 48 },
-      { id: 'hs-3', productId: 'prod-016', topPercent: 90, leftPercent: 54 },
+      { id: 'hs-1', productId: 'prod-cam-004', topPercent: 32, leftPercent: 52 },
+      { id: 'hs-2', productId: 'prod-cam-008', topPercent: 68, leftPercent: 48 },
+      { id: 'hs-3', productId: 'prod-mol-001', topPercent: 90, leftPercent: 54 },
     ],
   },
   {
@@ -31,9 +31,9 @@ export const LOOKBOOK_LOOKS: LookbookLook[] = [
     collection: 'Core Archive',
     image: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1200&q=80',
     hotspots: [
-      { id: 'hs-4', productId: 'prod-006', topPercent: 35, leftPercent: 45 },
-      { id: 'hs-5', productId: 'prod-009', topPercent: 72, leftPercent: 50 },
-      { id: 'hs-6', productId: 'prod-011', topPercent: 12, leftPercent: 48 },
+      { id: 'hs-4', productId: 'prod-cam-006', topPercent: 35, leftPercent: 45 },
+      { id: 'hs-5', productId: 'prod-cam-009', topPercent: 72, leftPercent: 50 },
+      { id: 'hs-6', productId: 'prod-cam-001', topPercent: 12, leftPercent: 48 },
     ],
   },
 ];

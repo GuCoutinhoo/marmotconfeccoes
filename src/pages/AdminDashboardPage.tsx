@@ -92,9 +92,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
 
   if (isLoading) {
     return (
-      <div className="bg-[#080808] text-[#EFECE6] min-h-screen py-24 px-4 flex flex-col items-center justify-center space-y-4">
-        <div className="w-10 h-10 border-2 border-[#D6B35A] border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-mono uppercase tracking-widest text-[#777777]">
+      <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-24 px-4 flex flex-col items-center justify-center space-y-4">
+        <div className="w-10 h-10 border-2 border-[#18181B] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-mono uppercase tracking-widest text-[#71717A]">
           Verificando Permissões Administrativas...
         </p>
       </div>
@@ -103,29 +103,29 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
 
   if (!isAdmin) {
     return (
-      <div className="bg-[#080808] text-[#EFECE6] min-h-screen py-16 flex items-center justify-center px-4">
-        <div className="bg-[#161616] border border-[#262626] p-8 md:p-10 rounded-2xl max-w-md w-full space-y-6 shadow-2xl text-center">
-          <div className="w-16 h-16 bg-red-950/40 text-red-400 border border-red-800/60 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+      <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-16 flex items-center justify-center px-4">
+        <div className="bg-white border border-[#E4E4E7] p-8 md:p-10 rounded-2xl max-w-md w-full space-y-6 shadow-xl text-center">
+          <div className="w-16 h-16 bg-red-50 text-red-600 border border-red-200 rounded-2xl flex items-center justify-center mx-auto shadow-xs">
             <Lock className="w-8 h-8" />
           </div>
 
           <div>
-            <h1 className="text-2xl font-black uppercase text-[#EFECE6] tracking-tight">
+            <h1 className="text-2xl font-black uppercase text-[#18181B] tracking-tight">
               ACESSO RESTRITO
             </h1>
-            <p className="text-xs text-[#777777] mt-2 leading-relaxed">
+            <p className="text-xs text-[#71717A] mt-2 leading-relaxed">
               Esta área é exclusiva para administradores da MARMOT. É necessário autenticar com uma conta autorizada.
             </p>
           </div>
 
           {user && user.role !== 'admin' && (
-            <div className="bg-amber-950/40 border border-amber-800/60 text-amber-300 p-3.5 rounded-xl text-xs flex items-start gap-2.5 text-left">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3.5 rounded-xl text-xs flex items-start gap-2.5 text-left">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
               <div>
-                <p className="font-bold text-[#EFECE6]">Conectado como Cliente:</p>
-                <p className="font-mono text-[11px] text-amber-400 mt-0.5">{user.email}</p>
-                <p className="text-[10px] text-[#A0A0A0] mt-1">
-                  Sua conta atual não possui o privilégio <span className="font-mono text-[#D6B35A]">role = "admin"</span>.
+                <p className="font-bold text-[#18181B]">Conectado como Cliente:</p>
+                <p className="font-mono text-[11px] text-amber-700 mt-0.5">{user.email}</p>
+                <p className="text-[10px] text-[#71717A] mt-1">
+                  Sua conta atual não possui o privilégio <span className="font-mono text-[#B45309]">role = "admin"</span>.
                 </p>
               </div>
             </div>
@@ -137,7 +137,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                 if (user) logout();
                 onNavigate('account');
               }}
-              className="w-full bg-[#D6B35A] text-black hover:bg-[#EFECE6] font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2"
+              className="w-full bg-[#0B0B0E] text-white hover:bg-[#27272A] font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               {user ? 'TROCAR DE CONTA / LOGIN ADMIN' : 'FAZER LOGIN COMO ADMINISTRADOR'}
@@ -145,7 +145,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
 
             <button
               onClick={() => onNavigate('home')}
-              className="w-full bg-[#080808] hover:bg-[#222222] border border-[#262626] text-[#777777] hover:text-[#EFECE6] font-bold text-xs uppercase py-3 rounded-xl transition-all"
+              className="w-full bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase py-3 rounded-xl transition-all cursor-pointer"
             >
               Voltar para a Loja
             </button>
@@ -202,21 +202,21 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
   ];
 
   return (
-    <div className="bg-[#080808] text-[#EFECE6] min-h-screen py-6">
+    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-6">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <Breadcrumb items={[{ label: 'Painel ERP Admin', onClick: () => onNavigate('admin') }]} />
 
         {/* Top Header Bar */}
-        <div className="bg-[#141414] border border-[#222222] p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+        <div className="bg-white border border-[#E4E4E7] p-5 sm:p-6 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xs">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#D6B35A]/10 border border-[#D6B35A]/30 flex items-center justify-center text-[#D6B35A] font-black text-lg">
+            <div className="w-11 h-11 rounded-xl bg-[#F4C400] text-[#0B0B0E] flex items-center justify-center font-black text-lg">
               M
             </div>
             <div>
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#D6B35A] uppercase">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase">
                 <ShieldCheck className="w-3.5 h-3.5" /> MARMOT ERP • SISTEMA DE GESTÃO INTEGRADA
               </div>
-              <h1 className="text-xl sm:text-2xl font-black uppercase text-[#EFECE6] tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black uppercase text-[#18181B] tracking-tight">
                 PAINEL OPERACIONAL & ADMINISTRATIVO
               </h1>
             </div>
@@ -225,9 +225,9 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
           <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
             <button
               onClick={() => onNavigate('home')}
-              className="bg-[#080808] hover:bg-[#222] border border-[#262626] text-[#EFECE6] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5"
+              className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#18181B] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <Store className="w-3.5 h-3.5 text-[#D6B35A]" /> Ver Loja <ExternalLink className="w-3 h-3 text-[#777]" />
+              <Store className="w-3.5 h-3.5 text-[#B45309]" /> Ver Loja <ExternalLink className="w-3 h-3 text-[#71717A]" />
             </button>
 
             <button
@@ -235,7 +235,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                 await logout();
                 onNavigate('home');
               }}
-              className="bg-[#080808] hover:bg-red-950/40 text-[#777777] hover:text-red-400 border border-[#262626] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5"
+              className="bg-[#F8F9FA] hover:bg-red-50 text-[#71717A] hover:text-red-600 border border-[#E4E4E7] text-xs font-bold uppercase px-4 py-2.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" /> Sair
             </button>
@@ -245,10 +245,10 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
         {/* ERP Main Layout: Left Sidebar Navigation + Content Area */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Left Navigation Sidebar */}
-          <div className="lg:col-span-3 bg-[#141414] border border-[#222222] rounded-2xl p-4 space-y-6 shadow-xl sticky top-24">
+          <div className="lg:col-span-3 bg-white border border-[#E4E4E7] rounded-2xl p-4 space-y-6 shadow-xs sticky top-24">
             {menuGroups.map((group, gIdx) => (
               <div key={gIdx} className="space-y-1.5">
-                <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#666666] px-3">
+                <p className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#71717A] px-3">
                   {group.label}
                 </p>
                 <div className="space-y-0.5">
@@ -259,14 +259,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                       <button
                         key={item.id}
                         onClick={() => setActiveTab(item.id)}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase transition-all text-left ${
+                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase transition-all text-left cursor-pointer ${
                           isActive
-                            ? 'bg-[#D6B35A] text-black font-black shadow-md'
-                            : 'text-[#888888] hover:text-[#EFECE6] hover:bg-[#1a1a1a]'
+                            ? 'bg-[#0B0B0E] text-white font-black shadow-xs'
+                            : 'text-[#71717A] hover:text-[#18181B] hover:bg-[#F8F9FA]'
                         }`}
                       >
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-black' : 'text-[#D6B35A]'}`} />
+                          <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-[#71717A]'}`} />
                           <span className="truncate">{item.label}</span>
                         </div>
 
@@ -275,8 +275,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                             <span
                               className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
                                 isActive
-                                  ? 'bg-black text-[#D6B35A]'
-                                  : 'bg-red-950 text-red-400 border border-red-800'
+                                  ? 'bg-[#F4C400] text-black'
+                                  : 'bg-red-50 text-red-600 border border-red-200'
                               }`}
                             >
                               {item.badge}
@@ -286,8 +286,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                             <span
                               className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md ${
                                 isActive
-                                  ? 'bg-black text-[#D6B35A]'
-                                  : 'bg-[#080808] text-[#666] border border-[#222]'
+                                  ? 'bg-zinc-800 text-zinc-300'
+                                  : 'bg-[#F8F9FA] text-[#71717A] border border-[#E4E4E7]'
                               }`}
                             >
                               {item.count}
@@ -303,7 +303,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
           </div>
 
           {/* Right Main Content Panel */}
-          <div className="lg:col-span-9">
+          <div className="lg:col-span-9 bg-white border border-[#E4E4E7] rounded-2xl p-6 shadow-xs">
             {activeTab === 'overview' && (
               <AdminOverviewTab onNavigateTab={(tab) => setActiveTab(tab as AdminTab)} />
             )}

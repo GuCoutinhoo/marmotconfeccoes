@@ -15,19 +15,19 @@ export const StaffPicks: React.FC<StaffPicksProps> = ({
 }) => {
   const staffPicksData = [
     {
-      productId: 'prod-001',
+      productId: 'prod-cam-001',
       stylist: 'Felipe M. — Diretor de Design',
       note: 'O caimento boxy no ombro dessa camiseta é disparado nosso maior orgulho. Combina com qualquer calça cargo ou jeans wide leg.',
     },
     {
-      productId: 'prod-008',
+      productId: 'prod-cam-004',
       stylist: 'Camila V. — Head de Moda',
-      note: 'A calça cargo definitiva. Os bolsos laterais não inflam e o regulador de barra permite mudar a silhueta em segundos.',
+      note: 'A estrutura pesada e firme dessa peça traz presença imediata. Uma peça indispensável no guarda-roupa streetwear.',
     },
     {
-      productId: 'prod-016',
+      productId: 'prod-mol-001',
       stylist: 'Gabriel S. — Styling & Produção',
-      note: 'Tênis robusto por fora, mas ultra leve por dentro. A paleta Triple Black arremata qualquer visual urbano de inverno.',
+      note: 'Modelagem anorak com meio zíper e bolso canguru amplo. Arremata qualquer visual urbano com elegância e conforto térmico.',
     },
   ];
 

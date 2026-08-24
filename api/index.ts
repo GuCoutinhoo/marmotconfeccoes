@@ -795,8 +795,24 @@ const INITIAL_CORE_PRODUCTS: Product[] = [
     sku: 'AUR-PNT-003-BLK',
     sizes: ['38', '40', '42', '44', '46'],
     colors: [
-      { color: 'black', colorName: 'Stealth Black', colorHex: '#141414' },
-      { color: 'green', colorName: 'Military Olive', colorHex: '#4A5340' }
+      {
+        color: 'black',
+        colorName: 'Stealth Black',
+        colorHex: '#141414',
+        featuredImage: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80'
+        ]
+      },
+      {
+        color: 'green',
+        colorName: 'Military Olive',
+        colorHex: '#4A5340',
+        featuredImage: 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80'
+        ]
+      }
     ],
     image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
     images: [
@@ -836,8 +852,24 @@ const INITIAL_CORE_PRODUCTS: Product[] = [
     sku: 'AUR-OUT-004-BLK',
     sizes: ['P', 'M', 'G', 'GG'],
     colors: [
-      { color: 'black', colorName: 'Matte Jet Black', colorHex: '#181818' },
-      { color: 'grey', colorName: 'Titanium Slate', colorHex: '#52545A' }
+      {
+        color: 'black',
+        colorName: 'Matte Jet Black',
+        colorHex: '#181818',
+        featuredImage: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80'
+        ]
+      },
+      {
+        color: 'grey',
+        colorName: 'Titanium Slate',
+        colorHex: '#52545A',
+        featuredImage: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80',
+        images: [
+          'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80'
+        ]
+      }
     ],
     image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80',
     images: [
@@ -1079,10 +1111,7 @@ export class DatabaseManager {
 
       const prodRes = await client.query('SELECT data FROM store_products');
       if (prodRes.rows.length === 0) {
-        this.products = INITIAL_CORE_PRODUCTS;
-        for (const prod of INITIAL_CORE_PRODUCTS) {
-          await client.query('INSERT INTO store_products (id, slug, data) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING', [prod.id, prod.slug, JSON.stringify(prod)]);
-        }
+        this.products = [];
       } else {
         this.products = prodRes.rows.map((r) => r.data);
       }
@@ -1214,46 +1243,14 @@ export class DatabaseManager {
         }
       }
 
+      console.log('[PRODUCTS] carregando do Supabase');
       const { data: prodData, error: prodErr } = await this.supabase.from('products').select('*');
-      if (!prodErr && prodData && prodData.length > 0) {
+      if (!prodErr && prodData) {
         this.products = prodData.map((item: any) => this.mapSupabaseProduct(item));
         this.writeJsonFile(PRODUCTS_FILE, this.products);
-      } else if (!prodErr && prodData && prodData.length === 0) {
-        for (const prod of this.products) {
-          await this.supabase.from('products').upsert({
-            id: prod.id,
-            slug: prod.slug,
-            title: prod.title,
-            subtitle: prod.subtitle,
-            description: prod.description,
-            price: prod.price,
-            promo_price: prod.promoPrice,
-            category: prod.category,
-            subcategory: prod.subcategory,
-            collection: prod.collection,
-            tags: prod.tags,
-            rating: prod.rating,
-            review_count: prod.reviewCount,
-            stock_count: prod.stockCount,
-            sku: prod.sku,
-            sizes: prod.sizes,
-            colors: prod.colors,
-            image: prod.image,
-            images: prod.images,
-            details: prod.details,
-            care_instructions: prod.careInstructions,
-            composition: prod.composition,
-            weight: prod.weight,
-            height: prod.height,
-            width: prod.width,
-            length: prod.length,
-            is_new_release: prod.isNewRelease,
-            is_best_seller: prod.isBestSeller,
-            featured: prod.featured,
-            status: prod.status,
-            data: prod,
-          });
-        }
+        console.log(`[PRODUCTS] ${this.products.length} produtos carregados do Supabase`);
+      } else if (prodErr) {
+        console.error('[PRODUCTS] erro ao carregar do Supabase:', prodErr.message || prodErr);
       }
 
       const { data: ordersData, error: ordersErr } = await this.supabase.from('orders').select('*');
@@ -1377,7 +1374,7 @@ export class DatabaseManager {
 
   private loadFromFiles() {
     this.categories = this.readJsonFile(CATEGORIES_FILE, INITIAL_CATEGORIES);
-    this.products = this.readJsonFile(PRODUCTS_FILE, INITIAL_CORE_PRODUCTS).map((p: any) => ({
+    this.products = this.readJsonFile(PRODUCTS_FILE, []).map((p: any) => ({
       ...p,
       status: (p.status as any) || 'active',
       weight: p.weight && Number(p.weight) > 0 ? Number(p.weight) : (p.category === 'moletons' || p.category === 'jaquetas' ? 0.75 : p.category === 'calcas' ? 0.6 : 0.35),
@@ -1743,6 +1740,7 @@ export class DatabaseManager {
     };
 
     if (this.mode === 'supabase') {
+      console.log('[PRODUCTS] criando produto no Supabase', newProduct.id, newProduct.title);
       const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
       if (adminClient) {
         const { error } = await adminClient.from('products').upsert({
@@ -1874,6 +1872,7 @@ export class DatabaseManager {
     }
 
     if (this.mode === 'supabase') {
+      console.log('[PRODUCTS] atualizando produto no Supabase', updatedProduct.id, updatedProduct.title);
       const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
       if (adminClient) {
         const { error } = await adminClient.from('products').upsert({
@@ -1995,6 +1994,7 @@ export class DatabaseManager {
     const lowerId = cleanId.toLowerCase();
 
     if (this.mode === 'supabase') {
+      console.log('[PRODUCTS] excluindo produto no Supabase', cleanId);
       const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
       if (adminClient) {
         const { error } = await adminClient

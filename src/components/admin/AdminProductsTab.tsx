@@ -172,7 +172,27 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     setCustomSizes(existingCustoms);
     setIsCustomSizeOpen(false);
     setNewSizeInput('');
-    setFormColors(p.colors || [{ color: 'black', colorName: 'Black', colorHex: '#121212' }]);
+    const loadedColors: ProductVariant[] = (p.colors && p.colors.length > 0)
+      ? p.colors.map((c: any) => {
+          const vImgs: string[] = Array.isArray(c.images) && c.images.length > 0
+            ? c.images
+            : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
+          const feat = c.featuredImage || vImgs[0] || c.image || '';
+          return {
+            id: c.id,
+            color: c.color || (c.colorName ? c.colorName.toLowerCase().replace(/\s+/g, '-') : 'default'),
+            colorName: c.colorName || 'Cor Única',
+            colorHex: c.colorHex || '#121212',
+            images: vImgs,
+            featuredImage: feat,
+            image: feat,
+            sku: c.sku,
+            stockCount: c.stockCount,
+            sizes: c.sizes,
+          };
+        })
+      : [{ color: 'black', colorName: 'Black Onyx', colorHex: '#121212', images: [], featuredImage: '', image: '' }];
+    setFormColors(loadedColors);
     setFormComposition(p.composition || ['100% Algodão']);
   };
 
@@ -203,7 +223,16 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     setCustomSizes([]);
     setIsCustomSizeOpen(false);
     setNewSizeInput('');
-    setFormColors([{ color: 'black', colorName: 'Preto Stone', colorHex: '#181818' }]);
+    setFormColors([
+      {
+        color: 'black',
+        colorName: 'Preto Stone',
+        colorHex: '#181818',
+        images: [],
+        featuredImage: '',
+        image: '',
+      },
+    ]);
     setFormComposition(['100% Algodão Heavyweight 260g/m²', 'Modelagem Boxy Fit']);
   };
 
@@ -368,20 +397,157 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     setFormSizes((prev) => prev.filter((s) => s !== sz));
   };
 
-  // Add / Remove Colors
+  // Add / Remove / Manage Colors & Variant Galleries
   const handleAddColor = () => {
-    if (!newColorName.trim()) return;
+    const cleanName = newColorName.trim();
+    if (!cleanName) {
+      showToast('Aviso', 'Informe o nome da nova cor.', 'warning');
+      return;
+    }
+    const isDuplicate = formColors.some(
+      (c) => c.colorName.toLowerCase().trim() === cleanName.toLowerCase()
+    );
+    if (isDuplicate) {
+      showToast('Aviso', `A cor "${cleanName}" já existe neste produto.`, 'warning');
+      return;
+    }
+
     const variant: ProductVariant = {
-      color: newColorName.toLowerCase().replace(/\s+/g, '-'),
-      colorName: newColorName.trim(),
-      colorHex: newColorHex,
+      color: cleanName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-'),
+      colorName: cleanName,
+      colorHex: newColorHex || '#121212',
+      images: [],
+      featuredImage: '',
+      image: '',
     };
     setFormColors([...formColors, variant]);
     setNewColorName('');
+    showToast('Cor Adicionada', `Variante "${cleanName}" criada. Adicione as fotos específicas desta cor no card abaixo.`, 'success');
   };
 
   const handleRemoveColor = (idx: number) => {
+    if (formColors.length <= 1) {
+      showToast('Aviso', 'O produto deve ter ao menos uma cor cadastrada.', 'warning');
+      return;
+    }
     setFormColors(formColors.filter((_, i) => i !== idx));
+    showToast('Cor Removida', 'Variante de cor excluída do formulário.', 'info');
+  };
+
+  const handleVariantUpdateInfo = (idx: number, updates: Partial<ProductVariant>) => {
+    setFormColors((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], ...updates };
+      return next;
+    });
+  };
+
+  // Upload photos specifically for a color variant
+  const handleVariantFileUpload = async (variantIdx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    try {
+      setIsUploading(true);
+      const newUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const colorLabel = formColors[variantIdx]?.colorName || 'cor';
+        const url = await uploadImage(file, `${colorLabel}-${file.name}`);
+        newUrls.push(url);
+      }
+
+      setFormColors((prev) => {
+        const next = [...prev];
+        const cur = next[variantIdx];
+        const curImgs = cur.images || (cur.featuredImage ? [cur.featuredImage] : (cur.image ? [cur.image] : []));
+        const combined = [...curImgs, ...newUrls];
+        const feat = cur.featuredImage || combined[0] || '';
+        next[variantIdx] = {
+          ...cur,
+          images: combined,
+          featuredImage: feat,
+          image: feat,
+        };
+        return next;
+      });
+
+      showToast(
+        'Fotos Adicionadas!',
+        `${newUrls.length} foto(s) anexada(s) à cor "${formColors[variantIdx]?.colorName}".`,
+        'success'
+      );
+    } catch (err: any) {
+      showToast('Erro no Upload', err?.message || 'Falha ao processar imagens da cor.', 'error');
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  // Add direct image URL to a color variant
+  const handleVariantAddUrl = (variantIdx: number, urlToAdd: string) => {
+    const clean = urlToAdd.trim();
+    if (!clean) return;
+    setFormColors((prev) => {
+      const next = [...prev];
+      const cur = next[variantIdx];
+      const curImgs = cur.images || (cur.featuredImage ? [cur.featuredImage] : (cur.image ? [cur.image] : []));
+      if (curImgs.includes(clean)) {
+        showToast('Aviso', 'Esta imagem já foi adicionada para esta cor.', 'info');
+        return prev;
+      }
+      const combined = [...curImgs, clean];
+      const feat = cur.featuredImage || combined[0] || '';
+      next[variantIdx] = {
+        ...cur,
+        images: combined,
+        featuredImage: feat,
+        image: feat,
+      };
+      return next;
+    });
+    showToast('Imagem Adicionada', `Foto anexada à cor "${formColors[variantIdx]?.colorName}".`, 'info');
+  };
+
+  // Set cover for a color variant (move image to index 0 and set featuredImage)
+  const handleVariantSetCover = (variantIdx: number, imgIdx: number) => {
+    setFormColors((prev) => {
+      const next = [...prev];
+      const cur = next[variantIdx];
+      const curImgs = cur.images || (cur.featuredImage ? [cur.featuredImage] : (cur.image ? [cur.image] : []));
+      if (!curImgs[imgIdx]) return prev;
+      const copy = [...curImgs];
+      const [chosen] = copy.splice(imgIdx, 1);
+      copy.unshift(chosen);
+      next[variantIdx] = {
+        ...cur,
+        images: copy,
+        featuredImage: chosen,
+        image: chosen,
+      };
+      return next;
+    });
+    showToast('Capa da Cor Definida', 'Esta foto agora é a principal desta variante.', 'success');
+  };
+
+  // Remove single image from a color variant
+  const handleVariantRemoveImage = (variantIdx: number, imgIdx: number) => {
+    setFormColors((prev) => {
+      const next = [...prev];
+      const cur = next[variantIdx];
+      const curImgs = cur.images || (cur.featuredImage ? [cur.featuredImage] : (cur.image ? [cur.image] : []));
+      const filtered = curImgs.filter((_, i) => i !== imgIdx);
+      const feat = filtered[0] || '';
+      next[variantIdx] = {
+        ...cur,
+        images: filtered,
+        featuredImage: feat,
+        image: feat,
+      };
+      return next;
+    });
+    showToast('Foto Removida', 'Imagem removida desta cor.', 'info');
   };
 
   // Duplicate Product
@@ -425,7 +591,41 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     if (formIsBestSeller) tags.push('mais-vendido');
     if (validPromoPrice && validPromoPrice < validPrice) tags.push('oferta');
 
-    const primaryImage = formImages[0] || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';
+    // Validate Colors / Variants
+    if (!formColors || formColors.length === 0) {
+      showToast('Atenção', 'Adicione ao menos uma cor/variante ao produto.', 'error');
+      return;
+    }
+    const hasEmptyColorName = formColors.some((c) => !c.colorName || !c.colorName.trim());
+    if (hasEmptyColorName) {
+      showToast('Atenção', 'Todas as cores/variantes precisam ter um nome preenchido.', 'error');
+      return;
+    }
+
+    // Clean and normalize colors array before saving
+    const normalizedColors: ProductVariant[] = formColors.map((c) => {
+      const vImgs: string[] = Array.isArray(c.images) && c.images.length > 0
+        ? c.images
+        : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
+      const feat = c.featuredImage || vImgs[0] || c.image || '';
+      return {
+        id: c.id,
+        color: c.color || c.colorName.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-'),
+        colorName: c.colorName.trim(),
+        colorHex: c.colorHex || '#121212',
+        images: vImgs,
+        featuredImage: feat,
+        image: feat,
+        sku: c.sku,
+        stockCount: c.stockCount,
+        sizes: c.sizes,
+      };
+    });
+
+    const firstVariantWithImg = normalizedColors.find((c) => c.images && c.images.length > 0);
+    const variantFallbackImg = firstVariantWithImg?.images?.[0] || firstVariantWithImg?.featuredImage || '';
+    const primaryImage = formImages[0] || variantFallbackImg || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';
+    const allImages = formImages.length > 0 ? formImages : (variantFallbackImg ? [variantFallbackImg] : [primaryImage]);
 
     // Validate logistics dimensions
     const validWeight = parseNumber(formWeight, NaN);
@@ -470,9 +670,9 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           width: validWidth,
           length: validLength,
           image: primaryImage,
-          images: formImages.length > 0 ? formImages : [primaryImage],
+          images: allImages,
           sizes: formSizes,
-          colors: formColors,
+          colors: normalizedColors,
           tags,
           isNewRelease: formIsNewRelease,
           isBestSeller: formIsBestSeller,
@@ -499,9 +699,9 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           width: validWidth,
           length: validLength,
           image: primaryImage,
-          images: formImages.length > 0 ? formImages : [primaryImage],
+          images: allImages,
           sizes: formSizes,
-          colors: formColors,
+          colors: normalizedColors,
           tags,
           rating: 5.0,
           reviewCount: 0,
@@ -1422,74 +1622,288 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                 </div>
 
                 {/* Linha divisória */}
-                <div className="border-t border-[#222222] my-3" />
+                <div className="border-t border-[#222222] my-4" />
 
-                {/* CORES */}
-                <div className="space-y-3">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#EFECE6] block">
-                    Cores
-                  </span>
+                {/* CORES & VARIANTES COM GALERIA PRÓPRIA */}
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-[#222222] pb-2">
+                    <div>
+                      <span className="text-xs font-black uppercase tracking-wider text-[#D6B35A] flex items-center gap-1.5">
+                        <ImageIcon className="w-3.5 h-3.5" /> Variantes por Cor & Galerias Específicas
+                      </span>
+                      <p className="text-[11px] text-[#888888] mt-0.5">
+                        Cadastre cada cor e faça o upload das fotos correspondentes. Ao cliente selecionar uma cor no site, a galeria mudará automaticamente para as fotos desta cor.
+                      </p>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#888888] shrink-0">
+                      {formColors.length} {formColors.length === 1 ? 'cor cadastrada' : 'cores cadastradas'}
+                    </span>
+                  </div>
 
-                  {/* Lista de cores */}
-                  {formColors.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {formColors.map((col, idx) => (
+                  {/* Lista de Cards de Cada Cor */}
+                  <div className="space-y-4">
+                    {formColors.map((col, variantIdx) => {
+                      const variantImages = col.images || (col.featuredImage ? [col.featuredImage] : (col.image ? [col.image] : []));
+                      const featuredImg = col.featuredImage || variantImages[0] || '';
+
+                      return (
                         <div
-                          key={idx}
-                          className="flex items-center gap-2 bg-[#0a0a0a] border border-[#262626] px-3 py-1.5 rounded-lg text-xs"
+                          key={variantIdx}
+                          className="bg-[#0b0b0d] border border-[#24242c] hover:border-[#383844] rounded-xl p-4 space-y-3.5 transition-all shadow-md"
                         >
-                          <span
-                            className="w-3 h-3 rounded-full border border-white/20 shrink-0"
-                            style={{ backgroundColor: col.colorHex }}
-                          />
-                          <span className="text-[#EFECE6] font-medium">{col.colorName}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveColor(idx)}
-                            className="text-[#666666] hover:text-red-400 p-0.5 rounded transition-colors ml-1"
-                            title="Remover cor"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                          {/* Top bar do card da cor */}
+                          <div className="flex flex-wrap items-center justify-between gap-3 bg-[#111116] p-3 rounded-lg border border-[#1e1e26]">
+                            <div className="flex items-center gap-2.5 flex-1 min-w-[240px]">
+                              {/* Swatch Picker */}
+                              <div className="relative flex items-center justify-center">
+                                <span
+                                  className="w-7 h-7 rounded-full border border-white/20 shadow-inner block shrink-0"
+                                  style={{ backgroundColor: col.colorHex }}
+                                />
+                                <input
+                                  type="color"
+                                  value={col.colorHex || '#000000'}
+                                  onChange={(e) =>
+                                    handleVariantUpdateInfo(variantIdx, { colorHex: e.target.value })
+                                  }
+                                  className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                                  title="Clique para alterar o tom da cor"
+                                />
+                              </div>
 
-                  {/* Adicionar nova cor */}
-                  <div className="flex flex-wrap items-center gap-2 max-w-lg">
-                    <input
-                      type="text"
-                      value={newColorName}
-                      onChange={(e) => setNewColorName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleAddColor();
-                        }
-                      }}
-                      placeholder="Nome da nova cor"
-                      className="flex-1 min-w-[170px] bg-[#080808] border border-[#262626] px-3 py-1.5 rounded-lg text-xs text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
-                    />
-                    <div className="flex items-center gap-1.5 bg-[#080808] border border-[#262626] px-2 py-1 rounded-lg">
+                              {/* Input Nome da Cor */}
+                              <div className="flex-1">
+                                <input
+                                  type="text"
+                                  value={col.colorName}
+                                  onChange={(e) =>
+                                    handleVariantUpdateInfo(variantIdx, {
+                                      colorName: e.target.value,
+                                      color: e.target.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-'),
+                                    })
+                                  }
+                                  placeholder="Ex: Obsidian Black, Off-White, Bege Areia..."
+                                  className="w-full bg-[#08080a] border border-[#2a2a36] px-3 py-1.5 rounded-lg text-xs font-bold text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
+                                />
+                              </div>
+
+                              {/* Hex Input */}
+                              <div className="w-24">
+                                <input
+                                  type="text"
+                                  value={col.colorHex}
+                                  onChange={(e) =>
+                                    handleVariantUpdateInfo(variantIdx, { colorHex: e.target.value })
+                                  }
+                                  placeholder="#121212"
+                                  className="w-full bg-[#08080a] border border-[#2a2a36] px-2.5 py-1.5 rounded-lg text-xs font-mono text-[#D6B35A] uppercase focus:outline-none focus:border-[#D6B35A] text-center"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Ações da variante */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] font-mono font-semibold text-[#888888]">
+                                {variantImages.length} {variantImages.length === 1 ? 'foto' : 'fotos'}
+                              </span>
+
+                              {formColors.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveColor(variantIdx)}
+                                  className="text-[#777777] hover:text-red-400 p-1.5 rounded-lg hover:bg-red-500/10 transition-colors"
+                                  title={`Remover cor "${col.colorName}"`}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Galeria de Fotos da Variante */}
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-[#A1A1AA] uppercase tracking-wider flex items-center gap-1">
+                                Fotos desta cor ({col.colorName || 'Sem nome'}):
+                              </span>
+                              {variantImages.length === 0 && (
+                                <span className="text-[10px] text-amber-400 font-medium">
+                                  Nenhuma foto específica. Usará a galeria geral como reserva.
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Grid de Imagens da Variante */}
+                            {variantImages.length > 0 && (
+                              <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5">
+                                {variantImages.map((imgUrl, imgIdx) => {
+                                  const isCover = imgUrl === featuredImg || imgIdx === 0;
+                                  return (
+                                    <div
+                                      key={imgIdx}
+                                      className={`group/img relative aspect-[3/4] bg-[#141418] border rounded-lg overflow-hidden transition-all ${
+                                        isCover
+                                          ? 'border-[#D6B35A] ring-1 ring-[#D6B35A]/50 shadow-md'
+                                          : 'border-[#262630] hover:border-[#3e3e4c]'
+                                      }`}
+                                    >
+                                      <img
+                                        src={imgUrl}
+                                        alt={`${col.colorName} ${imgIdx + 1}`}
+                                        referrerPolicy="no-referrer"
+                                        className="w-full h-full object-cover"
+                                      />
+
+                                      {/* Badge Capa */}
+                                      {isCover && (
+                                        <div className="absolute top-1.5 left-1.5 bg-[#D6B35A] text-black font-black text-[9px] uppercase px-1.5 py-0.5 rounded shadow">
+                                          CAPA
+                                        </div>
+                                      )}
+
+                                      {/* Overlay com Ações */}
+                                      <div className="absolute inset-0 bg-black/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col justify-between p-1.5 backdrop-blur-[2px]">
+                                        <div className="flex justify-end gap-1">
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              handleOpenAdjuster(
+                                                imgUrl,
+                                                `Ajustar Foto: ${col.colorName}`,
+                                                (adjustedUrl) => {
+                                                  const copy = [...variantImages];
+                                                  copy[imgIdx] = adjustedUrl;
+                                                  handleVariantUpdateInfo(variantIdx, {
+                                                    images: copy,
+                                                    featuredImage: isCover ? adjustedUrl : featuredImg,
+                                                  });
+                                                  setAdjustModalOpen(false);
+                                                }
+                                              )
+                                            }
+                                            className="p-1 bg-[#1a1a22] text-[#EFECE6] hover:text-[#D6B35A] rounded transition-colors"
+                                            title="Ajustar / Cortar Foto"
+                                          >
+                                            <Crop className="w-3 h-3" />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleVariantRemoveImage(variantIdx, imgIdx)}
+                                            className="p-1 bg-red-950/80 text-red-300 hover:text-red-100 rounded transition-colors"
+                                            title="Remover Foto desta cor"
+                                          >
+                                            <Trash2 className="w-3 h-3" />
+                                          </button>
+                                        </div>
+
+                                        {!isCover && (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleVariantSetCover(variantIdx, imgIdx)}
+                                            className="w-full bg-[#D6B35A] hover:bg-white text-black font-black text-[9px] uppercase py-1 rounded transition-colors shadow"
+                                          >
+                                            Definir Capa
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+
+                            {/* Controles de Upload para esta Variante */}
+                            <div className="flex flex-wrap items-center gap-2 pt-1">
+                              {/* Botão Upload de Arquivos */}
+                              <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#14141c] hover:bg-[#1e1e28] text-[#EFECE6] hover:text-white border border-[#2a2a38] rounded-lg text-xs font-semibold cursor-pointer transition-all shadow-sm">
+                                <Upload className="w-3.5 h-3.5 text-[#D6B35A]" />
+                                <span>Upload Fotos ({col.colorName || 'Cor'})</span>
+                                <input
+                                  type="file"
+                                  multiple
+                                  accept="image/*"
+                                  onChange={(e) => handleVariantFileUpload(variantIdx, e)}
+                                  className="hidden"
+                                />
+                              </label>
+
+                              {/* Input URL Rápida para a Variante */}
+                              <div className="flex items-center gap-1.5 flex-1 min-w-[220px]">
+                                <input
+                                  type="url"
+                                  id={`var-url-input-${variantIdx}`}
+                                  placeholder="Ou cole a URL da imagem desta cor..."
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      const input = e.currentTarget;
+                                      handleVariantAddUrl(variantIdx, input.value);
+                                      input.value = '';
+                                    }
+                                  }}
+                                  className="flex-1 bg-[#08080a] border border-[#262632] px-3 py-1.5 rounded-lg text-xs text-[#EFECE6] placeholder-[#555] focus:outline-none focus:border-[#D6B35A]"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const input = document.getElementById(`var-url-input-${variantIdx}`) as HTMLInputElement;
+                                    if (input && input.value) {
+                                      handleVariantAddUrl(variantIdx, input.value);
+                                      input.value = '';
+                                    }
+                                  }}
+                                  className="px-2.5 py-1.5 bg-[#161620] hover:bg-[#20202c] text-[#D6B35A] border border-[#2a2a38] rounded-lg text-xs font-bold transition-colors shrink-0"
+                                >
+                                  + URL
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Adicionar Nova Cor */}
+                  <div className="bg-[#121217] border border-[#262632] p-3.5 rounded-xl space-y-2">
+                    <span className="text-[11px] font-bold text-[#EFECE6] uppercase tracking-wider block">
+                      + Adicionar Nova Cor / Variante
+                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
                       <input
-                        type="color"
-                        value={newColorHex}
-                        onChange={(e) => setNewColorHex(e.target.value)}
-                        className="w-5 h-5 rounded bg-transparent border-0 cursor-pointer p-0"
-                        title="Escolher tom"
+                        type="text"
+                        value={newColorName}
+                        onChange={(e) => setNewColorName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleAddColor();
+                          }
+                        }}
+                        placeholder="Nome da cor (Ex: Raw Bone, Branco, Moletom Cinza...)"
+                        className="flex-1 min-w-[200px] bg-[#08080a] border border-[#2a2a38] px-3.5 py-2 rounded-lg text-xs text-[#EFECE6] placeholder-[#666] focus:outline-none focus:border-[#D6B35A]"
                       />
-                      <span className="text-[10px] font-mono text-[#888888] uppercase">{newColorHex}</span>
+                      <div className="flex items-center gap-2 bg-[#08080a] border border-[#2a2a38] px-2.5 py-1.5 rounded-lg">
+                        <input
+                          type="color"
+                          value={newColorHex}
+                          onChange={(e) => setNewColorHex(e.target.value)}
+                          className="w-6 h-6 rounded bg-transparent border-0 cursor-pointer p-0"
+                          title="Escolher tom da nova cor"
+                        />
+                        <span className="text-[11px] font-mono text-[#D6B35A] uppercase font-bold">{newColorHex}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddColor}
+                        className="bg-[#D6B35A] hover:bg-[#e4c46c] text-black font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition-colors shrink-0 flex items-center gap-1.5 shadow-md"
+                      >
+                        <Plus className="w-4 h-4 stroke-[3]" />
+                        <span>Adicionar Cor</span>
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleAddColor}
-                      className="bg-[#0a0a0a] hover:bg-[#16140d] text-[#D6B35A] border border-[#D6B35A]/40 hover:border-[#D6B35A] px-3 py-1.5 rounded-lg text-xs font-bold uppercase transition-colors shrink-0 flex items-center gap-1"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Adicionar Cor</span>
-                    </button>
                   </div>
                 </div>
               </div>

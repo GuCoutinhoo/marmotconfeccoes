@@ -37,19 +37,19 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
   };
 
   return (
-    <section className="py-20 bg-[#0D0D0E] border-b border-[#27272A]">
+    <section className="py-20 bg-[#F8F9FA] border-b border-[#E4E4E7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header with Navigation Controls */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#C5A869] mb-1.5">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>DIRETO DO ATELIÊ</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#F4F4F5]">
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#18181B]">
               ÚLTIMOS LANÇAMENTOS
             </h2>
-            <p className="text-xs text-[#A1A1AA] mt-1 max-w-lg">
+            <p className="text-xs sm:text-sm text-[#52525B] mt-1 max-w-lg">
               Peças recém-saídas da confecção com estoques limitados e tiragem exclusiva.
             </p>
           </div>
@@ -57,7 +57,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={() => onNavigate('shop')}
-              className="text-xs font-bold uppercase text-[#C5A869] hover:underline flex items-center gap-1.5 mr-2"
+              className="text-xs sm:text-sm font-bold uppercase text-[#B45309] hover:text-[#18181B] hover:underline flex items-center gap-1.5 mr-2 cursor-pointer"
             >
               Ver todos <ArrowRight className="w-4 h-4" />
             </button>
@@ -65,14 +65,14 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => scroll('left')}
-                className="p-2.5 rounded-full bg-[#18181B] border border-[#27272A] text-[#F4F4F5] hover:bg-[#F4F4F5] hover:text-black transition-all"
+                className="p-2.5 rounded-full bg-white border border-[#E4E4E7] text-[#18181B] hover:bg-[#18181B] hover:text-white shadow-sm transition-all cursor-pointer"
                 aria-label="Anterior"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={() => scroll('right')}
-                className="p-2.5 rounded-full bg-[#18181B] border border-[#27272A] text-[#F4F4F5] hover:bg-[#F4F4F5] hover:text-black transition-all"
+                className="p-2.5 rounded-full bg-white border border-[#E4E4E7] text-[#18181B] hover:bg-[#18181B] hover:text-white shadow-sm transition-all cursor-pointer"
                 aria-label="Próximo"
               >
                 <ChevronRight className="w-5 h-5" />

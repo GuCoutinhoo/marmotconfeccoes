@@ -4,12 +4,24 @@ import { Product, Category, Address, Order, CartItem, ProductVariant } from '../
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || SUPABASE_PROJECT_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_DEFAULT_ANON_KEY;
+const getEnvVar = (viteKey: string, processKey: string, fallback: string): string => {
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta && (import.meta as any).env && (import.meta as any).env[viteKey]) {
+      return (import.meta as any).env[viteKey];
+    }
+  } catch {}
+  if (typeof process !== 'undefined' && process.env && process.env[processKey]) {
+    return process.env[processKey]!;
+  }
+  return fallback;
+};
+
+const supabaseUrl = getEnvVar('VITE_SUPABASE_URL', 'SUPABASE_URL', SUPABASE_PROJECT_URL);
+const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', SUPABASE_DEFAULT_ANON_KEY);
 
 export const isSupabaseConfigured = (): boolean => {
-  const url = import.meta.env.VITE_SUPABASE_URL || SUPABASE_PROJECT_URL;
-  const key = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_DEFAULT_ANON_KEY;
+  const url = supabaseUrl;
+  const key = supabaseAnonKey;
   return Boolean(url && key && !url.includes('placeholder'));
 };
 
@@ -113,9 +125,10 @@ export function mapSupabaseRowToCategory(row: any): Category {
 }
 
 /**
- * Direct query to Supabase for products with fallback handling and detailed error reporting.
+ * Direct query to Supabase for products. Supabase is the single source of truth.
  */
 export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Product[]; error?: any }> {
+  console.log('[PRODUCTS] carregando do Supabase');
   try {
     const { data, error } = await supabase
       .from('products')
@@ -123,19 +136,261 @@ export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Pro
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('[Supabase Client Direct] Erro ao carregar produtos:', error.message || error);
+      console.error('[PRODUCTS] Erro ao carregar do Supabase:', error.message || error);
       return { products: [], error };
     }
 
     if (!data || data.length === 0) {
+      console.log('[PRODUCTS] 0 produtos encontrados no Supabase.');
       return { products: [] };
     }
 
     const mapped = data.map(mapSupabaseRowToProduct);
+    console.log(`[PRODUCTS] ${mapped.length} produtos carregados do Supabase com sucesso.`);
     return { products: mapped };
   } catch (err: any) {
-    console.error('[Supabase Client Direct] Exceção ao buscar produtos:', err);
+    console.error('[PRODUCTS] Exceção ao carregar do Supabase:', err);
     return { products: [], error: err };
+  }
+}
+
+/**
+ * Builds a standardized Supabase row payload for products table.
+ */
+export function buildProductSupabasePayload(product: Product) {
+  return {
+    id: product.id,
+    slug: product.slug,
+    title: product.title,
+    subtitle: product.subtitle || '',
+    description: product.description || '',
+    price: product.price,
+    promo_price: product.promoPrice !== undefined ? product.promoPrice : null,
+    category: product.category,
+    subcategory: product.subcategory || 'Essenciais',
+    collection: product.collection || 'Vol. 04: Cyber Dystopia',
+    tags: product.tags || [],
+    rating: product.rating || 5.0,
+    review_count: product.reviewCount || 0,
+    stock_count: product.stockCount !== undefined ? product.stockCount : 20,
+    sku: product.sku || '',
+    sizes: product.sizes || ['P', 'M', 'G', 'GG'],
+    colors: product.colors || [],
+    image: product.image || '',
+    images: product.images || (product.image ? [product.image] : []),
+    details: product.details || [],
+    care_instructions: product.careInstructions || [],
+    composition: product.composition || [],
+    weight: product.weight || 0.35,
+    height: product.height || 4,
+    width: product.width || 20,
+    length: product.length || 25,
+    is_new_release: Boolean(product.isNewRelease),
+    is_best_seller: Boolean(product.isBestSeller),
+    featured: Boolean(product.featured),
+    status: product.status || 'active',
+    data: product,
+    updated_at: new Date().toISOString(),
+  };
+}
+
+/**
+ * Inserts a new product into Supabase table 'products'.
+ */
+export async function createProductInSupabase(productData: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
+  console.log('[PRODUCTS] criando produto no Supabase', productData);
+  try {
+    const title = productData.title?.trim() || 'Novo Produto';
+    const slug =
+      productData.slug?.trim() ||
+      title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-') + `-${Date.now().toString().slice(-4)}`;
+
+    const id = productData.id || `prod-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
+    const price = typeof productData.price === 'number' ? productData.price : parseFloat(String(productData.price || 199.9));
+    const promoPrice = productData.promoPrice !== undefined && productData.promoPrice !== null ? parseFloat(String(productData.promoPrice)) : undefined;
+
+    const newProduct: Product = {
+      id,
+      slug,
+      title,
+      subtitle: productData.subtitle?.trim() || '',
+      description: productData.description?.trim() || '',
+      price: isNaN(price) ? 199.9 : price,
+      promoPrice: promoPrice && !isNaN(promoPrice) ? promoPrice : undefined,
+      category: productData.category || 'camisetas',
+      subcategory: productData.subcategory?.trim() || 'Essenciais',
+      collection: productData.collection?.trim() || 'Vol. 04: Cyber Dystopia',
+      tags: Array.isArray(productData.tags) ? productData.tags : ['Lançamento'],
+      rating: productData.rating || 5.0,
+      reviewCount: productData.reviewCount || 0,
+      stockCount: productData.stockCount !== undefined ? parseInt(String(productData.stockCount), 10) : 25,
+      sku: productData.sku?.trim() || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
+      sizes: Array.isArray(productData.sizes) && productData.sizes.length > 0 ? productData.sizes : ['P', 'M', 'G', 'GG'],
+      colors: Array.isArray(productData.colors) && productData.colors.length > 0 ? productData.colors : [
+        { color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' },
+      ],
+      image: productData.image || (productData.images && productData.images[0]) || '',
+      images: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : (productData.image ? [productData.image] : []),
+      details: Array.isArray(productData.details) ? productData.details : ['100% Algodão Heavyweight 260g/m²'],
+      careInstructions: Array.isArray(productData.careInstructions) ? productData.careInstructions : ['Lavar em ciclo suave', 'Secar na sombra'],
+      composition: Array.isArray(productData.composition) ? productData.composition : ['100% Algodão Heavyweight 260g/m²'],
+      reviews: [],
+      weight: Number(productData.weight || 0.35),
+      height: Number(productData.height || 4),
+      width: Number(productData.width || 20),
+      length: Number(productData.length || 25),
+      isNewRelease: Boolean(productData.isNewRelease),
+      isBestSeller: Boolean(productData.isBestSeller),
+      featured: Boolean(productData.featured),
+      status: (productData.status as any) || 'active',
+      createdAt: new Date().toISOString(),
+    };
+
+    const payload = buildProductSupabasePayload(newProduct);
+
+    const { data, error } = await supabase
+      .from('products')
+      .upsert(payload)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[PRODUCTS] erro ao criar no Supabase:', error.message || error);
+      return { product: null, error };
+    }
+
+    const created = mapSupabaseRowToProduct(data || payload);
+    console.log('[PRODUCTS] produto criado com sucesso no Supabase:', created.id);
+    return { product: created };
+  } catch (err: any) {
+    console.error('[PRODUCTS] exceção ao criar produto no Supabase:', err);
+    return { product: null, error: err };
+  }
+}
+
+/**
+ * Updates an existing product in Supabase table 'products'.
+ */
+export async function updateProductInSupabase(id: string, updates: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
+  console.log('[PRODUCTS] atualizando produto no Supabase', id, updates);
+  try {
+    const cleanId = String(id).trim();
+
+    // Fetch existing product from Supabase to preserve fields
+    const { data: existingRow, error: fetchErr } = await supabase
+      .from('products')
+      .select('*')
+      .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
+      .maybeSingle();
+
+    if (fetchErr) {
+      console.warn('[PRODUCTS] aviso ao buscar produto existente no Supabase:', fetchErr.message);
+    }
+
+    const existingProduct = existingRow ? mapSupabaseRowToProduct(existingRow) : ({} as Product);
+    const updatedProduct: Product = {
+      ...existingProduct,
+      ...updates,
+      id: existingProduct.id || cleanId,
+      status: (updates.status as any) || existingProduct.status || 'active',
+    };
+
+    if (updates.price !== undefined) updatedProduct.price = parseFloat(String(updates.price));
+    if (updates.promoPrice !== undefined) {
+      updatedProduct.promoPrice = updates.promoPrice ? parseFloat(String(updates.promoPrice)) : undefined;
+    }
+    if (updates.stockCount !== undefined) updatedProduct.stockCount = parseInt(String(updates.stockCount), 10);
+    if (updates.weight !== undefined) updatedProduct.weight = parseFloat(String(updates.weight));
+    if (updates.height !== undefined) updatedProduct.height = parseFloat(String(updates.height));
+    if (updates.width !== undefined) updatedProduct.width = parseFloat(String(updates.width));
+    if (updates.length !== undefined) updatedProduct.length = parseFloat(String(updates.length));
+
+    if (updatedProduct.images && updatedProduct.images.length > 0 && !updatedProduct.image) {
+      updatedProduct.image = updatedProduct.images[0];
+    }
+
+    const payload = buildProductSupabasePayload(updatedProduct);
+
+    const { data, error } = await supabase
+      .from('products')
+      .upsert(payload)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[PRODUCTS] erro ao atualizar no Supabase:', error.message || error);
+      return { product: null, error };
+    }
+
+    const updated = mapSupabaseRowToProduct(data || payload);
+    console.log('[PRODUCTS] produto atualizado com sucesso no Supabase:', updated.id);
+    return { product: updated };
+  } catch (err: any) {
+    console.error('[PRODUCTS] exceção ao atualizar produto no Supabase:', err);
+    return { product: null, error: err };
+  }
+}
+
+/**
+ * Updates stock count of a product in Supabase table 'products'.
+ */
+export async function updateProductStockInSupabase(id: string, stockCount: number): Promise<{ product: Product | null; error?: any }> {
+  console.log('[PRODUCTS] atualizando produto no Supabase (estoque)', id, stockCount);
+  try {
+    const cleanId = String(id).trim();
+    const newStock = Math.max(0, parseInt(String(stockCount), 10));
+    const newStatus = newStock <= 0 ? 'out_of_stock' : 'active';
+
+    const { data, error } = await supabase
+      .from('products')
+      .update({
+        stock_count: newStock,
+        status: newStatus,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', cleanId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('[PRODUCTS] erro ao atualizar estoque no Supabase:', error.message || error);
+      return { product: null, error };
+    }
+
+    const updated = mapSupabaseRowToProduct(data);
+    return { product: updated };
+  } catch (err: any) {
+    console.error('[PRODUCTS] exceção ao atualizar estoque no Supabase:', err);
+    return { product: null, error: err };
+  }
+}
+
+/**
+ * Deletes a product from Supabase table 'products'.
+ */
+export async function deleteProductInSupabase(id: string): Promise<{ success: boolean; error?: any }> {
+  console.log('[PRODUCTS] excluindo produto no Supabase', id);
+  try {
+    const cleanId = String(id).trim();
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
+
+    if (error) {
+      console.error('[PRODUCTS] erro ao excluir no Supabase:', error.message || error);
+      return { success: false, error };
+    }
+
+    console.log('[PRODUCTS] produto excluído com sucesso no Supabase:', cleanId);
+    return { success: true };
+  } catch (err: any) {
+    console.error('[PRODUCTS] exceção ao excluir produto no Supabase:', err);
+    return { success: false, error: err };
   }
 }
 

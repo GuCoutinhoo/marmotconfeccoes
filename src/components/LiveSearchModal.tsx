@@ -42,27 +42,27 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
   const popularTerms = ['Hoodie Heavyweight', 'Calça Cargo', 'Puffer', 'Oversized', '5 Panel', 'Chunky Runner'];
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-start justify-center pt-16 px-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="w-full max-w-3xl bg-[#161616] border border-[#262626] rounded-xl text-[#EFECE6] overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-[120] flex items-start justify-center pt-16 px-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+      <div className="w-full max-w-3xl bg-white border border-[#E4E4E7] rounded-2xl text-[#18181B] overflow-hidden shadow-2xl">
         {/* Search Input Bar */}
-        <div className="p-4 border-b border-[#262626] flex items-center gap-3 bg-[#080808]">
-          <Search className="w-5 h-5 text-[#D6B35A]" />
+        <div className="p-4 border-b border-[#E4E4E7] flex items-center gap-3 bg-[#F8F9FA]">
+          <Search className="w-5 h-5 text-[#B45309]" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por moletons, cargos, oversized, tênis..."
             autoFocus
-            className="flex-1 bg-transparent text-[#EFECE6] placeholder-[#777777] text-sm font-medium focus:outline-none"
+            className="flex-1 bg-transparent text-[#18181B] placeholder-[#71717A] text-sm font-medium focus:outline-none"
           />
           {query && (
-            <button onClick={() => setQuery('')} className="p-1 text-[#777777] hover:text-[#EFECE6]">
+            <button onClick={() => setQuery('')} className="p-1 text-[#71717A] hover:text-[#18181B] cursor-pointer">
               <X className="w-4 h-4" />
             </button>
           )}
           <button
             onClick={onClose}
-            className="px-3 py-1 bg-[#262626] text-xs font-bold uppercase rounded hover:bg-[#EFECE6] hover:text-black text-[#EFECE6] transition-colors"
+            className="px-3 py-1 bg-[#E4E4E7] text-xs font-bold uppercase rounded-lg hover:bg-[#18181B] hover:text-white text-[#52525B] transition-colors cursor-pointer"
           >
             ESC
           </button>
@@ -73,15 +73,15 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
             <div>
               {/* Popular Searches */}
               <div className="mb-6">
-                <p className="text-xs font-bold uppercase text-[#777777] tracking-wider flex items-center gap-1.5 mb-3">
-                  <TrendingUp className="w-3.5 h-3.5 text-[#D6B35A]" /> Buscas Em Alta
+                <p className="text-xs font-bold uppercase text-[#71717A] tracking-wider flex items-center gap-1.5 mb-3">
+                  <TrendingUp className="w-3.5 h-3.5 text-[#B45309]" /> Buscas Em Alta
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {popularTerms.map((term) => (
                     <button
                       key={term}
                       onClick={() => setQuery(term)}
-                      className="text-xs bg-[#080808] border border-[#262626] hover:border-[#D6B35A] hover:text-[#D6B35A] text-[#777777] px-3 py-1.5 rounded-full transition-all"
+                      className="text-xs bg-[#F4F4F5] border border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B] text-[#52525B] px-3 py-1.5 rounded-full transition-all cursor-pointer"
                     >
                       {term}
                     </button>
@@ -91,7 +91,7 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
 
               {/* Quick Categories */}
               <div>
-                <p className="text-xs font-bold uppercase text-[#777777] tracking-wider mb-3">Navegar por Categoria</p>
+                <p className="text-xs font-bold uppercase text-[#71717A] tracking-wider mb-3">Navegar por Categoria</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
                   {['camisetas', 'oversized', 'moletons', 'cargos', 'jaquetas', 'tenis', 'bones', 'acessorios'].map((cat) => (
                     <button
@@ -100,10 +100,10 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
                         onClose();
                         onSearchCategory(cat);
                       }}
-                      className="p-3 bg-[#080808] border border-[#262626] hover:bg-[#161616] text-left font-bold capitalize rounded transition-colors flex items-center justify-between text-[#EFECE6]"
+                      className="p-3 bg-[#F8F9FA] border border-[#E4E4E7] hover:bg-white hover:border-[#18181B] text-left font-bold capitalize rounded-xl transition-colors flex items-center justify-between text-[#18181B] cursor-pointer shadow-xs"
                     >
                       <span>{cat}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#777777]" />
+                      <ArrowRight className="w-3.5 h-3.5 text-[#71717A]" />
                     </button>
                   ))}
                 </div>
@@ -112,16 +112,16 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
           ) : (
             <div>
               <div className="flex justify-between items-center mb-4">
-                <span className="text-xs text-[#777777]">
-                  {results.length} resultado(s) encontrado(s) para "<strong className="text-[#EFECE6]">{query}</strong>"
+                <span className="text-xs text-[#71717A]">
+                  {results.length} resultado(s) encontrado(s) para "<strong className="text-[#18181B]">{query}</strong>"
                 </span>
               </div>
 
               {results.length === 0 ? (
-                <div className="text-center py-12 text-[#777777]">
-                  <Sparkles className="w-8 h-8 mx-auto mb-2 text-[#777777]" />
-                  <p className="text-sm font-semibold text-[#EFECE6]">Nenhum produto encontrado.</p>
-                  <p className="text-xs mt-1 text-[#777777]">Tente pesquisar com termos mais genéricos como "hoodie" ou "cargo".</p>
+                <div className="text-center py-12 text-[#71717A]">
+                  <Sparkles className="w-8 h-8 mx-auto mb-2 text-[#71717A]" />
+                  <p className="text-sm font-semibold text-[#18181B]">Nenhum produto encontrado.</p>
+                  <p className="text-xs mt-1 text-[#71717A]">Tente pesquisar com termos mais genéricos como "hoodie" ou "cargo".</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -132,18 +132,18 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
                         onClose();
                         onSelectProduct(product.id);
                       }}
-                      className="flex gap-3 p-2.5 bg-[#080808] border border-[#262626] hover:border-[#D6B35A] rounded-lg cursor-pointer transition-all group"
+                      className="flex gap-3 p-2.5 bg-white border border-[#E4E4E7] hover:border-[#18181B] rounded-xl cursor-pointer transition-all group shadow-xs hover:shadow-md"
                     >
                       <img
                         src={product.images?.[0] || (product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'}
                         alt={product.title}
                         referrerPolicy="no-referrer"
-                        className="w-16 h-16 object-cover rounded bg-black shrink-0"
+                        className="w-16 h-16 object-cover rounded-lg bg-[#F4F4F5] shrink-0"
                       />
                       <div className="flex flex-col justify-center min-w-0">
-                        <span className="text-[10px] text-[#D6B35A] uppercase font-bold tracking-wider">{product.collection}</span>
-                        <h4 className="text-xs font-bold text-[#EFECE6] truncate group-hover:text-[#D6B35A] transition-colors">{product.title}</h4>
-                        <p className="text-xs font-black text-[#EFECE6] mt-1">
+                        <span className="text-[10px] text-[#B45309] uppercase font-bold tracking-wider">{product.collection}</span>
+                        <h4 className="text-xs font-bold text-[#18181B] truncate group-hover:text-[#B45309] transition-colors">{product.title}</h4>
+                        <p className="text-xs font-black text-[#18181B] mt-1">
                           R$ {(product.promoPrice || product.price).toFixed(2).replace('.', ',')}
                         </p>
                       </div>

@@ -30,21 +30,21 @@ export const CompactCustomerReviews: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 bg-[#111113] border-b border-[#27272A]">
+    <section className="py-16 bg-[#F8F9FA] border-b border-[#E4E4E7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#C5A869] mb-1.5">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
               <MessageSquareQuote className="w-3.5 h-3.5" />
               <span>PROVA SOCIAL REAL</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#F4F4F5]">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">
               AVALIAÇÕES DE COMPRADORES
             </h2>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-[#A1A1AA] font-mono">
-            <span className="text-[#C5A869] font-bold">4.9 / 5.0</span>
+          <div className="flex items-center gap-2 text-xs text-[#71717A] font-mono">
+            <span className="text-[#B45309] font-bold">4.9 / 5.0</span>
             <span>•</span>
             <span>+1.400 Avaliações Verificadas</span>
           </div>
@@ -55,32 +55,32 @@ export const CompactCustomerReviews: React.FC = () => {
           {reviews.map((rev, idx) => (
             <div
               key={idx}
-              className="bg-[#141416] border border-[#27272A] p-6 rounded-2xl space-y-3 hover:border-[#383840] transition-colors"
+              className="bg-white border border-[#E4E4E7] p-6 rounded-2xl space-y-3 hover:border-[#18181B] transition-colors shadow-sm"
             >
               <div className="flex items-center justify-between">
-                <div className="flex text-[#C5A869] gap-0.5">
+                <div className="flex text-[#B45309] gap-0.5">
                   {[...Array(rev.rating)].map((_, i) => (
                     <Star key={i} className="w-3.5 h-3.5 fill-current" />
                   ))}
                 </div>
 
                 {rev.verified && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#C5A869]">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#B45309]">
                     <CheckCircle2 className="w-3 h-3" /> Compra Verificada
                   </span>
                 )}
               </div>
 
-              <p className="text-xs text-[#F4F4F5] leading-relaxed italic">
+              <p className="text-xs sm:text-sm text-[#18181B] leading-relaxed italic">
                 "{rev.comment}"
               </p>
 
-              <div className="pt-3 border-t border-[#27272A] flex items-center justify-between text-[11px]">
+              <div className="pt-3 border-t border-[#E4E4E7] flex items-center justify-between text-[11px]">
                 <div>
-                  <span className="font-bold text-[#F4F4F5] block">{rev.author}</span>
+                  <span className="font-bold text-[#18181B] block">{rev.author}</span>
                   <span className="text-[10px] text-[#71717A]">{rev.location}</span>
                 </div>
-                <span className="text-[10px] text-[#A1A1AA] font-mono text-right max-w-[150px] truncate">
+                <span className="text-[10px] text-[#52525B] font-mono text-right max-w-[150px] truncate">
                   {rev.productName}
                 </span>
               </div>

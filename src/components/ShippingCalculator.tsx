@@ -220,16 +220,16 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
   };
 
   return (
-    <div className={`bg-[#161616] border border-[#262626] rounded-lg ${compact ? 'p-3' : 'p-4'}`}>
+    <div className={`bg-white border border-[#E4E4E7] rounded-2xl shadow-xs ${compact ? 'p-3.5' : 'p-5'}`}>
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <Truck className="w-4 h-4 text-[#D6B35A]" />
-          <h4 className="text-xs font-bold uppercase tracking-wider text-[#EFECE6]">
+          <Truck className="w-4 h-4 text-[#B45309]" />
+          <h4 className="text-xs font-bold uppercase tracking-wider text-[#18181B]">
             {compact ? 'Calcular Frete' : 'Calcular Frete e Prazo'}
           </h4>
         </div>
         {isFree && (
-          <span className="text-[10px] bg-[#D6B35A]/10 text-[#D6B35A] border border-[#D6B35A]/30 px-2 py-0.5 rounded font-mono font-bold">
+          <span className="text-[10px] bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] px-2 py-0.5 rounded font-mono font-bold">
             FRETE GRÁTIS ATIVO
           </span>
         )}
@@ -242,65 +242,65 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
           onChange={handleCepChange}
           placeholder="00000-000"
           maxLength={9}
-          className="flex-1 bg-[#080808] border border-[#262626] text-[#EFECE6] text-xs px-3 py-2.5 rounded focus:outline-none focus:border-[#D6B35A] font-mono tracking-wider placeholder-[#555555]"
+          className="flex-1 bg-[#F8F9FA] border border-[#E4E4E7] text-[#18181B] text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-[#18181B] font-mono tracking-wider placeholder-[#71717A]"
         />
         <button
           type="submit"
           disabled={loading}
-          className="bg-[#D6B35A] text-black text-xs font-bold px-4 py-2.5 rounded hover:bg-[#EFECE6] transition-colors disabled:opacity-50 flex items-center justify-center min-w-[90px]"
+          className="bg-[#F4C400] text-[#0B0B0E] text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#E5B500] transition-colors disabled:opacity-50 flex items-center justify-center min-w-[90px] cursor-pointer shadow-xs"
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Calcular'}
         </button>
       </form>
 
       {errorMessage && (
-        <div className="flex items-center gap-1.5 text-[11px] text-red-400 mt-2 mb-2">
+        <div className="flex items-center gap-1.5 text-[11px] text-red-600 mt-2 mb-2 font-medium">
           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      <div className="text-[11px] text-[#777777] flex items-center justify-between">
+      <div className="text-[11px] text-[#71717A] flex items-center justify-between pt-1">
         <a
           href="https://buscacepinter.correios.com.br/app/endereco/index.php"
           target="_blank"
           rel="noreferrer"
-          className="underline hover:text-[#EFECE6] transition-colors"
+          className="underline hover:text-[#18181B] transition-colors"
         >
           Não sei meu CEP
         </a>
-        <span className="flex items-center gap-1 text-[#D6B35A] font-semibold text-[10px]">
+        <span className="flex items-center gap-1 text-[#B45309] font-semibold text-[10px]">
           <ShieldCheck className="w-3 h-3" /> Envio seguro via Melhor Envio
         </span>
       </div>
 
       {options && options.length > 0 && (
-        <div className="mt-4 space-y-2 pt-3 border-t border-[#262626]">
+        <div className="mt-4 space-y-2 pt-3 border-t border-[#E4E4E7]">
           {options.map((opt) => {
             const isSelected = selectedOptionId === opt.id || selectedShipping?.id === opt.id;
             return (
               <div
                 key={opt.id}
                 onClick={() => handleSelect(opt)}
-                className={`flex items-center justify-between p-2.5 rounded border text-xs cursor-pointer transition-all ${
+                className={`flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                   isSelected
-                    ? 'border-[#D6B35A] bg-[#080808] text-[#EFECE6]'
-                    : 'border-[#262626] bg-[#080808]/60 text-[#888888] hover:border-[#3a3a3a]'
+                    ? 'border-[#18181B] bg-[#F8F9FA] text-[#18181B] shadow-xs'
+                    : 'border-[#E4E4E7] bg-white text-[#52525B] hover:border-[#18181B]'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
                   <div
                     className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-colors ${
-                      isSelected ? 'border-[#D6B35A] bg-[#D6B35A]' : 'border-[#444444]'
+                      isSelected ? 'border-[#18181B] bg-[#18181B]' : 'border-[#D4D4D8]'
                     }`}
                   >
-                    {isSelected && <Check className="w-2.5 h-2.5 text-black stroke-[3]" />}
+                    {isSelected && <Check className="w-2.5 h-2.5 text-white stroke-[3]" />}
                   </div>
                   <div>
-                    <p className="font-semibold text-[#EFECE6] leading-tight">
-                      {opt.name} <span className="text-[#888888] font-normal">({opt.carrier || opt.company})</span>
+                    <p className="font-semibold text-[#18181B] leading-tight">
+                      {opt.name} <span className="text-[#71717A] font-normal">({opt.carrier || opt.company})</span>
                     </p>
-                    <p className="text-[11px] text-[#777777] mt-0.5">
+                    <p className="text-[11px] text-[#71717A] mt-0.5">
                       Entrega em {opt.deliveryDays || `${opt.deliveryTime} dias úteis`}
                     </p>
                   </div>
@@ -308,17 +308,17 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
 
                 <div className="text-right">
                   {opt.price === 0 ? (
-                    <span className="font-bold text-[#D6B35A] uppercase tracking-wider text-[11px]">
+                    <span className="font-bold text-[#92400E] uppercase tracking-wider text-[11px] bg-[#FEF3C7] px-2 py-0.5 rounded">
                       GRÁTIS
                     </span>
                   ) : (
                     <div>
                       {opt.originalPrice && opt.originalPrice > opt.price && (
-                        <span className="text-[10px] line-through text-[#666666] mr-1 font-mono">
+                        <span className="text-[10px] line-through text-[#71717A] mr-1 font-mono">
                           R$ {opt.originalPrice.toFixed(2).replace('.', ',')}
                         </span>
                       )}
-                      <span className="font-bold text-[#EFECE6] font-mono">
+                      <span className="font-bold text-[#18181B] font-mono">
                         R$ {opt.price.toFixed(2).replace('.', ',')}
                       </span>
                     </div>

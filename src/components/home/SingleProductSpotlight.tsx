@@ -42,10 +42,10 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   const effectivePrice = product.promoPrice || product.price;
 
   return (
-    <section className="py-20 bg-[#111113] border-b border-[#27272A] relative overflow-hidden">
+    <section className="py-20 bg-[#F8F9FA] border-b border-[#E4E4E7] relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="flex items-center justify-between mb-8">
-          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#C5A869]">
+          <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309]">
             <Sparkles className="w-3.5 h-3.5" />
             <span>DESTAQUE DE ATELIÊ // SIGNATURE PIECE</span>
           </div>
@@ -55,9 +55,9 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
         </div>
 
         {/* Split Layout: Image Left | Details Right */}
-        <div className="bg-[#141416] border border-[#27272A] rounded-2xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center shadow-xl">
+        <div className="bg-white border border-[#E4E4E7] rounded-2xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center shadow-md">
           {/* Left Side: Large Product Image */}
-          <div className="lg:col-span-6 relative aspect-[3/4] sm:aspect-[4/5] rounded-xl overflow-hidden bg-[#0D0D0E] border border-[#27272A] group">
+          <div className="lg:col-span-6 relative aspect-[3/4] sm:aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F4F5] border border-[#E4E4E7] group">
             <img
               src={productImage}
               alt={product.title}
@@ -66,14 +66,14 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
             />
             {/* Badge */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-              <span className="bg-[#F4F4F5] text-[#0D0D0E] text-[10px] font-black uppercase px-3 py-1 rounded-md shadow-md">
+              <span className="bg-[#18181B] text-white text-[10px] font-black uppercase px-3 py-1 rounded-md shadow-sm">
                 MALHA HEAVY 400G/M²
               </span>
             </div>
 
             <button
               onClick={() => onQuickView(product)}
-              className="absolute bottom-4 right-4 bg-[#18181B]/90 hover:bg-[#F4F4F5] hover:text-black border border-[#2D2D34] text-[#F4F4F5] p-3 rounded-xl backdrop-blur-md transition-all flex items-center gap-2 text-xs font-bold uppercase shadow-lg"
+              className="absolute bottom-4 right-4 bg-white/95 hover:bg-[#18181B] hover:text-white border border-[#E4E4E7] text-[#18181B] p-3 rounded-xl backdrop-blur-md transition-all flex items-center gap-2 text-xs font-bold uppercase shadow-sm cursor-pointer"
             >
               <Eye className="w-4 h-4" /> Espiada Rápida
             </button>
@@ -82,18 +82,18 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
           {/* Right Side: Product Details & Purchase CTA */}
           <div className="lg:col-span-6 space-y-6">
             <div>
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#C5A869] uppercase tracking-wider mb-2">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase tracking-wider mb-2">
                 <span>{product.category}</span>
                 <span>•</span>
                 <span>{product.subcategory}</span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-[#F4F4F5] leading-tight">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-[#18181B] leading-tight">
                 {product.title}
               </h2>
 
               <div className="flex items-center gap-3 mt-3">
-                <div className="flex text-[#C5A869] gap-0.5">
+                <div className="flex text-[#B45309] gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -103,30 +103,30 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                     />
                   ))}
                 </div>
-                <span className="text-xs font-bold text-[#F4F4F5]">{product.rating.toFixed(1)}</span>
+                <span className="text-xs font-bold text-[#18181B]">{product.rating.toFixed(1)}</span>
                 <span className="text-xs text-[#71717A]">({product.reviewCount} avaliações verificadas)</span>
               </div>
             </div>
 
-            <p className="text-xs sm:text-sm text-[#A1A1AA] leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-[#52525B] leading-relaxed font-medium">
               {product.description}
             </p>
 
             {/* Key Specs */}
-            <div className="grid grid-cols-2 gap-3 text-xs bg-[#18181B] p-4 rounded-xl border border-[#27272A]">
+            <div className="grid grid-cols-2 gap-3 text-xs bg-[#F8F9FA] p-4 rounded-xl border border-[#E4E4E7]">
               <div>
                 <span className="text-[#71717A] text-[10px] uppercase font-bold block">Gramatura</span>
-                <span className="font-bold text-[#F4F4F5]">400g/m² Heavyweight</span>
+                <span className="font-bold text-[#18181B]">400g/m² Heavyweight</span>
               </div>
               <div>
                 <span className="text-[#71717A] text-[10px] uppercase font-bold block">Capuz</span>
-                <span className="font-bold text-[#F4F4F5]">Duplo Estruturado (Sem Cordão)</span>
+                <span className="font-bold text-[#18181B]">Duplo Estruturado (Sem Cordão)</span>
               </div>
             </div>
 
             {/* Price Box */}
             <div className="flex items-baseline gap-3">
-              <span className="text-2xl sm:text-3xl font-black text-[#F4F4F5]">
+              <span className="text-2xl sm:text-3xl font-black text-[#18181B]">
                 R$ {effectivePrice.toFixed(2).replace('.', ',')}
               </span>
               {product.promoPrice && (
@@ -134,25 +134,25 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                   R$ {product.price.toFixed(2).replace('.', ',')}
                 </span>
               )}
-              <span className="text-xs text-[#C5A869] font-mono font-bold ml-2">
+              <span className="text-xs text-[#B45309] font-mono font-bold ml-2">
                 R$ {(effectivePrice * 0.95).toFixed(2).replace('.', ',')} no PIX (5% OFF)
               </span>
             </div>
 
             {/* Size Selector */}
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase text-[#A1A1AA] block">
-                Selecione o Tamanho: <span className="text-[#F4F4F5] font-mono">{selectedSize}</span>
+              <label className="text-xs font-bold uppercase text-[#52525B] block">
+                Selecione o Tamanho: <span className="text-[#18181B] font-mono">{selectedSize}</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 {(product.sizes || ['P', 'M', 'G', 'GG', 'XG']).map((sz) => (
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
-                    className={`w-11 h-11 rounded-xl text-xs font-bold uppercase transition-all border ${
+                    className={`w-11 h-11 rounded-xl text-xs font-bold uppercase transition-all border cursor-pointer ${
                       selectedSize === sz
-                        ? 'bg-[#F4F4F5] text-[#0D0D0E] border-[#F4F4F5] shadow-md font-black'
-                        : 'bg-[#18181B] text-[#A1A1AA] border-[#27272A] hover:border-[#C5A869]/70 hover:text-[#F4F4F5]'
+                        ? 'bg-[#18181B] text-white border-[#18181B] shadow-sm font-black'
+                        : 'bg-[#F4F4F5] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B]'
                     }`}
                   >
                     {sz}
@@ -165,10 +165,10 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2.5 shadow-lg active:scale-[0.98] ${
+                className={`flex-1 py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2.5 shadow-sm active:scale-[0.98] cursor-pointer ${
                   added
-                    ? 'bg-emerald-500 text-black'
-                    : 'bg-[#F4F4F5] text-[#0D0D0E] hover:bg-white'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500]'
                 }`}
               >
                 {added ? (
@@ -184,14 +184,14 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
 
               <button
                 onClick={() => onNavigate('product', product.id)}
-                className="py-4 px-6 rounded-xl bg-[#18181B] border border-[#27272A] text-[#F4F4F5] hover:border-[#C5A869]/60 hover:text-[#C5A869] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2"
+                className="py-4 px-6 rounded-xl bg-white border border-[#E4E4E7] text-[#18181B] hover:bg-[#F4F4F5] hover:border-[#18181B] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
               >
                 Ver Detalhes <ArrowRight className="w-4 h-4" />
               </button>
             </div>
 
             <div className="flex items-center gap-2 text-[11px] text-[#71717A] pt-1">
-              <ShieldCheck className="w-4 h-4 text-[#C5A869]" />
+              <ShieldCheck className="w-4 h-4 text-[#B45309]" />
               <span>Garantia de caimento autoral • Troca grátis em até 30 dias • Envio direto de São Paulo</span>
             </div>
           </div>

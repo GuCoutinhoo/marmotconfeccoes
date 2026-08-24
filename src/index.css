@@ -2,12 +2,12 @@
 
 @layer base {
   body {
-    background-color: #080808;
-    color: #EFECE6;
+    background-color: #F8F9FA;
+    color: #18181B;
   }
   ::selection {
-    background-color: #D6B35A;
-    color: #080808;
+    background-color: #F4C400;
+    color: #18181B;
   }
 
   /* Instant button responsiveness & zero tap delay */
@@ -51,18 +51,18 @@
   display: none;
 }
 
-/* Custom sleek dark scrollbar */
+/* Custom sleek light scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0e0e0e;
+  background: #F4F4F5;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2b2b2b;
+  background: #D4D4D8;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #D6B35A;
+  background: #A1A1AA;
 }

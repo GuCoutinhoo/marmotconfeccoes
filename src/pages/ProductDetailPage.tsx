@@ -97,9 +97,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   if (!product) {
     return (
-      <div className="bg-[#0D0D0E] text-[#F4F4F5] min-h-screen py-24 flex items-center justify-center">
+      <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-24 flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-10 h-10 border-2 border-[#C5A869] border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-10 h-10 border-2 border-[#B45309] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-xs uppercase tracking-widest text-[#71717A]">Carregando produto...</p>
         </div>
       </div>
@@ -107,9 +107,32 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }
 
   const isFavorite = isInWishlist(product.id);
-  const images = (product.images && product.images.length > 0)
-    ? product.images
-    : [(product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'];
+
+  // Dynamic Image Gallery tied to the selected Color Variant
+  const images = React.useMemo(() => {
+    // 1. If the selected color has its own gallery of images
+    if (selectedColor?.images && Array.isArray(selectedColor.images) && selectedColor.images.length > 0) {
+      return selectedColor.images;
+    }
+    // 2. If the selected color has a featuredImage or image
+    if (selectedColor?.featuredImage || selectedColor?.image) {
+      return [selectedColor.featuredImage || selectedColor.image!];
+    }
+    // 3. Fallback to general product images
+    if (product.images && product.images.length > 0) {
+      return product.images;
+    }
+    if ((product as any).image) {
+      return [(product as any).image];
+    }
+    // 4. Default placeholder
+    return ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'];
+  }, [selectedColor, product]);
+
+  const handleSelectColor = (colorVariant: ProductVariant) => {
+    setSelectedColor(colorVariant);
+    setSelectedImageIndex(0);
+  };
 
   const effectivePrice = product.promoPrice || product.price;
   const installmentCount = 6;
@@ -187,7 +210,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     .slice(0, 4);
 
   return (
-    <div className="bg-[#0D0D0E] text-[#F4F4F5] min-h-screen py-8">
+    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <Breadcrumb
           items={[
@@ -203,7 +226,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* 1. Left Column: Gallery (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Image */}
-            <div className="relative aspect-[4/5] bg-[#141416] border border-[#27272A] rounded-2xl overflow-hidden group">
+            <div className="relative aspect-[4/5] bg-white border border-[#E4E4E7] rounded-2xl overflow-hidden group shadow-xs">
               <img
                 src={images[selectedImageIndex] || images[0]}
                 alt={product.title}
@@ -214,12 +237,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               {/* Minimal Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                 {product.isNewRelease && (
-                  <span className="bg-[#F4F4F5] text-[#0D0D0E] text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md shadow-md">
+                  <span className="bg-[#18181B] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md shadow-md">
                     NOVO DROP
                   </span>
                 )}
                 {product.promoPrice && (
-                  <span className="bg-[#991B1B] text-[#F4F4F5] text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md shadow-md">
+                  <span className="bg-[#DC2626] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md shadow-md">
                     -{Math.round(((product.price - product.promoPrice) / product.price) * 100)}% OFF
                   </span>
                 )}
@@ -228,7 +251,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               {/* Share Button */}
               <button
                 onClick={handleShare}
-                className="absolute top-4 right-4 p-3 bg-black/60 hover:bg-[#F4F4F5] hover:text-black rounded-full border border-[#323238] text-[#F4F4F5] transition-all backdrop-blur-md shadow-lg"
+                className="absolute top-4 right-4 p-3 bg-white/80 hover:bg-[#18181B] hover:text-white rounded-full border border-[#E4E4E7] text-[#18181B] transition-all backdrop-blur-md shadow-md cursor-pointer"
                 title="Compartilhar Peça"
               >
                 <Share2 className="w-4 h-4" />
@@ -242,10 +265,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   <button
                     key={idx}
                     onClick={() => setSelectedImageIndex(idx)}
-                    className={`relative w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
+                    className={`relative w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
                       selectedImageIndex === idx
-                        ? 'border-[#C5A869] shadow-md scale-95'
-                        : 'border-[#27272A] opacity-60 hover:opacity-100'
+                        ? 'border-[#18181B] shadow-md scale-95'
+                        : 'border-[#E4E4E7] opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img
@@ -270,18 +293,18 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </div>
 
               {/* Title */}
-              <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#F4F4F5] leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B] leading-tight">
                 {product.title}
               </h1>
 
               {/* Subtitle / Spec */}
-              <p className="text-xs text-[#A1A1AA] mt-1.5 font-medium">
+              <p className="text-xs sm:text-sm text-[#52525B] mt-1.5 font-medium">
                 {product.subtitle || 'Malha Heavyweight Boxy Fit'}
               </p>
 
               {/* Rating & Social Proof */}
               <div className="flex items-center gap-3 mt-3">
-                <div className="flex text-[#C5A869]">
+                <div className="flex text-[#F59E0B]">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
@@ -291,7 +314,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     />
                   ))}
                 </div>
-                <span className="text-xs font-bold text-[#F4F4F5]">{product.rating.toFixed(1)}</span>
+                <span className="text-xs font-bold text-[#18181B]">{product.rating.toFixed(1)}</span>
                 <span className="text-xs text-[#71717A]">
                   ({reviewsList.length} avaliações verificadas)
                 </span>
@@ -299,11 +322,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             </div>
 
             {/* Price & Installments Card */}
-            <div className="p-5 bg-[#141416] border border-[#27272A] rounded-2xl space-y-3">
+            <div className="p-5 bg-white border border-[#E4E4E7] rounded-2xl space-y-3 shadow-xs">
               <div className="flex items-baseline justify-between">
                 <div>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-2xl sm:text-3xl font-black text-[#F4F4F5]">
+                    <span className="text-2xl sm:text-3xl font-black text-[#18181B]">
                       R$ {effectivePrice.toFixed(2).replace('.', ',')}
                     </span>
                     {product.promoPrice && (
@@ -312,16 +335,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-[#A1A1AA] mt-1">
+                  <p className="text-xs text-[#52525B] mt-1">
                     em até <strong>{installmentCount}x de R$ {installmentValue.toFixed(2).replace('.', ',')}</strong> sem juros no cartão
                   </p>
                 </div>
 
                 <div className="text-right">
-                  <span className="inline-block bg-[#C5A869]/15 border border-[#C5A869]/40 text-[#C5A869] text-[10px] font-mono font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
+                  <span className="inline-block bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-[10px] font-mono font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
                     5% OFF NO PIX
                   </span>
-                  <p className="text-xs font-mono font-bold text-[#C5A869] mt-1">
+                  <p className="text-xs font-mono font-bold text-[#92400E] mt-1">
                     R$ {pixPrice.toFixed(2).replace('.', ',')}
                   </p>
                 </div>
@@ -331,24 +354,24 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             {/* Color Swatch Selector */}
             {product.colors && product.colors.length > 0 && (
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#A1A1AA] block">
-                  Cor: <span className="text-[#F4F4F5] font-extrabold">{selectedColor.colorName}</span>
+                <label className="text-xs font-bold uppercase tracking-wider text-[#71717A] block">
+                  Cor: <span className="text-[#18181B] font-extrabold">{selectedColor.colorName}</span>
                 </label>
                 <div className="flex items-center gap-3">
                   {product.colors.map((c, idx) => (
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => setSelectedColor(c)}
+                      onClick={() => handleSelectColor(c)}
                       className={`p-1 rounded-full border-2 cursor-pointer select-none touch-manipulation active:scale-90 transition-transform duration-75 ${
                         selectedColor.colorName === c.colorName
-                          ? 'border-[#C5A869] scale-110'
-                          : 'border-transparent opacity-60 hover:opacity-100'
+                          ? 'border-[#18181B] scale-110'
+                          : 'border-transparent opacity-70 hover:opacity-100'
                       }`}
                       title={c.colorName}
                     >
                       <span
-                        className="w-7 h-7 rounded-full block border border-white/20 shadow-md"
+                        className="w-7 h-7 rounded-full block border border-black/10 shadow-sm"
                         style={{ backgroundColor: c.colorHex }}
                       />
                     </button>
@@ -360,13 +383,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             {/* Size Selector */}
             <div className="space-y-2.5">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#A1A1AA]">
+                <label className="text-xs font-bold uppercase tracking-wider text-[#71717A]">
                   Tamanho (Modelagem Boxy)
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsSizeGuideOpen(true)}
-                  className="text-xs text-[#C5A869] hover:underline font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform duration-75"
+                  className="text-xs text-[#B45309] hover:underline font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform duration-75"
                 >
                   <Ruler className="w-3.5 h-3.5" /> Guia de Medidas
                 </button>
@@ -380,8 +403,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     onClick={() => setSelectedSize(sz)}
                     className={`py-3 rounded-xl text-xs font-black uppercase border cursor-pointer select-none touch-manipulation active:scale-95 transition-all duration-75 ${
                       selectedSize === sz
-                        ? 'bg-[#F4F4F5] text-[#0D0D0E] border-[#F4F4F5] shadow-lg scale-[1.02]'
-                        : 'bg-[#18181B] text-[#A1A1AA] border-[#27272A] hover:border-[#C5A869]/70 hover:text-[#F4F4F5] active:bg-[#27272A]'
+                        ? 'bg-[#18181B] text-white border-[#18181B] shadow-md scale-[1.02]'
+                        : 'bg-[#F8F9FA] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B] active:bg-[#E4E4E7]'
                     }`}
                   >
                     {sz}
@@ -395,7 +418,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </p>
 
               {product.stockCount <= 8 && (
-                <p className="text-xs text-amber-400 font-mono font-bold">
+                <p className="text-xs text-amber-600 font-mono font-bold">
                   Restam apenas {product.stockCount} unidades no ateliê!
                 </p>
               )}
@@ -405,20 +428,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-3">
                 {/* Quantity Box */}
-                <div className="flex items-center bg-[#141416] border border-[#27272A] rounded-xl p-1 shrink-0">
+                <div className="flex items-center bg-[#F8F9FA] border border-[#E4E4E7] rounded-xl p-1 shrink-0">
                   <button
                     type="button"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2.5 text-[#71717A] hover:text-[#F4F4F5] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#F4F4F5] transition-transform duration-75"
+                    className="p-2.5 text-[#71717A] hover:text-[#18181B] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#18181B] transition-transform duration-75"
                     aria-label="Diminuir quantidade"
                   >
                     <Minus className="w-4 h-4" />
                   </button>
-                  <span className="w-8 text-center font-bold text-xs text-[#F4F4F5] select-none">{quantity}</span>
+                  <span className="w-8 text-center font-bold text-xs text-[#18181B] select-none">{quantity}</span>
                   <button
                     type="button"
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-2.5 text-[#71717A] hover:text-[#F4F4F5] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#F4F4F5] transition-transform duration-75"
+                    className="p-2.5 text-[#71717A] hover:text-[#18181B] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#18181B] transition-transform duration-75"
                     aria-label="Aumentar quantidade"
                   >
                     <Plus className="w-4 h-4" />
@@ -429,10 +452,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className={`flex-1 font-black text-xs uppercase tracking-widest py-4 px-6 rounded-xl transition-all duration-75 flex items-center justify-center gap-2.5 shadow-xl cursor-pointer select-none touch-manipulation active:scale-95 ${
+                  className={`flex-1 font-black text-xs uppercase tracking-widest py-4 px-6 rounded-xl transition-all duration-75 flex items-center justify-center gap-2.5 shadow-md cursor-pointer select-none touch-manipulation active:scale-95 ${
                     isAddedRecently
-                      ? 'bg-emerald-500 text-black shadow-emerald-500/20'
-                      : 'bg-[#F4F4F5] hover:bg-white active:bg-[#D6B35A] active:text-black text-[#0D0D0E]'
+                      ? 'bg-emerald-600 text-white shadow-emerald-500/20'
+                      : 'bg-[#F4C400] hover:bg-[#E5B500] text-[#0B0B0E]'
                   }`}
                 >
                   {isAddedRecently ? (
@@ -454,8 +477,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   onClick={handleToggleWishlist}
                   className={`p-4 rounded-xl border transition-all duration-75 cursor-pointer select-none touch-manipulation active:scale-90 ${
                     isFavorite
-                      ? 'bg-[#C5A869] text-black border-[#C5A869]'
-                      : 'bg-[#141416] text-[#A1A1AA] border-[#27272A] hover:border-[#F4F4F5] hover:text-[#F4F4F5]'
+                      ? 'bg-[#18181B] text-white border-[#18181B]'
+                      : 'bg-[#F8F9FA] text-[#71717A] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B]'
                   }`}
                   title="Salvar nos Favoritos"
                 >
@@ -472,21 +495,21 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             />
 
             {/* Trust Assurances */}
-            <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#27272A] text-xs text-[#71717A]">
+            <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#E4E4E7] text-xs text-[#71717A]">
               <div className="flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[#C5A869]" />
+                <Truck className="w-4 h-4 text-[#B45309]" />
                 <span>Frete Grátis acima de R$ 399</span>
               </div>
               <div className="flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-[#C5A869]" />
+                <RotateCcw className="w-4 h-4 text-[#B45309]" />
                 <span>1ª Troca Grátis em até 30 dias</span>
               </div>
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#C5A869]" />
+                <ShieldCheck className="w-4 h-4 text-[#B45309]" />
                 <span>Ateliê em São Paulo</span>
               </div>
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-[#C5A869]" />
+                <Lock className="w-4 h-4 text-[#B45309]" />
                 <span>Pagamento 100% Seguro</span>
               </div>
             </div>
@@ -494,8 +517,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         </div>
 
         {/* 3. Product Specifications & Care Tabs */}
-        <div className="my-16 bg-[#141416] border border-[#27272A] rounded-2xl p-6 md:p-8 space-y-6">
-          <div className="flex border-b border-[#27272A] gap-6 overflow-x-auto scrollbar-none pb-2">
+        <div className="my-16 bg-white border border-[#E4E4E7] rounded-2xl p-6 md:p-8 space-y-6 shadow-xs">
+          <div className="flex border-b border-[#E4E4E7] gap-6 overflow-x-auto scrollbar-none pb-2">
             {[
               { id: 'details', label: 'Especificações & Detalhes' },
               { id: 'measurements', label: 'Tabela de Medidas (cm)' },
@@ -505,10 +528,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-3 text-xs font-black uppercase tracking-wider border-b-2 whitespace-nowrap transition-all ${
+                className={`pb-3 text-xs font-black uppercase tracking-wider border-b-2 whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === tab.id
-                    ? 'border-[#C5A869] text-[#C5A869]'
-                    : 'border-transparent text-[#71717A] hover:text-[#F4F4F5]'
+                    ? 'border-[#18181B] text-[#18181B]'
+                    : 'border-transparent text-[#71717A] hover:text-[#18181B]'
                 }`}
               >
                 {tab.label}
@@ -518,8 +541,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Tab 1: Details */}
           {activeTab === 'details' && (
-            <div className="space-y-4 text-xs text-[#A1A1AA] leading-relaxed">
-              <p className="text-sm font-medium text-[#F4F4F5]">
+            <div className="space-y-4 text-xs text-[#52525B] leading-relaxed">
+              <p className="text-sm font-medium text-[#18181B] whitespace-pre-line leading-relaxed">
                 {product.description}
               </p>
               <ul className="space-y-2 pt-2">
@@ -531,7 +554,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   'Confeccionado artesanalmente em São Paulo'
                 ]).map((d: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-[#C5A869] shrink-0 mt-0.5" />
+                    <Check className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
                     <span>{d}</span>
                   </li>
                 ))}
@@ -542,12 +565,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* Tab 2: Measurements */}
           {activeTab === 'measurements' && (
             <div className="space-y-4">
-              <p className="text-xs text-[#A1A1AA]">
+              <p className="text-xs text-[#71717A]">
                 Medidas tiradas com a peça plana em centímetros (tolerância de até 1,5cm):
               </p>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#1C1C20] text-[#C5A869] uppercase font-mono">
+                  <thead className="bg-[#F4F4F5] text-[#18181B] uppercase font-mono">
                     <tr>
                       <th className="p-3">Tamanho</th>
                       <th className="p-3">Tórax (Largura)</th>
@@ -556,7 +579,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       <th className="p-3">Manga</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#27272A] text-[#F4F4F5]">
+                  <tbody className="divide-y divide-[#E4E4E7] text-[#18181B]">
                     <tr>
                       <td className="p-3 font-bold">P</td>
                       <td className="p-3">56 cm</td>
@@ -600,8 +623,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Tab 3: Care */}
           {activeTab === 'care' && (
-            <div className="space-y-3 text-xs text-[#A1A1AA]">
-              <p className="font-bold text-[#F4F4F5]">Para manter sua peça com aspecto de nova por anos:</p>
+            <div className="space-y-3 text-xs text-[#52525B]">
+              <p className="font-bold text-[#18181B]">Para manter sua peça com aspecto de nova por anos:</p>
               <ul className="space-y-2 list-disc list-inside">
                 {(product.careInstructions || [
                   'Lavar na máquina em ciclo suave com água fria',
@@ -618,15 +641,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Tab 4: Shipping */}
           {activeTab === 'shipping' && (
-            <div className="space-y-4 text-xs text-[#A1A1AA] leading-relaxed">
+            <div className="space-y-4 text-xs text-[#52525B] leading-relaxed">
               <p>
-                <strong className="text-[#F4F4F5]">Expedição Rápida:</strong> Pedidos com pagamento aprovado até as 14h são postados em até 24h úteis direto do nosso ateliê em São Paulo.
+                <strong className="text-[#18181B]">Expedição Rápida:</strong> Pedidos com pagamento aprovado até as 14h são postados em até 24h úteis direto do nosso ateliê em São Paulo.
               </p>
               <p>
-                <strong className="text-[#F4F4F5]">1ª Troca Grátis (30 dias):</strong> Se o tamanho não ficar perfeito, você tem 30 dias corridos para solicitar a troca sem nenhum custo de frete.
+                <strong className="text-[#18181B]">1ª Troca Grátis (30 dias):</strong> Se o tamanho não ficar perfeito, você tem 30 dias corridos para solicitar a troca sem nenhum custo de frete.
               </p>
               <p>
-                <strong className="text-[#F4F4F5]">Frete Grátis:</strong> Válido automaticamente para todo o Brasil em compras acima de R$ 399.
+                <strong className="text-[#18181B]">Frete Grátis:</strong> Válido automaticamente para todo o Brasil em compras acima de R$ 399.
               </p>
             </div>
           )}
@@ -634,19 +657,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
         {/* 4. Customer Reviews Section */}
         <div className="my-16 space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#27272A] pb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E4E4E7] pb-6">
             <div>
-              <span className="text-xs font-mono font-bold text-[#C5A869] uppercase tracking-wider block mb-1">
+              <span className="text-xs font-mono font-bold text-[#B45309] uppercase tracking-wider block mb-1">
                 PROVA SOCIAL
               </span>
-              <h2 className="text-2xl font-black uppercase text-[#F4F4F5]">
+              <h2 className="text-2xl font-black uppercase text-[#18181B]">
                 AVALIAÇÕES DE QUEM COMPROU
               </h2>
             </div>
 
             <button
               onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
-              className="bg-[#18181B] hover:bg-[#222226] border border-[#323238] text-[#F4F4F5] font-bold text-xs uppercase px-5 py-3 rounded-xl transition-all hover:border-[#C5A869]/60"
+              className="bg-[#F8F9FA] hover:bg-[#18181B] hover:text-white border border-[#E4E4E7] text-[#18181B] font-bold text-xs uppercase px-5 py-3 rounded-xl transition-all cursor-pointer shadow-xs"
             >
               {isReviewFormOpen ? 'Fechar Formulário' : 'Escrever Avaliação'}
             </button>
@@ -654,12 +677,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Form to submit review */}
           {isReviewFormOpen && (
-            <form onSubmit={handleAddReview} className="bg-[#141416] border border-[#27272A] p-6 rounded-2xl space-y-4 animate-fadeIn">
-              <h3 className="text-xs font-bold uppercase text-[#F4F4F5]">Sua Avaliação sobre a Peça</h3>
+            <form onSubmit={handleAddReview} className="bg-white border border-[#E4E4E7] p-6 rounded-2xl space-y-4 animate-fadeIn shadow-xs">
+              <h3 className="text-xs font-bold uppercase text-[#18181B]">Sua Avaliação sobre a Peça</h3>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#A1A1AA]">Sua Nota:</span>
-                <div className="flex text-[#C5A869] cursor-pointer">
+                <span className="text-xs text-[#71717A]">Sua Nota:</span>
+                <div className="flex text-[#F59E0B] cursor-pointer">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
@@ -679,7 +702,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     onChange={(e) => setNewReviewName(e.target.value)}
                     required
                     placeholder="Ex: Lucas Silva"
-                    className="w-full bg-[#1C1C20] border border-[#2D2D34] px-3.5 py-2.5 rounded-lg text-xs text-[#F4F4F5] focus:outline-none focus:border-[#C5A869]"
+                    className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
                   />
                 </div>
 
@@ -691,7 +714,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                     onChange={(e) => setNewReviewTitle(e.target.value)}
                     required
                     placeholder="Ex: Caimento perfeito, malha de alta gramatura"
-                    className="w-full bg-[#1C1C20] border border-[#2D2D34] px-3.5 py-2.5 rounded-lg text-xs text-[#F4F4F5] focus:outline-none focus:border-[#C5A869]"
+                    className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
                   />
                 </div>
               </div>
@@ -704,13 +727,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   onChange={(e) => setNewReviewComment(e.target.value)}
                   required
                   placeholder="Conte como foi sua experiência com o caimento, tecido, acabamento e entrega..."
-                  className="w-full bg-[#1C1C20] border border-[#2D2D34] px-3.5 py-2.5 rounded-lg text-xs text-[#F4F4F5] focus:outline-none focus:border-[#C5A869]"
+                  className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
                 />
               </div>
 
               <button
                 type="submit"
-                className="bg-[#C5A869] text-black hover:bg-white font-bold text-xs uppercase px-6 py-3 rounded-xl transition-colors shadow-md"
+                className="bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-bold text-xs uppercase px-6 py-3 rounded-xl transition-colors shadow-xs cursor-pointer"
               >
                 Publicar Avaliação
               </button>
@@ -720,29 +743,29 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* Reviews List */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {reviewsList.map((rev: any, idx: number) => (
-              <div key={idx} className="bg-[#141416] border border-[#27272A] p-6 rounded-2xl space-y-3">
+              <div key={idx} className="bg-white border border-[#E4E4E7] p-6 rounded-2xl space-y-3 shadow-xs">
                 <div className="flex items-center justify-between">
-                  <div className="flex text-[#C5A869] gap-0.5">
+                  <div className="flex text-[#F59E0B] gap-0.5">
                     {[...Array(rev.rating || 5)].map((_, i) => (
                       <Star key={i} className="w-3.5 h-3.5 fill-current" />
                     ))}
                   </div>
 
-                  <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#C5A869]">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#92400E] bg-[#FEF3C7] px-2 py-0.5 rounded">
                     <CheckCircle2 className="w-3 h-3" /> Compra Verificada
                   </span>
                 </div>
 
-                <h4 className="text-xs font-bold text-[#F4F4F5] uppercase">
+                <h4 className="text-xs font-bold text-[#18181B] uppercase">
                   {rev.title || 'Excelente qualidade'}
                 </h4>
 
-                <p className="text-xs text-[#A1A1AA] leading-relaxed">
+                <p className="text-xs text-[#52525B] leading-relaxed">
                   "{rev.comment}"
                 </p>
 
-                <div className="pt-3 border-t border-[#27272A] flex justify-between items-center text-[11px] text-[#71717A]">
-                  <span className="font-bold text-[#F4F4F5]">{rev.userName}</span>
+                <div className="pt-3 border-t border-[#E4E4E7] flex justify-between items-center text-[11px] text-[#71717A]">
+                  <span className="font-bold text-[#18181B]">{rev.userName}</span>
                   <span className="font-mono">{rev.date || 'Recente'}</span>
                 </div>
               </div>
@@ -752,11 +775,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
         {/* 5. Related Products */}
         <div className="my-16 space-y-8">
-          <div className="border-b border-[#27272A] pb-4">
-            <span className="text-xs font-mono font-bold text-[#C5A869] uppercase tracking-wider block mb-1">
+          <div className="border-b border-[#E4E4E7] pb-4">
+            <span className="text-xs font-mono font-bold text-[#B45309] uppercase tracking-wider block mb-1">
               RECOMENDAÇÕES DE ATELIÊ
             </span>
-            <h2 className="text-2xl font-black uppercase text-[#F4F4F5]">
+            <h2 className="text-2xl font-black uppercase text-[#18181B]">
               COMPLETE O VISUAL
             </h2>
           </div>

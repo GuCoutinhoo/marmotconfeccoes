@@ -46,23 +46,23 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
   ];
 
   return (
-    <section className="py-20 bg-[#0D0D0E] border-b border-[#27272A]">
+    <section className="py-20 bg-white border-b border-[#E4E4E7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 border-b border-[#27272A] pb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 border-b border-[#E4E4E7] pb-8">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#C5A869] mb-1.5">
+            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
               <BookOpen className="w-3.5 h-3.5" />
               <span>MARMOT JOURNAL</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#F4F4F5]">
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#18181B]">
               CONTEÚDO & GUIAS DE ESTILO
             </h2>
-            <p className="text-xs text-[#A1A1AA] mt-1 max-w-lg">
+            <p className="text-xs sm:text-sm text-[#52525B] mt-1 max-w-lg">
               Guias de caimento, referências de styling e os bastidores de confecção do nosso ateliê paulista.
             </p>
           </div>
 
-          <span className="text-xs font-mono font-bold text-[#C5A869] uppercase border border-[#27272A] bg-[#141416] px-4 py-2 rounded-xl">
+          <span className="text-xs font-mono font-bold text-[#B45309] uppercase border border-[#E4E4E7] bg-[#F8F9FA] px-4 py-2 rounded-xl">
             EDITION // 2026
           </span>
         </div>
@@ -73,28 +73,28 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
             <div
               key={art.id}
               onClick={() => onNavigate('shop')}
-              className="group relative bg-[#141416] border border-[#27272A] hover:border-[#3E3E48] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-md flex flex-col justify-between"
+              className="group relative bg-white border border-[#E4E4E7] hover:border-[#18181B] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between"
             >
               {/* Image Header */}
-              <div className="relative h-64 sm:h-72 overflow-hidden bg-black">
+              <div className="relative h-64 sm:h-72 overflow-hidden bg-[#F4F4F5]">
                 <img
                   src={art.image}
                   alt={art.title}
                   referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-90 group-hover:brightness-100"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-95 group-hover:brightness-100"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#141416] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                 <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                  <span className="bg-[#F4F4F5] text-[#0D0D0E] text-[9px] font-black uppercase px-2.5 py-1 rounded shadow">
+                  <span className="bg-[#18181B] text-white text-[9px] font-black uppercase px-2.5 py-1 rounded shadow">
                     {art.tag}
                   </span>
                 </div>
 
-                <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between text-[11px] text-[#A1A1AA] font-mono">
+                <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between text-[11px] text-[#E4E4E7] font-mono">
                   <span>{art.category}</span>
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-[#C5A869]" /> {art.readTime}
+                    <Clock className="w-3 h-3 text-[#F4C400]" /> {art.readTime}
                   </span>
                 </div>
               </div>
@@ -102,15 +102,15 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
               {/* Text Body */}
               <div className="p-6 sm:p-7 space-y-3 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-xl font-black text-[#F4F4F5] uppercase tracking-tight group-hover:text-[#C5A869] transition-colors leading-snug">
+                  <h3 className="text-xl font-black text-[#18181B] uppercase tracking-tight group-hover:text-[#B45309] transition-colors leading-snug">
                     {art.title}
                   </h3>
-                  <p className="text-xs text-[#A1A1AA] mt-2 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-[#52525B] mt-2 leading-relaxed">
                     {art.excerpt}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-[#27272A] flex items-center gap-1.5 text-xs font-bold text-[#F4F4F5] group-hover:text-[#C5A869] group-hover:translate-x-1 transition-all">
+                <div className="pt-4 border-t border-[#E4E4E7] flex items-center gap-1.5 text-xs font-bold text-[#18181B] group-hover:text-[#B45309] group-hover:translate-x-1 transition-all">
                   LER ARTIGO & EXPLORAR PEÇAS <ArrowRight className="w-3.5 h-3.5" />
                 </div>
               </div>

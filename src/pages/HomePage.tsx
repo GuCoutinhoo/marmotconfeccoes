@@ -19,7 +19,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onQuickView }) =
   const { products } = useStore();
 
   return (
-    <div className="bg-[#0D0D0E] text-[#F4F4F5] min-h-screen">
+    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen">
       {/* 1. Hero Principal - Lookbook Editorial */}
       <BannerHero onNavigate={onNavigate} />
 
