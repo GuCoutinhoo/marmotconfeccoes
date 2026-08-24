@@ -546,7 +546,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Camisetas streetwear confeccionadas em algodão penteado 260g/m² com caimento estruturado.',
     image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Heavyweight 260g', 'Boxy Fit', 'Graphic Tees', 'Oversized'],
-    productCount: 14,
+    productCount: 0,
     order: 0,
     active: true,
   },
@@ -558,7 +558,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Hoodies e crewnecks de alta gramatura com toque ultra macio e acabamento premium.',
     image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Hoodies', 'Crewnecks', 'Zip-Ups'],
-    productCount: 10,
+    productCount: 19,
     order: 1,
     active: true,
   },
@@ -570,7 +570,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Jaquetas corta-vento, puffers térmicas e bombers utilitárias.',
     image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Puffer Jackets', 'Windbreakers', 'Bombers'],
-    productCount: 8,
+    productCount: 0,
     order: 2,
     active: true,
   },
@@ -582,7 +582,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Modelagens amplas, tecidos ripstop e detalhes funcionais.',
     image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Cargo Pants', 'Wide Leg', 'Parachute Pants', 'Sweatpants'],
-    productCount: 9,
+    productCount: 0,
     order: 3,
     active: true,
   },
@@ -594,7 +594,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Shorts leves com secagem rápida e bermudas de moletom encorpado.',
     image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Nylon Shorts', 'Cargo Shorts', 'Moletom Shorts'],
-    productCount: 6,
+    productCount: 0,
     order: 4,
     active: true,
   },
@@ -606,7 +606,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Shoulder bags, meias atoalhadas, cintos táticos e chaveiros exclusivos.',
     image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Shoulder Bags', 'Meias Atoalhadas', 'Cintos Táticos'],
-    productCount: 7,
+    productCount: 0,
     order: 5,
     active: true,
   },
@@ -618,7 +618,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Bonés desestruturados dad hat, gorros canelados e bucket hats.',
     image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Dad Hats', 'Buckets', 'Beanies', 'Snapbacks'],
-    productCount: 8,
+    productCount: 0,
     order: 6,
     active: true,
   },
@@ -630,268 +630,13 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Slides anatômicos de EVA injetado e calçados desenvolvidos para o cotidiano urbano.',
     image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Recovery Slides', 'Chunky Slides'],
-    productCount: 4,
+    productCount: 0,
     order: 7,
     active: true,
   },
 ];
 
-const INITIAL_CORE_PRODUCTS: Product[] = [
-  {
-    id: 'prod-001',
-    slug: 'camiseta-oversized-heavyweight-cyber-dystopia-black',
-    title: 'T-Shirt Oversized Heavyweight "Cyber Dystopia"',
-    subtitle: 'Algodão 260g/m² | Boxy Fit Especial',
-    description: 'Camiseta oversized desenvolvida com algodão puro 260g/m² de toque encorpado. Possui gola ribana de 3cm com reforço ombro a ombro.',
-    price: 189.90,
-    promoPrice: 159.90,
-    category: 'camisetas',
-    subcategory: 'Heavyweight 260g',
-    collection: 'Vol. 04: Cyber Dystopia',
-    tags: ['Lançamento', 'Mais Vendido'],
-    rating: 4.9,
-    reviewCount: 42,
-    stockCount: 18,
-    sku: 'AUR-TSH-001-BLK',
-    sizes: ['P', 'M', 'G', 'GG', 'XG'],
-    colors: [
-      {
-        color: 'black',
-        colorName: 'Obsidian Black',
-        colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
-      {
-        color: 'grey',
-        colorName: 'Washed Charcoal',
-        colorHex: '#3A3A3C',
-        featuredImage: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
-      {
-        color: 'white',
-        colorName: 'Raw Bone (Branco)',
-        colorHex: '#F0EFEA',
-        featuredImage: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=1000&q=80'
-        ]
-      }
-    ],
-    image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80',
-    ],
-    details: [
-      '100% Algodão Pima Penteado Heavyweight (260g/m²)',
-      'Modelagem Boxy Fit exclusiva AURA com ombro caído',
-      'Gola canelada de 3cm pespontada',
-      'Estampa em Silk-screen alta densidade resistente a lavagens'
-    ],
-    careInstructions: ['Lavar em ciclo delicado', 'Passar do avesso'],
-    composition: ['100% Algodão Heavyweight (260g/m²)'],
-    weight: 0.35,
-    height: 4,
-    width: 20,
-    length: 25,
-    isNewRelease: true,
-    isBestSeller: true,
-    featured: true,
-    status: 'active',
-  },
-  {
-    id: 'prod-002',
-    slug: 'hoodie-heavyweight-400g-raw-concrete',
-    title: 'Hoodie Boxy Heavyweight 400g "Raw Concrete"',
-    subtitle: 'Algodão 400g/m² com Capuz Duplo',
-    description: 'Moletom canguru premium confeccionado em algodão 3 cabos 400g/m² felpado internamente. Capuz estruturado duplo sem cordões.',
-    price: 349.90,
-    promoPrice: 299.90,
-    category: 'moletons',
-    subcategory: 'Hoodies',
-    collection: 'Core Streetwear Essentials',
-    tags: ['Mais Vendido', 'Destaque'],
-    rating: 5.0,
-    reviewCount: 38,
-    stockCount: 12,
-    sku: 'AUR-HD-002-GRY',
-    sizes: ['P', 'M', 'G', 'GG'],
-    colors: [
-      {
-        color: 'grey',
-        colorName: 'Raw Concrete Grey',
-        colorHex: '#7D7D7D',
-        featuredImage: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
-      {
-        color: 'black',
-        colorName: 'Pitch Black',
-        colorHex: '#0A0A0A',
-        featuredImage: 'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
-      {
-        color: 'beige',
-        colorName: 'Desert Dune (Bege)',
-        colorHex: '#C2B69D',
-        featuredImage: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=1000&q=80'
-        ]
-      }
-    ],
-    image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
-      'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?auto=format&fit=crop&w=1000&q=80',
-    ],
-    details: [
-      'Moletom 3 Cabos Pesado 400g/m²',
-      'Capuz duplo estruturado com caimento firme',
-      'Bolso canguru frontal com costura reforçada'
-    ],
-    careInstructions: ['Lavar à máquina em temperatura fria', 'Não centrifugar em alta velocidade'],
-    composition: ['85% Algodão Premium, 15% Poliéster Estruturante'],
-    weight: 0.85,
-    height: 8,
-    width: 25,
-    length: 30,
-    isNewRelease: false,
-    isBestSeller: true,
-    featured: true,
-    status: 'active',
-  },
-  {
-    id: 'prod-003',
-    slug: 'calca-cargo-tech-ripstop-multi-pocket-black',
-    title: 'Calça Cargo Tech Ripstop Multi-Pocket',
-    subtitle: 'Tecido Ripstop Militar Anti-Rasgo | 8 Bolsos',
-    description: 'Calça cargo utilitária confeccionada em tecido Ripstop resistente à água e fricção. Conta com 8 bolsos funcionais e ajustadores na barra.',
-    price: 289.90,
-    category: 'calcas',
-    subcategory: 'Cargo Pants',
-    collection: 'Tactical Division 2026',
-    tags: ['Lançamento'],
-    rating: 4.8,
-    reviewCount: 19,
-    stockCount: 15,
-    sku: 'AUR-PNT-003-BLK',
-    sizes: ['38', '40', '42', '44', '46'],
-    colors: [
-      {
-        color: 'black',
-        colorName: 'Stealth Black',
-        colorHex: '#141414',
-        featuredImage: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
-      {
-        color: 'green',
-        colorName: 'Military Olive',
-        colorHex: '#4A5340',
-        featuredImage: 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80'
-        ]
-      }
-    ],
-    image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
-    ],
-    details: [
-      'Tecido Ripstop Reforçado Anti-Rasgo',
-      '8 bolsos utilitários com fechamento em velcro e zíper YKK',
-      'Ajuste nos tornozelos por cordão elástico com stopper'
-    ],
-    careInstructions: ['Lavar com água fria', 'Não passar ferro quente sobre os aviamentos'],
-    composition: ['65% Algodão, 35% Poliamida Ripstop'],
-    weight: 0.6,
-    height: 5,
-    width: 22,
-    length: 28,
-    isNewRelease: true,
-    isBestSeller: false,
-    featured: true,
-    status: 'active',
-  },
-  {
-    id: 'prod-004',
-    slug: 'jaqueta-puffer-thermal-monochrome-black',
-    title: 'Jaqueta Puffer Thermal Ultra-Light Monochrome',
-    subtitle: 'Isolamento Térmico Dupont Sorona® | Resistente à Água',
-    description: 'Puffer jacket com gomos volumosos e isolamento ecológico Sorona®. Acabamento externo em poliamida matte repelente a respingos.',
-    price: 459.90,
-    promoPrice: 399.90,
-    category: 'jaquetas',
-    subcategory: 'Puffer Jackets',
-    collection: 'Outerwear Expedition',
-    tags: ['Destaque', 'Edição Limitada'],
-    rating: 5.0,
-    reviewCount: 27,
-    stockCount: 8,
-    sku: 'AUR-OUT-004-BLK',
-    sizes: ['P', 'M', 'G', 'GG'],
-    colors: [
-      {
-        color: 'black',
-        colorName: 'Matte Jet Black',
-        colorHex: '#181818',
-        featuredImage: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
-      {
-        color: 'grey',
-        colorName: 'Titanium Slate',
-        colorHex: '#52545A',
-        featuredImage: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80'
-        ]
-      }
-    ],
-    image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80',
-    ],
-    details: [
-      'Recheio térmico Dupont Sorona® sustentável e hipoalergênico',
-      'Tecido externo resistente a respingos de chuva e vento',
-      'Bolsos laterais com forro fleece para aquecer as mãos'
-    ],
-    careInstructions: ['Lavagem a seco recomendada ou ciclo muito delicado'],
-    composition: ['100% Poliamida Externa / Enchimento 100% Poliéster Térmico'],
-    weight: 0.9,
-    height: 10,
-    width: 28,
-    length: 35,
-    isNewRelease: false,
-    isBestSeller: true,
-    featured: true,
-    status: 'active',
-  }
-];
+const INITIAL_CORE_PRODUCTS: Product[] = [];
 
 const INITIAL_COUPONS_LIST: DbCoupon[] = [
   {

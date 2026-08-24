@@ -48,7 +48,7 @@ export interface Product {
   details: string[]; // Composition, weight, embroidery etc.
   composition?: string[];
   careInstructions: string[];
-  reviews: Review[];
+  reviews?: Review[];
   // Physical specs for shipping (Melhor Envio)
   weight?: number; // kg, ex: 0.35 (350g)
   height?: number; // cm, ex: 4

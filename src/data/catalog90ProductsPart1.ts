@@ -58,7 +58,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:47.289Z",
+    "createdAt": "2026-08-24T22:55:59.700Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -73,8 +73,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-002",
@@ -133,7 +132,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:47.520Z",
+    "createdAt": "2026-08-24T22:55:59.949Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -148,8 +147,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-003",
@@ -208,7 +206,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:47.762Z",
+    "createdAt": "2026-08-24T22:56:00.214Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -223,8 +221,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-004",
@@ -283,7 +280,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:47.989Z",
+    "createdAt": "2026-08-24T22:56:00.439Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -298,8 +295,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-005",
@@ -358,7 +354,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:48.245Z",
+    "createdAt": "2026-08-24T22:56:00.671Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -373,8 +369,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-006",
@@ -433,7 +428,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:48.528Z",
+    "createdAt": "2026-08-24T22:56:00.885Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -448,8 +443,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-007",
@@ -508,7 +502,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:48.772Z",
+    "createdAt": "2026-08-24T22:56:01.099Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -523,8 +517,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-008",
@@ -583,7 +576,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:49.003Z",
+    "createdAt": "2026-08-24T22:56:01.338Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -598,233 +591,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
-  },
-  {
-    "id": "prod-mol-009",
-    "sku": "MM-MOL-009",
-    "slug": "moletom-inside-out",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
-    "price": 349.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Moletom Inside Out",
-    "width": 30,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "grey",
-        "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#71717A",
-        "colorName": "Cinza Mescla",
-        "featuredImage": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 8,
-    "images": [
-      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 35,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.85,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "category": "moletons",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:20:49.228Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 25,
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "description": "Costuras propositalmente expostas\nAcabamentos aparentes\nEtiquetas externas ou detalhes invertidos\nConstrução com aparência de roupa do avesso\nModelagem oversized\nEstética desconstruída",
-    "reviewCount": 0,
-    "subcategory": "Moletons",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "reviews": []
-  },
-  {
-    "id": "prod-mol-010",
-    "sku": "MM-MOL-010",
-    "slug": "moletom-mock-neck",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "image": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80",
-    "price": 349.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Moletom Mock Neck",
-    "width": 30,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "grey",
-        "image": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#71717A",
-        "colorName": "Cinza Mescla",
-        "featuredImage": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 8,
-    "images": [
-      "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 35,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.85,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "category": "moletons",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:20:49.455Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 25,
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "description": "Gola média ou alta\nSem capuz\nVisual limpo\nOmbros caídos\nCorpo largo\nTecido encorpado",
-    "reviewCount": 0,
-    "subcategory": "Moletons",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "reviews": []
-  },
-  {
-    "id": "prod-mol-011",
-    "sku": "MM-MOL-011",
-    "slug": "moletom-panel-construction",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "image": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80",
-    "price": 349.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Moletom Panel Construction",
-    "width": 30,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "grey",
-        "image": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#71717A",
-        "colorName": "Cinza Mescla",
-        "featuredImage": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 8,
-    "images": [
-      "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 35,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.85,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "category": "moletons",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:20:49.699Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 25,
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "description": "Diversos painéis no corpo\nRecortes geométricos\nCosturas bem evidentes\nConstrução em blocos\nMistura de diferentes texturas\nEstética arquitetônica",
-    "reviewCount": 0,
-    "subcategory": "Moletons",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-012",
@@ -883,7 +650,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:49.923Z",
+    "createdAt": "2026-08-24T22:56:02.249Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -898,233 +665,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
-  },
-  {
-    "id": "prod-mol-013",
-    "sku": "MM-MOL-013",
-    "slug": "moletom-raglan-sport",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-    "price": 349.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Moletom Raglan Sport",
-    "width": 30,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "grey",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#71717A",
-        "colorName": "Cinza Mescla",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 8,
-    "images": [
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 35,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.85,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "category": "moletons",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:20:50.142Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 25,
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "description": "Mangas raglan\nCostura da manga partindo da gola\nRecortes esportivos\nCorpo largo\nPunhos contrastantes\nInspiração em roupas esportivas retrô",
-    "reviewCount": 0,
-    "subcategory": "Moletons",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "reviews": []
-  },
-  {
-    "id": "prod-mol-014",
-    "sku": "MM-MOL-014",
-    "slug": "moletom-raw-seam",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
-    "price": 349.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Moletom Raw Seam",
-    "width": 30,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "grey",
-        "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#71717A",
-        "colorName": "Cinza Mescla",
-        "featuredImage": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 8,
-    "images": [
-      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 35,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.85,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "category": "moletons",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:20:50.375Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 25,
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "description": "Costuras viradas para fora\nBarra parcialmente sem acabamento\nBordas cruas\nConstrução desconstruída\nModelagem boxy\nAparência propositalmente imperfeita",
-    "reviewCount": 0,
-    "subcategory": "Moletons",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "reviews": []
-  },
-  {
-    "id": "prod-mol-015",
-    "sku": "MM-MOL-015",
-    "slug": "moletom-sherpa-panel",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
-    "price": 349.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Moletom Sherpa Panel",
-    "width": 30,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "grey",
-        "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#71717A",
-        "colorName": "Cinza Mescla",
-        "featuredImage": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 8,
-    "images": [
-      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 35,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.85,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "category": "moletons",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:20:50.600Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 25,
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "description": "Painéis em tecido sherpa\nMistura de tecidos lisos e felpudos\nConstrução estruturada\nAparência pesada\nVisual de inverno\nContraste forte de texturas",
-    "reviewCount": 0,
-    "subcategory": "Moletons",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "reviews": []
+    ]
   },
   {
     "id": "prod-mol-016",
@@ -1183,7 +724,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:50.821Z",
+    "createdAt": "2026-08-24T22:56:03.121Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -1198,8 +739,155 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
+    ]
+  },
+  {
+    "id": "prod-mol-009",
+    "sku": "MM-MOL-009",
+    "slug": "moletom-inside-out",
+    "tags": [
+      "Moletom",
+      "Streetwear"
     ],
-    "reviews": []
+    "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+    "price": 349.9,
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "title": "Moletom Inside Out",
+    "width": 30,
+    "colors": [
+      {
+        "color": "black",
+        "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#121212",
+        "colorName": "Preto",
+        "featuredImage": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        "color": "grey",
+        "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#71717A",
+        "colorName": "Cinza Mescla",
+        "featuredImage": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+      }
+    ],
+    "height": 8,
+    "images": [
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "length": 35,
+    "rating": 5,
+    "status": "active",
+    "weight": 0.85,
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "category": "moletons",
+    "featured": true,
+    "subtitle": "",
+    "createdAt": "2026-08-24T22:56:01.556Z",
+    "collection": "Coleção Marmot Atelier",
+    "stockCount": 25,
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "description": "Costuras propositalmente expostas\nAcabamentos aparentes\nEtiquetas externas ou detalhes invertidos\nConstrução com aparência de roupa do avesso\nModelagem oversized\nEstética desconstruída",
+    "reviewCount": 0,
+    "subcategory": "Moletons",
+    "isBestSeller": false,
+    "isNewRelease": true,
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ]
+  },
+  {
+    "id": "prod-mol-013",
+    "sku": "MM-MOL-013",
+    "slug": "moletom-raglan-sport",
+    "tags": [
+      "Moletom",
+      "Streetwear"
+    ],
+    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "price": 349.9,
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "title": "Moletom Raglan Sport",
+    "width": 30,
+    "colors": [
+      {
+        "color": "black",
+        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#121212",
+        "colorName": "Preto",
+        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        "color": "grey",
+        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#71717A",
+        "colorName": "Cinza Mescla",
+        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      }
+    ],
+    "height": 8,
+    "images": [
+      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "length": 35,
+    "rating": 5,
+    "status": "active",
+    "weight": 0.85,
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "category": "moletons",
+    "featured": true,
+    "subtitle": "",
+    "createdAt": "2026-08-24T22:56:02.472Z",
+    "collection": "Coleção Marmot Atelier",
+    "stockCount": 25,
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "description": "Mangas raglan\nCostura da manga partindo da gola\nRecortes esportivos\nCorpo largo\nPunhos contrastantes\nInspiração em roupas esportivas retrô",
+    "reviewCount": 0,
+    "subcategory": "Moletons",
+    "isBestSeller": false,
+    "isNewRelease": true,
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ]
   },
   {
     "id": "prod-mol-017",
@@ -1258,7 +946,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:51.038Z",
+    "createdAt": "2026-08-24T22:56:03.346Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -1273,8 +961,155 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
+    ]
+  },
+  {
+    "id": "prod-mol-010",
+    "sku": "MM-MOL-010",
+    "slug": "moletom-mock-neck",
+    "tags": [
+      "Moletom",
+      "Streetwear"
     ],
-    "reviews": []
+    "image": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80",
+    "price": 349.9,
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "title": "Moletom Mock Neck",
+    "width": 30,
+    "colors": [
+      {
+        "color": "black",
+        "image": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#121212",
+        "colorName": "Preto",
+        "featuredImage": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        "color": "grey",
+        "image": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#71717A",
+        "colorName": "Cinza Mescla",
+        "featuredImage": "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
+      }
+    ],
+    "height": 8,
+    "images": [
+      "https://images.unsplash.com/photo-1578587018452-892bacefd3f2?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "length": 35,
+    "rating": 5,
+    "status": "active",
+    "weight": 0.85,
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "category": "moletons",
+    "featured": true,
+    "subtitle": "",
+    "createdAt": "2026-08-24T22:56:01.778Z",
+    "collection": "Coleção Marmot Atelier",
+    "stockCount": 25,
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "description": "Gola média ou alta\nSem capuz\nVisual limpo\nOmbros caídos\nCorpo largo\nTecido encorpado",
+    "reviewCount": 0,
+    "subcategory": "Moletons",
+    "isBestSeller": false,
+    "isNewRelease": true,
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ]
+  },
+  {
+    "id": "prod-mol-014",
+    "sku": "MM-MOL-014",
+    "slug": "moletom-raw-seam",
+    "tags": [
+      "Moletom",
+      "Streetwear"
+    ],
+    "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
+    "price": 349.9,
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "title": "Moletom Raw Seam",
+    "width": 30,
+    "colors": [
+      {
+        "color": "black",
+        "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#121212",
+        "colorName": "Preto",
+        "featuredImage": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        "color": "grey",
+        "image": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#71717A",
+        "colorName": "Cinza Mescla",
+        "featuredImage": "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
+      }
+    ],
+    "height": 8,
+    "images": [
+      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "length": 35,
+    "rating": 5,
+    "status": "active",
+    "weight": 0.85,
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "category": "moletons",
+    "featured": true,
+    "subtitle": "",
+    "createdAt": "2026-08-24T22:56:02.695Z",
+    "collection": "Coleção Marmot Atelier",
+    "stockCount": 25,
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "description": "Costuras viradas para fora\nBarra parcialmente sem acabamento\nBordas cruas\nConstrução desconstruída\nModelagem boxy\nAparência propositalmente imperfeita",
+    "reviewCount": 0,
+    "subcategory": "Moletons",
+    "isBestSeller": false,
+    "isNewRelease": true,
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ]
   },
   {
     "id": "prod-mol-018",
@@ -1333,7 +1168,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:51.268Z",
+    "createdAt": "2026-08-24T22:56:03.572Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -1348,8 +1183,155 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
+    ]
+  },
+  {
+    "id": "prod-mol-011",
+    "sku": "MM-MOL-011",
+    "slug": "moletom-panel-construction",
+    "tags": [
+      "Moletom",
+      "Streetwear"
     ],
-    "reviews": []
+    "image": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80",
+    "price": 349.9,
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "title": "Moletom Panel Construction",
+    "width": 30,
+    "colors": [
+      {
+        "color": "black",
+        "image": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#121212",
+        "colorName": "Preto",
+        "featuredImage": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        "color": "grey",
+        "image": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#71717A",
+        "colorName": "Cinza Mescla",
+        "featuredImage": "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
+      }
+    ],
+    "height": 8,
+    "images": [
+      "https://images.unsplash.com/photo-1543087903-1ac2ec7aa8c5?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "length": 35,
+    "rating": 5,
+    "status": "active",
+    "weight": 0.85,
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "category": "moletons",
+    "featured": true,
+    "subtitle": "",
+    "createdAt": "2026-08-24T22:56:02.028Z",
+    "collection": "Coleção Marmot Atelier",
+    "stockCount": 25,
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "description": "Diversos painéis no corpo\nRecortes geométricos\nCosturas bem evidentes\nConstrução em blocos\nMistura de diferentes texturas\nEstética arquitetônica",
+    "reviewCount": 0,
+    "subcategory": "Moletons",
+    "isBestSeller": false,
+    "isNewRelease": true,
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ]
+  },
+  {
+    "id": "prod-mol-015",
+    "sku": "MM-MOL-015",
+    "slug": "moletom-sherpa-panel",
+    "tags": [
+      "Moletom",
+      "Streetwear"
+    ],
+    "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
+    "price": 349.9,
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "title": "Moletom Sherpa Panel",
+    "width": 30,
+    "colors": [
+      {
+        "color": "black",
+        "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#121212",
+        "colorName": "Preto",
+        "featuredImage": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
+      },
+      {
+        "color": "grey",
+        "image": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
+        ],
+        "colorHex": "#71717A",
+        "colorName": "Cinza Mescla",
+        "featuredImage": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
+      }
+    ],
+    "height": 8,
+    "images": [
+      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "length": 35,
+    "rating": 5,
+    "status": "active",
+    "weight": 0.85,
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "category": "moletons",
+    "featured": true,
+    "subtitle": "",
+    "createdAt": "2026-08-24T22:56:02.906Z",
+    "collection": "Coleção Marmot Atelier",
+    "stockCount": 25,
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "description": "Painéis em tecido sherpa\nMistura de tecidos lisos e felpudos\nConstrução estruturada\nAparência pesada\nVisual de inverno\nContraste forte de texturas",
+    "reviewCount": 0,
+    "subcategory": "Moletons",
+    "isBestSeller": false,
+    "isNewRelease": true,
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ]
   },
   {
     "id": "prod-mol-019",
@@ -1408,7 +1390,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "category": "moletons",
     "featured": true,
     "subtitle": "",
-    "createdAt": "2026-08-24T21:20:51.492Z",
+    "createdAt": "2026-08-24T22:56:03.790Z",
     "collection": "Coleção Marmot Atelier",
     "stockCount": 25,
     "composition": [
@@ -1423,768 +1405,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Lavar do avesso em água fria",
       "Não usar secadora rotativa",
       "Secar à sombra"
-    ],
-    "reviews": []
-  },
-  {
-    "id": "prod-cam-001",
-    "sku": "MM-CAM-001",
-    "slug": "camiseta-contrast-stitch",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Contrast Stitch",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:01.070Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Costuras em cor contrastante\nLinhas aparentes no corpo e nas mangas\nVisual gráfico e marcante\nModelagem ampla\nOmbros levemente caídos\nAcabamento streetwear moderno",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-002",
-    "sku": "MM-CAM-002",
-    "slug": "camiseta-double-layer",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Double Layer",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:01.305Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Segunda camada aparente na barra\nMangas com efeito de sobreposição\nComprimentos diferentes entre as camadas\nAparência de duas camisetas usadas juntas\nModelagem oversized\nVisual em camadas",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-003",
-    "sku": "MM-CAM-003",
-    "slug": "camiseta-drop-shoulder",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Drop Shoulder",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:01.558Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Ombros bem caídos\nCostura da manga abaixo da linha natural do ombro\nMangas mais largas\nCorpo amplo\nCaimento relaxado\nVisual streetwear minimalista",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-004",
-    "sku": "MM-CAM-004",
-    "slug": "camiseta-heavy-boxy",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Heavy Boxy",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:01.830Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Corpo curto e largo\nModelagem boxy\nOmbros caídos\nMangas largas\nTecido pesado e encorpado\nEstrutura firme",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-005",
-    "sku": "MM-CAM-005",
-    "slug": "camiseta-panel",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Panel",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:02.081Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Painéis diferentes no corpo\nRecortes geométricos\nCosturas aparentes\nPossibilidade de contraste entre tecidos ou cores\nConstrução visual mais elaborada\nEstética arquitetônica",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-006",
-    "sku": "MM-CAM-006",
-    "slug": "camiseta-pocket-utility",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Pocket Utility",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:02.646Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Bolso grande no peito\nBolsos adicionais ou divisórias utilitárias\nDetalhes funcionais\nModelagem oversized\nVisual inspirado em roupas cargo\nConstrução prática e streetwear",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-007",
-    "sku": "MM-CAM-007",
-    "slug": "camiseta-raglan-oversized",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Raglan Oversized",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:02.877Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Mangas raglan\nCostura das mangas partindo da gola\nMangas amplas\nCorpo largo\nModelagem oversized\nVisual esportivo e retrô",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-008",
-    "sku": "MM-CAM-008",
-    "slug": "camiseta-raw-hem",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Raw Hem",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:03.151Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Barra com acabamento cru\nBordas propositalmente sem acabamento tradicional\nCosturas aparentes\nVisual desconstruído\nModelagem ampla\nAparência propositalmente irregular",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-009",
-    "sku": "MM-CAM-009",
-    "slug": "camiseta-striped-heavy",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Striped Heavy",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:03.425Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Listras horizontais largas\nTecido pesado\nModelagem oversized\nOmbros caídos\nMangas largas\nVisual streetwear retrô",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ]
-  },
-  {
-    "id": "prod-cam-010",
-    "sku": "MM-CAM-010",
-    "slug": "camiseta-washed-vintage",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-    "price": 189.9,
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "title": "Camiseta Washed Vintage",
-    "width": 25,
-    "colors": [
-      {
-        "color": "black",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#121212",
-        "colorName": "Preto",
-        "featuredImage": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-      },
-      {
-        "color": "offwhite",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-        ],
-        "colorHex": "#F5F5F0",
-        "colorName": "Off White",
-        "featuredImage": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-      }
-    ],
-    "height": 4,
-    "images": [
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "length": 30,
-    "rating": 5,
-    "status": "active",
-    "weight": 0.35,
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "reviews": [],
-    "category": "camisetas",
-    "featured": true,
-    "subtitle": "",
-    "createdAt": "2026-08-24T21:30:03.700Z",
-    "collection": "Coleção Marmot Atelier",
-    "stockCount": 30,
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "description": "Lavagem envelhecida\nEfeito desbotado\nTecido com aparência usada\nTonalidade irregular\nModelagem oversized\nVisual vintage e streetwear",
-    "reviewCount": 0,
-    "subcategory": "Camisetas",
-    "isBestSeller": false,
-    "isNewRelease": true,
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
     ]
   }
 ];
-export const catalog90ProductsPart1 = CATALOG_90_PRODUCTS_PART1;
