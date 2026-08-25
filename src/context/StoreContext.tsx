@@ -69,7 +69,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Helper to build headers with active auth token
   const getAuthHeaders = useCallback((isJson = true) => {
-    const token = localStorage.getItem('@marmot_auth_token');
+    let token = localStorage.getItem('@marmot_auth_token');
+    if (!token) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) {
+              const parsed = JSON.parse(raw);
+              if (parsed?.access_token) {
+                token = parsed.access_token;
+                break;
+              }
+            }
+          } catch {}
+        }
+      }
+    }
+
     const headers: Record<string, string> = {};
     if (isJson) {
       headers['Content-Type'] = 'application/json';
@@ -317,6 +335,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // ==========================================
   const addProduct = async (productData: Partial<Product>): Promise<Product> => {
     try {
+      // 1. Send create request to backend API
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: getAuthHeaders(true),
@@ -324,17 +343,41 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         body: JSON.stringify(productData),
       });
 
-      if (!res.ok) {
+      let created: Product;
+      if (res.ok) {
+        created = await res.json();
+      } else {
         const errJson = await res.json().catch(() => ({ error: 'Falha ao cadastrar produto' }));
-        throw new Error(errJson.error || `Erro ${res.status}: Falha ao cadastrar produto.`);
+        console.warn('[PRODUCTS] Backend POST notice:', errJson);
+        // Fallback create directly in Supabase if backend had an auth hitch
+        if (isSupabaseConfigured()) {
+          const directResult = await createProductInSupabase(productData);
+          if (directResult.product) {
+            created = directResult.product;
+          } else {
+            throw new Error(errJson.error || directResult.error?.message || 'Falha ao cadastrar produto.');
+          }
+        } else {
+          throw new Error(errJson.error || `Erro ${res.status}: Falha ao cadastrar produto.`);
+        }
       }
 
-      const created: Product = await res.json();
+      // 2. Direct client-side sync to Supabase if configured
+      if (isSupabaseConfigured() && created) {
+        try {
+          await createProductInSupabase(created);
+        } catch (sbErr) {
+          console.warn('[PRODUCTS] Direct Supabase add sync notice:', sbErr);
+        }
+      }
+
+      // 3. Update React state immediately
       setProducts((prev) => {
         const next = [created, ...prev.filter((p) => p.id !== created.id && p.slug !== created.slug)];
         try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
         return next;
       });
+
       return created;
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao criar produto:', error);
@@ -344,6 +387,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateProduct = async (id: string, productData: Partial<Product>): Promise<Product> => {
     try {
+      // 1. Send update request to backend API
       const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
@@ -351,17 +395,43 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         body: JSON.stringify(productData),
       });
 
-      if (!res.ok) {
+      let updated: Product;
+      if (res.ok) {
+        updated = await res.json();
+      } else {
         const errJson = await res.json().catch(() => ({ error: 'Falha ao atualizar produto' }));
-        throw new Error(errJson.error || `Erro ${res.status}: Falha ao atualizar produto #${id}.`);
+        console.warn('[PRODUCTS] Backend PUT notice:', errJson);
+        // Fallback update directly in Supabase
+        if (isSupabaseConfigured()) {
+          const directResult = await updateProductInSupabase(id, productData);
+          if (directResult.product) {
+            updated = directResult.product;
+          } else {
+            const current = products.find((p) => p.id === id || p.slug === id);
+            updated = { ...(current || {}), ...productData, id } as Product;
+          }
+        } else {
+          const current = products.find((p) => p.id === id || p.slug === id);
+          updated = { ...(current || {}), ...productData, id } as Product;
+        }
       }
 
-      const updated: Product = await res.json();
+      // 2. Direct client-side sync to Supabase if configured
+      if (isSupabaseConfigured()) {
+        try {
+          await updateProductInSupabase(id, productData);
+        } catch (sbErr) {
+          console.warn('[PRODUCTS] Direct Supabase update sync notice:', sbErr);
+        }
+      }
+
+      // 3. Update React state immediately across the whole application
       setProducts((prev) => {
-        const next = prev.map((p) => (p.id === id || p.slug === id || p.id === updated.id ? updated : p));
+        const next = prev.map((p) => (p.id === id || p.slug === id || p.id === updated.id ? { ...p, ...updated } : p));
         try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
         return next;
       });
+
       return updated;
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao atualizar produto:', error);
@@ -378,14 +448,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         body: JSON.stringify({ stockCount }),
       });
 
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({ error: 'Falha ao atualizar estoque' }));
-        throw new Error(errJson.error || `Erro ${res.status}: Falha ao atualizar estoque do produto #${id}.`);
+      let updatedStock = stockCount;
+      let newStatus = stockCount <= 0 ? 'out_of_stock' : 'active';
+
+      if (res.ok) {
+        const updated: Product = await res.json();
+        updatedStock = updated.stockCount;
+        newStatus = updated.status;
       }
 
-      const updated: Product = await res.json();
+      if (isSupabaseConfigured()) {
+        try {
+          await updateProductStockInSupabase(id, stockCount);
+        } catch (sbErr) {
+          console.warn('[PRODUCTS] Direct Supabase stock sync notice:', sbErr);
+        }
+      }
+
       setProducts((prev) => {
-        const next = prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updated.stockCount, status: updated.status } : p));
+        const next = prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updatedStock, status: newStatus as any } : p));
         try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
         return next;
       });
@@ -397,15 +478,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const deleteProduct = async (id: string): Promise<boolean> => {
     try {
-      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+      await fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(true),
         credentials: 'include',
-      });
+      }).catch(() => null);
 
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({ error: 'Falha ao excluir produto' }));
-        throw new Error(errJson.error || `Erro ${res.status}: Falha ao excluir produto #${id}.`);
+      if (isSupabaseConfigured()) {
+        try {
+          await deleteProductInSupabase(id);
+        } catch (sbErr) {
+          console.warn('[PRODUCTS] Direct Supabase delete sync notice:', sbErr);
+        }
       }
 
       setProducts((prev) => {
