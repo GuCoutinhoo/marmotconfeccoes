@@ -38,7 +38,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
               </span>
               <span className="text-white/40 font-mono text-sm">/</span>
               <span className="text-[11.5px] sm:text-[12.5px] font-mono tracking-[0.16em] uppercase text-zinc-300">
-                PESO E PRESENÇA
+                PSO E PRESENÇA
               </span>
             </div>
 
