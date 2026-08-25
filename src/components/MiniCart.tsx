@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Truck, Tag, Sparkles } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface MiniCartProps {
   onNavigate?: (page: string, param?: string) => void;
@@ -116,10 +117,11 @@ export const MiniCart: React.FC<MiniCartProps> = ({
           ) : (
             cart.map((item, idx) => {
               const itemPrice = item.product.promoPrice || item.product.price;
-              const itemImage =
+              const rawItemImage =
                 (item.selectedColor?.images && item.selectedColor.images.length > 0)
                   ? item.selectedColor.images[0]
-                  : (item.selectedColor?.featuredImage || item.selectedColor?.image || item.product.images?.[0] || (item.product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80');
+                  : (item.selectedColor?.featuredImage || item.selectedColor?.image || item.product.images?.[0] || (item.product as any).image);
+              const itemImage = getValidProductImageUrl(rawItemImage, item.product.category, `${item.product.id}-${item.selectedColor?.colorName}`);
 
               return (
                 <div
@@ -130,6 +132,7 @@ export const MiniCart: React.FC<MiniCartProps> = ({
                     src={itemImage}
                     alt={item.product.title}
                     referrerPolicy="no-referrer"
+                    onError={(e) => handleProductImageError(e, item.product.category, item.product.id)}
                     className="w-20 h-24 object-cover object-[center_top] rounded-lg bg-[#E4E4E7] shrink-0"
                   />
 

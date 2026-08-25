@@ -3,6 +3,7 @@ import { useStore } from '../../context/StoreContext';
 import { useToast } from '../../context/ToastContext';
 import { Product, ProductVariant } from '../../types';
 import { ImageAdjustModal } from './ImageAdjustModal';
+import { getValidProductImageUrl, handleProductImageError } from '../../utils/imageUtils';
 import {
   Package,
   Plus,
@@ -838,9 +839,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-14 rounded-lg bg-[#F9F9F7] overflow-hidden border border-[#E5E5E1] shrink-0">
                           <img
-                            src={p.image || (p.images && p.images[0])}
+                            src={getValidProductImageUrl(p.image || (p.images && p.images[0]), p.category, p.id)}
                             alt={p.title}
                             referrerPolicy="no-referrer"
+                            onError={(e) => handleProductImageError(e, p.category, p.id)}
                             className="w-full h-full object-cover"
                           />
                         </div>
@@ -1753,9 +1755,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                       }`}
                                     >
                                       <img
-                                        src={imgUrl}
+                                        src={getValidProductImageUrl(imgUrl, formCategory, `${col.colorName}-${imgIdx}`)}
                                         alt={`${col.colorName} ${imgIdx + 1}`}
                                         referrerPolicy="no-referrer"
+                                        onError={(e) => handleProductImageError(e, formCategory, `${col.colorName}-${imgIdx}`)}
                                         className="w-full h-full object-cover"
                                       />
 

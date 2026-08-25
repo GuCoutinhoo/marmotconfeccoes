@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Order, Address, ShippingOption } from '../types';
 import { validateAndFetchCep, normalizeCep, isValidCepFormat, formatCep } from '../services/cepService';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface CheckoutPageProps {
   onNavigate: (page: string, param?: string) => void;
@@ -1330,16 +1331,19 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 {/* Items List */}
                 <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
                   {cartItems.map((item, idx) => {
-                    const itemImage =
+                    const rawItemImage =
                       (item.selectedColor?.images && item.selectedColor.images.length > 0)
                         ? item.selectedColor.images[0]
-                        : (item.selectedColor?.featuredImage || item.selectedColor?.image || item.product.images?.[0] || (item.product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80');
+                        : (item.selectedColor?.featuredImage || item.selectedColor?.image || item.product.images?.[0] || (item.product as any).image);
+                    const itemImage = getValidProductImageUrl(rawItemImage, item.product.category, item.product.id);
 
                     return (
                       <div key={idx} className="flex gap-3 items-center">
                         <img
                           src={itemImage}
                           alt={item.product.title}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => handleProductImageError(e, item.product.category, item.product.id)}
                           className="w-12 h-16 object-cover rounded-lg bg-[#F4F4F5] shrink-0 border border-[#E4E4E7]"
                         />
                         <div className="flex-1 min-w-0 text-xs">

@@ -4,6 +4,7 @@ import { Heart, Eye, ShoppingBag, Check } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface ProductCardProps {
   product: Product;
@@ -23,11 +24,16 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   const { addToCart } = useCart();
 
   const isFavorite = isInWishlist(product.id);
-  const images = (product.images && product.images.length > 0)
+  const rawImages = (product.images && product.images.length > 0)
     ? product.images
-    : [(product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=600&q=75'];
+    : [(product as any).image];
   
-  const displayImage = hoveredColorImage || images[currentImageIndex] || images[0];
+  const images = rawImages.map((img, idx) => 
+    getValidProductImageUrl(img, product.category, `${product.id}-${idx}`)
+  );
+  
+  const rawDisplay = hoveredColorImage || images[currentImageIndex] || images[0];
+  const displayImage = getValidProductImageUrl(rawDisplay, product.category, product.id);
 
   const effectivePrice = product.promoPrice || product.price;
   const installmentCount = 3;
@@ -57,6 +63,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           decoding="async"
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-[center_top] transition-transform duration-500 ease-out group-hover:scale-105"
+          onError={(e) => handleProductImageError(e, product.category, product.id)}
           onMouseEnter={() => !hoveredColorImage && images.length > 1 && setCurrentImageIndex(1)}
           onMouseLeave={() => !hoveredColorImage && setCurrentImageIndex(0)}
         />

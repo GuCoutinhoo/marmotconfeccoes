@@ -4,6 +4,7 @@ import { X, Heart, ShoppingBag, Check, ShieldCheck, Ruler } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { SizeGuideModal } from './SizeGuideModal';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -27,19 +28,24 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
 
   // Dynamic gallery based on selected color
   const images = React.useMemo(() => {
+    let rawList: string[] = [];
     if (selectedColor?.images && Array.isArray(selectedColor.images) && selectedColor.images.length > 0) {
-      return selectedColor.images;
+      rawList = selectedColor.images;
+    } else if (selectedColor?.featuredImage || selectedColor?.image) {
+      rawList = [selectedColor.featuredImage || selectedColor.image!];
+    } else if (product.images && product.images.length > 0) {
+      rawList = product.images;
+    } else if ((product as any).image) {
+      rawList = [(product as any).image];
     }
-    if (selectedColor?.featuredImage || selectedColor?.image) {
-      return [selectedColor.featuredImage || selectedColor.image!];
+
+    if (rawList.length === 0) {
+      return [getValidProductImageUrl(null, product.category, product.id)];
     }
-    if (product.images && product.images.length > 0) {
-      return product.images;
-    }
-    if ((product as any).image) {
-      return [(product as any).image];
-    }
-    return ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'];
+
+    return rawList.map((img, idx) =>
+      getValidProductImageUrl(img, product.category, `${product.id}-${idx}`)
+    );
   }, [selectedColor, product]);
 
   const [selectedImage, setSelectedImage] = useState<string>(images[0]);
@@ -86,6 +92,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 src={selectedImage || images[0]}
                 alt={product.title}
                 referrerPolicy="no-referrer"
+                onError={(e) => handleProductImageError(e, product.category, product.id)}
                 className="w-full h-full object-cover object-[center_top]"
               />
               {product.promoPrice && (
@@ -106,7 +113,13 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                       (selectedImage || images[0]) === img ? 'border-[#18181B] ring-2 ring-[#18181B]/20' : 'border-[#E4E4E7] opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover object-[center_top]" />
+                    <img 
+                      src={img} 
+                      alt="" 
+                      referrerPolicy="no-referrer" 
+                      onError={(e) => handleProductImageError(e, product.category, `${product.id}-${idx}`)}
+                      className="w-full h-full object-cover object-[center_top]" 
+                    />
                   </button>
                 ))}
               </div>

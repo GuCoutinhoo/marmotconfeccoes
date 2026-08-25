@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { Address } from '../types';
 import { validateAndFetchCep, normalizeCep, formatCep, isValidCepFormat } from '../services/cepService';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface AccountPageProps {
   initialTab?: string;
@@ -1245,10 +1246,11 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                           {(ord?.items || []).map((it: any, itemIdx: number) => (
                             <div key={itemIdx} className="flex gap-3 items-center">
                               <img
-                                src={it?.productImage || it?.image || it?.image_snapshot || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80'}
+                                src={getValidProductImageUrl(it?.productImage || it?.image || it?.image_snapshot, 'camisetas', it?.productTitle || String(itemIdx))}
                                 alt={it?.productTitle || it?.title || 'Produto'}
                                 className="w-12 h-14 object-cover rounded bg-[#F4F4F5] shrink-0 border border-[#E4E4E7]"
                                 referrerPolicy="no-referrer"
+                                onError={(e) => handleProductImageError(e, 'camisetas', it?.productTitle || String(itemIdx))}
                               />
                               <div className="flex-1 text-xs">
                                 <p className="font-bold text-[#18181B] line-clamp-1">{it?.productTitle || it?.title || 'Produto'}</p>

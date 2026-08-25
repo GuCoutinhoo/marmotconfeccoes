@@ -24,6 +24,7 @@ import {
   Lock,
 } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface ProductDetailPageProps {
   productId: string;
@@ -110,23 +111,25 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   // Dynamic Image Gallery tied to the selected Color Variant
   const images = React.useMemo(() => {
+    let rawList: string[] = [];
     // 1. If the selected color has its own gallery of images
     if (selectedColor?.images && Array.isArray(selectedColor.images) && selectedColor.images.length > 0) {
-      return selectedColor.images;
+      rawList = selectedColor.images;
+    } else if (selectedColor?.featuredImage || selectedColor?.image) {
+      rawList = [selectedColor.featuredImage || selectedColor.image!];
+    } else if (product.images && product.images.length > 0) {
+      rawList = product.images;
+    } else if ((product as any).image) {
+      rawList = [(product as any).image];
     }
-    // 2. If the selected color has a featuredImage or image
-    if (selectedColor?.featuredImage || selectedColor?.image) {
-      return [selectedColor.featuredImage || selectedColor.image!];
+
+    if (rawList.length === 0) {
+      return [getValidProductImageUrl(null, product.category, product.id)];
     }
-    // 3. Fallback to general product images
-    if (product.images && product.images.length > 0) {
-      return product.images;
-    }
-    if ((product as any).image) {
-      return [(product as any).image];
-    }
-    // 4. Default placeholder
-    return ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'];
+
+    return rawList.map((img, idx) =>
+      getValidProductImageUrl(img, product.category, `${product.id}-${idx}`)
+    );
   }, [selectedColor, product]);
 
   const handleSelectColor = (colorVariant: ProductVariant) => {
@@ -231,6 +234,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 src={images[selectedImageIndex] || images[0]}
                 alt={product.title}
                 referrerPolicy="no-referrer"
+                onError={(e) => handleProductImageError(e, product.category, `${product.id}-${selectedImageIndex}`)}
                 className="w-full h-full object-cover object-[center_top] transition-transform duration-500 ease-out group-hover:scale-[1.02]"
               />
 
@@ -275,6 +279,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       src={img}
                       alt={`Miniatura ${idx + 1}`}
                       referrerPolicy="no-referrer"
+                      onError={(e) => handleProductImageError(e, product.category, `${product.id}-thumb-${idx}`)}
                       className="w-full h-full object-cover object-[center_top]"
                     />
                   </button>

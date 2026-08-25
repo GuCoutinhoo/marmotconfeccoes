@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, X, TrendingUp, ArrowRight, Sparkles } from 'lucide-react';
 import { Product } from '../types';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface LiveSearchModalProps {
   isOpen: boolean;
@@ -135,9 +136,10 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
                       className="flex gap-3 p-2.5 bg-white border border-[#E4E4E7] hover:border-[#18181B] rounded-xl cursor-pointer transition-all group shadow-xs hover:shadow-md"
                     >
                       <img
-                        src={product.images?.[0] || (product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'}
+                        src={getValidProductImageUrl(product.images?.[0] || (product as any).image, product.category, product.id)}
                         alt={product.title}
                         referrerPolicy="no-referrer"
+                        onError={(e) => handleProductImageError(e, product.category, product.id)}
                         className="w-16 h-16 object-cover rounded-lg bg-[#F4F4F5] shrink-0"
                       />
                       <div className="flex flex-col justify-center min-w-0">

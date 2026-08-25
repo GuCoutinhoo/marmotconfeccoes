@@ -15,6 +15,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Order, OrderStatus } from '../types';
+import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface TrackingPageProps {
   initialCode?: string;
@@ -244,10 +245,11 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({
                 {(activeOrder.items || []).map((it: any, idx: number) => (
                   <div key={idx} className="flex gap-3 p-3 bg-[#F8F9FA] border border-[#E4E4E7] rounded-xl">
                     <img
-                      src={it.productImage || it.image || it.image_snapshot || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=150&q=80'}
+                      src={getValidProductImageUrl(it.productImage || it.image || it.image_snapshot, 'camisetas', it.productTitle || String(idx))}
                       alt={it.productTitle || it.title || 'Produto'}
                       className="w-14 h-16 object-cover rounded-lg bg-[#F4F4F5] shrink-0 border border-[#E4E4E7]"
                       referrerPolicy="no-referrer"
+                      onError={(e) => handleProductImageError(e, 'camisetas', it.productTitle || String(idx))}
                     />
                     <div className="text-xs">
                       <p className="font-bold text-[#18181B] line-clamp-1">{it.productTitle || it.title || 'Produto'}</p>
