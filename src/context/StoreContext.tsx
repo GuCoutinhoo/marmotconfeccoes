@@ -68,8 +68,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         fetchCategoriesFromSupabaseDirect(),
       ]);
 
-      if (prodResult.products !== undefined) {
+      if (prodResult.products && prodResult.products.length > 0) {
         setProducts(prodResult.products);
+      } else {
+        try {
+          const prodRes = await fetch('/api/products');
+          if (prodRes.ok) {
+            const prodData = await prodRes.json();
+            if (prodData && Array.isArray(prodData.products) && prodData.products.length > 0) {
+              setProducts(prodData.products);
+            }
+          }
+        } catch {}
       }
 
       if (catResult.categories && catResult.categories.length > 0) {

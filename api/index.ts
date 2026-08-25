@@ -1001,13 +1001,14 @@ export class DatabaseManager {
       }
 
       console.log('[PRODUCTS] carregando do Supabase');
-      const { data: prodData, error: prodErr } = await this.supabase.from('products').select('*');
-      if (!prodErr && prodData) {
+      const PRODUCT_SELECT_COLUMNS = 'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
+      const { data: prodData, error: prodErr } = await this.supabase.from('products').select(PRODUCT_SELECT_COLUMNS).order('created_at', { ascending: false });
+      if (!prodErr && prodData && prodData.length > 0) {
         this.products = prodData.map((item: any) => this.mapSupabaseProduct(item));
         this.writeJsonFile(PRODUCTS_FILE, this.products);
         console.log(`[PRODUCTS] ${this.products.length} produtos carregados do Supabase`);
       } else if (prodErr) {
-        console.error('[PRODUCTS] erro ao carregar do Supabase:', prodErr.message || prodErr);
+        console.warn('[PRODUCTS] aviso ao carregar do Supabase:', prodErr.message || prodErr);
       }
 
       const { data: ordersData, error: ordersErr } = await this.supabase.from('orders').select('*');

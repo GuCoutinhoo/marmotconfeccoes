@@ -124,34 +124,43 @@ export function mapSupabaseRowToCategory(row: any): Category {
   };
 }
 
+export const PRODUCT_SELECT_COLUMNS =
+  'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
+
 /**
- * Direct query to Supabase for products. Supabase is the single source of truth.
+ * Direct query to Supabase for products with optimized column selection and resilient fallback.
  */
 export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Product[]; error?: any }> {
-  console.log('[PRODUCTS] carregando do Supabase');
   try {
     const { data, error } = await supabase
       .from('products')
-      .select('*')
+      .select(PRODUCT_SELECT_COLUMNS)
       .order('created_at', { ascending: false });
 
+    if (!error && data && data.length > 0) {
+      const mapped = data.map(mapSupabaseRowToProduct);
+      return { products: mapped };
+    }
+
     if (error) {
-      console.error('[PRODUCTS] Erro ao carregar do Supabase:', error.message || error);
-      return { products: [], error };
+      console.warn('[PRODUCTS] Aviso ao carregar do Supabase:', error.message || error);
     }
-
-    if (!data || data.length === 0) {
-      console.log('[PRODUCTS] 0 produtos encontrados no Supabase.');
-      return { products: [] };
-    }
-
-    const mapped = data.map(mapSupabaseRowToProduct);
-    console.log(`[PRODUCTS] ${mapped.length} produtos carregados do Supabase com sucesso.`);
-    return { products: mapped };
   } catch (err: any) {
-    console.error('[PRODUCTS] Exceção ao carregar do Supabase:', err);
-    return { products: [], error: err };
+    console.warn('[PRODUCTS] Exceção ao carregar do Supabase:', err?.message || err);
   }
+
+  // Graceful fallback to backend API if Supabase encounters a timeout or cold start
+  try {
+    const apiRes = await fetch('/api/products');
+    if (apiRes.ok) {
+      const apiData = await apiRes.json();
+      if (apiData && Array.isArray(apiData.products) && apiData.products.length > 0) {
+        return { products: apiData.products };
+      }
+    }
+  } catch {}
+
+  return { products: [] };
 }
 
 /**
@@ -189,7 +198,7 @@ export function buildProductSupabasePayload(product: Product) {
     is_best_seller: Boolean(product.isBestSeller),
     featured: Boolean(product.featured),
     status: product.status || 'active',
-    data: product,
+    data: null,
     updated_at: new Date().toISOString(),
   };
 }
