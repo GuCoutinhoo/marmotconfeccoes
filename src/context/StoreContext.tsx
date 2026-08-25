@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { Category, Product } from '../types';
+import { CATALOG_90_PRODUCTS } from '../data/catalog90Products';
+import { INITIAL_8_CATEGORIES } from '../data/categories';
 import {
   fetchProductsFromSupabaseDirect,
   fetchCategoriesFromSupabaseDirect,
@@ -39,10 +41,31 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  // Instant synchronous initialization (0ms First Contentful Paint)
+  const [categories, setCategories] = useState<Category[]>(() => {
+    try {
+      const cached = localStorage.getItem('@marmot_cached_categories');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return INITIAL_8_CATEGORIES || [];
+  });
+
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const cached = localStorage.getItem('@marmot_cached_products');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return CATALOG_90_PRODUCTS || [];
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState<boolean>(true);
 
   // Helper to build headers with active auth token
   const getAuthHeaders = useCallback((isJson = true) => {
@@ -60,8 +83,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const fetchStoreData = useCallback(async () => {
     try {
-      setIsLoading(true);
-
       // Fast, parallel API fetch from backend (in-memory cache + Supabase sync)
       const [prodRes, catRes] = await Promise.all([
         fetch('/api/products').catch(() => null),
@@ -108,8 +129,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
-      setProducts(loadedProducts);
-      setCategories(loadedCategories);
+      if (loadedProducts.length > 0) {
+        setProducts(loadedProducts);
+        try {
+          localStorage.setItem('@marmot_cached_products', JSON.stringify(loadedProducts));
+        } catch {}
+      }
+
+      if (loadedCategories.length > 0) {
+        setCategories(loadedCategories);
+        try {
+          localStorage.setItem('@marmot_cached_categories', JSON.stringify(loadedCategories));
+        } catch {}
+      }
     } catch (error) {
       console.error('[PRODUCTS] Erro ao carregar catálogo da loja:', error);
     } finally {
@@ -298,7 +330,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const created: Product = await res.json();
-      setProducts((prev) => [created, ...prev.filter((p) => p.id !== created.id && p.slug !== created.slug)]);
+      setProducts((prev) => {
+        const next = [created, ...prev.filter((p) => p.id !== created.id && p.slug !== created.slug)];
+        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        return next;
+      });
       return created;
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao criar produto:', error);
@@ -321,7 +357,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const updated: Product = await res.json();
-      setProducts((prev) => prev.map((p) => (p.id === id || p.slug === id || p.id === updated.id ? updated : p)));
+      setProducts((prev) => {
+        const next = prev.map((p) => (p.id === id || p.slug === id || p.id === updated.id ? updated : p));
+        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        return next;
+      });
       return updated;
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao atualizar produto:', error);
@@ -344,9 +384,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const updated: Product = await res.json();
-      setProducts((prev) =>
-        prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updated.stockCount, status: updated.status } : p))
-      );
+      setProducts((prev) => {
+        const next = prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updated.stockCount, status: updated.status } : p));
+        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        return next;
+      });
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao atualizar estoque:', error);
       throw error;
@@ -366,7 +408,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         throw new Error(errJson.error || `Erro ${res.status}: Falha ao excluir produto #${id}.`);
       }
 
-      setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
+      setProducts((prev) => {
+        const next = prev.filter((p) => p.id !== id && p.slug !== id);
+        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        return next;
+      });
       return true;
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao excluir produto:', error);

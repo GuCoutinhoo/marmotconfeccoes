@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -8,6 +9,41 @@ import { Pool } from 'pg';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
+
+const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) {
+  try {
+    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+  } catch {
+    // Read-only filesystem fail-safe
+  }
+}
+
+export function saveBase64ToUploads(imageStr: string | undefined | null, prefix = 'prod'): string {
+  if (!imageStr || typeof imageStr !== 'string') return imageStr || '';
+  if (imageStr.startsWith('http://') || imageStr.startsWith('https://') || imageStr.startsWith('/uploads/')) {
+    return imageStr;
+  }
+  const match = imageStr.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+  if (!match || match.length !== 3) return imageStr;
+  try {
+    const mime = match[1];
+    const base64Data = match[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+    let ext = 'jpg';
+    if (mime.includes('png')) ext = 'png';
+    else if (mime.includes('webp')) ext = 'webp';
+    const hash = crypto.createHash('md5').update(buffer).digest('hex').slice(0, 12);
+    const filename = `marmot-${prefix}-${hash}.${ext}`;
+    const filePath = path.join(UPLOADS_DIR, filename);
+    if (!fs.existsSync(filePath)) {
+      fs.writeFileSync(filePath, buffer);
+    }
+    return `/uploads/${filename}`;
+  } catch {
+    return imageStr;
+  }
+}
 
 // =========================================================================
 // 1. DATA MODELS & TYPES (Completely self-contained, no ../src imports)
@@ -826,19 +862,17 @@ export class DatabaseManager {
   public async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    try {
-      if (this.mode === 'supabase' && this.supabase) {
-        await this.loadFromSupabase();
-      } else if (this.mode === 'postgres' && this.pgPool) {
-        await this.loadFromPostgres();
-      } else {
-        this.loadFromFiles();
-      }
-      this.isInitialized = true;
-    } catch (err) {
-      console.warn('[DB] Fallback initialization notice:', err);
-      this.loadFromFiles();
-      this.isInitialized = true;
+    // Load local storage immediately for 0ms instant startup
+    this.loadFromFiles();
+    this.isInitialized = true;
+
+    if (this.mode === 'supabase' && this.supabase) {
+      // Background sync from Supabase without blocking requests
+      this.loadFromSupabase().catch((err) => {
+        console.warn('[DB] Supabase background sync notice:', err?.message || err);
+      });
+    } else if (this.mode === 'postgres' && this.pgPool) {
+      await this.loadFromPostgres().catch(() => {});
     }
   }
 
@@ -892,11 +926,102 @@ export class DatabaseManager {
     }
   }
 
+  public sanitizeProduct(p: any): Product {
+    if (!p) return {} as Product;
+    const prodId = String(p.id || `prod-${Date.now()}`);
+    const rawMainImage = p.image || (Array.isArray(p.images) && p.images[0]) || '';
+    const cleanMainImage = saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+
+    const rawImagesList = Array.isArray(p.images) && p.images.length > 0
+      ? p.images
+      : (rawMainImage ? [rawMainImage] : []);
+    const cleanImagesList = rawImagesList.map((img: string, idx: number) =>
+      saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`)
+    );
+
+    const rawColors = Array.isArray(p.colors) && p.colors.length > 0
+      ? p.colors
+      : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }];
+
+    const cleanColors = rawColors.map((c: any, cIdx: number) => {
+      const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
+        ? c.images
+        : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
+      const cleanVariantImages = rawVariantImages.map((vImg: string, vIdx: number) =>
+        saveBase64ToUploads(vImg, `p-${prodId.slice(-6)}-c${cIdx}-v${vIdx}`)
+      );
+      const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
+      const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
+
+      return {
+        id: c.id,
+        color: c.color || 'default',
+        colorName: c.colorName || 'Cor Única',
+        colorHex: c.colorHex || '#000000',
+        image: cleanFeatured || cleanMainImage,
+        featuredImage: cleanFeatured || cleanMainImage,
+        images: cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]),
+        sku: c.sku,
+        stockCount: c.stockCount,
+        sizes: c.sizes,
+      };
+    });
+
+    return {
+      ...p,
+      id: prodId,
+      image: cleanMainImage || (cleanImagesList[0] || ''),
+      images: cleanImagesList.length > 0 ? cleanImagesList : (cleanMainImage ? [cleanMainImage] : []),
+      colors: cleanColors,
+      status: (p.status as any) || 'active',
+      weight: p.weight && Number(p.weight) > 0 ? Number(p.weight) : (p.category === 'moletons' || p.category === 'jaquetas' ? 0.75 : p.category === 'calcas' ? 0.6 : 0.35),
+      height: p.height && Number(p.height) > 0 ? Number(p.height) : (p.category === 'moletons' || p.category === 'jaquetas' ? 8 : 4),
+      width: p.width && Number(p.width) > 0 ? Number(p.width) : 20,
+      length: p.length && Number(p.length) > 0 ? Number(p.length) : 25,
+    };
+  }
+
   private mapSupabaseProduct(item: any): Product {
     if (!item) return {} as Product;
     const d = (item.data && typeof item.data === 'object') ? item.data : {};
+    const prodId = String(item.id || d.id || `prod-${Date.now()}`);
+    
+    const rawMainImage = item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '';
+    const cleanMainImage = saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+
+    const rawImagesList = Array.isArray(item.images) && item.images.length > 0
+      ? item.images
+      : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : []));
+    const cleanImagesList = rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
+
+    const rawColors = Array.isArray(item.colors) && item.colors.length > 0
+      ? item.colors
+      : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
+
+    const cleanColors = rawColors.map((c: any, cIdx: number) => {
+      const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
+        ? c.images
+        : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
+      const cleanVariantImages = rawVariantImages.map((vImg: string, vIdx: number) => saveBase64ToUploads(vImg, `p-${prodId.slice(-6)}-c${cIdx}-v${vIdx}`));
+      const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
+      const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
+
+      return {
+        id: c.id,
+        color: c.color || 'default',
+        colorName: c.colorName || 'Cor Única',
+        colorHex: c.colorHex || '#000000',
+        image: cleanFeatured || cleanMainImage,
+        featuredImage: cleanFeatured || cleanMainImage,
+        images: cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]),
+        sku: c.sku,
+        stockCount: c.stockCount,
+        sizes: c.sizes,
+      };
+    });
+
     return {
-      id: String(item.id || d.id || `prod-${Date.now()}`),
+      id: prodId,
       slug: String(item.slug || d.slug || (item.title ? item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
       title: item.title || d.title || 'Produto Streetwear',
       subtitle: item.subtitle || d.subtitle || '',
@@ -914,31 +1039,9 @@ export class DatabaseManager {
       stockCount: typeof item.stock_count === 'number' ? item.stock_count : parseInt(item.stock_count || d.stockCount || 20, 10),
       sku: item.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
       sizes: Array.isArray(item.sizes) && item.sizes.length > 0 ? item.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
-      colors: (() => {
-        const rawColors = Array.isArray(item.colors) && item.colors.length > 0
-          ? item.colors
-          : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
-        return rawColors.map((c: any) => {
-          const variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
-            ? c.images
-            : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
-          const featured = c.featuredImage || variantImages[0] || c.image || '';
-          return {
-            id: c.id,
-            color: c.color || 'default',
-            colorName: c.colorName || 'Cor Única',
-            colorHex: c.colorHex || '#000000',
-            image: featured,
-            featuredImage: featured,
-            images: variantImages,
-            sku: c.sku,
-            stockCount: c.stockCount,
-            sizes: c.sizes,
-          };
-        });
-      })(),
-      image: item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '',
-      images: Array.isArray(item.images) && item.images.length > 0 ? item.images : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (item.image ? [item.image] : (d.image ? [d.image] : []))),
+      colors: cleanColors,
+      image: cleanMainImage || (cleanImagesList[0] || ''),
+      images: cleanImagesList.length > 0 ? cleanImagesList : (cleanMainImage ? [cleanMainImage] : []),
       details: Array.isArray(item.details) ? item.details : (Array.isArray(d.details) ? d.details : ['100% Algodão Heavyweight']),
       careInstructions: Array.isArray(item.care_instructions) ? item.care_instructions : (Array.isArray(d.careInstructions) ? d.careInstructions : ['Lavar em ciclo suave']),
       composition: Array.isArray(item.composition) ? item.composition : (Array.isArray(d.composition) ? d.composition : ['100% Algodão']),
@@ -1132,14 +1235,18 @@ export class DatabaseManager {
 
   private loadFromFiles() {
     this.categories = this.readJsonFile(CATEGORIES_FILE, INITIAL_CATEGORIES);
-    this.products = this.readJsonFile(PRODUCTS_FILE, []).map((p: any) => ({
-      ...p,
-      status: (p.status as any) || 'active',
-      weight: p.weight && Number(p.weight) > 0 ? Number(p.weight) : (p.category === 'moletons' || p.category === 'jaquetas' ? 0.75 : p.category === 'calcas' ? 0.6 : 0.35),
-      height: p.height && Number(p.height) > 0 ? Number(p.height) : (p.category === 'moletons' || p.category === 'jaquetas' ? 8 : 4),
-      width: p.width && Number(p.width) > 0 ? Number(p.width) : 20,
-      length: p.length && Number(p.length) > 0 ? Number(p.length) : 25,
-    }));
+    const rawProds = this.readJsonFile(PRODUCTS_FILE, []);
+    let neededSanitization = false;
+    this.products = rawProds.map((p: any) => {
+      const sanitized = this.sanitizeProduct(p);
+      if (sanitized.image !== p.image || sanitized.images?.length !== p.images?.length) {
+        neededSanitization = true;
+      }
+      return sanitized;
+    });
+    if (neededSanitization) {
+      this.writeJsonFile(PRODUCTS_FILE, this.products);
+    }
     this.users = this.readJsonFile(USERS_FILE, []);
     this.orders = this.readJsonFile(ORDERS_FILE, []);
     this.coupons = this.readJsonFile(COUPONS_FILE, INITIAL_COUPONS_LIST);
@@ -1462,7 +1569,7 @@ export class DatabaseManager {
       throw new Error('O campo "Comprimento (cm)" é obrigatório e deve ser um número maior que zero.');
     }
 
-    const newProduct: Product = {
+    const newProduct: Product = this.sanitizeProduct({
       id,
       slug,
       title,
@@ -1499,7 +1606,7 @@ export class DatabaseManager {
       featured: Boolean(productData.featured),
       status: (productData.status as any) || 'active',
       createdAt: new Date().toISOString(),
-    };
+    });
 
     if (this.mode === 'supabase') {
       console.log('[PRODUCTS] criando produto no Supabase', newProduct.id, newProduct.title);
@@ -1633,41 +1740,43 @@ export class DatabaseManager {
       updatedProduct.image = updatedProduct.images[0];
     }
 
+    const cleanProduct = this.sanitizeProduct(updatedProduct);
+
     if (this.mode === 'supabase') {
-      console.log('[PRODUCTS] atualizando produto no Supabase', updatedProduct.id, updatedProduct.title);
+      console.log('[PRODUCTS] atualizando produto no Supabase', cleanProduct.id, cleanProduct.title);
       const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
       if (adminClient) {
         const { error } = await adminClient.from('products').upsert({
-          id: updatedProduct.id,
-          slug: updatedProduct.slug,
-          title: updatedProduct.title,
-          subtitle: updatedProduct.subtitle,
-          description: updatedProduct.description,
-          price: updatedProduct.price,
-          promo_price: updatedProduct.promoPrice,
-          category: updatedProduct.category,
-          subcategory: updatedProduct.subcategory,
-          collection: updatedProduct.collection,
-          tags: updatedProduct.tags,
-          rating: updatedProduct.rating,
-          review_count: updatedProduct.reviewCount,
-          stock_count: updatedProduct.stockCount,
-          sku: updatedProduct.sku,
-          sizes: updatedProduct.sizes,
-          colors: updatedProduct.colors,
-          image: updatedProduct.image,
-          images: updatedProduct.images,
-          details: updatedProduct.details,
-          care_instructions: updatedProduct.careInstructions,
-          composition: updatedProduct.composition,
-          weight: updatedProduct.weight,
-          height: updatedProduct.height,
-          width: updatedProduct.width,
-          length: updatedProduct.length,
-          is_new_release: updatedProduct.isNewRelease,
-          is_best_seller: updatedProduct.isBestSeller,
-          featured: updatedProduct.featured,
-          status: updatedProduct.status,
+          id: cleanProduct.id,
+          slug: cleanProduct.slug,
+          title: cleanProduct.title,
+          subtitle: cleanProduct.subtitle,
+          description: cleanProduct.description,
+          price: cleanProduct.price,
+          promo_price: cleanProduct.promoPrice,
+          category: cleanProduct.category,
+          subcategory: cleanProduct.subcategory,
+          collection: cleanProduct.collection,
+          tags: cleanProduct.tags,
+          rating: cleanProduct.rating,
+          review_count: cleanProduct.reviewCount,
+          stock_count: cleanProduct.stockCount,
+          sku: cleanProduct.sku,
+          sizes: cleanProduct.sizes,
+          colors: cleanProduct.colors,
+          image: cleanProduct.image,
+          images: cleanProduct.images,
+          details: cleanProduct.details,
+          care_instructions: cleanProduct.careInstructions,
+          composition: cleanProduct.composition,
+          weight: cleanProduct.weight,
+          height: cleanProduct.height,
+          width: cleanProduct.width,
+          length: cleanProduct.length,
+          is_new_release: cleanProduct.isNewRelease,
+          is_best_seller: cleanProduct.isBestSeller,
+          featured: cleanProduct.featured,
+          status: cleanProduct.status,
           data: null,
         });
 
@@ -1678,10 +1787,10 @@ export class DatabaseManager {
       }
     }
 
-    this.products[idx] = updatedProduct;
+    this.products[idx] = cleanProduct;
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
-    return updatedProduct;
+    return cleanProduct;
   }
 
   public async updateProductStock(id: string, stockCount: number): Promise<Product> {
@@ -4870,6 +4979,7 @@ export const couponRateLimiter = new RateLimiter(60 * 1000, 30, 'coupons');
 export const newsletterRateLimiter = new RateLimiter(60 * 1000, 10, 'newsletter');
 export const reviewRateLimiter = new RateLimiter(10 * 60 * 1000, 15, 'reviews');
 
+app.use(compression({ threshold: 512 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser(process.env.SESSION_SECRET || 'marmot-session-secret-token-key-2026'));
@@ -4877,21 +4987,10 @@ app.use(cookieParser(process.env.SESSION_SECRET || 'marmot-session-secret-token-
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
   next();
 });
 
-const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
-if (!fs.existsSync(UPLOADS_DIR)) {
-  try {
-    fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-  } catch {
-    // Read-only filesystem fail-safe
-  }
-}
-app.use('/uploads', express.static(UPLOADS_DIR));
+app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: '30d', immutable: true }));
 
 async function ensureAdminUser() {
   await db.initialize();
@@ -5091,6 +5190,7 @@ app.get('/api/products', async (req, res) => {
       status: status as string,
     });
 
+    res.setHeader('Cache-Control', 'public, max-age=10, stale-while-revalidate=60');
     res.json({ products, total: products.length });
   } catch (error: any) {
     console.error('[API Products Error]', error);
@@ -5105,6 +5205,7 @@ app.get('/api/products/:id', async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: 'Produto não encontrado no catálogo.' });
     }
+    res.setHeader('Cache-Control', 'public, max-age=10, stale-while-revalidate=60');
     res.json(product);
   } catch {
     res.status(500).json({ error: 'Erro ao buscar dados do produto.' });
@@ -5169,6 +5270,7 @@ app.delete('/api/products/:id', requireAdmin, async (req: any, res) => {
 app.get('/api/categories', async (req, res) => {
   try {
     const categories = await db.getAllCategories();
+    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
     res.json(categories);
   } catch {
     res.status(500).json({ error: 'Erro ao buscar categorias.' });
