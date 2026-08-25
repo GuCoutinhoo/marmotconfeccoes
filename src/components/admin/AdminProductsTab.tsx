@@ -24,6 +24,7 @@ import {
   TrendingDown,
   Crop,
   Sliders,
+  Loader2,
 } from 'lucide-react';
 
 interface AdminProductsTabProps {
@@ -44,6 +45,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Image Adjustment Modal State
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
@@ -651,6 +653,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     }
 
     try {
+      setIsSaving(true);
       if (editingProduct) {
         await updateProduct(editingProduct.id, {
           title: formTitle.trim(),
@@ -678,7 +681,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           isBestSeller: formIsBestSeller,
           composition: formComposition,
         });
-        showToast('Produto Atualizado!', `${formTitle} salvo no banco de dados com sucesso.`, 'success');
+        showToast('Produto Atualizado!', `${formTitle} salvo com sucesso.`, 'success');
         setEditingProduct(null);
       } else {
         await addProduct({
@@ -710,11 +713,13 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           composition: formComposition,
           careInstructions: ['Lavar do avesso em água fria', 'Não usar secadora', 'Secar na sombra'],
         });
-        showToast('Produto Cadastrado!', `${formTitle} adicionado e persistido no banco com sucesso.`, 'success');
+        showToast('Produto Cadastrado!', `${formTitle} adicionado com sucesso.`, 'success');
         setIsAddOpen(false);
       }
     } catch (err: any) {
       showToast('Erro ao Salvar', err?.message || 'Ocorreu um erro ao salvar o produto no banco.', 'error');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1977,19 +1982,28 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
             <div className="flex flex-col-reverse sm:flex-row gap-3 px-5 py-4 sm:px-8 sm:py-4 border-t border-[#E5E5E1] bg-white shrink-0">
               <button
                 type="button"
+                disabled={isSaving || isUploading}
                 onClick={() => {
                   setEditingProduct(null);
                   setIsAddOpen(false);
                 }}
-                className="w-full sm:flex-1 bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] py-3 rounded-xl text-xs font-bold uppercase transition-colors"
+                className="w-full sm:flex-1 bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] py-3 rounded-xl text-xs font-bold uppercase transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="w-full sm:flex-1 bg-[#F0C84B] text-black font-extrabold py-3 rounded-xl text-xs uppercase hover:bg-[#F0C84B]/90 transition-colors shadow-sm"
+                disabled={isSaving || isUploading}
+                className="w-full sm:flex-1 bg-[#F0C84B] text-black font-extrabold py-3 rounded-xl text-xs uppercase hover:bg-[#F0C84B]/90 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {editingProduct ? 'Salvar Alterações' : 'Publicar Produto'}
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Processando e Salvando...</span>
+                  </>
+                ) : (
+                  <span>{editingProduct ? 'Salvar Alterações' : 'Publicar Produto'}</span>
+                )}
               </button>
             </div>
           </form>

@@ -280,22 +280,27 @@ export async function updateProductInSupabase(id: string, updates: Partial<Produ
   try {
     const cleanId = String(id).trim();
 
-    // Fetch existing product from Supabase to preserve fields
-    const { data: existingRow, error: fetchErr } = await supabase
-      .from('products')
-      .select('*')
-      .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
-      .maybeSingle();
+    let existingProduct = {} as Product;
+    // Only perform an extra fetch if essential required fields are missing from updates
+    if (!updates.title || !updates.category || updates.price === undefined) {
+      const { data: existingRow, error: fetchErr } = await supabase
+        .from('products')
+        .select('*')
+        .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
+        .maybeSingle();
 
-    if (fetchErr) {
-      console.warn('[PRODUCTS] aviso ao buscar produto existente no Supabase:', fetchErr.message);
+      if (fetchErr) {
+        console.warn('[PRODUCTS] aviso ao buscar produto existente no Supabase:', fetchErr.message);
+      }
+      if (existingRow) {
+        existingProduct = mapSupabaseRowToProduct(existingRow);
+      }
     }
 
-    const existingProduct = existingRow ? mapSupabaseRowToProduct(existingRow) : ({} as Product);
     const updatedProduct: Product = {
       ...existingProduct,
       ...updates,
-      id: existingProduct.id || cleanId,
+      id: updates.id || existingProduct.id || cleanId,
       status: (updates.status as any) || existingProduct.status || 'active',
     };
 

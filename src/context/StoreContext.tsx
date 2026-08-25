@@ -285,16 +285,21 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   const updateProduct = async (id: string, productData: Partial<Product>): Promise<Product> => {
+    // 1. Optimistic UI update instantly for zero perceived delay
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id || p.slug === id ? ({ ...p, ...productData } as Product) : p))
+    );
+
     try {
       const { product: updated, error } = await updateProductInSupabase(id, productData);
       if (error || !updated) {
         throw new Error(error?.message || `Falha ao atualizar produto #${id} no Supabase.`);
       }
 
-      // Update state with updated Supabase record
+      // 2. Sync final updated Supabase record in state
       setProducts((prev) => prev.map((p) => (p.id === id || p.slug === id || p.id === updated.id ? updated : p)));
 
-      // Background sync to server API if available
+      // Background sync to server API if available (non-blocking)
       fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
