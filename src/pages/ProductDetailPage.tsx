@@ -226,12 +226,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* 1. Left Column: Gallery (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Image */}
-            <div className="relative aspect-[4/5] bg-white border border-[#E4E4E7] rounded-2xl overflow-hidden group shadow-xs">
+            <div className="relative aspect-[3/4] sm:aspect-[2/3] bg-[#F4F4F5] border border-[#E4E4E7] rounded-2xl overflow-hidden group shadow-xs">
               <img
                 src={images[selectedImageIndex] || images[0]}
                 alt={product.title}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                className="w-full h-full object-cover object-[center_top] transition-transform duration-500 ease-out group-hover:scale-[1.02]"
               />
 
               {/* Minimal Badges */}
@@ -265,7 +265,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   <button
                     key={idx}
                     onClick={() => setSelectedImageIndex(idx)}
-                    className={`relative w-20 h-24 sm:w-24 sm:h-28 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
+                    className={`relative w-20 h-24 sm:w-24 sm:h-32 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-[#F4F4F5] ${
                       selectedImageIndex === idx
                         ? 'border-[#18181B] shadow-md scale-95'
                         : 'border-[#E4E4E7] opacity-70 hover:opacity-100'
@@ -275,7 +275,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       src={img}
                       alt={`Miniatura ${idx + 1}`}
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover object-[center_top]"
                     />
                   </button>
                 ))}

@@ -40,7 +40,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             <div
               key={cat.id || cat.slug}
               onClick={() => onNavigate('shop', cat.slug)}
-              className="group relative h-72 sm:h-80 rounded-2xl overflow-hidden border border-[#E4E4E7] hover:border-[#18181B] cursor-pointer bg-[#F4F4F5] transition-all duration-300 shadow-sm hover:shadow-lg"
+              className="group relative h-72 sm:h-80 rounded-lg overflow-hidden border border-[#E4E4E7] hover:border-[#18181B] cursor-pointer bg-[#F4F4F5] transition-all duration-300 shadow-sm hover:shadow-lg"
             >
               {/* Image with subtle zoom */}
               <img

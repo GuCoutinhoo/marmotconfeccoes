@@ -37,7 +37,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     let result = [...products];
 
     if (selectedCategory) {
-      result = result.filter((p) => p.category === selectedCategory || p.subcategory === selectedCategory);
+      if (selectedCategory === 'calcas') {
+        result = result.filter((p) => p.category === 'calcas' || p.category === 'cargos' || p.subcategory === 'calcas' || p.tags?.some(t => t.toLowerCase() === 'calças' || t.toLowerCase() === 'calca'));
+      } else {
+        result = result.filter((p) => p.category === selectedCategory || p.subcategory === selectedCategory || p.tags?.some(t => t.toLowerCase() === selectedCategory.toLowerCase()));
+      }
     }
 
     if (selectedCollection) {

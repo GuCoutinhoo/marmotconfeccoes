@@ -56,7 +56,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+          className="w-full h-full object-cover object-[center_top] transition-transform duration-500 ease-out group-hover:scale-105"
           onMouseEnter={() => !hoveredColorImage && images.length > 1 && setCurrentImageIndex(1)}
           onMouseLeave={() => !hoveredColorImage && setCurrentImageIndex(0)}
         />

@@ -74,7 +74,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
       ref={dropdownRef}
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
-      className="absolute right-0 top-full mt-2 w-80 sm:w-88 rounded-xl border border-[#E4E4E7] bg-white p-0 text-[#18181B] shadow-[0_20px_50px_rgba(0,0,0,0.12)] z-[100] animate-fadeIn overflow-hidden"
+      className="absolute right-0 top-full mt-2 w-80 sm:w-88 rounded-lg border border-[#E4E4E7] bg-white p-0 text-[#18181B] shadow-[0_20px_50px_rgba(0,0,0,0.12)] z-[100] animate-fadeIn overflow-hidden"
     >
       {/* ========================================================= */}
       {/* 1. CABEÇALHO DO DROPDOWN */}

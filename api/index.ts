@@ -546,7 +546,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Camisetas streetwear confeccionadas em algodão penteado 260g/m² com caimento estruturado.',
     image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Heavyweight 260g', 'Boxy Fit', 'Graphic Tees', 'Oversized'],
-    productCount: 0,
+    productCount: 10,
     order: 0,
     active: true,
   },
@@ -570,7 +570,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Jaquetas corta-vento, puffers térmicas e bombers utilitárias.',
     image: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Puffer Jackets', 'Windbreakers', 'Bombers'],
-    productCount: 0,
+    productCount: 19,
     order: 2,
     active: true,
   },
@@ -582,7 +582,7 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Modelagens amplas, tecidos ripstop e detalhes funcionais.',
     image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Cargo Pants', 'Wide Leg', 'Parachute Pants', 'Sweatpants'],
-    productCount: 0,
+    productCount: 18,
     order: 3,
     active: true,
   },
@@ -594,8 +594,20 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Shorts leves com secagem rápida e bermudas de moletom encorpado.',
     image: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Nylon Shorts', 'Cargo Shorts', 'Moletom Shorts'],
-    productCount: 0,
+    productCount: 15,
     order: 4,
+    active: true,
+  },
+  {
+    id: 'tenis',
+    slug: 'tenis',
+    name: 'Tênis',
+    tagline: 'Sneakers Chunky & Solados Tratorados',
+    description: 'Silhuetas chunky, solados tratorados, slides e sneakers exclusivos para o lifestyle urbano.',
+    image: 'https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=800&q=80',
+    subcategories: ['Chunky Platform', 'Retro Runner', 'Skate Leather', 'Chunky Slides'],
+    productCount: 10,
+    order: 5,
     active: true,
   },
   {
@@ -606,8 +618,8 @@ const INITIAL_CATEGORIES: Category[] = [
     description: 'Shoulder bags, meias atoalhadas, cintos táticos e chaveiros exclusivos.',
     image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
     subcategories: ['Shoulder Bags', 'Meias Atoalhadas', 'Cintos Táticos'],
-    productCount: 0,
-    order: 5,
+    productCount: 15,
+    order: 6,
     active: true,
   },
   {
@@ -1315,7 +1327,11 @@ export class DatabaseManager {
 
     if (filters.category) {
       const cat = filters.category.toLowerCase();
-      list = list.filter((p) => p.category?.toLowerCase() === cat || p.subcategory?.toLowerCase() === cat);
+      if (cat === 'calcas') {
+        list = list.filter((p) => p.category?.toLowerCase() === 'calcas' || p.category?.toLowerCase() === 'cargos' || p.subcategory?.toLowerCase() === 'calcas' || p.tags?.some(t => t.toLowerCase() === 'calças' || t.toLowerCase() === 'calca'));
+      } else {
+        list = list.filter((p) => p.category?.toLowerCase() === cat || p.subcategory?.toLowerCase() === cat || p.tags?.some(t => t.toLowerCase() === cat));
+      }
     }
 
     if (filters.subcategory) {

@@ -64,7 +64,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover object-[center_top] group-hover:scale-105 transition-transform duration-500"
             />
             {/* Badge */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">

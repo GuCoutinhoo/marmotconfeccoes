@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2.5 rounded-xl bg-[#F4F4F5] border border-[#E4E4E7] text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all cursor-pointer shadow-sm"
+            className="lg:hidden p-2.5 rounded-lg bg-[#F4F4F5] border border-[#E4E4E7] text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all cursor-pointer shadow-sm"
             aria-label="Abrir menu mobile"
           >
             {isMobileMenuOpen ? <X className="w-5 h-5 text-[#B45309]" /> : <Menu className="w-5 h-5" />}
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
             className="flex items-center gap-3.5 cursor-pointer group select-none py-1"
           >
             <div className="relative">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-[#FFD700] via-[#F4C400] to-[#D9A300] text-[#0B0B0E] font-black text-xl sm:text-2xl flex items-center justify-center rounded-xl tracking-tighter transition-all duration-300 shadow-[0_4px_16px_rgba(244,196,0,0.25)] group-hover:shadow-[0_0_25px_rgba(244,196,0,0.45)] group-hover:scale-105 shrink-0 border border-[#FFF080]/60">
+              <div className="w-10 h-10 sm:w-11 sm:h-11 bg-gradient-to-br from-[#FFD700] via-[#F4C400] to-[#D9A300] text-[#0B0B0E] font-black text-xl sm:text-2xl flex items-center justify-center rounded-lg tracking-tighter transition-all duration-300 shadow-[0_4px_16px_rgba(244,196,0,0.25)] group-hover:shadow-[0_0_25px_rgba(244,196,0,0.45)] group-hover:scale-105 shrink-0 border border-[#FFF080]/60">
                 M
               </div>
               <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-[#22C55E] border-2 border-white rounded-full" title="Online" />
@@ -156,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {/* Search Trigger */}
           <button
             onClick={onOpenSearch}
-            className="h-10 sm:h-11 flex items-center gap-2.5 px-3.5 sm:px-4 rounded-xl bg-[#F4F4F5] border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all shadow-sm group w-10 sm:w-44 md:w-52 lg:w-60 justify-center sm:justify-start cursor-pointer"
+            className="h-10 sm:h-11 flex items-center gap-2.5 px-3.5 sm:px-4 rounded-lg bg-[#F4F4F5] border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all shadow-sm group w-10 sm:w-44 md:w-52 lg:w-60 justify-center sm:justify-start cursor-pointer"
             title="Buscar produtos (Ctrl+K)"
             aria-label="Pesquisar na loja"
           >
@@ -172,7 +172,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {/* Wishlist Icon */}
           <button
             onClick={() => onNavigate('account', 'wishlist')}
-            className="relative h-10 sm:h-11 w-10 sm:w-11 hidden sm:flex items-center justify-center rounded-xl bg-[#F4F4F5] border border-[#E4E4E7] text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all shadow-sm cursor-pointer group"
+            className="relative h-10 sm:h-11 w-10 sm:w-11 hidden sm:flex items-center justify-center rounded-lg bg-[#F4F4F5] border border-[#E4E4E7] text-[#52525B] hover:text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all shadow-sm cursor-pointer group"
             title="Meus Favoritos"
             aria-label="Abrir favoritos"
           >
@@ -188,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           <div className="relative">
             <button
               onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-              className={`h-10 sm:h-11 px-3 sm:px-4.5 rounded-xl transition-all duration-200 flex items-center gap-2 border text-xs shadow-sm cursor-pointer ${
+              className={`h-10 sm:h-11 px-3 sm:px-4.5 rounded-lg transition-all duration-200 flex items-center gap-2 border text-xs shadow-sm cursor-pointer ${
                 user
                   ? isUserDropdownOpen
                     ? 'border-[#18181B] bg-[#18181B] text-white shadow-md'
@@ -218,7 +218,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {!user && (
             <button
               onClick={() => onNavigate('account', 'register')}
-              className="h-10 sm:h-11 px-4 sm:px-5 rounded-xl flex items-center gap-2 bg-gradient-to-r from-[#FFD700] via-[#F4C400] to-[#E5B500] hover:from-[#FFE033] hover:to-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_16px_rgba(244,196,0,0.35)] hover:shadow-[0_0_25px_rgba(244,196,0,0.55)] hover:scale-[1.02] active:scale-95 shrink-0 cursor-pointer border border-[#FFF080]/50"
+              className="h-10 sm:h-11 px-4 sm:px-5 rounded-lg flex items-center gap-2 bg-gradient-to-r from-[#FFD700] via-[#F4C400] to-[#E5B500] hover:from-[#FFE033] hover:to-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_16px_rgba(244,196,0,0.35)] hover:shadow-[0_0_25px_rgba(244,196,0,0.55)] hover:scale-[1.02] active:scale-95 shrink-0 cursor-pointer border border-[#FFF080]/50"
               title="Criar nova conta"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
@@ -230,7 +230,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {user && (
             <button
               onClick={openMiniCart}
-              className="h-10 sm:h-11 px-3.5 sm:px-5 rounded-xl flex items-center gap-2 bg-[#18181B] hover:bg-black text-white font-black text-xs uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(0,0,0,0.15)] active:scale-95 shrink-0 cursor-pointer"
+              className="h-10 sm:h-11 px-3.5 sm:px-5 rounded-lg flex items-center gap-2 bg-[#18181B] hover:bg-black text-white font-black text-xs uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(0,0,0,0.15)] active:scale-95 shrink-0 cursor-pointer"
               title="Abrir Carrinho"
             >
               <ShoppingBag className="w-4 h-4 stroke-[2.5] text-[#F4C400]" />

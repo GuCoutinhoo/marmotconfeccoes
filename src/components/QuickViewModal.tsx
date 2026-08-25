@@ -80,13 +80,13 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
           </button>
 
           {/* Left Gallery */}
-          <div className="w-full md:w-1/2 p-6 bg-[#F8F9FA] border-b md:border-b-0 md:border-r border-[#E4E4E7] flex flex-col justify-between">
-            <div className="relative aspect-square rounded-xl overflow-hidden border border-[#E4E4E7] mb-4 bg-white shadow-xs">
+          <div className="w-full md:w-1/2 p-4 sm:p-6 bg-[#F8F9FA] border-b md:border-b-0 md:border-r border-[#E4E4E7] flex flex-col justify-between">
+            <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-xl overflow-hidden border border-[#E4E4E7] mb-4 bg-[#F4F4F5] shadow-xs">
               <img
                 src={selectedImage || images[0]}
                 alt={product.title}
                 referrerPolicy="no-referrer"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-[center_top]"
               />
               {product.promoPrice && (
                 <span className="absolute top-3 left-3 bg-[#F4C400] text-[#0B0B0E] text-[10px] font-black px-2.5 py-1 uppercase tracking-wider rounded shadow-xs">
@@ -102,11 +102,11 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(img)}
-                    className={`relative w-16 h-16 rounded-lg border overflow-hidden shrink-0 transition-all cursor-pointer ${
+                    className={`relative w-14 h-16 sm:w-16 sm:h-20 rounded-lg border overflow-hidden shrink-0 transition-all cursor-pointer bg-[#F4F4F5] ${
                       (selectedImage || images[0]) === img ? 'border-[#18181B] ring-2 ring-[#18181B]/20' : 'border-[#E4E4E7] opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                    <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover object-[center_top]" />
                   </button>
                 ))}
               </div>

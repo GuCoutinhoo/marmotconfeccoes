@@ -130,7 +130,7 @@ export const MiniCart: React.FC<MiniCartProps> = ({
                     src={itemImage}
                     alt={item.product.title}
                     referrerPolicy="no-referrer"
-                    className="w-20 h-24 object-cover rounded-lg bg-[#E4E4E7] shrink-0"
+                    className="w-20 h-24 object-cover object-[center_top] rounded-lg bg-[#E4E4E7] shrink-0"
                   />
 
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
