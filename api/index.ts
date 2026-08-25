@@ -1536,7 +1536,7 @@ export class DatabaseManager {
           is_best_seller: newProduct.isBestSeller,
           featured: newProduct.featured,
           status: newProduct.status,
-          data: newProduct,
+          data: null,
         });
 
         if (error) {
@@ -1668,7 +1668,7 @@ export class DatabaseManager {
           is_best_seller: updatedProduct.isBestSeller,
           featured: updatedProduct.featured,
           status: updatedProduct.status,
-          data: updatedProduct,
+          data: null,
         });
 
         if (error) {
@@ -1732,7 +1732,7 @@ export class DatabaseManager {
         const { error } = await adminClient.from('products').update({
           stock_count: newStock,
           status: status,
-          data: updated,
+          data: null,
         }).eq('id', current.id);
 
         if (error) {

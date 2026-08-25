@@ -62,42 +62,56 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       setIsLoading(true);
 
-      // Directly load from Supabase - Single Source of Truth
-      const [prodResult, catResult] = await Promise.all([
-        fetchProductsFromSupabaseDirect(),
-        fetchCategoriesFromSupabaseDirect(),
+      // Fast, parallel API fetch from backend (in-memory cache + Supabase sync)
+      const [prodRes, catRes] = await Promise.all([
+        fetch('/api/products').catch(() => null),
+        fetch('/api/categories').catch(() => null),
       ]);
 
-      if (prodResult.products && prodResult.products.length > 0) {
-        setProducts(prodResult.products);
-      } else {
-        try {
-          const prodRes = await fetch('/api/products');
-          if (prodRes.ok) {
-            const prodData = await prodRes.json();
-            if (prodData && Array.isArray(prodData.products) && prodData.products.length > 0) {
-              setProducts(prodData.products);
-            }
-          }
-        } catch {}
+      let loadedProducts: Product[] = [];
+      let loadedCategories: Category[] = [];
+
+      if (prodRes && prodRes.ok) {
+        const data = await prodRes.json();
+        if (data && Array.isArray(data.products) && data.products.length > 0) {
+          loadedProducts = data.products;
+        }
       }
 
-      if (catResult.categories && catResult.categories.length > 0) {
-        setCategories(catResult.categories);
-      } else {
-        // Fallback check on categories API if empty
-        try {
-          const catRes = await fetch('/api/categories', { credentials: 'include' });
-          if (catRes.ok) {
-            const catData = await catRes.json();
-            if (Array.isArray(catData)) {
-              setCategories(catData);
-            }
-          }
-        } catch {}
+      if (catRes && catRes.ok) {
+        const data = await catRes.json();
+        if (Array.isArray(data) && data.length > 0) {
+          loadedCategories = data;
+        }
       }
+
+      // Fallback directly to Supabase only if backend returned empty
+      if (loadedProducts.length === 0) {
+        try {
+          const directProd = await fetchProductsFromSupabaseDirect();
+          if (directProd.products && directProd.products.length > 0) {
+            loadedProducts = directProd.products;
+          }
+        } catch (sbErr) {
+          console.warn('[PRODUCTS] Fallback Supabase error:', sbErr);
+        }
+      }
+
+      if (loadedCategories.length === 0) {
+        try {
+          const directCat = await fetchCategoriesFromSupabaseDirect();
+          if (directCat.categories && directCat.categories.length > 0) {
+            loadedCategories = directCat.categories;
+          }
+        } catch (sbCatErr) {
+          console.warn('[CATEGORIES] Fallback Supabase error:', sbCatErr);
+        }
+      }
+
+      setProducts(loadedProducts);
+      setCategories(loadedCategories);
     } catch (error) {
-      console.error('[PRODUCTS] Erro ao carregar produtos do Supabase:', error);
+      console.error('[PRODUCTS] Erro ao carregar catálogo da loja:', error);
     } finally {
       setIsLoading(false);
       setIsInitialized(true);
@@ -267,58 +281,49 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   // ==========================================
-  // Product Actions (Supabase Authoritative)
+  // Product Actions (Server Authoritative & Supabase Synced)
   // ==========================================
   const addProduct = async (productData: Partial<Product>): Promise<Product> => {
     try {
-      const { product: created, error } = await createProductInSupabase(productData);
-      if (error || !created) {
-        throw new Error(error?.message || 'Falha ao inserir produto no Supabase.');
-      }
-
-      // Update state with newly created Supabase record
-      setProducts((prev) => [created, ...prev.filter((p) => p.id !== created.id && p.slug !== created.slug)]);
-
-      // Background sync to server API if available
-      fetch('/api/products', {
+      const res = await fetch('/api/products', {
         method: 'POST',
         headers: getAuthHeaders(true),
         credentials: 'include',
-        body: JSON.stringify(created),
-      }).catch((err) => console.warn('[Store API Sync] Sync notice:', err));
+        body: JSON.stringify(productData),
+      });
 
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Falha ao cadastrar produto' }));
+        throw new Error(errJson.error || `Erro ${res.status}: Falha ao cadastrar produto.`);
+      }
+
+      const created: Product = await res.json();
+      setProducts((prev) => [created, ...prev.filter((p) => p.id !== created.id && p.slug !== created.slug)]);
       return created;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[PRODUCTS] Erro ao criar produto:', error);
       throw error;
     }
   };
 
   const updateProduct = async (id: string, productData: Partial<Product>): Promise<Product> => {
-    // 1. Optimistic UI update instantly for zero perceived delay
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id || p.slug === id ? ({ ...p, ...productData } as Product) : p))
-    );
-
     try {
-      const { product: updated, error } = await updateProductInSupabase(id, productData);
-      if (error || !updated) {
-        throw new Error(error?.message || `Falha ao atualizar produto #${id} no Supabase.`);
-      }
-
-      // 2. Sync final updated Supabase record in state
-      setProducts((prev) => prev.map((p) => (p.id === id || p.slug === id || p.id === updated.id ? updated : p)));
-
-      // Background sync to server API if available (non-blocking)
-      fetch(`/api/products/${encodeURIComponent(id)}`, {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
         credentials: 'include',
-        body: JSON.stringify(updated),
-      }).catch((err) => console.warn('[Store API Sync] Sync notice:', err));
+        body: JSON.stringify(productData),
+      });
 
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Falha ao atualizar produto' }));
+        throw new Error(errJson.error || `Erro ${res.status}: Falha ao atualizar produto #${id}.`);
+      }
+
+      const updated: Product = await res.json();
+      setProducts((prev) => prev.map((p) => (p.id === id || p.slug === id || p.id === updated.id ? updated : p)));
       return updated;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[PRODUCTS] Erro ao atualizar produto:', error);
       throw error;
     }
@@ -326,23 +331,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateStock = async (id: string, stockCount: number): Promise<void> => {
     try {
-      const { product: updated, error } = await updateProductStockInSupabase(id, stockCount);
-      if (error || !updated) {
-        throw new Error(error?.message || `Falha ao atualizar estoque do produto #${id} no Supabase.`);
-      }
-
-      setProducts((prev) =>
-        prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updated.stockCount, status: updated.status } : p))
-      );
-
-      // Background sync to server API
-      fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
         credentials: 'include',
         body: JSON.stringify({ stockCount }),
-      }).catch((err) => console.warn('[Store API Sync] Sync stock notice:', err));
-    } catch (error) {
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Falha ao atualizar estoque' }));
+        throw new Error(errJson.error || `Erro ${res.status}: Falha ao atualizar estoque do produto #${id}.`);
+      }
+
+      const updated: Product = await res.json();
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updated.stockCount, status: updated.status } : p))
+      );
+    } catch (error: any) {
       console.error('[PRODUCTS] Erro ao atualizar estoque:', error);
       throw error;
     }
@@ -350,23 +355,20 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const deleteProduct = async (id: string): Promise<boolean> => {
     try {
-      const { success, error } = await deleteProductInSupabase(id);
-      if (error || !success) {
-        throw new Error(error?.message || `Falha ao excluir produto #${id} do Supabase.`);
-      }
-
-      // Only remove from interface state after Supabase confirms deletion
-      setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
-
-      // Background sync to server API
-      fetch(`/api/products/${encodeURIComponent(id)}`, {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(true),
         credentials: 'include',
-      }).catch((err) => console.warn('[Store API Sync] Sync delete notice:', err));
+      });
 
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Falha ao excluir produto' }));
+        throw new Error(errJson.error || `Erro ${res.status}: Falha ao excluir produto #${id}.`);
+      }
+
+      setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('[PRODUCTS] Erro ao excluir produto:', error);
       throw error;
     }
