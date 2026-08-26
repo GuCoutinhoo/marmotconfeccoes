@@ -369,28 +369,9 @@ export async function uploadProductImageToStorage(
     }
   }
 
-  // 2. Fallback to backend API upload (send JSON payload with base64)
+  // 2. Self-contained compressed WebP data URL fallback (guaranteed to work across Vercel, Supabase and all clients)
   if (base64Preview) {
-    try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image: base64Preview,
-          filename: `${cleanProdId}-${uniqueId}.${ext}`,
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.url) {
-          console.log('[STORAGE] Upload concluído via backend proxy:', data.url);
-          return data.url;
-        }
-      }
-    } catch (apiErr) {
-      console.warn('[STORAGE] Fallback de upload via backend proxy indisponível:', apiErr);
-    }
+    return base64Preview;
   }
 
   // 3. Resilient fallback: return the lightweight compressed Data URL or existing string
