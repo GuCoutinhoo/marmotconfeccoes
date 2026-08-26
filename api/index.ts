@@ -1599,55 +1599,56 @@ export class DatabaseManager {
     this.products.unshift(newProduct);
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
-    // 2. Synchronize to Supabase database with error safety
+    // 2. Synchronize to Supabase database in background with error safety
     if (this.mode === 'supabase' && this.supabase) {
-      try {
-        console.log('[PRODUCTS] persistindo novo produto no Supabase:', newProduct.id, newProduct.title);
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (adminClient) {
-          const { error } = await adminClient.from('products').upsert({
-            id: newProduct.id,
-            slug: newProduct.slug,
-            title: newProduct.title,
-            subtitle: newProduct.subtitle,
-            description: newProduct.description,
-            price: newProduct.price,
-            promo_price: newProduct.promoPrice ?? null,
-            category: newProduct.category,
-            subcategory: newProduct.subcategory,
-            collection: newProduct.collection,
-            tags: newProduct.tags,
-            rating: newProduct.rating,
-            review_count: newProduct.reviewCount,
-            stock_count: newProduct.stockCount,
-            sku: newProduct.sku,
-            sizes: newProduct.sizes,
-            colors: newProduct.colors,
-            image: newProduct.image,
-            images: newProduct.images,
-            details: newProduct.details,
-            care_instructions: newProduct.careInstructions,
-            composition: newProduct.composition,
-            weight: newProduct.weight,
-            height: newProduct.height,
-            width: newProduct.width,
-            length: newProduct.length,
-            is_new_release: newProduct.isNewRelease,
-            is_best_seller: newProduct.isBestSeller,
-            featured: newProduct.featured,
-            status: newProduct.status,
-            data: null,
-          });
+      (async () => {
+        try {
+          const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+          if (adminClient) {
+            const { error } = await adminClient.from('products').upsert({
+              id: newProduct.id,
+              slug: newProduct.slug,
+              title: newProduct.title,
+              subtitle: newProduct.subtitle,
+              description: newProduct.description,
+              price: newProduct.price,
+              promo_price: newProduct.promoPrice ?? null,
+              category: newProduct.category,
+              subcategory: newProduct.subcategory,
+              collection: newProduct.collection,
+              tags: newProduct.tags,
+              rating: newProduct.rating,
+              review_count: newProduct.reviewCount,
+              stock_count: newProduct.stockCount,
+              sku: newProduct.sku,
+              sizes: newProduct.sizes,
+              colors: newProduct.colors,
+              image: newProduct.image,
+              images: newProduct.images,
+              details: newProduct.details,
+              care_instructions: newProduct.careInstructions,
+              composition: newProduct.composition,
+              weight: newProduct.weight,
+              height: newProduct.height,
+              width: newProduct.width,
+              length: newProduct.length,
+              is_new_release: newProduct.isNewRelease,
+              is_best_seller: newProduct.isBestSeller,
+              featured: newProduct.featured,
+              status: newProduct.status,
+              data: null,
+            });
 
-          if (error) {
-            console.warn('[DB] Supabase product insert notice:', error.message);
-          } else {
-            console.log('[DB] Produto criado no Supabase com sucesso:', newProduct.id);
+            if (error) {
+              console.warn('[DB] Supabase product insert notice:', error.message);
+            } else {
+              console.log('[DB] Produto criado no Supabase com sucesso:', newProduct.id);
+            }
           }
+        } catch (sbErr: any) {
+          console.warn('[DB] Supabase insert exception:', sbErr?.message);
         }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase insert exception:', sbErr?.message);
-      }
+      })();
     }
 
     return newProduct;
@@ -1736,55 +1737,56 @@ export class DatabaseManager {
     this.products[idx] = cleanProduct;
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
-    // 2. Synchronize to Supabase database with error safety
+    // 2. Synchronize to Supabase database in background with error safety
     if (this.mode === 'supabase' && this.supabase) {
-      try {
-        console.log('[PRODUCTS] persistindo alterações do produto no Supabase:', cleanProduct.id, cleanProduct.title);
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (adminClient) {
-          const { error } = await adminClient.from('products').upsert({
-            id: cleanProduct.id,
-            slug: cleanProduct.slug,
-            title: cleanProduct.title,
-            subtitle: cleanProduct.subtitle || '',
-            description: cleanProduct.description || '',
-            price: cleanProduct.price,
-            promo_price: cleanProduct.promoPrice ?? null,
-            category: cleanProduct.category,
-            subcategory: cleanProduct.subcategory || 'Essenciais',
-            collection: cleanProduct.collection || 'Vol. 04: Cyber Dystopia',
-            tags: cleanProduct.tags || [],
-            rating: cleanProduct.rating || 5.0,
-            review_count: cleanProduct.reviewCount || 0,
-            stock_count: cleanProduct.stockCount ?? 20,
-            sku: cleanProduct.sku || '',
-            sizes: cleanProduct.sizes || ['P', 'M', 'G', 'GG'],
-            colors: cleanProduct.colors || [],
-            image: cleanProduct.image || '',
-            images: cleanProduct.images || [],
-            details: cleanProduct.details || [],
-            care_instructions: cleanProduct.careInstructions || [],
-            composition: cleanProduct.composition || [],
-            weight: cleanProduct.weight || 0.35,
-            height: cleanProduct.height || 4,
-            width: cleanProduct.width || 20,
-            length: cleanProduct.length || 25,
-            is_new_release: Boolean(cleanProduct.isNewRelease),
-            is_best_seller: Boolean(cleanProduct.isBestSeller),
-            featured: Boolean(cleanProduct.featured),
-            status: cleanProduct.status || 'active',
-            data: null,
-          });
+      (async () => {
+        try {
+          const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+          if (adminClient) {
+            const { error } = await adminClient.from('products').upsert({
+              id: cleanProduct.id,
+              slug: cleanProduct.slug,
+              title: cleanProduct.title,
+              subtitle: cleanProduct.subtitle || '',
+              description: cleanProduct.description || '',
+              price: cleanProduct.price,
+              promo_price: cleanProduct.promoPrice ?? null,
+              category: cleanProduct.category,
+              subcategory: cleanProduct.subcategory || 'Essenciais',
+              collection: cleanProduct.collection || 'Vol. 04: Cyber Dystopia',
+              tags: cleanProduct.tags || [],
+              rating: cleanProduct.rating || 5.0,
+              review_count: cleanProduct.reviewCount || 0,
+              stock_count: cleanProduct.stockCount ?? 20,
+              sku: cleanProduct.sku || '',
+              sizes: cleanProduct.sizes || ['P', 'M', 'G', 'GG'],
+              colors: cleanProduct.colors || [],
+              image: cleanProduct.image || '',
+              images: cleanProduct.images || [],
+              details: cleanProduct.details || [],
+              care_instructions: cleanProduct.careInstructions || [],
+              composition: cleanProduct.composition || [],
+              weight: cleanProduct.weight || 0.35,
+              height: cleanProduct.height || 4,
+              width: cleanProduct.width || 20,
+              length: cleanProduct.length || 25,
+              is_new_release: Boolean(cleanProduct.isNewRelease),
+              is_best_seller: Boolean(cleanProduct.isBestSeller),
+              featured: Boolean(cleanProduct.featured),
+              status: cleanProduct.status || 'active',
+              data: null,
+            });
 
-          if (error) {
-            console.warn('[DB] Supabase product update notice:', error.message);
-          } else {
-            console.log('[DB] Produto atualizado no Supabase com sucesso:', cleanProduct.id);
+            if (error) {
+              console.warn('[DB] Supabase product update notice:', error.message);
+            } else {
+              console.log('[DB] Produto atualizado no Supabase com sucesso:', cleanProduct.id);
+            }
           }
+        } catch (sbErr: any) {
+          console.warn('[DB] Supabase product update exception:', sbErr?.message);
         }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase product update exception:', sbErr?.message);
-      }
+      })();
     }
 
     return cleanProduct;
