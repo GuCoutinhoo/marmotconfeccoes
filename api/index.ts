@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import sharp from 'sharp';
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
@@ -5512,7 +5513,7 @@ app.post('/api/auth/logout', (req, res) => {
 });
 
 // --- Uploads ---
-app.post('/api/upload', (req, res) => {
+app.post('/api/upload', async (req, res) => {
   try {
     const { image, filename } = req.body;
     if (!image) {
@@ -5523,21 +5524,24 @@ app.post('/api/upload', (req, res) => {
       return res.json({ success: true, url: image });
     }
 
-    const matches = image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    const matches = typeof image === 'string' ? image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/) : null;
     if (!matches || matches.length !== 3) {
       return res.json({ success: true, url: image });
     }
 
     const mimeType = matches[1];
     const base64Data = matches[2];
-    const buffer = Buffer.from(base64Data, 'base64');
+    let buffer = Buffer.from(base64Data, 'base64');
 
-    let extension = 'png';
-    if (mimeType.includes('jpeg') || mimeType.includes('jpg')) extension = 'jpg';
-    else if (mimeType.includes('webp')) extension = 'webp';
+    try {
+      buffer = await sharp(buffer)
+        .resize(900, 1200, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 82 })
+        .toBuffer();
+    } catch {}
 
     const safeBaseName = (filename || 'upload').replace(/[^a-z0-9_-]/gi, '').toLowerCase().slice(0, 30);
-    const uniqueFilename = `marmot-${Date.now()}-${safeBaseName || 'img'}.${extension}`;
+    const uniqueFilename = `marmot-${Date.now()}-${safeBaseName || 'img'}.webp`;
     const filePath = path.join(UPLOADS_DIR, uniqueFilename);
 
     try {
@@ -5545,10 +5549,11 @@ app.post('/api/upload', (req, res) => {
       const publicUrl = `/uploads/${uniqueFilename}`;
       return res.json({ success: true, url: publicUrl });
     } catch {
-      return res.json({ success: true, url: image });
+      const optimizedDataUrl = `data:image/webp;base64,${buffer.toString('base64')}`;
+      return res.json({ success: true, url: optimizedDataUrl });
     }
-  } catch {
-    res.status(500).json({ error: 'Falha ao processar upload.' });
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || 'Falha ao processar upload.' });
   }
 });
 

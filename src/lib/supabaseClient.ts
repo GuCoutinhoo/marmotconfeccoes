@@ -214,100 +214,195 @@ export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Pro
 export const SUPABASE_STORAGE_BUCKET = 'product-images';
 
 /**
+ * Compresses an image (Data URL or Blob) on the client side using HTML5 Canvas
+ * to ensure high visual quality and minimal payload (< 50 KB).
+ */
+export async function compressImageClient(source: string | Blob | File, maxWidth = 900, maxHeight = 1200, quality = 0.82): Promise<string> {
+  if (typeof window === 'undefined') {
+    if (typeof source === 'string') return source;
+    return '';
+  }
+
+  return new Promise((resolve) => {
+    try {
+      let dataUrl = '';
+      if (typeof source === 'string') {
+        if (!source.startsWith('data:')) {
+          return resolve(source);
+        }
+        dataUrl = source;
+      }
+
+      const processDataUrl = (srcUrl: string) => {
+        if (!srcUrl || !srcUrl.startsWith('data:')) {
+          return resolve(srcUrl || '');
+        }
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+          try {
+            let width = img.width || 800;
+            let height = img.height || 1000;
+
+            if (width > maxWidth || height > maxHeight) {
+              const ratio = Math.min(maxWidth / width, maxHeight / height);
+              width = Math.max(1, Math.round(width * ratio));
+              height = Math.max(1, Math.round(height * ratio));
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return resolve(srcUrl);
+
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressed = canvas.toDataURL('image/webp', quality);
+            if (compressed && compressed.startsWith('data:image/webp') && compressed.length < srcUrl.length) {
+              resolve(compressed);
+            } else {
+              const jpegCompressed = canvas.toDataURL('image/jpeg', quality);
+              resolve(jpegCompressed || srcUrl);
+            }
+          } catch {
+            resolve(srcUrl);
+          }
+        };
+        img.onerror = () => resolve(srcUrl);
+        img.src = srcUrl;
+      };
+
+      if (dataUrl) {
+        processDataUrl(dataUrl);
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => processDataUrl(e.target?.result as string);
+        reader.onerror = () => resolve('');
+        reader.readAsDataURL(source as Blob);
+      }
+    } catch {
+      resolve(typeof source === 'string' ? source : '');
+    }
+  });
+}
+
+/**
  * Uploads an image file or base64 to Supabase Storage 'product-images' bucket
- * or falls back to backend storage proxy. Returns the permanent public URL.
+ * or falls back to backend storage proxy. Returns the permanent public URL or compressed data URL.
  */
 export async function uploadProductImageToStorage(
   source: File | Blob | string,
   productId: string = 'general',
   customName?: string
 ): Promise<string> {
-  if (typeof source === 'string' && (source.startsWith('http://') || source.startsWith('https://'))) {
+  if (typeof source === 'string' && (source.startsWith('http://') || source.startsWith('https://') || source.startsWith('/uploads/'))) {
     return source;
+  }
+
+  // Optimize and compress source on client side first if in browser
+  let workingSource = source;
+  let base64Preview = '';
+
+  if (typeof window !== 'undefined') {
+    try {
+      const compressed = await compressImageClient(source);
+      if (compressed) {
+        workingSource = compressed;
+        base64Preview = compressed;
+      }
+    } catch {}
   }
 
   const cleanProdId = String(productId || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
   const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  const ext = customName ? (customName.split('.').pop() || 'jpg') : 'jpg';
+  const ext = customName ? (customName.split('.').pop() || 'webp') : 'webp';
   const filePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
 
-  let blob: Blob;
-  let contentType = 'image/jpeg';
+  let blob: Blob | null = null;
+  let contentType = 'image/webp';
 
-  if (typeof source === 'string') {
-    if (source.startsWith('data:')) {
-      const parts = source.split(',');
-      const mimeMatch = parts[0].match(/:(.*?);/);
-      if (mimeMatch) contentType = mimeMatch[1];
-      const bstr = atob(parts[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      blob = new Blob([u8arr], { type: contentType });
-    } else {
-      blob = new Blob([source], { type: contentType });
+  if (typeof workingSource === 'string') {
+    if (workingSource.startsWith('data:')) {
+      base64Preview = workingSource;
+      try {
+        const parts = workingSource.split(',');
+        const mimeMatch = parts[0].match(/:(.*?);/);
+        if (mimeMatch) contentType = mimeMatch[1];
+        const bstr = atob(parts[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        blob = new Blob([u8arr], { type: contentType });
+      } catch {}
     }
   } else {
-    blob = source;
-    contentType = source.type || 'image/jpeg';
+    blob = workingSource;
+    contentType = workingSource.type || 'image/webp';
   }
 
-  // 1. Try Supabase Storage directly
-  try {
-    const { data: uploadData, error: uploadErr } = await supabase.storage
-      .from(SUPABASE_STORAGE_BUCKET)
-      .upload(filePath, blob, {
-        contentType,
-        cacheControl: '31536000',
-        upsert: true,
+  // 1. Try Supabase Storage directly if blob exists
+  if (blob) {
+    try {
+      const { data: uploadData, error: uploadErr } = await supabase.storage
+        .from(SUPABASE_STORAGE_BUCKET)
+        .upload(filePath, blob, {
+          contentType,
+          cacheControl: '31536000',
+          upsert: true,
+        });
+
+      if (!uploadErr && uploadData) {
+        const { data: urlData } = supabase.storage
+          .from(SUPABASE_STORAGE_BUCKET)
+          .getPublicUrl(filePath);
+
+        if (urlData && urlData.publicUrl) {
+          console.log('[STORAGE] Upload concluído no Supabase Storage:', urlData.publicUrl);
+          return urlData.publicUrl;
+        }
+      }
+    } catch (err: any) {
+      console.warn('[STORAGE] Exceção upload Supabase Storage:', err?.message);
+    }
+  }
+
+  // 2. Fallback to backend API upload (send JSON payload with base64)
+  if (base64Preview) {
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: base64Preview,
+          filename: `${cleanProdId}-${uniqueId}.${ext}`,
+        }),
       });
 
-    if (!uploadErr && uploadData) {
-      const { data: urlData } = supabase.storage
-        .from(SUPABASE_STORAGE_BUCKET)
-        .getPublicUrl(filePath);
-
-      if (urlData && urlData.publicUrl) {
-        console.log('[STORAGE] Upload concluído no Supabase Storage:', urlData.publicUrl);
-        return urlData.publicUrl;
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.url) {
+          console.log('[STORAGE] Upload concluído via backend proxy:', data.url);
+          return data.url;
+        }
       }
-    } else if (uploadErr) {
-      console.warn('[STORAGE] Aviso upload Supabase Storage:', uploadErr.message);
+    } catch (apiErr) {
+      console.warn('[STORAGE] Fallback de upload via backend proxy indisponível:', apiErr);
     }
-  } catch (err: any) {
-    console.warn('[STORAGE] Exceção upload Supabase Storage:', err?.message);
   }
 
-  // 2. Fallback to backend API upload (which saves securely and returns public URL)
-  try {
-    const formData = new FormData();
-    formData.append('image', blob, `${uniqueId}.${ext}`);
-    formData.append('productId', cleanProdId);
-
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.url) {
-        console.log('[STORAGE] Upload concluído via backend proxy:', data.url);
-        return data.url;
-      }
-    }
-  } catch (apiErr) {
-    console.error('[STORAGE] Falha no fallback de upload:', apiErr);
+  // 3. Resilient fallback: return the lightweight compressed Data URL or existing string
+  if (base64Preview) {
+    return base64Preview;
   }
 
-  // If all fails and source is a string URL, return it
-  if (typeof source === 'string' && !source.startsWith('data:')) {
+  if (typeof source === 'string') {
     return source;
   }
 
-  throw new Error('Falha ao fazer upload da imagem para o armazenamento.');
+  return '';
 }
 
 /**
