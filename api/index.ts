@@ -871,10 +871,16 @@ export class DatabaseManager {
     this.isInitialized = true;
 
     if (this.mode === 'supabase' && this.supabase) {
-      // Background sync from Supabase without blocking requests
-      this.loadFromSupabase().catch((err) => {
-        console.warn('[DB] Supabase background sync notice:', err?.message || err);
-      });
+      if (this.products.length === 0) {
+        await this.loadFromSupabase().catch((err) => {
+          console.warn('[DB] Supabase initial load notice:', err?.message || err);
+        });
+      } else {
+        // Background sync from Supabase without blocking requests
+        this.loadFromSupabase().catch((err) => {
+          console.warn('[DB] Supabase background sync notice:', err?.message || err);
+        });
+      }
     } else if (this.mode === 'postgres' && this.pgPool) {
       await this.loadFromPostgres().catch(() => {});
     }
@@ -5238,7 +5244,9 @@ app.get('/api/products', async (req, res) => {
       status: status as string,
     });
 
-    res.setHeader('Cache-Control', 'public, max-age=10, stale-while-revalidate=60');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
     res.json({ products, total: products.length });
   } catch (error: any) {
     console.error('[API Products Error]', error);
@@ -5253,7 +5261,9 @@ app.get('/api/products/:id', async (req, res) => {
     if (!product) {
       return res.status(404).json({ error: 'Produto não encontrado no catálogo.' });
     }
-    res.setHeader('Cache-Control', 'public, max-age=10, stale-while-revalidate=60');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
     res.json(product);
   } catch {
     res.status(500).json({ error: 'Erro ao buscar dados do produto.' });

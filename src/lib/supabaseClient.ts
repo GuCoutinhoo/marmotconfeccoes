@@ -163,26 +163,43 @@ export const PRODUCT_SELECT_COLUMNS =
  */
 export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Product[]; error?: any }> {
   try {
+    // 1. Try single fast query
     const { data, error } = await supabase
       .from('products')
-      .select(PRODUCT_SELECT_COLUMNS)
-      .order('created_at', { ascending: false });
+      .select(PRODUCT_SELECT_COLUMNS);
 
     if (!error && data && data.length > 0) {
       const mapped = data.map(mapSupabaseRowToProduct);
       return { products: mapped };
     }
 
+    // 2. If single query timed out or errored, fetch in resilient fast chunks (0-59, 60-119, 120-179)
     if (error) {
-      console.warn('[PRODUCTS] Aviso ao carregar do Supabase:', error.message || error);
+      console.warn('[PRODUCTS] Tentando busca em lotes resilientes após aviso:', error.message || error);
+      const batchPromises = [
+        supabase.from('products').select(PRODUCT_SELECT_COLUMNS).range(0, 59),
+        supabase.from('products').select(PRODUCT_SELECT_COLUMNS).range(60, 119),
+        supabase.from('products').select(PRODUCT_SELECT_COLUMNS).range(120, 179),
+      ];
+      const batchResults = await Promise.all(batchPromises);
+      const combinedRows: any[] = [];
+      for (const res of batchResults) {
+        if (res.data && Array.isArray(res.data)) {
+          combinedRows.push(...res.data);
+        }
+      }
+      if (combinedRows.length > 0) {
+        const mapped = combinedRows.map(mapSupabaseRowToProduct);
+        return { products: mapped };
+      }
     }
   } catch (err: any) {
     console.warn('[PRODUCTS] Exceção ao carregar do Supabase:', err?.message || err);
   }
 
-  // Graceful fallback to backend API if Supabase encounters a timeout or cold start
+  // Graceful fallback to backend API if Supabase encounters a temporary issue
   try {
-    const apiRes = await fetch('/api/products');
+    const apiRes = await fetch('/api/products', { cache: 'no-store' });
     if (apiRes.ok) {
       const apiData = await apiRes.json();
       if (apiData && Array.isArray(apiData.products) && apiData.products.length > 0) {
