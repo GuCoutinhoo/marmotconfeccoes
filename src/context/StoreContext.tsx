@@ -13,6 +13,8 @@ import {
   supabase,
   mapSupabaseRowToProduct,
   mapSupabaseRowToCategory,
+  uploadProductImageToStorage,
+  deleteProductImageFromStorage,
 } from '../lib/supabaseClient';
 
 interface StoreContextType {
@@ -235,74 +237,27 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     };
   }, []);
 
-  // Upload helper: supports URL, File, or Base64 and ensures images are universally preserved across Vercel & AI Studio
+  // Upload helper: uploads to Supabase Storage (bucket 'product-images') or fallback proxy and returns permanent URL
   const uploadImage = async (imageFileOrBase64: File | string, filename?: string): Promise<string> => {
     try {
-      if (typeof imageFileOrBase64 === 'string') {
-        if (imageFileOrBase64.startsWith('http://') || imageFileOrBase64.startsWith('https://')) {
-          return imageFileOrBase64;
-        }
-        if (imageFileOrBase64.startsWith('data:image/')) {
-          return imageFileOrBase64;
-        }
+      if (typeof imageFileOrBase64 === 'string' && (imageFileOrBase64.startsWith('http://') || imageFileOrBase64.startsWith('https://'))) {
+        return imageFileOrBase64;
       }
 
-      // Convert File to compressed Data URL (so it persists directly inside Supabase across all environments)
-      if (imageFileOrBase64 instanceof File) {
-        return new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const rawResult = e.target?.result as string;
-            const img = new Image();
-            img.onload = () => {
-              const canvas = document.createElement('canvas');
-              let width = img.width;
-              let height = img.height;
-              const maxDim = 1200;
-              if (width > maxDim || height > maxDim) {
-                if (width > height) {
-                  height = Math.round((height * maxDim) / width);
-                  width = maxDim;
-                } else {
-                  width = Math.round((width * maxDim) / height);
-                  height = maxDim;
-                }
-              }
-              canvas.width = width;
-              canvas.height = height;
-              const ctx = canvas.getContext('2d');
-              if (ctx) {
-                ctx.drawImage(img, 0, 0, width, height);
-                const compressed = canvas.toDataURL('image/jpeg', 0.85);
-                // Also attempt backend upload if available
-                fetch('/api/upload', {
-                  method: 'POST',
-                  headers: getAuthHeaders(true),
-                  credentials: 'include',
-                  body: JSON.stringify({ image: compressed, filename: imageFileOrBase64.name }),
-                })
-                  .then((r) => (r.ok ? r.json() : null))
-                  .then((d) => {
-                    if (d?.url) resolve(d.url);
-                    else resolve(compressed);
-                  })
-                  .catch(() => resolve(compressed));
-              } else {
-                resolve(rawResult);
-              }
-            };
-            img.onerror = () => resolve(rawResult);
-            img.src = rawResult;
-          };
-          reader.onerror = () => resolve('');
-          reader.readAsDataURL(imageFileOrBase64);
-        });
+      // Convert File / Base64 to compressed image and upload to Storage
+      const uploadedUrl = await uploadProductImageToStorage(imageFileOrBase64, 'general', filename);
+      if (uploadedUrl) {
+        return uploadedUrl;
       }
 
       return typeof imageFileOrBase64 === 'string' ? imageFileOrBase64 : '';
     } catch (error) {
-      console.error('Upload error:', error);
-      return typeof imageFileOrBase64 === 'string' ? imageFileOrBase64 : '';
+      console.error('Upload error in StoreContext:', error);
+      // If it's already a URL, return it
+      if (typeof imageFileOrBase64 === 'string' && !imageFileOrBase64.startsWith('data:')) {
+        return imageFileOrBase64;
+      }
+      throw error;
     }
   };
 

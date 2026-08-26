@@ -1605,7 +1605,7 @@ export class DatabaseManager {
         try {
           const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
           if (adminClient) {
-            const { error } = await adminClient.from('products').upsert({
+            const { error } = await adminClient.from('products').insert({
               id: newProduct.id,
               slug: newProduct.slug,
               title: newProduct.title,
@@ -1727,7 +1727,8 @@ export class DatabaseManager {
       }
     }
 
-    if (updatedProduct.images && updatedProduct.images.length > 0 && !updatedProduct.image) {
+    // Consistency rule: image MUST equal images[0]
+    if (updatedProduct.images && updatedProduct.images.length > 0) {
       updatedProduct.image = updatedProduct.images[0];
     }
 
@@ -1737,50 +1738,57 @@ export class DatabaseManager {
     this.products[idx] = cleanProduct;
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
-    // 2. Synchronize to Supabase database in background with error safety
+    // 2. Synchronize to Supabase database via direct UPDATE
     if (this.mode === 'supabase' && this.supabase) {
       (async () => {
         try {
           const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
           if (adminClient) {
-            const { error } = await adminClient.from('products').upsert({
-              id: cleanProduct.id,
-              slug: cleanProduct.slug,
-              title: cleanProduct.title,
-              subtitle: cleanProduct.subtitle || '',
-              description: cleanProduct.description || '',
-              price: cleanProduct.price,
-              promo_price: cleanProduct.promoPrice ?? null,
-              category: cleanProduct.category,
-              subcategory: cleanProduct.subcategory || 'Essenciais',
-              collection: cleanProduct.collection || 'Vol. 04: Cyber Dystopia',
-              tags: cleanProduct.tags || [],
-              rating: cleanProduct.rating || 5.0,
-              review_count: cleanProduct.reviewCount || 0,
-              stock_count: cleanProduct.stockCount ?? 20,
-              sku: cleanProduct.sku || '',
-              sizes: cleanProduct.sizes || ['P', 'M', 'G', 'GG'],
-              colors: cleanProduct.colors || [],
-              image: cleanProduct.image || '',
-              images: cleanProduct.images || [],
-              details: cleanProduct.details || [],
-              care_instructions: cleanProduct.careInstructions || [],
-              composition: cleanProduct.composition || [],
-              weight: cleanProduct.weight || 0.35,
-              height: cleanProduct.height || 4,
-              width: cleanProduct.width || 20,
-              length: cleanProduct.length || 25,
-              is_new_release: Boolean(cleanProduct.isNewRelease),
-              is_best_seller: Boolean(cleanProduct.isBestSeller),
-              featured: Boolean(cleanProduct.featured),
-              status: cleanProduct.status || 'active',
+            const updatePayload: Record<string, any> = {
+              updated_at: new Date().toISOString(),
               data: null,
-            });
+            };
+            if (updates.title !== undefined) updatePayload.title = cleanProduct.title;
+            if (updates.slug !== undefined) updatePayload.slug = cleanProduct.slug;
+            if (updates.subtitle !== undefined) updatePayload.subtitle = cleanProduct.subtitle || '';
+            if (updates.description !== undefined) updatePayload.description = cleanProduct.description || '';
+            if (updates.price !== undefined) updatePayload.price = cleanProduct.price;
+            if (updates.promoPrice !== undefined) updatePayload.promo_price = cleanProduct.promoPrice ?? null;
+            if (updates.category !== undefined) updatePayload.category = cleanProduct.category;
+            if (updates.subcategory !== undefined) updatePayload.subcategory = cleanProduct.subcategory || 'Essenciais';
+            if (updates.collection !== undefined) updatePayload.collection = cleanProduct.collection || 'Vol. 04: Cyber Dystopia';
+            if (updates.tags !== undefined) updatePayload.tags = cleanProduct.tags || [];
+            if (updates.rating !== undefined) updatePayload.rating = cleanProduct.rating || 5.0;
+            if (updates.reviewCount !== undefined) updatePayload.review_count = cleanProduct.reviewCount || 0;
+            if (updates.stockCount !== undefined) updatePayload.stock_count = cleanProduct.stockCount ?? 20;
+            if (updates.sku !== undefined) updatePayload.sku = cleanProduct.sku || '';
+            if (updates.sizes !== undefined) updatePayload.sizes = cleanProduct.sizes || ['P', 'M', 'G', 'GG'];
+            if (updates.colors !== undefined) updatePayload.colors = cleanProduct.colors || [];
+            if (updates.image !== undefined || updates.images !== undefined) {
+              updatePayload.image = cleanProduct.image || '';
+              updatePayload.images = cleanProduct.images || [];
+            }
+            if (updates.details !== undefined) updatePayload.details = cleanProduct.details || [];
+            if (updates.careInstructions !== undefined) updatePayload.care_instructions = cleanProduct.careInstructions || [];
+            if (updates.composition !== undefined) updatePayload.composition = cleanProduct.composition || [];
+            if (updates.weight !== undefined) updatePayload.weight = cleanProduct.weight || 0.35;
+            if (updates.height !== undefined) updatePayload.height = cleanProduct.height || 4;
+            if (updates.width !== undefined) updatePayload.width = cleanProduct.width || 20;
+            if (updates.length !== undefined) updatePayload.length = cleanProduct.length || 25;
+            if (updates.isNewRelease !== undefined) updatePayload.is_new_release = Boolean(cleanProduct.isNewRelease);
+            if (updates.isBestSeller !== undefined) updatePayload.is_best_seller = Boolean(cleanProduct.isBestSeller);
+            if (updates.featured !== undefined) updatePayload.featured = Boolean(cleanProduct.featured);
+            if (updates.status !== undefined) updatePayload.status = cleanProduct.status || 'active';
+
+            const { error } = await adminClient
+              .from('products')
+              .update(updatePayload)
+              .eq('id', cleanProduct.id);
 
             if (error) {
               console.warn('[DB] Supabase product update notice:', error.message);
             } else {
-              console.log('[DB] Produto atualizado no Supabase com sucesso:', cleanProduct.id);
+              console.log('[DB] Produto atualizado no Supabase com sucesso via UPDATE:', cleanProduct.id);
             }
           }
         } catch (sbErr: any) {

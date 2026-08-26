@@ -163,10 +163,144 @@ export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Pro
   return { products: [] };
 }
 
+export const SUPABASE_STORAGE_BUCKET = 'product-images';
+
+/**
+ * Uploads an image file or base64 to Supabase Storage 'product-images' bucket
+ * or falls back to backend storage proxy. Returns the permanent public URL.
+ */
+export async function uploadProductImageToStorage(
+  source: File | Blob | string,
+  productId: string = 'general',
+  customName?: string
+): Promise<string> {
+  if (typeof source === 'string' && (source.startsWith('http://') || source.startsWith('https://'))) {
+    return source;
+  }
+
+  const cleanProdId = String(productId || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  const ext = customName ? (customName.split('.').pop() || 'jpg') : 'jpg';
+  const filePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
+
+  let blob: Blob;
+  let contentType = 'image/jpeg';
+
+  if (typeof source === 'string') {
+    if (source.startsWith('data:')) {
+      const parts = source.split(',');
+      const mimeMatch = parts[0].match(/:(.*?);/);
+      if (mimeMatch) contentType = mimeMatch[1];
+      const bstr = atob(parts[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      blob = new Blob([u8arr], { type: contentType });
+    } else {
+      blob = new Blob([source], { type: contentType });
+    }
+  } else {
+    blob = source;
+    contentType = source.type || 'image/jpeg';
+  }
+
+  // 1. Try Supabase Storage directly
+  try {
+    const { data: uploadData, error: uploadErr } = await supabase.storage
+      .from(SUPABASE_STORAGE_BUCKET)
+      .upload(filePath, blob, {
+        contentType,
+        cacheControl: '31536000',
+        upsert: true,
+      });
+
+    if (!uploadErr && uploadData) {
+      const { data: urlData } = supabase.storage
+        .from(SUPABASE_STORAGE_BUCKET)
+        .getPublicUrl(filePath);
+
+      if (urlData && urlData.publicUrl) {
+        console.log('[STORAGE] Upload concluído no Supabase Storage:', urlData.publicUrl);
+        return urlData.publicUrl;
+      }
+    } else if (uploadErr) {
+      console.warn('[STORAGE] Aviso upload Supabase Storage:', uploadErr.message);
+    }
+  } catch (err: any) {
+    console.warn('[STORAGE] Exceção upload Supabase Storage:', err?.message);
+  }
+
+  // 2. Fallback to backend API upload (which saves securely and returns public URL)
+  try {
+    const formData = new FormData();
+    formData.append('image', blob, `${uniqueId}.${ext}`);
+    formData.append('productId', cleanProdId);
+
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.url) {
+        console.log('[STORAGE] Upload concluído via backend proxy:', data.url);
+        return data.url;
+      }
+    }
+  } catch (apiErr) {
+    console.error('[STORAGE] Falha no fallback de upload:', apiErr);
+  }
+
+  // If all fails and source is a string URL, return it
+  if (typeof source === 'string' && !source.startsWith('data:')) {
+    return source;
+  }
+
+  throw new Error('Falha ao fazer upload da imagem para o armazenamento.');
+}
+
+/**
+ * Safely deletes an image from Supabase Storage if it's hosted in the project.
+ */
+export async function deleteProductImageFromStorage(imageUrl: string): Promise<boolean> {
+  if (!imageUrl || typeof imageUrl !== 'string') return false;
+  if (!imageUrl.includes('supabase.co') || !imageUrl.includes(SUPABASE_STORAGE_BUCKET)) {
+    return true;
+  }
+
+  try {
+    const bucketToken = `/${SUPABASE_STORAGE_BUCKET}/`;
+    const idx = imageUrl.indexOf(bucketToken);
+    if (idx === -1) return false;
+
+    const storagePath = imageUrl.substring(idx + bucketToken.length).split('?')[0];
+    if (!storagePath) return false;
+
+    const { error } = await supabase.storage.from(SUPABASE_STORAGE_BUCKET).remove([storagePath]);
+    if (error) {
+      console.warn('[STORAGE] Aviso ao remover imagem antiga:', error.message);
+      return false;
+    }
+    console.log('[STORAGE] Imagem antiga removida do Storage:', storagePath);
+    return true;
+  } catch (err: any) {
+    console.warn('[STORAGE] Exceção ao remover imagem antiga:', err?.message);
+    return false;
+  }
+}
+
 /**
  * Builds a standardized Supabase row payload for products table.
  */
 export function buildProductSupabasePayload(product: Product) {
+  const images = Array.isArray(product.images) && product.images.length > 0
+    ? product.images
+    : (product.image ? [product.image] : []);
+  const mainImage = images[0] || product.image || '';
+
   return {
     id: product.id,
     slug: product.slug,
@@ -185,8 +319,8 @@ export function buildProductSupabasePayload(product: Product) {
     sku: product.sku || '',
     sizes: product.sizes || ['P', 'M', 'G', 'GG'],
     colors: product.colors || [],
-    image: product.image || '',
-    images: product.images || (product.image ? [product.image] : []),
+    image: mainImage,
+    images: images,
     details: product.details || [],
     care_instructions: product.careInstructions || [],
     composition: product.composition || [],
@@ -207,7 +341,7 @@ export function buildProductSupabasePayload(product: Product) {
  * Inserts a new product into Supabase table 'products'.
  */
 export async function createProductInSupabase(productData: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
-  console.log('[PRODUCTS] criando produto no Supabase', productData);
+  console.log('[PRODUCTS] Inserindo novo produto no Supabase via INSERT', productData.title);
   try {
     const title = productData.title?.trim() || 'Novo Produto';
     const slug =
@@ -221,6 +355,11 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
     const id = productData.id || `prod-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
     const price = typeof productData.price === 'number' ? productData.price : parseFloat(String(productData.price || 199.9));
     const promoPrice = productData.promoPrice !== undefined && productData.promoPrice !== null ? parseFloat(String(productData.promoPrice)) : undefined;
+
+    const rawImages = Array.isArray(productData.images) && productData.images.length > 0
+      ? productData.images
+      : (productData.image ? [productData.image] : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80']);
+    const rawMainImage = rawImages[0];
 
     const newProduct: Product = {
       id,
@@ -242,8 +381,8 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
       colors: Array.isArray(productData.colors) && productData.colors.length > 0 ? productData.colors : [
         { color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' },
       ],
-      image: productData.image || (productData.images && productData.images[0]) || '',
-      images: Array.isArray(productData.images) && productData.images.length > 0 ? productData.images : (productData.image ? [productData.image] : []),
+      image: rawMainImage,
+      images: rawImages,
       details: Array.isArray(productData.details) ? productData.details : ['100% Algodão Heavyweight 260g/m²'],
       careInstructions: Array.isArray(productData.careInstructions) ? productData.careInstructions : ['Lavar em ciclo suave', 'Secar na sombra'],
       composition: Array.isArray(productData.composition) ? productData.composition : ['100% Algodão Heavyweight 260g/m²'],
@@ -261,90 +400,98 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
 
     const payload = buildProductSupabasePayload(newProduct);
 
+    // DIRECT INSERT ONLY
     const { data, error } = await supabase
       .from('products')
-      .upsert(payload)
+      .insert(payload)
       .select()
       .single();
 
     if (error) {
-      console.error('[PRODUCTS] erro ao criar no Supabase:', error.message || error);
+      console.error('[PRODUCTS] Erro ao criar no Supabase via INSERT:', error.message || error);
       return { product: null, error };
     }
 
     const created = mapSupabaseRowToProduct(data || payload);
-    console.log('[PRODUCTS] produto criado com sucesso no Supabase:', created.id);
+    console.log('[PRODUCTS] Produto criado com sucesso via INSERT no Supabase:', created.id);
     return { product: created };
   } catch (err: any) {
-    console.error('[PRODUCTS] exceção ao criar produto no Supabase:', err);
+    console.error('[PRODUCTS] Exceção ao criar produto no Supabase:', err);
     return { product: null, error: err };
   }
 }
 
 /**
- * Updates an existing product in Supabase table 'products'.
+ * Updates an existing product in Supabase table 'products' using individual field UPDATE.
+ * NEVER performs full upserts.
  */
 export async function updateProductInSupabase(id: string, updates: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
-  console.log('[PRODUCTS] atualizando produto no Supabase', id, updates);
+  console.log('[PRODUCTS] Atualizando produto no Supabase (individual UPDATE)', id);
   try {
     const cleanId = String(id).trim();
-
-    let existingProduct = {} as Product;
-    // Only perform an extra fetch if essential required fields are missing from updates
-    if (!updates.title || !updates.category || updates.price === undefined) {
-      const { data: existingRow, error: fetchErr } = await supabase
-        .from('products')
-        .select('*')
-        .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
-        .maybeSingle();
-
-      if (fetchErr) {
-        console.warn('[PRODUCTS] aviso ao buscar produto existente no Supabase:', fetchErr.message);
-      }
-      if (existingRow) {
-        existingProduct = mapSupabaseRowToProduct(existingRow);
-      }
-    }
-
-    const updatedProduct: Product = {
-      ...existingProduct,
-      ...updates,
-      id: updates.id || existingProduct.id || cleanId,
-      status: (updates.status as any) || existingProduct.status || 'active',
+    const patchPayload: Record<string, any> = {
+      updated_at: new Date().toISOString(),
     };
 
-    if (updates.price !== undefined) updatedProduct.price = parseFloat(String(updates.price));
+    if (updates.title !== undefined) patchPayload.title = updates.title.trim();
+    if (updates.slug !== undefined) patchPayload.slug = updates.slug.trim();
+    if (updates.subtitle !== undefined) patchPayload.subtitle = updates.subtitle.trim();
+    if (updates.description !== undefined) patchPayload.description = updates.description.trim();
+    if (updates.price !== undefined) patchPayload.price = parseFloat(String(updates.price));
     if (updates.promoPrice !== undefined) {
-      updatedProduct.promoPrice = updates.promoPrice ? parseFloat(String(updates.promoPrice)) : undefined;
+      patchPayload.promo_price = updates.promoPrice !== null && updates.promoPrice !== undefined ? parseFloat(String(updates.promoPrice)) : null;
     }
-    if (updates.stockCount !== undefined) updatedProduct.stockCount = parseInt(String(updates.stockCount), 10);
-    if (updates.weight !== undefined) updatedProduct.weight = parseFloat(String(updates.weight));
-    if (updates.height !== undefined) updatedProduct.height = parseFloat(String(updates.height));
-    if (updates.width !== undefined) updatedProduct.width = parseFloat(String(updates.width));
-    if (updates.length !== undefined) updatedProduct.length = parseFloat(String(updates.length));
+    if (updates.category !== undefined) patchPayload.category = String(updates.category).toLowerCase().trim();
+    if (updates.subcategory !== undefined) patchPayload.subcategory = updates.subcategory.trim();
+    if (updates.collection !== undefined) patchPayload.collection = updates.collection.trim();
+    if (updates.tags !== undefined) patchPayload.tags = updates.tags;
+    if (updates.rating !== undefined) patchPayload.rating = parseFloat(String(updates.rating));
+    if (updates.reviewCount !== undefined) patchPayload.review_count = parseInt(String(updates.reviewCount), 10);
+    if (updates.stockCount !== undefined) patchPayload.stock_count = parseInt(String(updates.stockCount), 10);
+    if (updates.sku !== undefined) patchPayload.sku = updates.sku.trim();
+    if (updates.sizes !== undefined) patchPayload.sizes = updates.sizes;
+    if (updates.colors !== undefined) patchPayload.colors = updates.colors;
 
-    if (updatedProduct.images && updatedProduct.images.length > 0 && !updatedProduct.image) {
-      updatedProduct.image = updatedProduct.images[0];
+    // Strict image & images consistency: image MUST equal images[0]
+    if (updates.images !== undefined) {
+      const imgs = Array.isArray(updates.images) ? updates.images : (updates.images ? [updates.images] : []);
+      patchPayload.images = imgs;
+      patchPayload.image = imgs[0] || updates.image || '';
+    } else if (updates.image !== undefined) {
+      patchPayload.image = updates.image;
+      patchPayload.images = updates.image ? [updates.image] : [];
     }
 
-    const payload = buildProductSupabasePayload(updatedProduct);
+    if (updates.details !== undefined) patchPayload.details = updates.details;
+    if (updates.careInstructions !== undefined) patchPayload.care_instructions = updates.careInstructions;
+    if (updates.composition !== undefined) patchPayload.composition = updates.composition;
+    if (updates.weight !== undefined) patchPayload.weight = parseFloat(String(updates.weight));
+    if (updates.height !== undefined) patchPayload.height = parseFloat(String(updates.height));
+    if (updates.width !== undefined) patchPayload.width = parseFloat(String(updates.width));
+    if (updates.length !== undefined) patchPayload.length = parseFloat(String(updates.length));
+    if (updates.isNewRelease !== undefined) patchPayload.is_new_release = Boolean(updates.isNewRelease);
+    if (updates.isBestSeller !== undefined) patchPayload.is_best_seller = Boolean(updates.isBestSeller);
+    if (updates.featured !== undefined) patchPayload.featured = Boolean(updates.featured);
+    if (updates.status !== undefined) patchPayload.status = updates.status;
 
+    // Individual UPDATE: update products set ... where id = cleanId
     const { data, error } = await supabase
       .from('products')
-      .upsert(payload)
+      .update(patchPayload)
+      .eq('id', cleanId)
       .select()
       .single();
 
     if (error) {
-      console.error('[PRODUCTS] erro ao atualizar no Supabase:', error.message || error);
+      console.error('[PRODUCTS] Erro no UPDATE do Supabase:', error.message || error);
       return { product: null, error };
     }
 
-    const updated = mapSupabaseRowToProduct(data || payload);
-    console.log('[PRODUCTS] produto atualizado com sucesso no Supabase:', updated.id);
+    const updated = mapSupabaseRowToProduct(data);
+    console.log('[PRODUCTS] Produto atualizado com sucesso via UPDATE no Supabase:', updated.id);
     return { product: updated };
   } catch (err: any) {
-    console.error('[PRODUCTS] exceção ao atualizar produto no Supabase:', err);
+    console.error('[PRODUCTS] Exceção ao atualizar produto no Supabase:', err);
     return { product: null, error: err };
   }
 }

@@ -4,6 +4,7 @@ import { useToast } from '../../context/ToastContext';
 import { Product, ProductVariant } from '../../types';
 import { ImageAdjustModal } from './ImageAdjustModal';
 import { getValidProductImageUrl, handleProductImageError } from '../../utils/imageUtils';
+import { uploadProductImageToStorage, deleteProductImageFromStorage } from '../../lib/supabaseClient';
 import {
   Package,
   Plus,
@@ -655,8 +656,50 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
     try {
       setIsSaving(true);
+      const targetProdId = editingProduct?.id || 'new';
+
+      // 1. Process and upload any pending Data URL / Base64 images to permanent storage
+      const uploadedFormImages: string[] = [];
+      for (const img of formImages) {
+        if (typeof img === 'string' && img.startsWith('data:')) {
+          const permanentUrl = await uploadProductImageToStorage(img, targetProdId, `form-${Date.now()}.jpg`);
+          uploadedFormImages.push(permanentUrl);
+        } else {
+          uploadedFormImages.push(img);
+        }
+      }
+
+      // Process variant images
+      const processedColors: ProductVariant[] = [];
+      for (const c of normalizedColors) {
+        const processedVImgs: string[] = [];
+        for (const vImg of c.images || []) {
+          if (typeof vImg === 'string' && vImg.startsWith('data:')) {
+            const pUrl = await uploadProductImageToStorage(vImg, targetProdId, `variant-${c.color}-${Date.now()}.jpg`);
+            processedVImgs.push(pUrl);
+          } else {
+            processedVImgs.push(vImg);
+          }
+        }
+        const feat = processedVImgs[0] || (c.featuredImage?.startsWith('data:') ? processedVImgs[0] : c.featuredImage) || '';
+        processedColors.push({
+          ...c,
+          images: processedVImgs,
+          featuredImage: feat,
+          image: feat,
+        });
+      }
+
+      const firstVarWithImg = processedColors.find((c) => c.images && c.images.length > 0);
+      const varFallbackImg = firstVarWithImg?.images?.[0] || firstVarWithImg?.featuredImage || '';
+      const cleanAllImages = uploadedFormImages.length > 0 ? uploadedFormImages : (varFallbackImg ? [varFallbackImg] : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80']);
+      const finalPrimaryImage = cleanAllImages[0];
+
       if (editingProduct) {
-        await updateProduct(editingProduct.id, {
+        const oldImages = Array.isArray(editingProduct.images) ? editingProduct.images : (editingProduct.image ? [editingProduct.image] : []);
+
+        // 2. Perform isolated UPDATE on specific product
+        const updated = await updateProduct(editingProduct.id, {
           title: formTitle.trim(),
           subtitle: formSubtitle.trim(),
           slug: formSlug.trim() || formTitle.toLowerCase().replace(/\s+/g, '-'),
@@ -673,16 +716,30 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           height: validHeight,
           width: validWidth,
           length: validLength,
-          image: primaryImage,
-          images: allImages,
+          image: finalPrimaryImage,
+          images: cleanAllImages,
           sizes: formSizes,
-          colors: normalizedColors,
+          colors: processedColors,
           tags,
           isNewRelease: formIsNewRelease,
           isBestSeller: formIsBestSeller,
           composition: formComposition,
         });
-        showToast('Produto Atualizado!', `${formTitle} salvo com sucesso.`, 'success');
+
+        // 3. Confirm update and safely cleanup obsolete storage images if not used by any other product
+        if (updated) {
+          const removedImages = oldImages.filter((oldUrl) => !cleanAllImages.includes(oldUrl));
+          for (const oldUrl of removedImages) {
+            const isUsedElsewhere = products.some(
+              (p) => p.id !== editingProduct.id && (p.image === oldUrl || (Array.isArray(p.images) && p.images.includes(oldUrl)))
+            );
+            if (!isUsedElsewhere) {
+              await deleteProductImageFromStorage(oldUrl);
+            }
+          }
+        }
+
+        showToast('Produto Atualizado!', `${formTitle} salvo com sucesso no banco.`, 'success');
         setEditingProduct(null);
       } else {
         await addProduct({
@@ -702,10 +759,10 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           height: validHeight,
           width: validWidth,
           length: validLength,
-          image: primaryImage,
-          images: allImages,
+          image: finalPrimaryImage,
+          images: cleanAllImages,
           sizes: formSizes,
-          colors: normalizedColors,
+          colors: processedColors,
           tags,
           rating: 5.0,
           reviewCount: 0,
