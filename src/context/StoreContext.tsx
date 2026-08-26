@@ -380,8 +380,21 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // ==========================================
   const addProduct = async (productData: Partial<Product>): Promise<Product> => {
     try {
-      // 1. Send create request to backend API
       let created: Product | null = null;
+
+      // 1. Direct write to Supabase if configured (Source of truth)
+      if (isSupabaseConfigured()) {
+        try {
+          const directResult = await createProductInSupabase(productData);
+          if (directResult.product) {
+            created = directResult.product;
+          }
+        } catch (sbErr) {
+          console.warn('[PRODUCTS] Direct Supabase add notice:', sbErr);
+        }
+      }
+
+      // 2. Synchronize to Backend API
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
@@ -389,54 +402,37 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           method: 'POST',
           headers: getAuthHeaders(true),
           credentials: 'include',
-          body: JSON.stringify(productData),
+          body: JSON.stringify(created || productData),
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
 
         if (res.ok) {
-          created = await res.json();
-        } else {
-          const errJson = await res.json().catch(() => ({ error: 'Falha ao cadastrar produto' }));
-          console.warn('[PRODUCTS] Backend POST notice:', errJson);
+          const apiCreated = await res.json();
+          if (!created) created = apiCreated;
         }
       } catch (netErr) {
         console.warn('[PRODUCTS] Backend request timed out or error:', netErr);
       }
 
-      // 2. Fallback create directly in Supabase or generate local item if needed
+      // 3. Fallback local item if both failed
       if (!created) {
-        if (isSupabaseConfigured()) {
-          const directResult = await createProductInSupabase(productData);
-          if (directResult.product) {
-            created = directResult.product;
-          }
-        }
-        if (!created) {
-          const localId = `p-${Date.now()}`;
-          created = {
-            id: localId,
-            slug: productData.slug || `produto-${Date.now().toString().slice(-4)}`,
-            title: productData.title || 'Novo Produto',
-            price: productData.price || 189.9,
-            category: productData.category || 'camisetas',
-            image: productData.image || '',
-            images: productData.images || [],
-            colors: productData.colors || [],
-            sizes: productData.sizes || ['P', 'M', 'G', 'GG'],
-            status: productData.status || 'active',
-            stockCount: productData.stockCount ?? 20,
-            tags: productData.tags || [],
-            ...productData,
-          } as Product;
-        }
-      }
-
-      // 3. Direct client-side sync to Supabase in background (Non-blocking)
-      if (isSupabaseConfigured() && created) {
-        createProductInSupabase(created).catch((sbErr) => {
-          console.warn('[PRODUCTS] Direct Supabase add sync notice:', sbErr);
-        });
+        const localId = `p-${Date.now()}`;
+        created = {
+          id: localId,
+          slug: productData.slug || `produto-${Date.now().toString().slice(-4)}`,
+          title: productData.title || 'Novo Produto',
+          price: productData.price || 189.9,
+          category: productData.category || 'camisetas',
+          image: productData.image || '',
+          images: productData.images || [],
+          colors: productData.colors || [],
+          sizes: productData.sizes || ['P', 'M', 'G', 'GG'],
+          status: productData.status || 'active',
+          stockCount: productData.stockCount ?? 20,
+          tags: productData.tags || [],
+          ...productData,
+        } as Product;
       }
 
       // 4. Update React state immediately
@@ -455,8 +451,21 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateProduct = async (id: string, productData: Partial<Product>): Promise<Product> => {
     try {
-      // 1. Send update request to backend API with fast timeout
       let updated: Product | null = null;
+
+      // 1. Direct write to Supabase if configured (Immediate persistence across all clients)
+      if (isSupabaseConfigured()) {
+        try {
+          const directResult = await updateProductInSupabase(id, productData);
+          if (directResult.product) {
+            updated = directResult.product;
+          }
+        } catch (sbErr) {
+          console.warn('[PRODUCTS] Direct Supabase update notice:', sbErr);
+        }
+      }
+
+      // 2. Synchronize to backend API
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
@@ -470,26 +479,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         clearTimeout(timeoutId);
 
         if (res.ok) {
-          updated = await res.json();
-        } else {
-          const errJson = await res.json().catch(() => ({ error: 'Falha ao atualizar produto' }));
-          console.warn('[PRODUCTS] Backend PUT notice:', errJson);
+          const apiUpdated = await res.json();
+          if (!updated) updated = apiUpdated;
         }
       } catch (netErr) {
         console.warn('[PRODUCTS] Backend request error/timeout:', netErr);
       }
 
-      // 2. Fallback update directly if backend was bypassed
+      // 3. Fallback calculation if neither returned
       if (!updated) {
         const current = products.find((p) => p.id === id || p.slug === id);
-        updated = { ...(current || {}), ...productData, id } as Product;
-      }
-
-      // 3. Direct client-side sync to Supabase in background (Non-blocking)
-      if (isSupabaseConfigured()) {
-        updateProductInSupabase(id, productData).catch((sbErr) => {
-          console.warn('[PRODUCTS] Direct Supabase update sync notice:', sbErr);
-        });
+        const images = productData.images || (productData.image ? [productData.image] : current?.images || []);
+        const mainImage = images[0] || productData.image || current?.image || '';
+        updated = {
+          ...(current || {}),
+          ...productData,
+          id: current?.id || id,
+          image: mainImage,
+          images: images,
+        } as Product;
       }
 
       // 4. Update React state immediately across the whole application

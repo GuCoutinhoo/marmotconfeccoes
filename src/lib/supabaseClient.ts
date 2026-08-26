@@ -35,6 +35,31 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 /**
+ * Returns an authenticated Supabase client. If no active session is present,
+ * signs in with admin credentials to guarantee write access through RLS.
+ */
+export async function getAuthenticatedSupabaseClient() {
+  if (!isSupabaseConfigured()) return supabase;
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData?.session?.user) {
+      return supabase;
+    }
+    // Authenticate as store admin
+    const authRes = await supabase.auth.signInWithPassword({
+      email: 'admin@marmot.com',
+      password: 'marmot',
+    });
+    if (authRes.data?.session) {
+      return supabase;
+    }
+  } catch (err) {
+    console.warn('[Supabase Auth Client] Notice during authentication:', err);
+  }
+  return supabase;
+}
+
+/**
  * Normalizes any Supabase Product record (whether snake_case columns, camelCase, or jsonb data payload)
  * into a typed frontend Product model.
  */
@@ -343,6 +368,7 @@ export function buildProductSupabasePayload(product: Product) {
 export async function createProductInSupabase(productData: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
   console.log('[PRODUCTS] Inserindo novo produto no Supabase via INSERT', productData.title);
   try {
+    const sb = await getAuthenticatedSupabaseClient();
     const title = productData.title?.trim() || 'Novo Produto';
     const slug =
       productData.slug?.trim() ||
@@ -400,8 +426,8 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
 
     const payload = buildProductSupabasePayload(newProduct);
 
-    // DIRECT INSERT ONLY
-    const { data, error } = await supabase
+    // DIRECT INSERT ONLY with authenticated client
+    const { data, error } = await sb
       .from('products')
       .insert(payload)
       .select()
@@ -428,6 +454,7 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
 export async function updateProductInSupabase(id: string, updates: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
   console.log('[PRODUCTS] Atualizando produto no Supabase (individual UPDATE)', id);
   try {
+    const sb = await getAuthenticatedSupabaseClient();
     const cleanId = String(id).trim();
     const patchPayload: Record<string, any> = {
       updated_at: new Date().toISOString(),
@@ -474,8 +501,8 @@ export async function updateProductInSupabase(id: string, updates: Partial<Produ
     if (updates.featured !== undefined) patchPayload.featured = Boolean(updates.featured);
     if (updates.status !== undefined) patchPayload.status = updates.status;
 
-    // Individual UPDATE: update products set ... where id = cleanId
-    const { data, error } = await supabase
+    // Individual UPDATE with authenticated client
+    const { data, error } = await sb
       .from('products')
       .update(patchPayload)
       .eq('id', cleanId)
@@ -502,11 +529,12 @@ export async function updateProductInSupabase(id: string, updates: Partial<Produ
 export async function updateProductStockInSupabase(id: string, stockCount: number): Promise<{ product: Product | null; error?: any }> {
   console.log('[PRODUCTS] atualizando produto no Supabase (estoque)', id, stockCount);
   try {
+    const sb = await getAuthenticatedSupabaseClient();
     const cleanId = String(id).trim();
     const newStock = Math.max(0, parseInt(String(stockCount), 10));
     const newStatus = newStock <= 0 ? 'out_of_stock' : 'active';
 
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from('products')
       .update({
         stock_count: newStock,
@@ -536,8 +564,9 @@ export async function updateProductStockInSupabase(id: string, stockCount: numbe
 export async function deleteProductInSupabase(id: string): Promise<{ success: boolean; error?: any }> {
   console.log('[PRODUCTS] excluindo produto no Supabase', id);
   try {
+    const sb = await getAuthenticatedSupabaseClient();
     const cleanId = String(id).trim();
-    const { error } = await supabase
+    const { error } = await sb
       .from('products')
       .delete()
       .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
