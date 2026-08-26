@@ -24,13 +24,14 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   const { addToCart } = useCart();
 
   const isFavorite = isInWishlist(product.id);
+  const primaryImage = product.image || (product.images && product.images.length > 0 ? product.images[0] : '');
   const rawImages = (product.images && product.images.length > 0)
-    ? product.images
-    : [(product as any).image];
+    ? (primaryImage && product.images[0] !== primaryImage ? [primaryImage, ...product.images.filter(x => x !== primaryImage)] : product.images)
+    : (primaryImage ? [primaryImage] : []);
   
-  const images = rawImages.map((img, idx) => 
-    getValidProductImageUrl(img, product.category, `${product.id}-${idx}`)
-  );
+  const images = rawImages.length > 0
+    ? rawImages.map((img, idx) => getValidProductImageUrl(img, product.category, `${product.id}-${idx}`))
+    : [getValidProductImageUrl(null, product.category, product.id)];
   
   const rawDisplay = hoveredColorImage || images[currentImageIndex] || images[0];
   const displayImage = getValidProductImageUrl(rawDisplay, product.category, product.id);

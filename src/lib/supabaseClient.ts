@@ -67,6 +67,34 @@ export function mapSupabaseRowToProduct(row: any): Product {
   if (!row) return {} as Product;
   const d = (row.data && typeof row.data === 'object') ? row.data : {};
 
+  const primaryImg = row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || '';
+  const allImagesList = Array.isArray(row.images) && row.images.length > 0
+    ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
+    : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : []));
+
+  const rawColors = Array.isArray(row.colors) && row.colors.length > 0
+    ? row.colors
+    : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
+
+  const cleanColors = rawColors.map((c: any) => {
+    const variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
+      ? c.images
+      : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
+    const featured = c.featuredImage || variantImages[0] || c.image || primaryImg;
+    return {
+      id: c.id,
+      color: c.color || 'default',
+      colorName: c.colorName || 'Cor Única',
+      colorHex: c.colorHex || '#000000',
+      image: featured,
+      featuredImage: featured,
+      images: variantImages.length > 0 ? variantImages : (allImagesList.length > 0 ? allImagesList : [primaryImg]),
+      sku: c.sku,
+      stockCount: c.stockCount,
+      sizes: c.sizes,
+    };
+  });
+
   return {
     id: String(row.id || d.id || `prod-${Date.now()}`),
     slug: String(row.slug || d.slug || (row.title ? row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
@@ -86,31 +114,9 @@ export function mapSupabaseRowToProduct(row: any): Product {
     stockCount: typeof row.stock_count === 'number' ? row.stock_count : parseInt(row.stock_count || d.stockCount || 20, 10),
     sku: row.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
     sizes: Array.isArray(row.sizes) && row.sizes.length > 0 ? row.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
-    colors: (() => {
-      const rawColors = Array.isArray(row.colors) && row.colors.length > 0
-        ? row.colors
-        : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
-      return rawColors.map((c: any) => {
-        const variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
-          ? c.images
-          : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
-        const featured = c.featuredImage || variantImages[0] || c.image || '';
-        return {
-          id: c.id,
-          color: c.color || 'default',
-          colorName: c.colorName || 'Cor Única',
-          colorHex: c.colorHex || '#000000',
-          image: featured,
-          featuredImage: featured,
-          images: variantImages,
-          sku: c.sku,
-          stockCount: c.stockCount,
-          sizes: c.sizes,
-        };
-      });
-    })(),
-    image: row.image || d.image || (Array.isArray(row.images) && row.images[0]) || (Array.isArray(d.images) && d.images[0]) || '',
-    images: Array.isArray(row.images) && row.images.length > 0 ? row.images : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (row.image ? [row.image] : (d.image ? [d.image] : []))),
+    colors: cleanColors,
+    image: primaryImg,
+    images: allImagesList,
     details: Array.isArray(row.details) ? row.details : (Array.isArray(d.details) ? d.details : ['100% Algodão Heavyweight']),
     careInstructions: Array.isArray(row.care_instructions) ? row.care_instructions : (Array.isArray(d.careInstructions) ? d.careInstructions : ['Lavar em ciclo suave']),
     composition: Array.isArray(row.composition) ? row.composition : (Array.isArray(d.composition) ? d.composition : ['100% Algodão']),

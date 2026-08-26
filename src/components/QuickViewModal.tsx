@@ -29,14 +29,18 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
   // Dynamic gallery based on selected color
   const images = React.useMemo(() => {
     let rawList: string[] = [];
+    const primaryProductImage = product.image || (product.images && product.images.length > 0 ? product.images[0] : '');
+
     if (selectedColor?.images && Array.isArray(selectedColor.images) && selectedColor.images.length > 0) {
       rawList = selectedColor.images;
     } else if (selectedColor?.featuredImage || selectedColor?.image) {
       rawList = [selectedColor.featuredImage || selectedColor.image!];
     } else if (product.images && product.images.length > 0) {
-      rawList = product.images;
-    } else if ((product as any).image) {
-      rawList = [(product as any).image];
+      rawList = primaryProductImage && product.images[0] !== primaryProductImage
+        ? [primaryProductImage, ...product.images.filter(x => x !== primaryProductImage)]
+        : product.images;
+    } else if (primaryProductImage) {
+      rawList = [primaryProductImage];
     }
 
     if (rawList.length === 0) {

@@ -167,7 +167,11 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     setFormLength(p.length !== undefined && p.length !== null ? String(p.length) : '');
     setFormIsNewRelease(!!p.isNewRelease);
     setFormIsBestSeller(!!p.isBestSeller);
-    setFormImages(p.images && p.images.length > 0 ? p.images : (p.image ? [p.image] : []));
+    const primaryImg = p.image || (p.images && p.images.length > 0 ? p.images[0] : '');
+    const loadedImages = (p.images && p.images.length > 0)
+      ? (primaryImg && p.images[0] !== primaryImg ? [primaryImg, ...p.images.filter((x: string) => x !== primaryImg)] : p.images)
+      : (primaryImg ? [primaryImg] : []);
+    setFormImages(loadedImages);
     const loadedSizes = p.sizes || ['P', 'M', 'G'];
     setFormSizes(loadedSizes);
     const existingCustoms = loadedSizes.filter(
@@ -694,6 +698,15 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
       const varFallbackImg = firstVarWithImg?.images?.[0] || firstVarWithImg?.featuredImage || '';
       const cleanAllImages = uploadedFormImages.length > 0 ? uploadedFormImages : (varFallbackImg ? [varFallbackImg] : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80']);
       const finalPrimaryImage = cleanAllImages[0];
+
+      // Ensure first color variant reflects the primary image if it does not have a separate variant photo
+      if (processedColors.length > 0) {
+        if (!processedColors[0].images || processedColors[0].images.length === 0 || !processedColors[0].featuredImage) {
+          processedColors[0].featuredImage = finalPrimaryImage;
+          processedColors[0].image = finalPrimaryImage;
+          processedColors[0].images = cleanAllImages;
+        }
+      }
 
       if (editingProduct) {
         const oldImages = Array.isArray(editingProduct.images) ? editingProduct.images : (editingProduct.image ? [editingProduct.image] : []);

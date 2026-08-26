@@ -21,7 +21,11 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 
 export function saveBase64ToUploads(imageStr: string | undefined | null, prefix = 'prod'): string {
   if (!imageStr || typeof imageStr !== 'string') return imageStr || '';
-  if (imageStr.startsWith('http://') || imageStr.startsWith('https://') || imageStr.startsWith('/uploads/')) {
+  if (imageStr.startsWith('http://') || imageStr.startsWith('https://')) {
+    return imageStr;
+  }
+  // On Vercel, serverless, or production, do NOT convert base64 to local /uploads/ which causes 404 on other instances/static CDN
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.NODE_ENV === 'production') {
     return imageStr;
   }
   const match = imageStr.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
