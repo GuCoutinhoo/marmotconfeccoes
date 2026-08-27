@@ -5512,10 +5512,10 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true, message: 'Logout realizado com sucesso.' });
 });
 
-// --- Uploads ---
+// --- Uploads (Preserves 100% of the original image resolution, bytes and format) ---
 app.post('/api/upload', async (req, res) => {
   try {
-    const { image, filename } = req.body;
+    const { image, filename, productId, mimeType: explicitMime } = req.body;
     if (!image) {
       return res.status(400).json({ error: 'Nenhuma imagem enviada.' });
     }
@@ -5524,33 +5524,80 @@ app.post('/api/upload', async (req, res) => {
       return res.json({ success: true, url: image });
     }
 
-    const matches = typeof image === 'string' ? image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/) : null;
+    const matches = typeof image === 'string' ? image.match(/^data:([A-Za-z-+/0-9]+);base64,(.+)$/) : null;
     if (!matches || matches.length !== 3) {
       return res.json({ success: true, url: image });
     }
 
-    const mimeType = matches[1];
+    const detectedMime = explicitMime || matches[1] || 'image/jpeg';
     const base64Data = matches[2];
-    let buffer = Buffer.from(base64Data, 'base64');
+    const buffer = Buffer.from(base64Data, 'base64');
 
+    let ext = 'jpg';
+    if (detectedMime.includes('png')) ext = 'png';
+    else if (detectedMime.includes('webp')) ext = 'webp';
+    else if (detectedMime.includes('jpeg') || detectedMime.includes('jpg')) ext = 'jpg';
+    else if (detectedMime.includes('gif')) ext = 'gif';
+    else if (detectedMime.includes('svg')) ext = 'svg';
+
+    if (filename && filename.includes('.')) {
+      const parsedExt = filename.split('.').pop()?.toLowerCase();
+      if (parsedExt && ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(parsedExt)) {
+        ext = parsedExt === 'jpeg' ? 'jpg' : parsedExt;
+      }
+    }
+
+    const cleanProdId = String(productId || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const storagePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
+
+    // 1. Upload directly to Supabase Storage 'product-images' bucket (Preserving original bytes & resolution)
     try {
-      buffer = await sharp(buffer)
-        .resize(900, 1200, { fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: 82 })
-        .toBuffer();
-    } catch {}
+      const adminClient = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+      if (adminClient) {
+        // Ensure bucket exists
+        try {
+          await adminClient.storage.createBucket('product-images', { public: true });
+        } catch {}
 
+        const { data: uploadData, error: uploadErr } = await adminClient.storage
+          .from('product-images')
+          .upload(storagePath, buffer, {
+            contentType: detectedMime,
+            cacheControl: '31536000',
+            upsert: true,
+          });
+
+        if (!uploadErr && uploadData) {
+          const { data: urlData } = adminClient.storage
+            .from('product-images')
+            .getPublicUrl(storagePath);
+
+          if (urlData && urlData.publicUrl) {
+            console.log('[UPLOAD] Arquivo original salvo com sucesso no Supabase Storage:', urlData.publicUrl);
+            return res.json({ success: true, url: urlData.publicUrl });
+          }
+        } else if (uploadErr) {
+          console.warn('[UPLOAD] Supabase Storage upload error notice:', uploadErr.message);
+        }
+      }
+    } catch (sbErr: any) {
+      console.warn('[UPLOAD] Supabase Storage exception:', sbErr?.message);
+    }
+
+    // 2. Local durable file fallback (Preserving original bytes)
     const safeBaseName = (filename || 'upload').replace(/[^a-z0-9_-]/gi, '').toLowerCase().slice(0, 30);
-    const uniqueFilename = `marmot-${Date.now()}-${safeBaseName || 'img'}.webp`;
+    const uniqueFilename = `marmot-${Date.now()}-${safeBaseName || 'img'}.${ext}`;
     const filePath = path.join(UPLOADS_DIR, uniqueFilename);
 
     try {
       fs.writeFileSync(filePath, buffer);
       const publicUrl = `/uploads/${uniqueFilename}`;
+      console.log('[UPLOAD] Arquivo original salvo em /uploads/:', publicUrl);
       return res.json({ success: true, url: publicUrl });
     } catch {
-      const optimizedDataUrl = `data:image/webp;base64,${buffer.toString('base64')}`;
-      return res.json({ success: true, url: optimizedDataUrl });
+      // 3. Fallback to original Data URL
+      return res.json({ success: true, url: image });
     }
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Falha ao processar upload.' });

@@ -132,35 +132,31 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Define Target Resolution
-      let targetWidth = 800;
-      let targetHeight = 800;
+      // Define Target Resolution based on image native resolution
+      const maxNatural = Math.max(imageElement.naturalWidth || 1600, imageElement.naturalHeight || 1600, 1600);
+      const baseDim = exportMode ? Math.min(maxNatural, 3200) : 800;
+
+      let targetWidth = baseDim;
+      let targetHeight = baseDim;
 
       if (aspectRatio === '1:1') {
-        targetWidth = 800;
-        targetHeight = 800;
+        targetWidth = baseDim;
+        targetHeight = baseDim;
       } else if (aspectRatio === '4:5') {
-        targetWidth = 800;
-        targetHeight = 1000;
+        targetWidth = baseDim;
+        targetHeight = Math.round(baseDim * 1.25);
       } else if (aspectRatio === '16:9') {
-        targetWidth = 960;
-        targetHeight = 540;
+        targetWidth = baseDim;
+        targetHeight = Math.round((baseDim * 9) / 16);
       } else {
         // Free / Original ratio
-        const origAspect = imageElement.naturalWidth / imageElement.naturalHeight;
-        targetWidth = 800;
-        targetHeight = Math.round(800 / origAspect);
+        const origAspect = (imageElement.naturalWidth || 800) / (imageElement.naturalHeight || 800);
+        targetWidth = baseDim;
+        targetHeight = Math.round(baseDim / origAspect);
       }
 
-      if (exportMode) {
-        // Full resolution output
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
-      } else {
-        // Preview canvas matches container
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
-      }
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
 
       // Clear Canvas with sleek dark background
       ctx.fillStyle = '#0a0a0a';
@@ -171,8 +167,10 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
       // Apply CSS Filters to Canvas
       ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) grayscale(${grayscale}%) sepia(${sepia}%)`;
 
+      const scaleMultiplier = exportMode ? (baseDim / 800) : 1;
+
       // Move to Center of Canvas
-      ctx.translate(canvas.width / 2 + offsetX, canvas.height / 2 + offsetY);
+      ctx.translate(canvas.width / 2 + offsetX * scaleMultiplier, canvas.height / 2 + offsetY * scaleMultiplier);
 
       // Rotate
       ctx.rotate((rotation * Math.PI) / 180);
@@ -294,7 +292,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
     const exportCanvas = document.createElement('canvas');
     renderCanvas(exportCanvas, true);
     try {
-      const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.92);
+      const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.98);
       onSave(dataUrl);
     } catch (e) {
       // Fallback if canvas is tainted by external URL

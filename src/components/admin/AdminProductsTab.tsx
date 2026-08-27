@@ -271,62 +271,37 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     setAdjustModalOpen(true);
   };
 
-  // Cover Photo Upload (Single Image for Product Cover)
+  // Cover Photo Upload (Uploads original file in full resolution directly)
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const rawDataUrl = event.target?.result as string;
-      if (rawDataUrl) {
-        setAdjustTargetImage(rawDataUrl);
-        setAdjustTitle(`Ajustar Foto de Capa: ${file.name}`);
-        setOnAdjustComplete(() => (adjustedUrl: string) => {
-          if (formImages.length > 0) {
-            const next = [...formImages];
-            next[0] = adjustedUrl;
-            setFormImages(next);
-          } else {
-            setFormImages([adjustedUrl]);
-          }
-          setAdjustModalOpen(false);
-          showToast('Foto de Capa Atualizada!', 'A foto principal do produto foi definida com sucesso.', 'success');
-        });
-        setAdjustModalOpen(true);
+    try {
+      setIsUploading(true);
+      const url = await uploadImage(file, file.name);
+      if (url) {
+        if (formImages.length > 0) {
+          const next = [...formImages];
+          next[0] = url;
+          setFormImages(next);
+        } else {
+          setFormImages([url]);
+        }
+        showToast('Foto de Capa Atualizada!', 'A foto principal foi carregada em alta qualidade.', 'success');
       }
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+    } catch (err: any) {
+      showToast('Erro no Upload', err?.message || 'Falha ao carregar foto de capa.', 'error');
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
+    }
   };
 
-  // Multiple File Upload
+  // Gallery File Upload (Uploads original files in full resolution directly)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-
-    // If single file, open adjuster directly
-    if (files.length === 1) {
-      const file = files[0];
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const rawDataUrl = event.target?.result as string;
-        if (rawDataUrl) {
-          setAdjustTargetImage(rawDataUrl);
-          setAdjustTitle(`Ajustar Foto: ${file.name}`);
-          setOnAdjustComplete(() => (adjustedUrl: string) => {
-            setFormImages([...formImages, adjustedUrl]);
-            setAdjustModalOpen(false);
-            showToast('Foto Adicionada e Ajustada!', 'A imagem foi incluída na galeria.', 'success');
-          });
-          setAdjustModalOpen(true);
-        }
-      };
-      reader.readAsDataURL(file);
-      e.target.value = '';
-      return;
-    }
 
     try {
       setIsUploading(true);
@@ -334,12 +309,16 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const url = await uploadImage(file, file.name);
-        newUrls.push(url);
+        if (url) {
+          newUrls.push(url);
+        }
       }
-      setFormImages([...formImages, ...newUrls]);
-      showToast('Fotos carregadas!', `${newUrls.length} foto(s) adicionada(s).`, 'success');
-    } catch (err) {
-      showToast('Erro no Upload', 'Falha ao processar imagens.', 'error');
+      if (newUrls.length > 0) {
+        setFormImages([...formImages, ...newUrls]);
+        showToast('Fotos Carregadas!', `${newUrls.length} foto(s) adicionada(s) em alta resolução.`, 'success');
+      }
+    } catch (err: any) {
+      showToast('Erro no Upload', err?.message || 'Falha ao processar imagens da galeria.', 'error');
     } finally {
       setIsUploading(false);
       e.target.value = '';

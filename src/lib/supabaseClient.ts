@@ -214,139 +214,71 @@ export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Pro
 export const SUPABASE_STORAGE_BUCKET = 'product-images';
 
 /**
- * Compresses an image (Data URL or Blob) on the client side using HTML5 Canvas
- * to ensure high visual quality and minimal payload (< 50 KB).
- */
-export async function compressImageClient(source: string | Blob | File, maxWidth = 900, maxHeight = 1200, quality = 0.82): Promise<string> {
-  if (typeof window === 'undefined') {
-    if (typeof source === 'string') return source;
-    return '';
-  }
-
-  return new Promise((resolve) => {
-    try {
-      let dataUrl = '';
-      if (typeof source === 'string') {
-        if (!source.startsWith('data:')) {
-          return resolve(source);
-        }
-        dataUrl = source;
-      }
-
-      const processDataUrl = (srcUrl: string) => {
-        if (!srcUrl || !srcUrl.startsWith('data:')) {
-          return resolve(srcUrl || '');
-        }
-
-        const img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => {
-          try {
-            let width = img.width || 800;
-            let height = img.height || 1000;
-
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = Math.max(1, Math.round(width * ratio));
-              height = Math.max(1, Math.round(height * ratio));
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return resolve(srcUrl);
-
-            ctx.drawImage(img, 0, 0, width, height);
-            const compressed = canvas.toDataURL('image/webp', quality);
-            if (compressed && compressed.startsWith('data:image/webp') && compressed.length < srcUrl.length) {
-              resolve(compressed);
-            } else {
-              const jpegCompressed = canvas.toDataURL('image/jpeg', quality);
-              resolve(jpegCompressed || srcUrl);
-            }
-          } catch {
-            resolve(srcUrl);
-          }
-        };
-        img.onerror = () => resolve(srcUrl);
-        img.src = srcUrl;
-      };
-
-      if (dataUrl) {
-        processDataUrl(dataUrl);
-      } else {
-        const reader = new FileReader();
-        reader.onload = (e) => processDataUrl(e.target?.result as string);
-        reader.onerror = () => resolve('');
-        reader.readAsDataURL(source as Blob);
-      }
-    } catch {
-      resolve(typeof source === 'string' ? source : '');
-    }
-  });
-}
-
-/**
  * Uploads an image file or base64 to Supabase Storage 'product-images' bucket
- * or falls back to backend storage proxy. Returns the permanent public URL or compressed data URL.
+ * or falls back to backend storage proxy. Preserves 100% of the original quality and resolution.
  */
 export async function uploadProductImageToStorage(
   source: File | Blob | string,
   productId: string = 'general',
   customName?: string
 ): Promise<string> {
+  // If it's already an absolute or uploaded URL, return directly
   if (typeof source === 'string' && (source.startsWith('http://') || source.startsWith('https://') || source.startsWith('/uploads/'))) {
     return source;
   }
 
-  // Optimize and compress source on client side first if in browser
-  let workingSource = source;
-  let base64Preview = '';
-
-  if (typeof window !== 'undefined') {
-    try {
-      const compressed = await compressImageClient(source);
-      if (compressed) {
-        workingSource = compressed;
-        base64Preview = compressed;
-      }
-    } catch {}
-  }
-
   const cleanProdId = String(productId || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
   const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  const ext = customName ? (customName.split('.').pop() || 'webp') : 'webp';
-  const filePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
-
-  let blob: Blob | null = null;
+  
+  let detectedExt = 'webp';
   let contentType = 'image/webp';
+  let blob: Blob | null = null;
+  let originalFilename = customName || '';
 
-  if (typeof workingSource === 'string') {
-    if (workingSource.startsWith('data:')) {
-      base64Preview = workingSource;
-      try {
-        const parts = workingSource.split(',');
-        const mimeMatch = parts[0].match(/:(.*?);/);
-        if (mimeMatch) contentType = mimeMatch[1];
-        const bstr = atob(parts[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-        blob = new Blob([u8arr], { type: contentType });
-      } catch {}
+  if (source instanceof File) {
+    blob = source;
+    contentType = source.type || 'image/jpeg';
+    originalFilename = source.name;
+    const parts = source.name.split('.');
+    if (parts.length > 1) {
+      detectedExt = parts.pop()?.toLowerCase() || 'jpg';
+    } else {
+      detectedExt = contentType.split('/')[1] || 'jpg';
     }
-  } else {
-    blob = workingSource;
-    contentType = workingSource.type || 'image/webp';
+  } else if (source instanceof Blob) {
+    blob = source;
+    contentType = source.type || 'image/jpeg';
+    detectedExt = contentType.split('/')[1] || 'jpg';
+    if (detectedExt === 'jpeg') detectedExt = 'jpg';
+  } else if (typeof source === 'string' && source.startsWith('data:')) {
+    try {
+      const parts = source.split(',');
+      const mimeMatch = parts[0].match(/:(.*?);/);
+      if (mimeMatch) {
+        contentType = mimeMatch[1];
+        detectedExt = contentType.split('/')[1] || 'jpg';
+        if (detectedExt === 'jpeg') detectedExt = 'jpg';
+      }
+      const bstr = atob(parts[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      blob = new Blob([u8arr], { type: contentType });
+    } catch (e) {
+      console.warn('[STORAGE] Failed to parse base64 Data URL:', e);
+    }
   }
 
-  // 1. Try Supabase Storage directly if blob exists
+  const ext = customName && customName.includes('.') ? (customName.split('.').pop() || detectedExt) : detectedExt;
+  const filePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
+
+  // 1. First Attempt: Upload original file directly to Supabase Storage via Authenticated Supabase Client
   if (blob) {
     try {
-      const { data: uploadData, error: uploadErr } = await supabase.storage
+      const client = await getAuthenticatedSupabaseClient();
+      const { data: uploadData, error: uploadErr } = await client.storage
         .from(SUPABASE_STORAGE_BUCKET)
         .upload(filePath, blob, {
           contentType,
@@ -355,30 +287,63 @@ export async function uploadProductImageToStorage(
         });
 
       if (!uploadErr && uploadData) {
-        const { data: urlData } = supabase.storage
+        const { data: urlData } = client.storage
           .from(SUPABASE_STORAGE_BUCKET)
           .getPublicUrl(filePath);
 
         if (urlData && urlData.publicUrl) {
-          console.log('[STORAGE] Upload concluído no Supabase Storage:', urlData.publicUrl);
+          console.log('[STORAGE] Upload concluído no Supabase Storage com qualidade original:', urlData.publicUrl);
           return urlData.publicUrl;
         }
+      } else if (uploadErr) {
+        console.warn('[STORAGE] Direct Supabase upload notice:', uploadErr.message);
       }
     } catch (err: any) {
-      console.warn('[STORAGE] Exceção upload Supabase Storage:', err?.message);
+      console.warn('[STORAGE] Direct Supabase upload exception:', err?.message);
     }
   }
 
-  // 2. Self-contained compressed WebP data URL fallback (guaranteed to work across Vercel, Supabase and all clients)
-  if (base64Preview) {
-    return base64Preview;
+  // 2. Second Attempt: Proxy upload to backend /api/upload preserving full resolution and bytes
+  if (typeof window !== 'undefined') {
+    try {
+      let payloadDataUrl = '';
+      if (typeof source === 'string' && source.startsWith('data:')) {
+        payloadDataUrl = source;
+      } else if (blob) {
+        payloadDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob!);
+        });
+      }
+
+      if (payloadDataUrl) {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: payloadDataUrl,
+            filename: originalFilename || `product-${uniqueId}.${ext}`,
+            productId: cleanProdId,
+            mimeType: contentType,
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.url) {
+            console.log('[STORAGE] Upload via backend proxy preservando qualidade:', data.url);
+            return data.url;
+          }
+        }
+      }
+    } catch (proxyErr) {
+      console.warn('[STORAGE] Backend upload proxy notice:', proxyErr);
+    }
   }
 
-  // 3. Resilient fallback: return the lightweight compressed Data URL or existing string
-  if (base64Preview) {
-    return base64Preview;
-  }
-
+  // 3. Fallback: If network failed, return original data URL or string
   if (typeof source === 'string') {
     return source;
   }
