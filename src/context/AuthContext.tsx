@@ -39,6 +39,7 @@ interface AuthContextData {
   deleteAddress: (id: string) => Promise<void>;
   setDefaultAddress: (id: string) => Promise<void>;
   addOrder: (order: Order) => Promise<Order>;
+  registerOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, status: OrderStatus, trackingCode?: string) => Promise<void>;
   refreshOrders: () => Promise<void>;
   refreshAllAdminOrders: () => Promise<void>;
@@ -1133,24 +1134,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // =========================================================
   // 7. ORDERS PERSISTENCE
   // =========================================================
-  const addOrder = async (newOrder: Order): Promise<Order> => {
-    try {
-      const res = await fetch('/api/user/orders', {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(newOrder),
-      });
+  const registerOrder = useCallback((order: Order) => {
+    setOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
+    setAllOrders((prev) => [order, ...prev.filter((o) => o.id !== order.id)]);
+  }, []);
 
-      if (res.ok) {
-        const createdOrder = await res.json();
-        setOrders((prev) => [createdOrder, ...prev.filter((o) => o.id !== createdOrder.id)]);
-        setAllOrders((prev) => [createdOrder, ...prev.filter((o) => o.id !== createdOrder.id)]);
-        return createdOrder;
+  const addOrder = async (newOrder: Order): Promise<Order> => {
+    // 1. Update local reactive state immediately
+    registerOrder(newOrder);
+
+    // 2. Only perform POST /api/user/orders if the order was not already persisted by backend checkout preference flow
+    if (!newOrder.paymentDetails?.mercadoPagoPreferenceId) {
+      try {
+        const res = await fetch('/api/user/orders', {
+          method: 'POST',
+          headers: getAuthHeaders(),
+          body: JSON.stringify(newOrder),
+        });
+
+        if (res.ok) {
+          const createdOrder = await res.json();
+          registerOrder(createdOrder);
+          return createdOrder;
+        }
+      } catch (err) {
+        console.error('Error creating order:', err);
       }
-    } catch (err) {
-      console.error('Error creating order:', err);
     }
-    setOrders((prev) => [newOrder, ...prev.filter((o) => o.id !== newOrder.id)]);
     return newOrder;
   };
 
@@ -1203,6 +1213,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteAddress,
         setDefaultAddress,
         addOrder,
+        registerOrder,
         updateOrderStatus,
         refreshOrders,
         refreshAllAdminOrders,

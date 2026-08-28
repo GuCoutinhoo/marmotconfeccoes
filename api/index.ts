@@ -2571,12 +2571,12 @@ export class DatabaseManager {
           const { data, error } = await adminClient
             .from('orders')
             .select('*')
-            .or(`id.eq.${clean},order_number.eq.${clean},tracking_code.eq.${clean},mercado_pago_preference_id.eq.${clean},mercado_pago_payment_id.eq.${clean}`)
+            .or(`id.eq.${clean},tracking_code.eq.${clean}`)
             .maybeSingle();
 
           if (!error && data) {
             const order: Order = (data.data && typeof data.data === 'object' && data.data.id) ? data.data : {
-              id: data.id || data.order_number || clean,
+              id: data.id || clean,
               userId: data.user_id || undefined,
               customerName: data.customer_name || 'Cliente Marmot',
               customerEmail: data.customer_email || '',
@@ -2588,21 +2588,18 @@ export class DatabaseManager {
               shippingStatus: data.shipping_status || 'Aguardando preparação',
               items: data.items || [],
               subtotal: Number(data.subtotal || 0),
-              discount: Number(data.discount_amount || data.discount || 0),
-              shippingFee: Number(data.shipping_amount || data.shipping_fee || 0),
+              discount: Number(data.discount || 0),
+              shippingFee: Number(data.shipping_fee || 0),
               total: Number(data.total || 0),
               paymentMethod: data.payment_method || 'Cartão de Crédito',
-              shippingAddress: data.shipping_address_snapshot || data.shipping_address || {},
-              shippingCarrier: data.shipping_company || data.shipping_carrier || 'Melhor Envio',
-              shippingService: data.shipping_service_name || data.shipping_service || 'SEDEX',
-              shippingServiceId: data.shipping_service_id,
-              shippingDeliveryTime: data.shipping_delivery_time,
+              shippingAddress: data.shipping_address || {},
+              shippingCarrier: data.shipping_option?.company || 'Melhor Envio',
+              shippingService: data.shipping_option?.service_name || 'SEDEX',
+              shippingServiceId: data.shipping_option?.service_id,
+              shippingDeliveryTime: data.shipping_option?.delivery_time,
               trackingCode: data.tracking_code || '',
               history: data.history || [],
-              paymentDetails: data.data?.paymentDetails || {
-                mercadoPagoPreferenceId: data.mercado_pago_preference_id || null,
-                mercadoPagoPaymentId: data.mercado_pago_payment_id || null,
-              },
+              paymentDetails: data.data?.paymentDetails || {},
               shippingDetails: data.data?.shippingDetails || null,
               createdAt: data.created_at || new Date().toISOString(),
             };
@@ -2621,7 +2618,6 @@ export class DatabaseManager {
     // 2. Memory / local file lookup
     return this.orders.find((o) =>
       o.id === clean ||
-      (o as any).order_number === clean ||
       o.trackingCode === clean ||
       o.paymentDetails?.mercadoPagoPreferenceId === clean ||
       o.paymentDetails?.mercadoPagoPaymentId === clean
@@ -2639,85 +2635,76 @@ export class DatabaseManager {
     this.writeJsonFile(ORDERS_FILE, this.orders);
 
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (adminClient) {
-          const orderPayload = {
-            id: order.id,
-            order_number: order.id,
-            user_id: order.userId || null,
-            customer_email: order.customerEmail || null,
-            customer_name: order.customerName || null,
-            customer_phone: order.customerPhone || null,
-            customer_cpf: order.customerCpf || null,
-            items: order.items,
-            shipping_address: order.shippingAddress,
-            shipping_address_snapshot: order.shippingAddress,
-            payment_method: order.paymentMethod,
-            subtotal: order.subtotal,
-            shipping_fee: order.shippingFee,
-            shipping_amount: order.shippingFee,
-            discount: order.discount,
-            discount_amount: order.discount,
-            total: order.total,
-            currency: 'BRL',
-            status: order.status,
-            payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' ? 'Pago' : 'Pendente'),
-            shipping_status: order.shippingStatus || 'Aguardando preparação',
-            payment_environment: process.env.MERCADOPAGO_ENV || 'test',
-            shipping_company: order.shippingCarrier || null,
-            shipping_service_name: order.shippingService || null,
-            shipping_service_id: order.shippingServiceId || null,
-            shipping_delivery_time: order.shippingDeliveryTime || null,
-            tracking_code: order.trackingCode || null,
-            mercado_pago_preference_id: order.paymentDetails?.mercadoPagoPreferenceId || null,
-            mercado_pago_payment_id: order.paymentDetails?.mercadoPagoPaymentId || null,
-            history: order.history,
-            data: order,
-            updated_at: new Date().toISOString(),
-          };
+      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (!adminClient) {
+        throw new Error('[DB] Cliente Supabase não configurado para persistência de pedidos.');
+      }
 
-          const { error: saveErr } = await adminClient.from('orders').upsert(orderPayload, { onConflict: 'id' });
-          if (saveErr) {
-            console.error('[DB] Supabase order upsert error details:', saveErr.message, saveErr.details, saveErr.hint);
-            const { error: insertErr } = await adminClient.from('orders').insert(orderPayload);
-            if (insertErr) {
-              console.error('[DB] Supabase order insert fallback error:', insertErr.message);
-            }
-          } else {
-            console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase`);
-          }
+      const orderPayload = {
+        id: order.id,
+        user_id: order.userId || null,
+        customer_email: order.customerEmail || 'cliente@marmot.com',
+        customer_name: order.customerName || null,
+        customer_phone: order.customerPhone || null,
+        customer_cpf: order.customerCpf || null,
+        items: order.items || [],
+        shipping_address: order.shippingAddress || {},
+        shipping_option: order.shippingOption || {
+          company: order.shippingCarrier || null,
+          service_name: order.shippingService || null,
+          service_id: order.shippingServiceId || null,
+          delivery_time: order.shippingDeliveryTime || null,
+        },
+        payment_method: order.paymentMethod || null,
+        subtotal: Number(order.subtotal || 0),
+        shipping_fee: Number(order.shippingFee || 0),
+        discount: Number(order.discount || 0),
+        total: Number(order.total || 0),
+        status: order.status || 'Aguardando Pagamento',
+        payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' ? 'Pago' : 'Pendente'),
+        tracking_code: order.trackingCode || null,
+        tracking_url: (order as any).trackingUrl || (order as any).tracking_url || null,
+        history: order.history || [],
+        notes: (order as any).notes || null,
+        data: order,
+        updated_at: new Date().toISOString(),
+      };
 
-          // Also save order_items if table exists
-          if (Array.isArray(order.items) && order.items.length > 0) {
-            for (const item of order.items) {
-              try {
-                await adminClient.from('order_items').upsert({
-                  id: item.id || `${order.id}-${item.productId}`,
-                  order_id: order.id,
-                  product_id: item.productId,
-                  product_name: item.title || (item as any).name || 'Produto',
-                  sku: item.sku || null,
-                  image_snapshot: item.image || null,
-                  size: item.size || null,
-                  color: item.color || null,
-                  quantity: item.quantity,
-                  unit_price: item.price,
-                  subtotal: item.subtotal || (item.price * item.quantity),
-                  weight_snapshot: item.weight || null,
-                  width_snapshot: item.width || null,
-                  height_snapshot: item.height || null,
-                  length_snapshot: item.length || null,
-                  data: item,
-                }, { onConflict: 'id' });
-              } catch (itemErr: any) {
-                console.warn('[DB] Supabase order_item notice:', itemErr.message);
-              }
-            }
+      const { error: saveErr } = await adminClient.from('orders').upsert(orderPayload, { onConflict: 'id' });
+      if (saveErr) {
+        console.error('[DB] Supabase order upsert error details:', saveErr.message, saveErr.details, saveErr.hint);
+        throw new Error(`Falha ao persistir pedido no Supabase: ${saveErr.message}`);
+      }
+      console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase`);
+
+      // Also save order_items if table exists
+      if (Array.isArray(order.items) && order.items.length > 0) {
+        for (const item of order.items) {
+          try {
+            await adminClient.from('order_items').upsert({
+              id: item.id || `${order.id}-${item.productId}`,
+              order_id: order.id,
+              product_id: item.productId,
+              title: item.title || (item as any).productTitle || (item as any).name || 'Produto',
+              sku: item.sku || null,
+              size: item.size || 'M',
+              color: item.color || (item as any).colorName || 'Padrão',
+              color_name: (item as any).colorName || item.color || null,
+              color_hex: (item as any).colorHex || null,
+              image: item.image || (item as any).productImage || null,
+              quantity: item.quantity || 1,
+              price: item.price || 0,
+              subtotal: item.subtotal || ((item.price || 0) * (item.quantity || 1)),
+              weight: item.weight || null,
+              height: item.height || null,
+              width: item.width || null,
+              length: item.length || null,
+              data: item,
+            }, { onConflict: 'id' });
+          } catch (itemErr: any) {
+            console.warn('[DB] Supabase order_item notice:', itemErr.message);
           }
         }
-      } catch (err) {
-        console.error('[DB] Supabase order upsert exception:', err);
       }
     }
     return order;
@@ -6768,41 +6755,53 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
 
     // 9. Call Mercado Pago API to create real dynamic preference
     const mpClient = getMercadoPagoClient();
+    if (!mpClient) {
+      console.error('[MERCADO PAGO] MERCADOPAGO_ACCESS_TOKEN não está configurado no servidor.');
+      return res.status(500).json({
+        error: 'Credenciais do Mercado Pago não configuradas no servidor.',
+        message: 'Defina a variável MERCADOPAGO_ACCESS_TOKEN nas configurações do ambiente.',
+      });
+    }
+
     let preferenceId = '';
     let initPoint = '';
     let sandboxInitPoint = '';
 
-    if (mpClient) {
-      try {
-        const preference = new Preference(mpClient);
-        const prefResponse = await preference.create({ body: preferencePayload });
+    try {
+      const preference = new Preference(mpClient);
+      const prefResponse = await preference.create({ body: preferencePayload });
 
-        preferenceId = prefResponse.id || '';
-        initPoint = prefResponse.init_point || '';
-        sandboxInitPoint = prefResponse.sandbox_init_point || '';
+      preferenceId = prefResponse.id || '';
+      initPoint = prefResponse.init_point || '';
+      sandboxInitPoint = prefResponse.sandbox_init_point || '';
 
-        newOrder.paymentDetails = {
-          ...newOrder.paymentDetails,
-          mercadoPagoPreferenceId: preferenceId,
-          mercadoPagoInitPoint: isSandbox && sandboxInitPoint ? sandboxInitPoint : initPoint,
-        };
-        await db.saveOrder(newOrder);
-      } catch (mpErr: any) {
-        console.error('[MERCADO PAGO SDK PREFERENCE ERROR]:', mpErr);
+      if (!initPoint && !sandboxInitPoint) {
+        throw new Error('Mercado Pago não retornou uma URL de checkout válida (init_point ausente).');
       }
+
+      newOrder.paymentDetails = {
+        ...newOrder.paymentDetails,
+        mercadoPagoPreferenceId: preferenceId,
+        mercadoPagoInitPoint: isSandbox && sandboxInitPoint ? sandboxInitPoint : initPoint,
+      };
+      await db.saveOrder(newOrder);
+    } catch (mpErr: any) {
+      console.error('[MERCADO PAGO SDK PREFERENCE ERROR]:', mpErr);
+      return res.status(500).json({
+        error: 'Erro ao gerar preferência no Mercado Pago.',
+        message: mpErr.message || 'Falha na comunicação com a API do Mercado Pago.',
+      });
     }
 
-    const targetUrl = (isSandbox && sandboxInitPoint)
-      ? sandboxInitPoint
-      : (initPoint || `${appUrl}/checkout?status=success&order_id=${newOrder.id}`);
+    const targetUrl = (isSandbox && sandboxInitPoint) ? sandboxInitPoint : (initPoint || sandboxInitPoint);
 
     return res.status(201).json({
       success: true,
       orderId: newOrder.id,
       order: newOrder,
       preferenceId,
-      init_point: initPoint || targetUrl,
-      sandbox_init_point: sandboxInitPoint || targetUrl,
+      init_point: initPoint,
+      sandbox_init_point: sandboxInitPoint,
       targetUrl,
       subtotal,
       discount,
@@ -6812,7 +6811,7 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
   } catch (error: any) {
     console.error('[CREATE PREFERENCE ERROR]:', error);
     return res.status(500).json({
-      error: 'Erro ao gerar preferência do Mercado Pago.',
+      error: 'Erro ao processar e salvar pedido do Mercado Pago.',
       message: error.message,
     });
   }
@@ -6961,13 +6960,11 @@ async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?
   let order = await db.getOrderById(orderId);
   const cleanId = String(orderId || '').trim();
 
-  // If not found in memory/Supabase by default lookup, try extended searches
+  // If not found by direct ID, search by tracking code or payment identifiers
   if (!order && cleanId) {
-    console.warn(`[Mercado Pago Verification] Order ${cleanId} not found in default lookup. Searching by alternative fields...`);
     const allOrders = await db.getOrders();
     order = allOrders.find((o) =>
       o.id === cleanId ||
-      (o as any).order_number === cleanId ||
       o.trackingCode === cleanId ||
       o.paymentDetails?.mercadoPagoPreferenceId === cleanId ||
       o.paymentDetails?.mercadoPagoPaymentId === cleanId ||
@@ -6975,83 +6972,8 @@ async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?
     ) || null;
   }
 
-  // If order is still not found, check if Mercado Pago has payment data to reconstruct/restore it safely
   if (!order) {
-    const token = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
-    if (token && (paymentIdParam || cleanId)) {
-      try {
-        let searchedPayment: any = null;
-        if (paymentIdParam) {
-          const fetchRes = await fetch(`https://api.mercadopago.com/v1/payments/${paymentIdParam}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (fetchRes.ok) searchedPayment = await fetchRes.json();
-        }
-        if (!searchedPayment && cleanId) {
-          const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(cleanId)}&sort=date_created&criteria=desc`;
-          const searchRes = await fetch(searchUrl, { headers: { Authorization: `Bearer ${token}` } });
-          if (searchRes.ok) {
-            const searchJson = await searchRes.json();
-            if (searchJson.results && searchJson.results.length > 0) searchedPayment = searchJson.results[0];
-          }
-        }
-        if (searchedPayment) {
-          console.log(`[Mercado Pago Verification] Found payment on MP for order ${cleanId}. Restoring order record in DB...`);
-          const isApproved = searchedPayment.status === 'approved';
-          const restoredOrder: Order = {
-            id: cleanId,
-            userId: searchedPayment.metadata?.user_id || undefined,
-            customerName: searchedPayment.payer?.first_name ? `${searchedPayment.payer.first_name} ${searchedPayment.payer.last_name || ''}`.trim() : 'Cliente Marmot',
-            customerEmail: searchedPayment.payer?.email || '',
-            customerPhone: searchedPayment.payer?.phone?.number || '',
-            customerCpf: searchedPayment.payer?.identification?.number || '',
-            date: new Date(searchedPayment.date_created || Date.now()).toLocaleDateString('pt-BR'),
-            status: isApproved ? 'Pagamento Aprovado' : 'Aguardando Pagamento',
-            paymentStatus: isApproved ? 'Pago' : 'Pendente',
-            shippingStatus: 'Aguardando preparação',
-            items: [],
-            subtotal: Number(searchedPayment.transaction_amount || 0),
-            discount: 0,
-            shippingFee: 0,
-            total: Number(searchedPayment.transaction_amount || 0),
-            paymentMethod: searchedPayment.payment_type_id || 'Mercado Pago',
-            shippingAddress: {
-              id: 'addr-restored',
-              recipientName: searchedPayment.payer?.first_name || 'Cliente',
-              cep: '00000-000',
-              street: 'Endereço registrado no Mercado Pago',
-              number: 'S/N',
-              city: 'São Paulo',
-              state: 'SP',
-            },
-            shippingCarrier: 'Melhor Envio',
-            shippingService: 'SEDEX',
-            trackingCode: `MM${Date.now().toString().slice(-8)}BR`,
-            history: [
-              {
-                status: isApproved ? 'Pagamento Aprovado' : 'Aguardando Pagamento',
-                timestamp: new Date().toLocaleString('pt-BR'),
-                description: `Pedido recuperado automaticamente a partir da transação Mercado Pago #${searchedPayment.id}.`,
-              },
-            ],
-            paymentDetails: {
-              mercadoPagoPaymentId: String(searchedPayment.id),
-              mercadoPagoStatus: searchedPayment.status,
-              mercadoPagoStatusDetail: searchedPayment.status_detail,
-              mercadoPagoPaymentMethod: searchedPayment.payment_method_id,
-            },
-            createdAt: searchedPayment.date_created || new Date().toISOString(),
-          };
-          order = await db.saveOrder(restoredOrder);
-        }
-      } catch (mpRestoreErr) {
-        console.warn('[Mercado Pago Verification] Could not restore order from MP:', mpRestoreErr);
-      }
-    }
-  }
-
-  if (!order) {
-    const notFoundErr: any = new Error(`Pedido #${cleanId} não encontrado.`);
+    const notFoundErr: any = new Error(`Pedido #${cleanId} não encontrado no banco de dados.`);
     notFoundErr.statusCode = 404;
     throw notFoundErr;
   }

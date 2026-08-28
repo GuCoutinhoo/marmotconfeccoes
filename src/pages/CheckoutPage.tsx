@@ -56,7 +56,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const cartDiscount = discountAmount || 0;
   const isFreeShipping = cartSubtotal >= 399;
 
-  const { user, addOrder, addAddress, isLoading: authLoading } = useAuth();
+  const { user, registerOrder, addAddress, isLoading: authLoading } = useAuth();
   const { showToast } = useToast();
 
   // Strict Authentication Guard: Unauthenticated visitors cannot access Checkout
@@ -196,7 +196,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
             const data = await res.json();
             const returnedOrder: Order = data.order;
             setCompletedOrder(returnedOrder);
-            addOrder(returnedOrder);
+            registerOrder(returnedOrder);
             setStep(3);
 
             if (data.approved || returnedOrder.status === 'Pagamento Aprovado' || returnedOrder.paymentStatus === 'Pago') {
@@ -215,11 +215,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
             if (fallbackRes.ok) {
               const fallbackOrder: Order = await fallbackRes.json();
               setCompletedOrder(fallbackOrder);
-              addOrder(fallbackOrder);
+              registerOrder(fallbackOrder);
               setStep(3);
               if (fallbackOrder.status === 'Pagamento Aprovado' || fallbackOrder.paymentStatus === 'Pago') {
                 clearCart();
               }
+            } else {
+              showToast('Pedido Não Encontrado', 'Não foi possível localizar o pedido informado.', 'error');
             }
           }
         } catch (err) {
@@ -243,7 +245,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         const data = await res.json();
         const updatedOrder: Order = data.order;
         setCompletedOrder(updatedOrder);
-        addOrder(updatedOrder);
+        registerOrder(updatedOrder);
 
         if (data.approved || updatedOrder.status === 'Pagamento Aprovado' || updatedOrder.paymentStatus === 'Pago') {
           clearCart();
@@ -474,14 +476,18 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || 'Erro ao gerar o checkout do Mercado Pago.');
+        throw new Error(errData.message || errData.error || 'Erro ao gerar o checkout do Mercado Pago.');
       }
 
       const data = await res.json();
-      const targetCheckoutUrl = data.targetUrl || data.initPoint || data.sandboxInitPoint;
+      const targetCheckoutUrl = data.targetUrl || data.init_point || data.sandbox_init_point || data.initPoint || data.sandboxInitPoint;
+
+      if (!targetCheckoutUrl) {
+        throw new Error('Link de pagamento não retornado pelo Mercado Pago.');
+      }
 
       if (data.order) {
-        addOrder(data.order);
+        registerOrder(data.order);
         setCompletedOrder(data.order);
       }
 
@@ -491,9 +497,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       showToast('Redirecionando...', 'Abrindo o Checkout Seguro do Mercado Pago.', 'info');
 
       // Direct redirection to Mercado Pago
-      setTimeout(() => {
-        window.location.href = targetCheckoutUrl;
-      }, 300);
+      window.location.assign(targetCheckoutUrl);
     } catch (err: any) {
       console.error('[Checkout Place Order Error]', err);
       showToast('Erro ao finalizar pedido', err.message || 'Tente novamente.', 'error');
