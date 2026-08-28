@@ -102,6 +102,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const [contactEmail, setContactEmail] = useState(user ? user.email : '');
   const [contactPhone, setContactPhone] = useState(user?.phone || '');
   const [contactCpf, setContactCpf] = useState(user?.cpf || '');
+  const [draftOrderId, setDraftOrderId] = useState<string>('');
 
   // Keep address updated if user finishes loading
   useEffect(() => {
@@ -428,8 +429,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         : 'Mercado Pago Checkout Pro';
 
       const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
+      let currentOrderId = draftOrderId;
+      if (!currentOrderId) {
+        currentOrderId = `MM-${Math.floor(100000 + Math.random() * 900000)}`;
+        setDraftOrderId(currentOrderId);
+      }
       const orderPayload = {
-        orderId: `MM-${Math.floor(100000 + Math.random() * 900000)}`,
+        orderId: currentOrderId,
         userId: user?.id || undefined,
         items: cartItems.map((item) => ({
           productId: item.product.id,

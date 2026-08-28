@@ -6597,7 +6597,7 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     // 5. Calculate official total
     const total = Math.max(0, Number((subtotal - discount + validatedShippingFee).toFixed(2)));
 
-    // 6. Generate order ID and create order in Database BEFORE payment (status: pending_payment)
+    // 6. Generate or reuse existing pending order in Database BEFORE payment (status: pending_payment)
     let orderUserId = (req as any).user?.id || req.body?.userId || payer?.id;
     const token = extractToken(req);
     if (!orderUserId && token) {
@@ -6610,25 +6610,38 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       }
     }
 
-    const orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const requestedOrderId = String(req.body?.orderId || req.body?.order_id || '').trim();
+    let existingOrder: Order | null = null;
+    if (requestedOrderId) {
+      try {
+        existingOrder = await db.getOrderById(requestedOrderId);
+      } catch {
+        existingOrder = null;
+      }
+    }
+
+    const orderId = (existingOrder && (existingOrder.status === 'Aguardando Pagamento' || existingOrder.paymentStatus === 'Pendente'))
+      ? existingOrder.id
+      : (requestedOrderId && requestedOrderId.startsWith('MM-') ? requestedOrderId : `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`);
+
     const newOrder: Order = {
       id: orderId,
-      userId: orderUserId || undefined,
-      customerName: payer?.name || req.body?.payerName || shippingAddress?.recipientName || (req as any).user?.name || 'Cliente Marmot',
-      customerEmail: payer?.email || req.body?.payerEmail || (req as any).user?.email || 'contato@marmot.com.br',
-      customerPhone: payer?.phone || req.body?.payerPhone || '',
-      customerCpf: payer?.cpf || req.body?.payerCpf || '',
-      date: new Date().toLocaleDateString('pt-BR'),
+      userId: orderUserId || existingOrder?.userId || undefined,
+      customerName: payer?.name || req.body?.payerName || shippingAddress?.recipientName || (req as any).user?.name || existingOrder?.customerName || 'Cliente Marmot',
+      customerEmail: payer?.email || req.body?.payerEmail || (req as any).user?.email || existingOrder?.customerEmail || 'contato@marmot.com.br',
+      customerPhone: payer?.phone || req.body?.payerPhone || existingOrder?.customerPhone || '',
+      customerCpf: payer?.cpf || req.body?.payerCpf || existingOrder?.customerCpf || '',
+      date: existingOrder?.date || new Date().toLocaleDateString('pt-BR'),
       status: 'Aguardando Pagamento',
       paymentStatus: 'Pendente',
-      shippingStatus: 'Aguardando preparação',
+      shippingStatus: existingOrder?.shippingStatus || 'Aguardando preparação',
       items: validatedItems,
       subtotal,
       discount,
       shippingFee: validatedShippingFee,
       total,
-      paymentMethod: (paymentMethod as any) || 'Cartão de Crédito',
-      shippingAddress: shippingAddress || {
+      paymentMethod: (paymentMethod as any) || existingOrder?.paymentMethod || 'Cartão de Crédito',
+      shippingAddress: shippingAddress || existingOrder?.shippingAddress || {
         id: 'addr-1',
         recipientName: payer?.name || 'Cliente',
         cep: '03806-010',
@@ -6637,20 +6650,21 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         city: 'São Paulo',
         state: 'SP',
       },
-      shippingCarrier: shippingCarrier || 'Melhor Envio',
-      shippingService: shippingService || 'Transportadora Padrão',
-      shippingServiceId: shippingServiceId ? String(shippingServiceId) : undefined,
-      shippingDeliveryTime: shippingDeliveryTime || 5,
-      estimatedDelivery: `${shippingDeliveryTime || 5} a ${(shippingDeliveryTime || 5) + 2} dias úteis`,
-      trackingCode: `MM${Date.now().toString().slice(-8)}BR`,
-      history: [
+      shippingCarrier: shippingCarrier || existingOrder?.shippingCarrier || 'Melhor Envio',
+      shippingService: shippingService || existingOrder?.shippingService || 'Transportadora Padrão',
+      shippingServiceId: shippingServiceId ? String(shippingServiceId) : existingOrder?.shippingServiceId,
+      shippingDeliveryTime: shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5,
+      estimatedDelivery: `${shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5} a ${(shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5) + 2} dias úteis`,
+      trackingCode: existingOrder?.trackingCode || `MM${Date.now().toString().slice(-8)}BR`,
+      history: existingOrder?.history && existingOrder.history.length > 0 ? existingOrder.history : [
         {
           status: 'Aguardando Pagamento',
           timestamp: new Date().toLocaleString('pt-BR'),
           description: 'Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago.',
         },
       ],
-      createdAt: new Date().toISOString(),
+      paymentDetails: existingOrder?.paymentDetails,
+      createdAt: existingOrder?.createdAt || new Date().toISOString(),
     };
 
     await db.saveOrder(newOrder);
