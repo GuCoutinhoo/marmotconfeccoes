@@ -234,6 +234,50 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
     }
   }, []);
 
+  // Automatic real-time status polling when order is pending on Step 3
+  useEffect(() => {
+    if (step !== 3 || !completedOrder) return;
+    const isApproved = completedOrder.status === 'Pagamento Aprovado' || completedOrder.paymentStatus === 'Pago';
+    const isRejected = completedOrder.status === 'Pagamento Recusado' || completedOrder.paymentStatus === 'Recusado' || completedOrder.status === 'Cancelado';
+    if (isApproved || isRejected) return;
+
+    let pollCount = 0;
+    const maxPolls = 20; // 20 polls * 3.5s = 70 seconds total window
+
+    const timer = setInterval(async () => {
+      pollCount += 1;
+      if (pollCount > maxPolls) {
+        clearInterval(timer);
+        return;
+      }
+
+      try {
+        const paymentId = completedOrder.paymentDetails?.mercadoPagoPaymentId;
+        const verifyUrl = `/api/mercadopago/verify-payment/${encodeURIComponent(completedOrder.id)}${paymentId ? `?payment_id=${encodeURIComponent(paymentId)}` : ''}`;
+        const res = await fetch(verifyUrl);
+        if (res.ok) {
+          const data = await res.json();
+          const updatedOrder: Order = data.order;
+          if (data.approved || updatedOrder.status === 'Pagamento Aprovado' || updatedOrder.paymentStatus === 'Pago') {
+            setCompletedOrder(updatedOrder);
+            registerOrder(updatedOrder);
+            clearCart();
+            showToast('Pagamento Confirmado!', `Pedido #${updatedOrder.id} aprovado com sucesso!`, 'success');
+            clearInterval(timer);
+          } else if (updatedOrder.status === 'Pagamento Recusado' || updatedOrder.paymentStatus === 'Recusado') {
+            setCompletedOrder(updatedOrder);
+            registerOrder(updatedOrder);
+            clearInterval(timer);
+          }
+        }
+      } catch (err) {
+        console.warn('[Auto Polling Error]:', err);
+      }
+    }, 3500);
+
+    return () => clearInterval(timer);
+  }, [step, completedOrder?.id, completedOrder?.status, completedOrder?.paymentStatus]);
+
   const handleVerifyPaymentNow = async () => {
     if (!completedOrder) return;
     setIsVerifyingStatus(true);

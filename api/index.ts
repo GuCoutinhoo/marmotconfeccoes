@@ -9,7 +9,7 @@ import { Pool } from 'pg';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import sharp from 'sharp';
-import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
+import { MercadoPagoConfig, Preference, Payment, WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
 
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
@@ -6477,30 +6477,31 @@ function getMercadoPagoClient() {
 }
 
 function verifyMercadoPagoWebhookSignature(req: express.Request, secret?: string): boolean {
-  if (!secret) return true; // Permissive if no secret configured
+  if (!secret || secret.trim().length === 0) return true; // Permissive if no secret configured
   const xSignature = (req.headers['x-signature'] as string) || '';
   const xRequestId = (req.headers['x-request-id'] as string) || '';
-  if (!xSignature) return false;
+  if (!xSignature) {
+    console.warn('[Mercado Pago Webhook Warning]: Header x-signature ausente.');
+    return false;
+  }
+
+  // Official data.id priority from query string (V2 webhooks format)
+  const dataId = (req.query?.['data.id'] || req.query?.id || req.body?.data?.id || req.body?.id) as string;
 
   try {
-    const parts = xSignature.split(',');
-    let ts = '';
-    let hash = '';
-    for (const part of parts) {
-      const [k, v] = part.trim().split('=');
-      if (k === 'ts') ts = v;
-      if (k === 'v1') hash = v;
+    WebhookSignatureValidator.validate({
+      xSignature,
+      xRequestId,
+      dataId: dataId ? String(dataId) : undefined,
+      secret: secret.trim(),
+    });
+    return true;
+  } catch (err: any) {
+    if (err instanceof InvalidWebhookSignatureError) {
+      console.warn(`[Mercado Pago Webhook Warning]: Invalid signature header - reason: ${err.reason} (reqId: ${err.requestId || xRequestId})`);
+    } else {
+      console.warn('[Mercado Pago Webhook Warning]: Invalid signature header -', err?.message || err);
     }
-    if (!ts || !hash) return false;
-
-    const dataId = String(req.body?.data?.id || req.query?.['data.id'] || req.query?.id || req.body?.id || '');
-    const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`;
-    const calculatedHash = crypto.createHmac('sha256', secret).update(manifest).digest('hex');
-
-    if (hash.length !== calculatedHash.length) return false;
-    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(calculatedHash, 'hex'));
-  } catch (err) {
-    console.error('[Mercado Pago Signature Verification Error]:', err);
     return false;
   }
 }
@@ -6695,16 +6696,19 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     // 8. Construct Mercado Pago Preference payload with dynamic items & prices
     let mpItems: any[] = [];
     if (discount > 0 && subtotal > 0) {
-      const discountRatio = Math.max(0, (subtotal - discount) / subtotal);
+      const netProductTotal = Math.max(0, Number((subtotal - discount).toFixed(2)));
       let distributedSum = 0;
       mpItems = validatedItems.map((item, idx) => {
-        let adjustedUnitPrice = Number((item.price * discountRatio).toFixed(2));
+        let itemTotal: number;
         if (idx === validatedItems.length - 1) {
-          const targetItemTotal = Math.max(0.01, Number((subtotal - discount - distributedSum).toFixed(2)));
-          adjustedUnitPrice = Number((targetItemTotal / item.quantity).toFixed(2));
+          itemTotal = Math.max(0.01, Number((netProductTotal - distributedSum).toFixed(2)));
         } else {
-          distributedSum += adjustedUnitPrice * item.quantity;
+          const itemProportion = (item.price * item.quantity) / subtotal;
+          itemTotal = Number((netProductTotal * itemProportion).toFixed(2));
+          distributedSum += itemTotal;
         }
+
+        const adjustedUnitPrice = Number((itemTotal / item.quantity).toFixed(2));
         return {
           id: item.productId,
           title: item.title,
@@ -6727,6 +6731,20 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         currency_id: 'BRL',
         unit_price: Number(item.price.toFixed(2)),
       }));
+    }
+
+    // Include shipping fee as an explicit line item in the preference so Checkout Pro transaction_amount reflects total including freight
+    if (validatedShippingFee > 0) {
+      mpItems.push({
+        id: `shipping-${shippingServiceId || 'fee'}`,
+        title: `Frete — ${shippingCarrier || 'Entrega'} ${shippingService ? `(${shippingService})` : ''}`.trim(),
+        description: `Envio para ${shippingAddress?.city || ''} - ${shippingAddress?.state || ''} (CEP: ${shippingAddress?.cep || ''}, Prazo: ${shippingDeliveryTime || 5} dias úteis)`,
+        picture_url: `${appUrl}/assets/shipping-box.png`,
+        category_id: 'shipping',
+        quantity: 1,
+        currency_id: 'BRL',
+        unit_price: Number(validatedShippingFee.toFixed(2)),
+      });
     }
 
     const isSandbox = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'sandbox';
@@ -6759,13 +6777,6 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         customer_email: payer?.email || '',
       },
     };
-
-    if (validatedShippingFee > 0) {
-      preferencePayload.shipments = {
-        cost: validatedShippingFee,
-        mode: 'not_specified',
-      };
-    }
 
     // 9. Call Mercado Pago API to create real dynamic preference
     const mpClient = getMercadoPagoClient();
@@ -7074,18 +7085,26 @@ async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?
 app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks/mercadopago'], async (req, res) => {
   try {
     const webhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET || process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+    const hasAccessToken = Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN);
+    const hasWebhookSecret = Boolean(webhookSecret && webhookSecret.trim().length > 0);
+    const mpEnv = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase();
+
+    const topic = req.query.topic || req.query.type || req.body?.type || req.body?.action || req.body?.topic;
+    const paymentId = req.query['data.id'] || req.query.id || req.body?.data?.id || req.body?.id;
+    const eventKey = paymentId ? String(paymentId) : `evt-${Date.now()}`;
+
+    console.log(`[Mercado Pago Webhook Received]: Topic=${topic || 'payment'}, PaymentId=${paymentId || 'N/A'}, hasAccessToken=${hasAccessToken}, hasWebhookSecret=${hasWebhookSecret}, mercadoPagoEnvironment=${mpEnv}`);
+
     const isSignatureValid = verifyMercadoPagoWebhookSignature(req, webhookSecret);
 
-    if (webhookSecret && !isSignatureValid) {
+    if (hasWebhookSecret && !isSignatureValid) {
       console.warn('[Mercado Pago Webhook Warning]: Invalid signature header.');
       return res.status(401).json({ error: 'Assinatura do webhook inválida.' });
     }
 
-    const topic = req.query.topic || req.query.type || req.body?.type || req.body?.action || req.body?.topic;
-    const paymentId = req.query.id || req.query['data.id'] || req.body?.data?.id || req.body?.id;
-    const eventKey = paymentId ? String(paymentId) : `evt-${Date.now()}`;
-
-    console.log(`[Mercado Pago Webhook Received]: Topic=${topic}, PaymentId=${paymentId}`);
+    if (hasWebhookSecret && isSignatureValid) {
+      console.log('[Mercado Pago Webhook]: Webhook signature validated');
+    }
 
     if (paymentId && (topic === 'payment' || topic === 'payment.updated' || topic === 'payment.created' || !topic)) {
       // Persistent distributed claim check (PostgreSQL UNIQUE constraint + state table)
@@ -7123,13 +7142,21 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
         }
 
         if (paymentData) {
+          console.log(`[Mercado Pago Webhook]: Payment fetched (ID: ${paymentId})`);
           const externalReference = paymentData.external_reference || paymentData.metadata?.order_id;
           if (externalReference) {
             orderIdFound = String(externalReference);
+            console.log(`[Mercado Pago Webhook]: external_reference found (${orderIdFound})`);
             const order = await db.getOrderById(orderIdFound);
             if (order) {
+              console.log(`[Mercado Pago Webhook]: Order #${order.id} found`);
               await applyMercadoPagoPaymentToOrder(order, paymentData);
-              console.log(`[Mercado Pago Webhook]: Order #${order.id} updated to status "${order.status}" / "${order.paymentStatus}".`);
+              if (order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago') {
+                console.log(`[Mercado Pago Webhook]: Payment approved`);
+                console.log(`[Mercado Pago Webhook]: Order #${order.id} updated to status "${order.status}" / "${order.paymentStatus}".`);
+              } else {
+                console.log(`[Mercado Pago Webhook]: Order #${order.id} updated with payment status "${order.paymentStatus}".`);
+              }
             }
           }
         }
@@ -8158,7 +8185,7 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
 
     const isSandbox = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'sandbox';
 
-    const mpItems = order.items.map((item) => ({
+    const mpItems: any[] = (order.items || []).map((item) => ({
       id: item.productId,
       title: item.title,
       description: `${item.title} (Tam: ${item.size}, Cor: ${item.color})`,
@@ -8168,6 +8195,19 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
       currency_id: 'BRL',
       unit_price: Number(item.price.toFixed(2)),
     }));
+
+    if (order.shippingFee && order.shippingFee > 0) {
+      mpItems.push({
+        id: `shipping-${order.shippingServiceId || 'fee'}`,
+        title: `Frete — ${order.shippingCarrier || 'Entrega'} ${order.shippingService ? `(${order.shippingService})` : ''}`.trim(),
+        description: `Envio para ${order.shippingAddress?.city || ''} - ${order.shippingAddress?.state || ''} (CEP: ${order.shippingAddress?.cep || ''})`,
+        picture_url: `${appUrl}/assets/shipping-box.png`,
+        category_id: 'shipping',
+        quantity: 1,
+        currency_id: 'BRL',
+        unit_price: Number(order.shippingFee.toFixed(2)),
+      });
+    }
 
     const preferencePayload: any = {
       items: mpItems,
@@ -8195,13 +8235,6 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
         customer_email: order.customerEmail || '',
       },
     };
-
-    if (order.shippingFee && order.shippingFee > 0) {
-      preferencePayload.shipments = {
-        cost: order.shippingFee,
-        mode: 'not_specified',
-      };
-    }
 
     const mpClient = getMercadoPagoClient();
     let preferenceId = '';

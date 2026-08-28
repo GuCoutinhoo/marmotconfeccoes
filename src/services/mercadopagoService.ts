@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { MercadoPagoConfig, Payment, Preference } from 'mercadopago';
+import { MercadoPagoConfig, Payment, Preference, WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
 
 export interface MercadoPagoSettings {
   environment: 'sandbox' | 'production';
@@ -164,46 +164,19 @@ export function verifyMercadoPagoWebhookSignature(params: {
   }
 
   try {
-    // Parse ts and hash parts
-    const parts = signatureHeader.split(',');
-    let ts = '';
-    let hashV1 = '';
-
-    for (const part of parts) {
-      const [key, value] = part.trim().split('=');
-      if (key === 'ts') ts = value;
-      if (key === 'v1') hashV1 = value;
-    }
-
-    if (!ts || !hashV1) {
-      console.error('[MercadoPago Webhook] Formato inválido no header x-signature:', signatureHeader);
-      return false;
-    }
-
-    // Build the manifest string
-    // Format: "id:[data.id];request-id:[x-request-id];ts:[ts];"
-    let manifest = '';
-    if (dataId) manifest += `id:${dataId};`;
-    if (requestId) manifest += `request-id:${requestId};`;
-    manifest += `ts:${ts};`;
-
-    // Compute HMAC-SHA256
-    const hmac = crypto.createHmac('sha256', secret);
-    hmac.update(manifest);
-    const calculatedHash = hmac.digest('hex');
-
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(calculatedHash, 'utf-8'),
-      Buffer.from(hashV1, 'utf-8')
-    );
-
-    if (!isValid) {
-      console.error('[MercadoPago Webhook] Assinatura HMAC inválida.');
-    }
-
-    return isValid;
+    WebhookSignatureValidator.validate({
+      xSignature: signatureHeader,
+      xRequestId: requestId || '',
+      dataId: dataId ? String(dataId) : undefined,
+      secret: secret.trim(),
+    });
+    return true;
   } catch (err: any) {
-    console.error('[MercadoPago Webhook] Erro ao validar assinatura:', err.message);
+    if (err instanceof InvalidWebhookSignatureError) {
+      console.error(`[MercadoPago Webhook] Assinatura HMAC inválida (${err.reason}).`);
+    } else {
+      console.error('[MercadoPago Webhook] Erro ao validar assinatura:', err?.message || err);
+    }
     return false;
   }
 }
