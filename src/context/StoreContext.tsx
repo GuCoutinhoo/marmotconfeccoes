@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { Category, Product } from '../types';
 import { CATALOG_90_PRODUCTS } from '../data/catalog90Products';
 import { INITIAL_8_CATEGORIES } from '../data/categories';
 import {
   fetchProductsFromSupabaseDirect,
   fetchCategoriesFromSupabaseDirect,
+  validateAndDeduplicateProducts,
   createProductInSupabase,
   updateProductInSupabase,
   deleteProductInSupabase,
@@ -17,11 +18,21 @@ import {
   deleteProductImageFromStorage,
 } from '../lib/supabaseClient';
 
+const PRODUCT_CACHE_KEY_V2 = '@marmot_cached_products_v2';
+const LEGACY_PRODUCT_CACHE_KEY = '@marmot_cached_products';
+
+interface ProductCacheSnapshotV2 {
+  version: 2;
+  savedAt: number;
+  products: Product[];
+}
+
 interface StoreContextType {
   categories: Category[];
   products: Product[];
   isLoading: boolean;
   isInitialized: boolean;
+  isFetchingFreshData: boolean;
   fetchStoreData: () => Promise<void>;
   
   // Category Actions
@@ -59,10 +70,20 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const [products, setProducts] = useState<Product[]>(() => {
     try {
-      const cached = localStorage.getItem('@marmot_cached_products');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      // 1. Automatically neutralize and wipe old corrupt unversioned cache
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem(LEGACY_PRODUCT_CACHE_KEY);
+      }
+    } catch {}
+
+    try {
+      // 2. Read strictly verified v2 snapshot
+      const raw = localStorage.getItem(PRODUCT_CACHE_KEY_V2);
+      if (raw) {
+        const parsed: ProductCacheSnapshotV2 = JSON.parse(raw);
+        if (parsed && parsed.version === 2 && Array.isArray(parsed.products) && parsed.products.length > 0) {
+          return validateAndDeduplicateProducts(parsed.products);
+        }
       }
     } catch {}
     return CATALOG_90_PRODUCTS || [];
@@ -70,6 +91,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState<boolean>(true);
+  const [isFetchingFreshData, setIsFetchingFreshData] = useState<boolean>(false);
+
+  // Race condition protection: always ensure only the latest request can commit to state
+  const latestFetchRequestIdRef = useRef<number>(0);
+
+  const saveProductCacheSnapshot = useCallback((prods: Product[]) => {
+    try {
+      if (!Array.isArray(prods) || prods.length === 0) return;
+      const snapshot: ProductCacheSnapshotV2 = {
+        version: 2,
+        savedAt: Date.now(),
+        products: prods,
+      };
+      localStorage.setItem(PRODUCT_CACHE_KEY_V2, JSON.stringify(snapshot));
+      console.log(`[PRODUCTS] cache snapshot rows=${prods.length}`);
+    } catch {}
+  }, []);
 
   // Helper to build headers with active auth token
   const getAuthHeaders = useCallback((isJson = true) => {
@@ -104,6 +142,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, []);
 
   const fetchStoreData = useCallback(async () => {
+    const currentReqId = ++latestFetchRequestIdRef.current;
+    console.log(`[PRODUCTS] StoreContext request #${currentReqId} started`);
+    setIsFetchingFreshData(true);
+
     try {
       let loadedProducts: Product[] = [];
       let loadedCategories: Category[] = [];
@@ -123,15 +165,15 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             loadedCategories = directCat.categories;
           }
         } catch (sbErr) {
-          console.warn('[STORE] Supabase direct fetch notice:', sbErr);
+          console.warn(`[PRODUCTS] request #${currentReqId} Supabase direct fetch notice:`, sbErr);
         }
       }
 
       // 2. If Supabase returned empty or unavailable, fallback to backend API
       if (loadedProducts.length === 0 || loadedCategories.length === 0) {
         const [prodRes, catRes] = await Promise.all([
-          fetch('/api/products').catch(() => null),
-          fetch('/api/categories').catch(() => null),
+          fetch('/api/products', { cache: 'no-store' }).catch(() => null),
+          fetch('/api/categories', { cache: 'no-store' }).catch(() => null),
         ]);
 
         if (loadedProducts.length === 0 && prodRes && prodRes.ok) {
@@ -149,11 +191,20 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
+      // 3. Race condition verification: if a newer request started while this one was running, discard this older result
+      if (currentReqId !== latestFetchRequestIdRef.current) {
+        console.log(`[PRODUCTS] request #${currentReqId} superseded by #${latestFetchRequestIdRef.current} — discarding stale response`);
+        return;
+      }
+
+      // 4. Strict Non-Destructive Catalog Update: ONLY commit when valid products are returned
       if (loadedProducts.length > 0) {
-        setProducts(loadedProducts);
-        try {
-          localStorage.setItem('@marmot_cached_products', JSON.stringify(loadedProducts));
-        } catch {}
+        const uniqueProducts = validateAndDeduplicateProducts(loadedProducts);
+        console.log(`[PRODUCTS] committing catalog rows=${uniqueProducts.length}`);
+        setProducts(uniqueProducts);
+        saveProductCacheSnapshot(uniqueProducts);
+      } else {
+        console.warn(`[PRODUCTS] request #${currentReqId} returned 0 valid products — preserving existing catalog in state.`);
       }
 
       if (loadedCategories.length > 0) {
@@ -163,12 +214,15 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         } catch {}
       }
     } catch (error) {
-      console.error('[PRODUCTS] Erro ao carregar catálogo da loja:', error);
+      console.error(`[PRODUCTS] request #${currentReqId} erro ao carregar catálogo da loja:`, error);
     } finally {
-      setIsLoading(false);
-      setIsInitialized(true);
+      if (currentReqId === latestFetchRequestIdRef.current) {
+        setIsLoading(false);
+        setIsInitialized(true);
+        setIsFetchingFreshData(false);
+      }
     }
-  }, []);
+  }, [saveProductCacheSnapshot]);
 
   useEffect(() => {
     fetchStoreData();
@@ -187,22 +241,24 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             const newProd = mapSupabaseRowToProduct(payload.new);
             setProducts((prev) => {
               const filtered = prev.filter((p) => p.id !== newProd.id && p.slug !== newProd.slug);
-              const next = [newProd, ...filtered];
-              try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+              const next = validateAndDeduplicateProducts([newProd, ...filtered]);
+              saveProductCacheSnapshot(next);
               return next;
             });
           } else if (payload.eventType === 'UPDATE' && payload.new) {
             const updatedProd = mapSupabaseRowToProduct(payload.new);
             setProducts((prev) => {
-              const next = prev.map((p) => (p.id === updatedProd.id || p.slug === updatedProd.slug ? { ...p, ...updatedProd } : p));
-              try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+              const next = validateAndDeduplicateProducts(
+                prev.map((p) => (p.id === updatedProd.id || p.slug === updatedProd.slug ? { ...p, ...updatedProd } : p))
+              );
+              saveProductCacheSnapshot(next);
               return next;
             });
           } else if (payload.eventType === 'DELETE' && payload.old?.id) {
-            const oldId = payload.old.id;
+            const oldId = String(payload.old.id);
             setProducts((prev) => {
               const next = prev.filter((p) => p.id !== oldId);
-              try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+              saveProductCacheSnapshot(next);
               return next;
             });
           }
@@ -235,7 +291,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [saveProductCacheSnapshot]);
 
   // Upload helper: uploads to Supabase Storage (bucket 'product-images') or fallback proxy and returns permanent URL
   const uploadImage = async (imageFileOrBase64: File | string, filename?: string): Promise<string> => {
@@ -397,8 +453,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // If Supabase succeeded, update state immediately & sync backend in background
       if (created) {
         setProducts((prev) => {
-          const next = [created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)];
-          try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+          const next = validateAndDeduplicateProducts([created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)]);
+          saveProductCacheSnapshot(next);
           return next;
         });
 
@@ -455,8 +511,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       // 4. Update React state immediately
       setProducts((prev) => {
-        const next = [created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)];
-        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        const next = validateAndDeduplicateProducts([created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)]);
+        saveProductCacheSnapshot(next);
         return next;
       });
 
@@ -486,8 +542,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // If Supabase succeeded, update React state & cache immediately and sync backend in background
       if (updated) {
         setProducts((prev) => {
-          const next = prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? { ...p, ...updated } : p));
-          try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+          const next = validateAndDeduplicateProducts(
+            prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? { ...p, ...updated } : p))
+          );
+          saveProductCacheSnapshot(next);
           return next;
         });
 
@@ -538,8 +596,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       // 4. Update React state immediately across the whole application
       setProducts((prev) => {
-        const next = prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? { ...p, ...updated } : p));
-        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        const next = validateAndDeduplicateProducts(
+          prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? { ...p, ...updated } : p))
+        );
+        saveProductCacheSnapshot(next);
         return next;
       });
 
@@ -581,8 +641,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       setProducts((prev) => {
-        const next = prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updatedStock, status: newStatus as any } : p));
-        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        const next = validateAndDeduplicateProducts(
+          prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updatedStock, status: newStatus as any } : p))
+        );
+        saveProductCacheSnapshot(next);
         return next;
       });
     } catch (error: any) {
@@ -609,7 +671,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       setProducts((prev) => {
         const next = prev.filter((p) => p.id !== id && p.slug !== id);
-        try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+        saveProductCacheSnapshot(next);
         return next;
       });
       return true;

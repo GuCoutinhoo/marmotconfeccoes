@@ -173,57 +173,133 @@ export function mapSupabaseRowToCategory(row: any): Category {
 export const PRODUCT_SELECT_COLUMNS =
   'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
 
+let supabaseProductFetchRequestId = 0;
+
 /**
- * Direct query to Supabase for products with optimized column selection and resilient fallback.
+ * Validates array of products and deduplicates by unique product.id using Map.
+ * Discards any corrupted, null or missing-id records.
+ */
+export function validateAndDeduplicateProducts(products: Product[]): Product[] {
+  if (!Array.isArray(products) || products.length === 0) return [];
+  const byId = new Map<string, Product>();
+
+  for (const item of products) {
+    if (!item || typeof item !== 'object') continue;
+    const cleanId = String(item.id || '').trim();
+    if (!cleanId) continue;
+    // Map ensures each unique id appears exactly once (latest or valid item)
+    byId.set(cleanId, item);
+  }
+
+  return Array.from(byId.values());
+}
+
+/**
+ * Executes a deterministic, reliable product query from Supabase.
+ * - Enforces order('id', { ascending: true }) on all attempts and pages.
+ * - Dynamic pagination supporting unlimited products without hardcoded range limits.
+ * - Strict ALL-OR-NOTHING semantics: ANY failed batch in a multi-batch attempt discards the entire attempt.
+ * - Controlled retry with limited backoff for transient network issues.
+ * - Deduplication by unique product.id.
  */
 export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Product[]; error?: any }> {
-  try {
-    // 1. Try single fast query
-    const { data, error } = await supabase
-      .from('products')
-      .select(PRODUCT_SELECT_COLUMNS);
+  const reqId = ++supabaseProductFetchRequestId;
+  console.log(`[PRODUCTS] request #${reqId} started`);
 
-    if (!error && data && data.length > 0) {
-      const mapped = data.map(mapSupabaseRowToProduct);
-      return { products: mapped };
+  const maxAttempts = 2;
+  let lastError: any = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (attempt > 1) {
+      console.log(`[PRODUCTS] request #${reqId} retry attempt ${attempt}/${maxAttempts}...`);
+      await new Promise((resolve) => setTimeout(resolve, 200 * attempt));
     }
 
-    // 2. If single query timed out or errored, fetch in resilient fast chunks (0-59, 60-119, 120-179)
-    if (error) {
-      console.warn('[PRODUCTS] Tentando busca em lotes resilientes após aviso:', error.message || error);
-      const batchPromises = [
-        supabase.from('products').select(PRODUCT_SELECT_COLUMNS).range(0, 59),
-        supabase.from('products').select(PRODUCT_SELECT_COLUMNS).range(60, 119),
-        supabase.from('products').select(PRODUCT_SELECT_COLUMNS).range(120, 179),
-      ];
-      const batchResults = await Promise.all(batchPromises);
-      const combinedRows: any[] = [];
-      for (const res of batchResults) {
-        if (res.data && Array.isArray(res.data)) {
-          combinedRows.push(...res.data);
+    try {
+      // 1. Primary Query: Single deterministic fast query ordered by id
+      const { data, error } = await supabase
+        .from('products')
+        .select(PRODUCT_SELECT_COLUMNS)
+        .order('id', { ascending: true });
+
+      if (!error && data && Array.isArray(data)) {
+        const mapped = data.map(mapSupabaseRowToProduct);
+        const unique = validateAndDeduplicateProducts(mapped);
+        console.log(`[PRODUCTS] primary query success rows=${data.length}, unique=${unique.length}`);
+        return { products: unique };
+      }
+
+      if (error) {
+        lastError = error;
+        console.warn(`[PRODUCTS] request #${reqId} primary query notice:`, error.message || error);
+      }
+
+      // 2. Dynamic Batch Fallback with strict All-or-Nothing validation
+      console.log(`[PRODUCTS] request #${reqId} attempting dynamic sequential batches...`);
+      const pageSize = 60;
+      let page = 0;
+      let hasMore = true;
+      let batchFailed = false;
+      const allBatchRows: any[] = [];
+
+      while (hasMore) {
+        const from = page * pageSize;
+        const to = from + pageSize - 1;
+
+        const { data: pageData, error: pageError } = await supabase
+          .from('products')
+          .select(PRODUCT_SELECT_COLUMNS)
+          .order('id', { ascending: true })
+          .range(from, to);
+
+        if (pageError || !pageData || !Array.isArray(pageData)) {
+          console.warn(`[PRODUCTS] batch ${page} failed (${pageError?.message || 'invalid data'}) — discarding partial result`);
+          batchFailed = true;
+          lastError = pageError || new Error(`Batch ${page} returned invalid data`);
+          break; // Stop immediately; do NOT accept partial data!
+        }
+
+        console.log(`[PRODUCTS] batch ${page} rows=${pageData.length}`);
+        allBatchRows.push(...pageData);
+
+        if (pageData.length < pageSize) {
+          hasMore = false;
+        } else {
+          page++;
         }
       }
-      if (combinedRows.length > 0) {
-        const mapped = combinedRows.map(mapSupabaseRowToProduct);
-        return { products: mapped };
+
+      // ONLY accept the batch result if ALL batches succeeded without any error
+      if (!batchFailed && allBatchRows.length > 0) {
+        const mapped = allBatchRows.map(mapSupabaseRowToProduct);
+        const unique = validateAndDeduplicateProducts(mapped);
+        console.log(`[PRODUCTS] final unique rows=${unique.length} from all batches`);
+        return { products: unique };
       }
+    } catch (err: any) {
+      lastError = err;
+      console.warn(`[PRODUCTS] request #${reqId} exception during attempt ${attempt}:`, err?.message || err);
     }
-  } catch (err: any) {
-    console.warn('[PRODUCTS] Exceção ao carregar do Supabase:', err?.message || err);
   }
 
   // Graceful fallback to backend API if Supabase encounters a temporary issue
   try {
+    console.log(`[PRODUCTS] request #${reqId} Supabase direct failed, checking backend /api/products...`);
     const apiRes = await fetch('/api/products', { cache: 'no-store' });
     if (apiRes.ok) {
       const apiData = await apiRes.json();
       if (apiData && Array.isArray(apiData.products) && apiData.products.length > 0) {
-        return { products: apiData.products };
+        const unique = validateAndDeduplicateProducts(apiData.products);
+        console.log(`[PRODUCTS] request #${reqId} backend api fallback rows=${unique.length}`);
+        return { products: unique };
       }
     }
-  } catch {}
+  } catch (apiErr) {
+    console.warn(`[PRODUCTS] request #${reqId} backend api fallback failed:`, apiErr);
+  }
 
-  return { products: [] };
+  console.warn(`[PRODUCTS] request #${reqId} failed completely — preserving current state`);
+  return { products: [], error: lastError || new Error('Failed to load products from all sources') };
 }
 
 export const SUPABASE_STORAGE_BUCKET = 'product-images';

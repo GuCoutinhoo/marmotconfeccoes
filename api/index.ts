@@ -867,24 +867,21 @@ export class DatabaseManager {
   public async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    // Load local storage immediately for 0ms instant startup
+    // Load local storage files as initial fallback
     this.loadFromFiles();
-    this.isInitialized = true;
 
     if (this.mode === 'supabase' && this.supabase) {
-      if (this.products.length === 0) {
-        await this.loadFromSupabase().catch((err) => {
-          console.warn('[DB] Supabase initial load notice:', err?.message || err);
-        });
-      } else {
-        // Background sync from Supabase without blocking requests
-        this.loadFromSupabase().catch((err) => {
-          console.warn('[DB] Supabase background sync notice:', err?.message || err);
-        });
+      // In Supabase mode, ensure authoritative catalog is loaded before marking initialization complete
+      try {
+        await this.loadFromSupabase();
+      } catch (err: any) {
+        console.warn('[DB] Supabase initial load notice:', err?.message || err);
       }
     } else if (this.mode === 'postgres' && this.pgPool) {
       await this.loadFromPostgres().catch(() => {});
     }
+
+    this.isInitialized = true;
   }
 
   private async loadFromPostgres() {
@@ -1114,13 +1111,25 @@ export class DatabaseManager {
         }
       }
 
-      console.log('[PRODUCTS] carregando do Supabase');
+      console.log('[PRODUCTS] Carregando catálogo completo do Supabase...');
       const PRODUCT_SELECT_COLUMNS = 'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
-      const { data: prodData, error: prodErr } = await this.supabase.from('products').select(PRODUCT_SELECT_COLUMNS).order('created_at', { ascending: false });
-      if (!prodErr && prodData && prodData.length > 0) {
-        this.products = prodData.map((item: any) => this.mapSupabaseProduct(item));
+      const { data: prodData, error: prodErr } = await this.supabase
+        .from('products')
+        .select(PRODUCT_SELECT_COLUMNS)
+        .order('id', { ascending: true });
+
+      if (!prodErr && prodData && Array.isArray(prodData) && prodData.length > 0) {
+        const mapped = prodData.map((item: any) => this.mapSupabaseProduct(item));
+        const byId = new Map<string, Product>();
+        for (const p of mapped) {
+          if (p && p.id && String(p.id).trim().length > 0) {
+            byId.set(String(p.id).trim(), p);
+          }
+        }
+        const uniqueProducts = Array.from(byId.values());
+        this.products = uniqueProducts;
         this.writeJsonFile(PRODUCTS_FILE, this.products);
-        console.log(`[PRODUCTS] ${this.products.length} produtos carregados do Supabase`);
+        console.log(`[PRODUCTS] ${this.products.length} produtos únicos carregados do Supabase com sucesso.`);
       } else if (prodErr) {
         console.warn('[PRODUCTS] aviso ao carregar do Supabase:', prodErr.message || prodErr);
       }
