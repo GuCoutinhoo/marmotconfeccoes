@@ -64,10 +64,40 @@ const FREE_SHIPPING_THRESHOLD = 399.00;
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, token } = useAuth();
-  const [cart, setCart] = useState<CartItem[]>([]);
+  
+  // Synchronous cache hydration to prevent empty cart flash on initial render
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const rawUser = localStorage.getItem('@marmot_auth_user');
+      let uId = '';
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser);
+        uId = parsed?.id || '';
+      }
+      if (uId) {
+        const savedUserCart = localStorage.getItem(`@aura_cart_${uId}`);
+        if (savedUserCart) {
+          const parsed = JSON.parse(savedUserCart);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      }
+      const generalCart = localStorage.getItem('@aura_cart');
+      if (generalCart) {
+        const parsed = JSON.parse(generalCart);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return [];
+  });
+
   const [cartHydrated, setCartHydrated] = useState<boolean>(false);
   const isHydratingRef = useRef<boolean>(false);
   const activeUserIdRef = useRef<string | null>(user?.id || null);
+  const cartRef = useRef<CartItem[]>(cart);
+
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
 
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(() => {
     try {
@@ -344,11 +374,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const calculateShipping = useCallback(
-    async (postalCodeToUse?: string): Promise<ShippingOption[]> => {
+    async (postalCodeToUse?: string, overrideItems?: CartItem[]): Promise<ShippingOption[]> => {
       const rawTarget = postalCodeToUse !== undefined ? postalCodeToUse : shippingPostalCode;
       const targetCep = normalizeCep(rawTarget);
 
-      console.log('[CALCULAR AGORA FRETE] 1. Início do cálculo. CEP:', targetCep, 'Raw:', rawTarget, 'Itens no carrinho:', cart.length);
+      // Determine active items: override items > cartRef > cart state
+      let activeCart = (overrideItems && overrideItems.length > 0)
+        ? overrideItems
+        : (cartRef.current && cartRef.current.length > 0)
+          ? cartRef.current
+          : cart;
+
+      // If activeCart is empty but user is logged in, check user cached cart
+      if ((!activeCart || activeCart.length === 0) && activeUserIdRef.current) {
+        try {
+          const cached = localStorage.getItem(`@aura_cart_${activeUserIdRef.current}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              activeCart = parsed;
+            }
+          }
+        } catch {}
+      }
+
+      console.log('[CALCULAR AGORA FRETE] 1. Início do cálculo. CEP:', targetCep, 'Raw:', rawTarget, 'Itens no carrinho:', activeCart ? activeCart.length : 0);
 
       if (!isValidCepFormat(targetCep) || targetCep.length !== 8) {
         const errorMsg = `[Validação Bloqueou] CEP "${rawTarget || ''}" inválido. Digite 8 dígitos numéricos.`;
@@ -359,7 +409,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return [];
       }
 
-      if (!cart || cart.length === 0) {
+      if (!activeCart || activeCart.length === 0) {
+        if (isHydratingRef.current) {
+          console.log('[CALCULAR AGORA FRETE] Carrinho ainda sincronizando. Aguardando...');
+          return [];
+        }
         const errorMsg = '[Validação Bloqueou] O carrinho está vazio (cart.length === 0). Adicione um produto para calcular o frete.';
         console.warn('[CALCULAR AGORA FRETE] Bloqueado:', errorMsg);
         setShippingError(errorMsg);
@@ -385,7 +439,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         // Step 2: Build and log actual product parameters (weight, dimensions, price, id)
-        const payloadItems = cart.map((item, idx) => {
+        const payloadItems = activeCart.map((item, idx) => {
           const p = item.product || ({} as any);
           const itemPayload = {
             productId: p.id || `prod-${idx + 1}`,
@@ -465,6 +519,23 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
     [cart, shippingPostalCode]
   );
+
+  // Auto-clear stale cart-empty errors and auto-calculate when cart becomes available
+  useEffect(() => {
+    if (cart.length > 0) {
+      setShippingError((prev) => {
+        if (prev && prev.includes('cart.length === 0')) {
+          return null;
+        }
+        return prev;
+      });
+
+      const clean = normalizeCep(shippingPostalCode);
+      if (isValidCepFormat(clean) && clean.length === 8 && shippingOptions.length === 0 && !isCalculatingShipping) {
+        calculateShipping(clean, cart);
+      }
+    }
+  }, [cart, shippingPostalCode, shippingOptions.length, isCalculatingShipping, calculateShipping]);
 
   const addToCart = (product: Product, selectedSize: string, selectedColor: ProductVariant, quantity = 1): boolean => {
     // 1. Strict Authentication Enforcement: Unauthenticated visitors cannot add items to the cart

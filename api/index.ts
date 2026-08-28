@@ -2476,70 +2476,73 @@ export class DatabaseManager {
   // ==========================================
   public async getOrders(userId?: string, userEmail?: string): Promise<Order[]> {
     await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        let query = this.supabase.from('orders').select('*').order('created_at', { ascending: false });
-        if (userId && userEmail) {
-          query = query.or(`user_id.eq.${userId},customer_email.eq.${userEmail},customer_email.eq.${userId}`);
-        } else if (userId) {
-          query = query.or(`user_id.eq.${userId},customer_email.eq.${userId}`);
-        } else if (userEmail) {
-          query = query.eq('customer_email', userEmail);
-        }
-        const { data, error } = await query;
-        if (!error && data) {
-          const sbOrders: Order[] = data.map((item: any) => {
-            if (item.data && typeof item.data === 'object' && item.data.id) {
-              return item.data;
-            }
-            return {
-              id: item.id || item.order_number,
-              userId: item.user_id || undefined,
-              customerName: item.customer_name || 'Cliente Marmot',
-              customerEmail: item.customer_email || '',
-              customerPhone: item.customer_phone || '',
-              customerCpf: item.customer_cpf || '',
-              date: new Date(item.created_at || Date.now()).toLocaleDateString('pt-BR'),
-              status: item.status || 'Aguardando Pagamento',
-              paymentStatus: item.payment_status || 'Pendente',
-              shippingStatus: item.shipping_status || 'Aguardando preparação',
-              items: item.items || [],
-              subtotal: Number(item.subtotal || 0),
-              discount: Number(item.discount_amount || item.discount || 0),
-              shippingFee: Number(item.shipping_amount || item.shipping_fee || 0),
-              total: Number(item.total || 0),
-              paymentMethod: item.payment_method || 'Cartão de Crédito',
-              shippingAddress: item.shipping_address_snapshot || item.shipping_address || {},
-              shippingCarrier: item.shipping_company || item.shipping_carrier || 'Melhor Envio',
-              shippingService: item.shipping_service_name || item.shipping_service || 'SEDEX',
-              shippingServiceId: item.shipping_service_id,
-              shippingDeliveryTime: item.shipping_delivery_time,
-              trackingCode: item.tracking_code || '',
-              history: item.history || [],
-              paymentDetails: item.data?.paymentDetails || {
-                mercadoPagoPreferenceId: item.mercado_pago_preference_id || null,
-                mercadoPagoPaymentId: item.mercado_pago_payment_id || null,
-              },
-              shippingDetails: item.data?.shippingDetails || null,
-              createdAt: item.created_at || new Date().toISOString(),
-            };
-          });
+        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (adminClient) {
+          let query = adminClient.from('orders').select('*').order('created_at', { ascending: false });
+          if (userId && userEmail) {
+            query = query.or(`user_id.eq.${userId},customer_email.eq.${userEmail},customer_email.eq.${userId}`);
+          } else if (userId) {
+            query = query.or(`user_id.eq.${userId},customer_email.eq.${userId}`);
+          } else if (userEmail) {
+            query = query.eq('customer_email', userEmail);
+          }
+          const { data, error } = await query;
+          if (!error && data) {
+            const sbOrders: Order[] = data.map((item: any) => {
+              if (item.data && typeof item.data === 'object' && item.data.id) {
+                return item.data;
+              }
+              return {
+                id: item.id || item.order_number,
+                userId: item.user_id || undefined,
+                customerName: item.customer_name || 'Cliente Marmot',
+                customerEmail: item.customer_email || '',
+                customerPhone: item.customer_phone || '',
+                customerCpf: item.customer_cpf || '',
+                date: new Date(item.created_at || Date.now()).toLocaleDateString('pt-BR'),
+                status: item.status || 'Aguardando Pagamento',
+                paymentStatus: item.payment_status || 'Pendente',
+                shippingStatus: item.shipping_status || 'Aguardando preparação',
+                items: item.items || [],
+                subtotal: Number(item.subtotal || 0),
+                discount: Number(item.discount_amount || item.discount || 0),
+                shippingFee: Number(item.shipping_amount || item.shipping_fee || 0),
+                total: Number(item.total || 0),
+                paymentMethod: item.payment_method || 'Cartão de Crédito',
+                shippingAddress: item.shipping_address_snapshot || item.shipping_address || {},
+                shippingCarrier: item.shipping_company || item.shipping_carrier || 'Melhor Envio',
+                shippingService: item.shipping_service_name || item.shipping_service || 'SEDEX',
+                shippingServiceId: item.shipping_service_id,
+                shippingDeliveryTime: item.shipping_delivery_time,
+                trackingCode: item.tracking_code || '',
+                history: item.history || [],
+                paymentDetails: item.data?.paymentDetails || {
+                  mercadoPagoPreferenceId: item.mercado_pago_preference_id || null,
+                  mercadoPagoPaymentId: item.mercado_pago_payment_id || null,
+                },
+                shippingDetails: item.data?.shippingDetails || null,
+                createdAt: item.created_at || new Date().toISOString(),
+              };
+            });
 
-          const map = new Map<string, Order>();
-          for (const o of sbOrders) map.set(o.id, o);
-          for (const o of this.orders) {
-            if (!map.has(o.id)) map.set(o.id, o);
+            const map = new Map<string, Order>();
+            for (const o of sbOrders) map.set(o.id, o);
+            for (const o of this.orders) {
+              if (!map.has(o.id)) map.set(o.id, o);
+            }
+            const merged = Array.from(map.values()).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+            this.orders = merged;
+            if (userId || userEmail) {
+              return merged.filter((o) =>
+                (userId && ((o as any).userId === userId || (o as any).user_id === userId)) ||
+                (userEmail && o.customerEmail?.toLowerCase() === userEmail.toLowerCase()) ||
+                (userId && o.customerEmail?.toLowerCase() === userId.toLowerCase())
+              );
+            }
+            return merged;
           }
-          const merged = Array.from(map.values()).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-          this.orders = merged;
-          if (userId || userEmail) {
-            return merged.filter((o) =>
-              (userId && ((o as any).userId === userId || (o as any).user_id === userId)) ||
-              (userEmail && o.customerEmail?.toLowerCase() === userEmail.toLowerCase()) ||
-              (userId && o.customerEmail?.toLowerCase() === userId.toLowerCase())
-            );
-          }
-          return merged;
         }
       } catch (err) {
         console.warn('[DB] Supabase live getOrders fallback:', err);
@@ -2557,52 +2560,72 @@ export class DatabaseManager {
 
   public async getOrderById(id: string): Promise<Order | null> {
     await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        const { data, error } = await this.supabase.from('orders').select('*').or(`id.eq.${id},tracking_code.eq.${id}`).maybeSingle();
-        if (!error && data) {
-          const order = (data.data && typeof data.data === 'object' && data.data.id) ? data.data : {
-            id: data.id || data.order_number,
-            userId: data.user_id || undefined,
-            customerName: data.customer_name || 'Cliente Marmot',
-            customerEmail: data.customer_email || '',
-            customerPhone: data.customer_phone || '',
-            customerCpf: data.customer_cpf || '',
-            date: new Date(data.created_at || Date.now()).toLocaleDateString('pt-BR'),
-            status: data.status || 'Aguardando Pagamento',
-            paymentStatus: data.payment_status || 'Pendente',
-            shippingStatus: data.shipping_status || 'Aguardando preparação',
-            items: data.items || [],
-            subtotal: Number(data.subtotal || 0),
-            discount: Number(data.discount_amount || data.discount || 0),
-            shippingFee: Number(data.shipping_amount || data.shipping_fee || 0),
-            total: Number(data.total || 0),
-            paymentMethod: data.payment_method || 'Cartão de Crédito',
-            shippingAddress: data.shipping_address_snapshot || data.shipping_address || {},
-            shippingCarrier: data.shipping_company || data.shipping_carrier || 'Melhor Envio',
-            shippingService: data.shipping_service_name || data.shipping_service || 'SEDEX',
-            shippingServiceId: data.shipping_service_id,
-            shippingDeliveryTime: data.shipping_delivery_time,
-            trackingCode: data.tracking_code || '',
-            history: data.history || [],
-            paymentDetails: data.data?.paymentDetails || {
-              mercadoPagoPreferenceId: data.mercado_pago_preference_id || null,
-              mercadoPagoPaymentId: data.mercado_pago_payment_id || null,
-            },
-            shippingDetails: data.data?.shippingDetails || null,
-            createdAt: data.created_at || new Date().toISOString(),
-          };
+    if (!id) return null;
+    const clean = String(id).trim();
 
-          const idx = this.orders.findIndex((o) => o.id === id);
-          if (idx >= 0) this.orders[idx] = order;
-          else this.orders.unshift(order);
-          return order;
+    // 1. Direct Supabase query with admin client (bypasses RLS to guarantee order persistence across lambdas)
+    if (this.mode === 'supabase') {
+      try {
+        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (adminClient) {
+          const { data, error } = await adminClient
+            .from('orders')
+            .select('*')
+            .or(`id.eq.${clean},order_number.eq.${clean},tracking_code.eq.${clean},mercado_pago_preference_id.eq.${clean},mercado_pago_payment_id.eq.${clean}`)
+            .maybeSingle();
+
+          if (!error && data) {
+            const order: Order = (data.data && typeof data.data === 'object' && data.data.id) ? data.data : {
+              id: data.id || data.order_number || clean,
+              userId: data.user_id || undefined,
+              customerName: data.customer_name || 'Cliente Marmot',
+              customerEmail: data.customer_email || '',
+              customerPhone: data.customer_phone || '',
+              customerCpf: data.customer_cpf || '',
+              date: new Date(data.created_at || Date.now()).toLocaleDateString('pt-BR'),
+              status: data.status || 'Aguardando Pagamento',
+              paymentStatus: data.payment_status || 'Pendente',
+              shippingStatus: data.shipping_status || 'Aguardando preparação',
+              items: data.items || [],
+              subtotal: Number(data.subtotal || 0),
+              discount: Number(data.discount_amount || data.discount || 0),
+              shippingFee: Number(data.shipping_amount || data.shipping_fee || 0),
+              total: Number(data.total || 0),
+              paymentMethod: data.payment_method || 'Cartão de Crédito',
+              shippingAddress: data.shipping_address_snapshot || data.shipping_address || {},
+              shippingCarrier: data.shipping_company || data.shipping_carrier || 'Melhor Envio',
+              shippingService: data.shipping_service_name || data.shipping_service || 'SEDEX',
+              shippingServiceId: data.shipping_service_id,
+              shippingDeliveryTime: data.shipping_delivery_time,
+              trackingCode: data.tracking_code || '',
+              history: data.history || [],
+              paymentDetails: data.data?.paymentDetails || {
+                mercadoPagoPreferenceId: data.mercado_pago_preference_id || null,
+                mercadoPagoPaymentId: data.mercado_pago_payment_id || null,
+              },
+              shippingDetails: data.data?.shippingDetails || null,
+              createdAt: data.created_at || new Date().toISOString(),
+            };
+
+            const idx = this.orders.findIndex((o) => o.id === order.id || o.id === clean);
+            if (idx >= 0) this.orders[idx] = order;
+            else this.orders.unshift(order);
+            return order;
+          }
         }
       } catch (err) {
         console.warn('[DB] Supabase live getOrderById fallback:', err);
       }
     }
-    return this.orders.find((o) => o.id === id || o.trackingCode === id) || null;
+
+    // 2. Memory / local file lookup
+    return this.orders.find((o) =>
+      o.id === clean ||
+      (o as any).order_number === clean ||
+      o.trackingCode === clean ||
+      o.paymentDetails?.mercadoPagoPreferenceId === clean ||
+      o.paymentDetails?.mercadoPagoPaymentId === clean
+    ) || null;
   }
 
   public async saveOrder(order: Order): Promise<Order> {
@@ -2615,72 +2638,86 @@ export class DatabaseManager {
     }
     this.writeJsonFile(ORDERS_FILE, this.orders);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const orderPayload = {
-          id: order.id,
-          order_number: order.id,
-          user_id: order.userId || null,
-          customer_email: order.customerEmail || null,
-          customer_name: order.customerName || null,
-          customer_phone: order.customerPhone || null,
-          customer_cpf: order.customerCpf || null,
-          items: order.items,
-          shipping_address: order.shippingAddress,
-          shipping_address_snapshot: order.shippingAddress,
-          payment_method: order.paymentMethod,
-          subtotal: order.subtotal,
-          shipping_fee: order.shippingFee,
-          shipping_amount: order.shippingFee,
-          discount: order.discount,
-          discount_amount: order.discount,
-          total: order.total,
-          currency: 'BRL',
-          status: order.status,
-          payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' ? 'Pago' : 'Pendente'),
-          shipping_status: order.shippingStatus || 'Aguardando preparação',
-          payment_environment: process.env.MERCADOPAGO_ENV || 'test',
-          shipping_company: order.shippingCarrier || null,
-          shipping_service_name: order.shippingService || null,
-          shipping_service_id: order.shippingServiceId || null,
-          shipping_delivery_time: order.shippingDeliveryTime || null,
-          tracking_code: order.trackingCode || null,
-          mercado_pago_preference_id: order.paymentDetails?.mercadoPagoPreferenceId || null,
-          mercado_pago_payment_id: order.paymentDetails?.mercadoPagoPaymentId || null,
-          history: order.history,
-          data: order,
-          updated_at: new Date().toISOString(),
-        };
+        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (adminClient) {
+          const orderPayload = {
+            id: order.id,
+            order_number: order.id,
+            user_id: order.userId || null,
+            customer_email: order.customerEmail || null,
+            customer_name: order.customerName || null,
+            customer_phone: order.customerPhone || null,
+            customer_cpf: order.customerCpf || null,
+            items: order.items,
+            shipping_address: order.shippingAddress,
+            shipping_address_snapshot: order.shippingAddress,
+            payment_method: order.paymentMethod,
+            subtotal: order.subtotal,
+            shipping_fee: order.shippingFee,
+            shipping_amount: order.shippingFee,
+            discount: order.discount,
+            discount_amount: order.discount,
+            total: order.total,
+            currency: 'BRL',
+            status: order.status,
+            payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' ? 'Pago' : 'Pendente'),
+            shipping_status: order.shippingStatus || 'Aguardando preparação',
+            payment_environment: process.env.MERCADOPAGO_ENV || 'test',
+            shipping_company: order.shippingCarrier || null,
+            shipping_service_name: order.shippingService || null,
+            shipping_service_id: order.shippingServiceId || null,
+            shipping_delivery_time: order.shippingDeliveryTime || null,
+            tracking_code: order.trackingCode || null,
+            mercado_pago_preference_id: order.paymentDetails?.mercadoPagoPreferenceId || null,
+            mercado_pago_payment_id: order.paymentDetails?.mercadoPagoPaymentId || null,
+            history: order.history,
+            data: order,
+            updated_at: new Date().toISOString(),
+          };
 
-        await this.supabase.from('orders').upsert(orderPayload);
+          const { error: saveErr } = await adminClient.from('orders').upsert(orderPayload, { onConflict: 'id' });
+          if (saveErr) {
+            console.error('[DB] Supabase order upsert error details:', saveErr.message, saveErr.details, saveErr.hint);
+            const { error: insertErr } = await adminClient.from('orders').insert(orderPayload);
+            if (insertErr) {
+              console.error('[DB] Supabase order insert fallback error:', insertErr.message);
+            }
+          } else {
+            console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase`);
+          }
 
-        // Also save order_items if table exists
-        if (Array.isArray(order.items) && order.items.length > 0) {
-          for (const item of order.items) {
-            try {
-              await this.supabase.from('order_items').upsert({
-                id: item.id || `${order.id}-${item.productId}`,
-                order_id: order.id,
-                product_id: item.productId,
-                product_name: item.title || (item as any).name || 'Produto',
-                sku: item.sku || null,
-                image_snapshot: item.image || null,
-                size: item.size || null,
-                color: item.color || null,
-                quantity: item.quantity,
-                unit_price: item.price,
-                subtotal: item.subtotal || (item.price * item.quantity),
-                weight_snapshot: item.weight || null,
-                width_snapshot: item.width || null,
-                height_snapshot: item.height || null,
-                length_snapshot: item.length || null,
-                data: item,
-              });
-            } catch {}
+          // Also save order_items if table exists
+          if (Array.isArray(order.items) && order.items.length > 0) {
+            for (const item of order.items) {
+              try {
+                await adminClient.from('order_items').upsert({
+                  id: item.id || `${order.id}-${item.productId}`,
+                  order_id: order.id,
+                  product_id: item.productId,
+                  product_name: item.title || (item as any).name || 'Produto',
+                  sku: item.sku || null,
+                  image_snapshot: item.image || null,
+                  size: item.size || null,
+                  color: item.color || null,
+                  quantity: item.quantity,
+                  unit_price: item.price,
+                  subtotal: item.subtotal || (item.price * item.quantity),
+                  weight_snapshot: item.weight || null,
+                  width_snapshot: item.width || null,
+                  height_snapshot: item.height || null,
+                  length_snapshot: item.length || null,
+                  data: item,
+                }, { onConflict: 'id' });
+              } catch (itemErr: any) {
+                console.warn('[DB] Supabase order_item notice:', itemErr.message);
+              }
+            }
           }
         }
       } catch (err) {
-        console.error('[DB] Supabase order upsert error:', err);
+        console.error('[DB] Supabase order upsert exception:', err);
       }
     }
     return order;
@@ -6921,9 +6958,102 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
 
 // Function to securely query Mercado Pago API to verify payment status of an order
 async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?: string): Promise<{ order: Order; paymentData: any | null; isApproved: boolean; status: string }> {
-  const order = await db.getOrderById(orderId);
+  let order = await db.getOrderById(orderId);
+  const cleanId = String(orderId || '').trim();
+
+  // If not found in memory/Supabase by default lookup, try extended searches
+  if (!order && cleanId) {
+    console.warn(`[Mercado Pago Verification] Order ${cleanId} not found in default lookup. Searching by alternative fields...`);
+    const allOrders = await db.getOrders();
+    order = allOrders.find((o) =>
+      o.id === cleanId ||
+      (o as any).order_number === cleanId ||
+      o.trackingCode === cleanId ||
+      o.paymentDetails?.mercadoPagoPreferenceId === cleanId ||
+      o.paymentDetails?.mercadoPagoPaymentId === cleanId ||
+      (paymentIdParam && (o.paymentDetails?.mercadoPagoPaymentId === paymentIdParam || o.id === paymentIdParam))
+    ) || null;
+  }
+
+  // If order is still not found, check if Mercado Pago has payment data to reconstruct/restore it safely
   if (!order) {
-    throw new Error(`Pedido #${orderId} não encontrado.`);
+    const token = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+    if (token && (paymentIdParam || cleanId)) {
+      try {
+        let searchedPayment: any = null;
+        if (paymentIdParam) {
+          const fetchRes = await fetch(`https://api.mercadopago.com/v1/payments/${paymentIdParam}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (fetchRes.ok) searchedPayment = await fetchRes.json();
+        }
+        if (!searchedPayment && cleanId) {
+          const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(cleanId)}&sort=date_created&criteria=desc`;
+          const searchRes = await fetch(searchUrl, { headers: { Authorization: `Bearer ${token}` } });
+          if (searchRes.ok) {
+            const searchJson = await searchRes.json();
+            if (searchJson.results && searchJson.results.length > 0) searchedPayment = searchJson.results[0];
+          }
+        }
+        if (searchedPayment) {
+          console.log(`[Mercado Pago Verification] Found payment on MP for order ${cleanId}. Restoring order record in DB...`);
+          const isApproved = searchedPayment.status === 'approved';
+          const restoredOrder: Order = {
+            id: cleanId,
+            userId: searchedPayment.metadata?.user_id || undefined,
+            customerName: searchedPayment.payer?.first_name ? `${searchedPayment.payer.first_name} ${searchedPayment.payer.last_name || ''}`.trim() : 'Cliente Marmot',
+            customerEmail: searchedPayment.payer?.email || '',
+            customerPhone: searchedPayment.payer?.phone?.number || '',
+            customerCpf: searchedPayment.payer?.identification?.number || '',
+            date: new Date(searchedPayment.date_created || Date.now()).toLocaleDateString('pt-BR'),
+            status: isApproved ? 'Pagamento Aprovado' : 'Aguardando Pagamento',
+            paymentStatus: isApproved ? 'Pago' : 'Pendente',
+            shippingStatus: 'Aguardando preparação',
+            items: [],
+            subtotal: Number(searchedPayment.transaction_amount || 0),
+            discount: 0,
+            shippingFee: 0,
+            total: Number(searchedPayment.transaction_amount || 0),
+            paymentMethod: searchedPayment.payment_type_id || 'Mercado Pago',
+            shippingAddress: {
+              id: 'addr-restored',
+              recipientName: searchedPayment.payer?.first_name || 'Cliente',
+              cep: '00000-000',
+              street: 'Endereço registrado no Mercado Pago',
+              number: 'S/N',
+              city: 'São Paulo',
+              state: 'SP',
+            },
+            shippingCarrier: 'Melhor Envio',
+            shippingService: 'SEDEX',
+            trackingCode: `MM${Date.now().toString().slice(-8)}BR`,
+            history: [
+              {
+                status: isApproved ? 'Pagamento Aprovado' : 'Aguardando Pagamento',
+                timestamp: new Date().toLocaleString('pt-BR'),
+                description: `Pedido recuperado automaticamente a partir da transação Mercado Pago #${searchedPayment.id}.`,
+              },
+            ],
+            paymentDetails: {
+              mercadoPagoPaymentId: String(searchedPayment.id),
+              mercadoPagoStatus: searchedPayment.status,
+              mercadoPagoStatusDetail: searchedPayment.status_detail,
+              mercadoPagoPaymentMethod: searchedPayment.payment_method_id,
+            },
+            createdAt: searchedPayment.date_created || new Date().toISOString(),
+          };
+          order = await db.saveOrder(restoredOrder);
+        }
+      } catch (mpRestoreErr) {
+        console.warn('[Mercado Pago Verification] Could not restore order from MP:', mpRestoreErr);
+      }
+    }
+  }
+
+  if (!order) {
+    const notFoundErr: any = new Error(`Pedido #${cleanId} não encontrado.`);
+    notFoundErr.statusCode = 404;
+    throw notFoundErr;
   }
 
   // If already marked as approved in DB, return approved state
@@ -7101,8 +7231,13 @@ app.all([
       paymentDetails: result.order.paymentDetails,
     });
   } catch (error: any) {
-    console.error('[Verify Payment Endpoint Error]:', error);
-    return res.status(500).json({ error: error.message || 'Erro ao verificar pagamento no Mercado Pago.' });
+    const statusCode = error.statusCode || 500;
+    console.error(`[Verify Payment Endpoint Error ${statusCode}]:`, error.message);
+    return res.status(statusCode).json({
+      success: false,
+      notFound: statusCode === 404,
+      error: error.message || 'Erro ao verificar pagamento no Mercado Pago.',
+    });
   }
 });
 

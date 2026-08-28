@@ -38,21 +38,36 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
  * Returns an authenticated Supabase client. If no active session is present,
  * signs in with admin credentials to guarantee write access through RLS.
  */
+let cachedAuthSession: boolean = false;
+let authInFlightPromise: Promise<any> | null = null;
+
 export async function getAuthenticatedSupabaseClient() {
   if (!isSupabaseConfigured()) return supabase;
+  if (cachedAuthSession) return supabase;
+
   try {
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData?.session?.user) {
+      cachedAuthSession = true;
       return supabase;
     }
-    // Authenticate as store admin
-    const authRes = await supabase.auth.signInWithPassword({
-      email: 'admin@marmot.com',
-      password: 'marmot',
-    });
-    if (authRes.data?.session) {
-      return supabase;
+
+    if (!authInFlightPromise) {
+      authInFlightPromise = supabase.auth.signInWithPassword({
+        email: 'admin@marmot.com',
+        password: 'marmot',
+      }).then((authRes) => {
+        if (authRes.data?.session) {
+          cachedAuthSession = true;
+        }
+      }).catch((err) => {
+        console.warn('[Supabase Auth Client] Notice during authentication:', err);
+      }).finally(() => {
+        authInFlightPromise = null;
+      });
     }
+
+    await authInFlightPromise;
   } catch (err) {
     console.warn('[Supabase Auth Client] Notice during authentication:', err);
   }

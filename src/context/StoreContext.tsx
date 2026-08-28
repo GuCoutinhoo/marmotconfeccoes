@@ -382,7 +382,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       let created: Product | null = null;
 
-      // 1. Direct write to Supabase if configured (Source of truth)
+      // 1. Direct write to Supabase if configured (Fastest path & Single Source of Truth)
       if (isSupabaseConfigured()) {
         try {
           const directResult = await createProductInSupabase(productData);
@@ -394,7 +394,26 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
-      // 2. Synchronize to Backend API
+      // If Supabase succeeded, update state immediately & sync backend in background
+      if (created) {
+        setProducts((prev) => {
+          const next = [created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)];
+          try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+          return next;
+        });
+
+        // Non-blocking background sync to backend
+        fetch('/api/products', {
+          method: 'POST',
+          headers: getAuthHeaders(true),
+          credentials: 'include',
+          body: JSON.stringify(created),
+        }).catch(() => {});
+
+        return created;
+      }
+
+      // 2. Synchronize to Backend API if Supabase was not configured or direct call failed
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
@@ -402,14 +421,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           method: 'POST',
           headers: getAuthHeaders(true),
           credentials: 'include',
-          body: JSON.stringify(created || productData),
+          body: JSON.stringify(productData),
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
 
         if (res.ok) {
-          const apiCreated = await res.json();
-          if (!created) created = apiCreated;
+          created = await res.json();
         }
       } catch (netErr) {
         console.warn('[PRODUCTS] Backend request timed out or error:', netErr);
@@ -442,7 +460,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return next;
       });
 
-      return created!;
+      return created;
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao criar produto:', error);
       throw error;
@@ -465,7 +483,26 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
-      // 2. Synchronize to backend API
+      // If Supabase succeeded, update React state & cache immediately and sync backend in background
+      if (updated) {
+        setProducts((prev) => {
+          const next = prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? { ...p, ...updated } : p));
+          try { localStorage.setItem('@marmot_cached_products', JSON.stringify(next)); } catch {}
+          return next;
+        });
+
+        // Non-blocking background sync to backend
+        fetch(`/api/products/${encodeURIComponent(id)}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(true),
+          credentials: 'include',
+          body: JSON.stringify(productData),
+        }).catch(() => {});
+
+        return updated;
+      }
+
+      // 2. Synchronize to backend API if Supabase was not configured or direct call failed
       try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 6000);
@@ -479,8 +516,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         clearTimeout(timeoutId);
 
         if (res.ok) {
-          const apiUpdated = await res.json();
-          if (!updated) updated = apiUpdated;
+          updated = await res.json();
         }
       } catch (netErr) {
         console.warn('[PRODUCTS] Backend request error/timeout:', netErr);
@@ -507,7 +543,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return next;
       });
 
-      return updated!;
+      return updated;
     } catch (error: any) {
       console.error('[PRODUCTS] Erro ao atualizar produto:', error);
       throw error;

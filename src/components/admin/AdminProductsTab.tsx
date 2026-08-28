@@ -298,24 +298,20 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     }
   };
 
-  // Gallery File Upload (Uploads original files in full resolution directly)
+  // Gallery File Upload (Uploads original files in full resolution directly in parallel)
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     try {
       setIsUploading(true);
-      const newUrls: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const url = await uploadImage(file, file.name);
-        if (url) {
-          newUrls.push(url);
-        }
-      }
-      if (newUrls.length > 0) {
-        setFormImages([...formImages, ...newUrls]);
-        showToast('Fotos Carregadas!', `${newUrls.length} foto(s) adicionada(s) em alta resolução.`, 'success');
+      const fileList = Array.from(files) as File[];
+      const uploaded = await Promise.all(fileList.map((file) => uploadImage(file, file.name)));
+      const validUrls = uploaded.filter((u): u is string => Boolean(u && u.trim()));
+
+      if (validUrls.length > 0) {
+        setFormImages([...formImages, ...validUrls]);
+        showToast('Fotos Carregadas!', `${validUrls.length} foto(s) adicionada(s) em alta resolução.`, 'success');
       }
     } catch (err: any) {
       showToast('Erro no Upload', err?.message || 'Falha ao processar imagens da galeria.', 'error');
@@ -430,26 +426,25 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     });
   };
 
-  // Upload photos specifically for a color variant
+  // Upload photos specifically for a color variant (Parallel)
   const handleVariantFileUpload = async (variantIdx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
     try {
       setIsUploading(true);
-      const newUrls: string[] = [];
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const colorLabel = formColors[variantIdx]?.colorName || 'cor';
-        const url = await uploadImage(file, `${colorLabel}-${file.name}`);
-        newUrls.push(url);
-      }
+      const fileList = Array.from(files) as File[];
+      const colorLabel = formColors[variantIdx]?.colorName || 'cor';
+      const uploaded = await Promise.all(
+        fileList.map((file) => uploadImage(file, `${colorLabel}-${file.name}`))
+      );
+      const validUrls = uploaded.filter((u): u is string => Boolean(u && u.trim()));
 
       setFormColors((prev) => {
         const next = [...prev];
         const cur = next[variantIdx];
         const curImgs = cur.images || (cur.featuredImage ? [cur.featuredImage] : (cur.image ? [cur.image] : []));
-        const combined = [...curImgs, ...newUrls];
+        const combined = [...curImgs, ...validUrls];
         const feat = cur.featuredImage || combined[0] || '';
         next[variantIdx] = {
           ...cur,
@@ -462,7 +457,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
 
       showToast(
         'Fotos Adicionadas!',
-        `${newUrls.length} foto(s) anexada(s) à cor "${formColors[variantIdx]?.colorName}".`,
+        `${validUrls.length} foto(s) anexada(s) à cor "${formColors[variantIdx]?.colorName}".`,
         'success'
       );
     } catch (err: any) {
@@ -642,37 +637,47 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
       setIsSaving(true);
       const targetProdId = editingProduct?.id || 'new';
 
-      // 1. Process and upload any pending Data URL / Base64 images to permanent storage
-      const uploadedFormImages: string[] = [];
-      for (const img of formImages) {
-        if (typeof img === 'string' && img.startsWith('data:')) {
-          const permanentUrl = await uploadProductImageToStorage(img, targetProdId, `form-${Date.now()}.jpg`);
-          uploadedFormImages.push(permanentUrl);
-        } else {
-          uploadedFormImages.push(img);
-        }
-      }
+      // 1. Process and upload only new Base64/Data URLs in parallel; keep existing URLs intact
+      const hasBase64Form = formImages.some((img) => typeof img === 'string' && img.startsWith('data:'));
+      const uploadedFormImages: string[] = hasBase64Form
+        ? await Promise.all(
+            formImages.map((img, idx) => {
+              if (typeof img === 'string' && img.startsWith('data:')) {
+                return uploadProductImageToStorage(img, targetProdId, `form-${idx}-${Date.now()}.jpg`);
+              }
+              return Promise.resolve(img);
+            })
+          )
+        : formImages;
 
-      // Process variant images
-      const processedColors: ProductVariant[] = [];
-      for (const c of normalizedColors) {
-        const processedVImgs: string[] = [];
-        for (const vImg of c.images || []) {
-          if (typeof vImg === 'string' && vImg.startsWith('data:')) {
-            const pUrl = await uploadProductImageToStorage(vImg, targetProdId, `variant-${c.color}-${Date.now()}.jpg`);
-            processedVImgs.push(pUrl);
-          } else {
-            processedVImgs.push(vImg);
+      // Process variant images (parallelized and only for data: URLs)
+      const processedColors: ProductVariant[] = await Promise.all(
+        normalizedColors.map(async (c) => {
+          const vImgs = c.images || [];
+          const hasBase64Var = vImgs.some((v) => typeof v === 'string' && v.startsWith('data:')) ||
+                               (typeof c.featuredImage === 'string' && c.featuredImage.startsWith('data:'));
+
+          let processedVImgs = vImgs;
+          if (hasBase64Var) {
+            processedVImgs = await Promise.all(
+              vImgs.map((vImg, vIdx) => {
+                if (typeof vImg === 'string' && vImg.startsWith('data:')) {
+                  return uploadProductImageToStorage(vImg, targetProdId, `variant-${c.color}-${vIdx}-${Date.now()}.jpg`);
+                }
+                return Promise.resolve(vImg);
+              })
+            );
           }
-        }
-        const feat = processedVImgs[0] || (c.featuredImage?.startsWith('data:') ? processedVImgs[0] : c.featuredImage) || '';
-        processedColors.push({
-          ...c,
-          images: processedVImgs,
-          featuredImage: feat,
-          image: feat,
-        });
-      }
+
+          const feat = processedVImgs[0] || (c.featuredImage?.startsWith('data:') ? processedVImgs[0] : c.featuredImage) || '';
+          return {
+            ...c,
+            images: processedVImgs,
+            featuredImage: feat,
+            image: feat,
+          };
+        })
+      );
 
       const firstVarWithImg = processedColors.find((c) => c.images && c.images.length > 0);
       const varFallbackImg = firstVarWithImg?.images?.[0] || firstVarWithImg?.featuredImage || '';
@@ -691,7 +696,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
       if (editingProduct) {
         const oldImages = Array.isArray(editingProduct.images) ? editingProduct.images : (editingProduct.image ? [editingProduct.image] : []);
 
-        // 2. Perform isolated UPDATE on specific product
+        // 2. Perform isolated single UPDATE on specific product
         const updated = await updateProduct(editingProduct.id, {
           title: formTitle.trim(),
           subtitle: formSubtitle.trim(),
@@ -719,21 +724,26 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
           composition: formComposition,
         });
 
-        // 3. Confirm update and safely cleanup obsolete storage images if not used by any other product
-        if (updated) {
-          const removedImages = oldImages.filter((oldUrl) => !cleanAllImages.includes(oldUrl));
-          for (const oldUrl of removedImages) {
-            const isUsedElsewhere = products.some(
-              (p) => p.id !== editingProduct.id && (p.image === oldUrl || (Array.isArray(p.images) && p.images.includes(oldUrl)))
-            );
-            if (!isUsedElsewhere) {
-              await deleteProductImageFromStorage(oldUrl);
-            }
-          }
-        }
-
+        // Close modal and give immediate success response
         showToast('Produto Atualizado!', `${formTitle} salvo com sucesso no banco.`, 'success');
         setEditingProduct(null);
+
+        // 3. Non-blocking background task: cleanup obsolete storage images if removed
+        if (updated) {
+          const removedImages = oldImages.filter((oldUrl) => !cleanAllImages.includes(oldUrl));
+          if (removedImages.length > 0) {
+            setTimeout(() => {
+              removedImages.forEach((oldUrl) => {
+                const isUsedElsewhere = products.some(
+                  (p) => p.id !== editingProduct.id && (p.image === oldUrl || (Array.isArray(p.images) && p.images.includes(oldUrl)))
+                );
+                if (!isUsedElsewhere) {
+                  deleteProductImageFromStorage(oldUrl).catch(() => {});
+                }
+              });
+            }, 100);
+          }
+        }
       } else {
         await addProduct({
           title: formTitle.trim(),
