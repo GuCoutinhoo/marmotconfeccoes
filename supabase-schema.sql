@@ -236,16 +236,41 @@ CREATE TABLE IF NOT EXISTS public.orders (
   shipping_fee NUMERIC(10, 2) NOT NULL DEFAULT 0,
   discount NUMERIC(10, 2) NOT NULL DEFAULT 0,
   total NUMERIC(10, 2) NOT NULL DEFAULT 0,
-  status TEXT DEFAULT 'pending',
-  payment_status TEXT DEFAULT 'pending',
+  status TEXT DEFAULT 'Aguardando Pagamento',
+  payment_status TEXT DEFAULT 'Pendente',
+  shipping_status TEXT DEFAULT 'Aguardando preparação',
   tracking_code TEXT,
   tracking_url TEXT,
+  paid_at TIMESTAMPTZ,
+  separation_started_at TIMESTAMPTZ,
+  posted_at TIMESTAMPTZ,
+  in_transit_at TIMESTAMPTZ,
+  out_for_delivery_at TIMESTAMPTZ,
+  delivered_at TIMESTAMPTZ,
+  mercado_pago_payment_id TEXT,
+  mercado_pago_preference_id TEXT,
+  melhor_envio_shipment_id TEXT,
+  shipping_label_url TEXT,
   history JSONB DEFAULT '[]'::jsonb,
   notes TEXT,
   data JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migration for existing instances of public.orders
+ALTER TABLE public.orders
+  ADD COLUMN IF NOT EXISTS shipping_status TEXT DEFAULT 'Aguardando preparação',
+  ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS separation_started_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS posted_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS in_transit_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS out_for_delivery_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS delivered_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS mercado_pago_payment_id TEXT,
+  ADD COLUMN IF NOT EXISTS mercado_pago_preference_id TEXT,
+  ADD COLUMN IF NOT EXISTS melhor_envio_shipment_id TEXT,
+  ADD COLUMN IF NOT EXISTS shipping_label_url TEXT;
 
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
@@ -1326,3 +1351,49 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT OR UPDATE ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- ==============================================================================
+-- 19. SUPABASE STORAGE: BUCKET 'product-images' & RLS POLICIES
+-- ==============================================================================
+
+-- 1. Criação do bucket 'product-images' público com limite de 10MB
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'product-images',
+  'product-images',
+  true,
+  10485760,
+  ARRAY['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = true,
+  file_size_limit = 10485760,
+  allowed_mime_types = ARRAY['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif', 'image/svg+xml'];
+
+-- 2. Políticas de Leitura Pública
+DROP POLICY IF EXISTS "Public Access to product-images" ON storage.objects;
+CREATE POLICY "Public Access to product-images"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'product-images');
+
+-- 3. Políticas de Inserção / Upload (Admin ou Service Role)
+DROP POLICY IF EXISTS "Allow Admin Upload to product-images" ON storage.objects;
+CREATE POLICY "Allow Admin Upload to product-images"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'product-images' AND (public.is_admin() OR auth.role() = 'service_role' OR auth.role() = 'authenticated'));
+
+-- 4. Políticas de Atualização
+DROP POLICY IF EXISTS "Allow Admin Update on product-images" ON storage.objects;
+CREATE POLICY "Allow Admin Update on product-images"
+  ON storage.objects FOR UPDATE
+  USING (bucket_id = 'product-images' AND (public.is_admin() OR auth.role() = 'service_role' OR auth.role() = 'authenticated'));
+
+-- 5. Políticas de Exclusão
+DROP POLICY IF EXISTS "Allow Admin Delete on product-images" ON storage.objects;
+CREATE POLICY "Allow Admin Delete on product-images"
+  ON storage.objects FOR DELETE
+  USING (bucket_id = 'product-images' AND (public.is_admin() OR auth.role() = 'service_role' OR auth.role() = 'authenticated'));
+
+-- Recarrega o cache do PostgREST
+NOTIFY pgrst, 'reload schema';
+

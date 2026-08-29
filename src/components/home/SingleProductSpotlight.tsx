@@ -3,6 +3,7 @@ import { Product } from '../../types';
 import { ShoppingBag, Star, ShieldCheck, Sparkles, ArrowRight, Eye, Check } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
+import { getValidProductImageUrl, handleProductImageError } from '../../utils/imageUtils';
 
 interface SingleProductSpotlightProps {
   products: Product[];
@@ -18,8 +19,8 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   const { addToCart, openMiniCart } = useCart();
   const { showToast } = useToast();
 
-  // Select hero product (Hoodie Heavyweight 400g)
-  const product = products.find((p) => p.id === 'prod-004') || products[0];
+  // Select hero product (first heavyweight piece or first active product)
+  const product = products.find((p) => p.isBestSeller || p.isNewRelease) || products[0];
 
   const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || 'M');
   const [selectedColor, setSelectedColor] = useState(
@@ -29,7 +30,8 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
 
   if (!product) return null;
 
-  const productImage = product.images?.[0] || (product as any).image || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80';
+  const rawProductImage = product.images?.[0] || product.image;
+  const productImage = getValidProductImageUrl(rawProductImage, product.category, product.id);
 
   const handleAddToCart = () => {
     const success = addToCart(product, selectedSize, selectedColor);
@@ -65,6 +67,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
               decoding="async"
               referrerPolicy="no-referrer"
               className="w-full h-full object-cover object-[center_top] group-hover:scale-105 transition-transform duration-500"
+              onError={(e) => handleProductImageError(e, product.category, product.id)}
             />
             {/* Badge */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">

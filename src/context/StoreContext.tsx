@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { Category, Product } from '../types';
-import { CATALOG_90_PRODUCTS } from '../data/catalog90Products';
 import { INITIAL_8_CATEGORIES } from '../data/categories';
 import {
   fetchProductsFromSupabaseDirect,
@@ -17,15 +16,6 @@ import {
   uploadProductImageToStorage,
   deleteProductImageFromStorage,
 } from '../lib/supabaseClient';
-
-const PRODUCT_CACHE_KEY_V2 = '@marmot_cached_products_v2';
-const LEGACY_PRODUCT_CACHE_KEY = '@marmot_cached_products';
-
-interface ProductCacheSnapshotV2 {
-  version: 2;
-  savedAt: number;
-  products: Product[];
-}
 
 interface StoreContextType {
   categories: Category[];
@@ -56,7 +46,7 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Instant synchronous initialization (0ms First Contentful Paint)
+  // Categories state: fallback to initial structural categories
   const [categories, setCategories] = useState<Category[]>(() => {
     try {
       const cached = localStorage.getItem('@marmot_cached_categories');
@@ -68,46 +58,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return INITIAL_8_CATEGORIES || [];
   });
 
-  const [products, setProducts] = useState<Product[]>(() => {
-    try {
-      // 1. Automatically neutralize and wipe old corrupt unversioned cache
-      if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.removeItem(LEGACY_PRODUCT_CACHE_KEY);
-      }
-    } catch {}
-
-    try {
-      // 2. Read strictly verified v2 snapshot
-      const raw = localStorage.getItem(PRODUCT_CACHE_KEY_V2);
-      if (raw) {
-        const parsed: ProductCacheSnapshotV2 = JSON.parse(raw);
-        if (parsed && parsed.version === 2 && Array.isArray(parsed.products) && parsed.products.length > 0) {
-          return validateAndDeduplicateProducts(parsed.products);
-        }
-      }
-    } catch {}
-    return CATALOG_90_PRODUCTS || [];
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isInitialized, setIsInitialized] = useState<boolean>(true);
+  // STRICT SINGLE SOURCE OF TRUTH: Initial products state MUST be empty []
+  // NEVER initialize with stale local storage or fallback catalog with wrong images
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [isFetchingFreshData, setIsFetchingFreshData] = useState<boolean>(false);
+
+  // Clean any old corrupted legacy caches on mount
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem('@marmot_cached_products');
+        localStorage.removeItem('@marmot_cached_products_v2');
+      }
+    } catch {}
+  }, []);
 
   // Race condition protection: always ensure only the latest request can commit to state
   const latestFetchRequestIdRef = useRef<number>(0);
-
-  const saveProductCacheSnapshot = useCallback((prods: Product[]) => {
-    try {
-      if (!Array.isArray(prods) || prods.length === 0) return;
-      const snapshot: ProductCacheSnapshotV2 = {
-        version: 2,
-        savedAt: Date.now(),
-        products: prods,
-      };
-      localStorage.setItem(PRODUCT_CACHE_KEY_V2, JSON.stringify(snapshot));
-      console.log(`[PRODUCTS] cache snapshot rows=${prods.length}`);
-    } catch {}
-  }, []);
 
   // Helper to build headers with active auth token
   const getAuthHeaders = useCallback((isJson = true) => {
@@ -150,7 +119,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       let loadedProducts: Product[] = [];
       let loadedCategories: Category[] = [];
 
-      // 1. If Supabase is configured, fetch directly from Supabase as primary source of truth across Vercel & Google AI Studio
+      // 1. If Supabase is configured, fetch directly from Supabase as primary source of truth
       if (isSupabaseConfigured()) {
         try {
           const [directProd, directCat] = await Promise.all([
@@ -197,14 +166,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return;
       }
 
-      // 4. Strict Non-Destructive Catalog Update: ONLY commit when valid products are returned
+      // 4. Commit authoritative catalog to state
       if (loadedProducts.length > 0) {
         const uniqueProducts = validateAndDeduplicateProducts(loadedProducts);
         console.log(`[PRODUCTS] committing catalog rows=${uniqueProducts.length}`);
         setProducts(uniqueProducts);
-        saveProductCacheSnapshot(uniqueProducts);
       } else {
-        console.warn(`[PRODUCTS] request #${currentReqId} returned 0 valid products — preserving existing catalog in state.`);
+        console.warn(`[PRODUCTS] request #${currentReqId} returned 0 valid products.`);
       }
 
       if (loadedCategories.length > 0) {
@@ -222,13 +190,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setIsFetchingFreshData(false);
       }
     }
-  }, [saveProductCacheSnapshot]);
+  }, []);
 
   useEffect(() => {
     fetchStoreData();
   }, [fetchStoreData]);
 
-  // Real-time synchronization with Supabase: keeps Vercel and Google AI Studio in sync live!
+  // Real-time synchronization with Supabase: keeps all clients in sync live!
   useEffect(() => {
     if (!isSupabaseConfigured()) return;
     const channel = supabase
@@ -236,31 +204,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'products' },
-        (payload) => {
+        async (payload) => {
           if (payload.eventType === 'INSERT' && payload.new) {
             const newProd = mapSupabaseRowToProduct(payload.new);
             setProducts((prev) => {
               const filtered = prev.filter((p) => p.id !== newProd.id && p.slug !== newProd.slug);
-              const next = validateAndDeduplicateProducts([newProd, ...filtered]);
-              saveProductCacheSnapshot(next);
-              return next;
+              return validateAndDeduplicateProducts([newProd, ...filtered]);
             });
           } else if (payload.eventType === 'UPDATE' && payload.new) {
             const updatedProd = mapSupabaseRowToProduct(payload.new);
             setProducts((prev) => {
-              const next = validateAndDeduplicateProducts(
-                prev.map((p) => (p.id === updatedProd.id || p.slug === updatedProd.slug ? { ...p, ...updatedProd } : p))
+              return validateAndDeduplicateProducts(
+                prev.map((p) => (p.id === updatedProd.id || p.slug === updatedProd.slug ? updatedProd : p))
               );
-              saveProductCacheSnapshot(next);
-              return next;
             });
           } else if (payload.eventType === 'DELETE' && payload.old?.id) {
             const oldId = String(payload.old.id);
-            setProducts((prev) => {
-              const next = prev.filter((p) => p.id !== oldId);
-              saveProductCacheSnapshot(next);
-              return next;
-            });
+            setProducts((prev) => prev.filter((p) => p.id !== oldId));
           }
         }
       )
@@ -291,30 +251,21 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [saveProductCacheSnapshot]);
+  }, []);
 
   // Upload helper: uploads to Supabase Storage (bucket 'product-images') or fallback proxy and returns permanent URL
   const uploadImage = async (imageFileOrBase64: File | string, filename?: string): Promise<string> => {
-    try {
-      if (typeof imageFileOrBase64 === 'string' && (imageFileOrBase64.startsWith('http://') || imageFileOrBase64.startsWith('https://'))) {
-        return imageFileOrBase64;
-      }
-
-      // Convert File / Base64 to compressed image and upload to Storage
-      const uploadedUrl = await uploadProductImageToStorage(imageFileOrBase64, 'general', filename);
-      if (uploadedUrl) {
-        return uploadedUrl;
-      }
-
-      return typeof imageFileOrBase64 === 'string' ? imageFileOrBase64 : '';
-    } catch (error) {
-      console.error('Upload error in StoreContext:', error);
-      // If it's already a URL, return it
-      if (typeof imageFileOrBase64 === 'string' && !imageFileOrBase64.startsWith('data:')) {
-        return imageFileOrBase64;
-      }
-      throw error;
+    if (typeof imageFileOrBase64 === 'string' && (imageFileOrBase64.startsWith('http://') || imageFileOrBase64.startsWith('https://') || imageFileOrBase64.startsWith('/uploads/'))) {
+      return imageFileOrBase64;
     }
+
+    // Convert File / Base64 to compressed image and upload to Storage
+    const uploadedUrl = await uploadProductImageToStorage(imageFileOrBase64, 'general', filename);
+    if (uploadedUrl && !uploadedUrl.startsWith('data:')) {
+      return uploadedUrl;
+    }
+
+    throw new Error('Falha no upload da imagem. Não foi possível gerar uma URL persistente.');
   };
 
   // ==========================================
@@ -411,7 +362,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       console.error('Error reordering categories:', error);
     }
 
-    // Local sort if network failed
     const reordered: Category[] = [];
     orderedIds.forEach((id, idx) => {
       const found = categories.find((c) => c.id === id || c.slug === id);
@@ -438,7 +388,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       let created: Product | null = null;
 
-      // 1. Direct write to Supabase if configured (Fastest path & Single Source of Truth)
+      // 1. Direct write to Supabase if configured (Single Source of Truth)
       if (isSupabaseConfigured()) {
         try {
           const directResult = await createProductInSupabase(productData);
@@ -453,12 +403,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // If Supabase succeeded, update state immediately & sync backend in background
       if (created) {
         setProducts((prev) => {
-          const next = validateAndDeduplicateProducts([created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)]);
-          saveProductCacheSnapshot(next);
-          return next;
+          return validateAndDeduplicateProducts([created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)]);
         });
 
-        // Non-blocking background sync to backend
         fetch('/api/products', {
           method: 'POST',
           headers: getAuthHeaders(true),
@@ -470,50 +417,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       // 2. Synchronize to Backend API if Supabase was not configured or direct call failed
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000);
-        const res = await fetch('/api/products', {
-          method: 'POST',
-          headers: getAuthHeaders(true),
-          credentials: 'include',
-          body: JSON.stringify(productData),
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(productData),
+      });
 
-        if (res.ok) {
-          created = await res.json();
-        }
-      } catch (netErr) {
-        console.warn('[PRODUCTS] Backend request timed out or error:', netErr);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Falha ao salvar produto no servidor' }));
+        throw new Error(errJson.error || 'Falha ao salvar produto no servidor.');
       }
 
-      // 3. Fallback local item if both failed
-      if (!created) {
-        const localId = `p-${Date.now()}`;
-        created = {
-          id: localId,
-          slug: productData.slug || `produto-${Date.now().toString().slice(-4)}`,
-          title: productData.title || 'Novo Produto',
-          price: productData.price || 189.9,
-          category: productData.category || 'camisetas',
-          image: productData.image || '',
-          images: productData.images || [],
-          colors: productData.colors || [],
-          sizes: productData.sizes || ['P', 'M', 'G', 'GG'],
-          status: productData.status || 'active',
-          stockCount: productData.stockCount ?? 20,
-          tags: productData.tags || [],
-          ...productData,
-        } as Product;
+      created = await res.json();
+      if (!created || !created.id) {
+        throw new Error('Servidor retornou um produto inválido.');
       }
 
-      // 4. Update React state immediately
       setProducts((prev) => {
-        const next = validateAndDeduplicateProducts([created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)]);
-        saveProductCacheSnapshot(next);
-        return next;
+        return validateAndDeduplicateProducts([created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)]);
       });
 
       return created;
@@ -527,7 +449,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       let updated: Product | null = null;
 
-      // 1. Direct write to Supabase if configured (Immediate persistence across all clients)
+      // 1. Direct write to Supabase if configured
       if (isSupabaseConfigured()) {
         try {
           const directResult = await updateProductInSupabase(id, productData);
@@ -539,17 +461,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
-      // If Supabase succeeded, update React state & cache immediately and sync backend in background
       if (updated) {
         setProducts((prev) => {
-          const next = validateAndDeduplicateProducts(
-            prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? { ...p, ...updated } : p))
+          return validateAndDeduplicateProducts(
+            prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? updated! : p))
           );
-          saveProductCacheSnapshot(next);
-          return next;
         });
 
-        // Non-blocking background sync to backend
         fetch(`/api/products/${encodeURIComponent(id)}`, {
           method: 'PUT',
           headers: getAuthHeaders(true),
@@ -560,47 +478,28 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return updated;
       }
 
-      // 2. Synchronize to backend API if Supabase was not configured or direct call failed
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6000);
-        const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
-          method: 'PUT',
-          headers: getAuthHeaders(true),
-          credentials: 'include',
-          body: JSON.stringify(productData),
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
+      // 2. Synchronize to backend API
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(productData),
+      });
 
-        if (res.ok) {
-          updated = await res.json();
-        }
-      } catch (netErr) {
-        console.warn('[PRODUCTS] Backend request error/timeout:', netErr);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Falha ao atualizar produto no servidor' }));
+        throw new Error(errJson.error || 'Falha ao atualizar produto no servidor.');
       }
 
-      // 3. Fallback calculation if neither returned
-      if (!updated) {
-        const current = products.find((p) => p.id === id || p.slug === id);
-        const images = productData.images || (productData.image ? [productData.image] : current?.images || []);
-        const mainImage = images[0] || productData.image || current?.image || '';
-        updated = {
-          ...(current || {}),
-          ...productData,
-          id: current?.id || id,
-          image: mainImage,
-          images: images,
-        } as Product;
+      updated = await res.json();
+      if (!updated || !updated.id) {
+        throw new Error('Servidor retornou um produto inválido ao atualizar.');
       }
 
-      // 4. Update React state immediately across the whole application
       setProducts((prev) => {
-        const next = validateAndDeduplicateProducts(
-          prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? { ...p, ...updated } : p))
+        return validateAndDeduplicateProducts(
+          prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? updated! : p))
         );
-        saveProductCacheSnapshot(next);
-        return next;
       });
 
       return updated;
@@ -612,78 +511,65 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateStock = async (id: string, stockCount: number): Promise<void> => {
     try {
-      let updatedStock = stockCount;
-      let newStatus = stockCount <= 0 ? 'out_of_stock' : 'active';
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        const res = await fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
-          method: 'PUT',
-          headers: getAuthHeaders(true),
-          credentials: 'include',
-          body: JSON.stringify({ stockCount }),
-          signal: controller.signal,
-        });
-        clearTimeout(timeoutId);
-
-        if (res.ok) {
-          const updated: Product = await res.json();
-          updatedStock = updated.stockCount;
-          newStatus = updated.status;
-        }
-      } catch {}
+      setProducts((prev) =>
+        prev.map((p) => {
+          if (p.id === id || p.slug === id) {
+            return {
+              ...p,
+              stockCount,
+              status: stockCount <= 0 ? 'out_of_stock' : p.status === 'out_of_stock' ? 'active' : p.status,
+            };
+          }
+          return p;
+        })
+      );
 
       if (isSupabaseConfigured()) {
-        updateProductStockInSupabase(id, stockCount).catch((sbErr) => {
-          console.warn('[PRODUCTS] Direct Supabase stock sync notice:', sbErr);
-        });
+        await updateProductStockInSupabase(id, stockCount).catch(() => {});
       }
 
-      setProducts((prev) => {
-        const next = validateAndDeduplicateProducts(
-          prev.map((p) => (p.id === id || p.slug === id ? { ...p, stockCount: updatedStock, status: newStatus as any } : p))
-        );
-        saveProductCacheSnapshot(next);
-        return next;
-      });
-    } catch (error: any) {
-      console.error('[PRODUCTS] Erro ao atualizar estoque:', error);
-      throw error;
+      fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify({ stockCount }),
+      }).catch(() => {});
+    } catch (error) {
+      console.error('Update stock error:', error);
     }
   };
 
   const deleteProduct = async (id: string): Promise<boolean> => {
     try {
+      // Find current product to remove images from storage if needed
+      const current = products.find((p) => p.id === id || p.slug === id);
+      if (current?.image) {
+        deleteProductImageFromStorage(current.image).catch(() => {});
+      }
+
+      // Direct Supabase delete
+      if (isSupabaseConfigured()) {
+        await deleteProductInSupabase(id).catch(() => {});
+      }
+
+      // Backend delete
       await fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(true),
         credentials: 'include',
-      }).catch(() => null);
+      }).catch(() => {});
 
-      if (isSupabaseConfigured()) {
-        try {
-          await deleteProductInSupabase(id);
-        } catch (sbErr) {
-          console.warn('[PRODUCTS] Direct Supabase delete sync notice:', sbErr);
-        }
-      }
-
-      setProducts((prev) => {
-        const next = prev.filter((p) => p.id !== id && p.slug !== id);
-        saveProductCacheSnapshot(next);
-        return next;
-      });
+      setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
       return true;
-    } catch (error: any) {
-      console.error('[PRODUCTS] Erro ao excluir produto:', error);
+    } catch (error) {
+      console.error('Delete product error:', error);
       throw error;
     }
   };
 
   const getProductById = (idOrSlug: string): Product | undefined => {
-    const clean = idOrSlug.toLowerCase().trim();
-    return products.find((p) => p.id?.toLowerCase() === clean || p.slug?.toLowerCase() === clean);
+    const clean = idOrSlug.trim();
+    return products.find((p) => p.id === clean || p.slug === clean);
   };
 
   return (
@@ -693,6 +579,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         products,
         isLoading,
         isInitialized,
+        isFetchingFreshData,
         fetchStoreData,
         addCategory,
         updateCategory,

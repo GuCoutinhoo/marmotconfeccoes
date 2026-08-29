@@ -38,39 +38,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
  * Returns an authenticated Supabase client. If no active session is present,
  * signs in with admin credentials to guarantee write access through RLS.
  */
-let cachedAuthSession: boolean = false;
-let authInFlightPromise: Promise<any> | null = null;
-
 export async function getAuthenticatedSupabaseClient() {
-  if (!isSupabaseConfigured()) return supabase;
-  if (cachedAuthSession) return supabase;
-
-  try {
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData?.session?.user) {
-      cachedAuthSession = true;
-      return supabase;
-    }
-
-    if (!authInFlightPromise) {
-      authInFlightPromise = supabase.auth.signInWithPassword({
-        email: 'admin@marmot.com',
-        password: 'marmot',
-      }).then((authRes) => {
-        if (authRes.data?.session) {
-          cachedAuthSession = true;
-        }
-      }).catch((err) => {
-        console.warn('[Supabase Auth Client] Notice during authentication:', err);
-      }).finally(() => {
-        authInFlightPromise = null;
-      });
-    }
-
-    await authInFlightPromise;
-  } catch (err) {
-    console.warn('[Supabase Auth Client] Notice during authentication:', err);
-  }
   return supabase;
 }
 
@@ -539,7 +507,7 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
 
     const rawImages = Array.isArray(productData.images) && productData.images.length > 0
       ? productData.images
-      : (productData.image ? [productData.image] : ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80']);
+      : (productData.image ? [productData.image] : ['/placeholder-product.svg']);
     const rawMainImage = rawImages[0];
 
     const newProduct: Product = {

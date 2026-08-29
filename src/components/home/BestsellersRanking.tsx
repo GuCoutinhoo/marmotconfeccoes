@@ -1,6 +1,7 @@
 import React from 'react';
 import { Product } from '../../types';
 import { ProductCard } from '../ProductCard';
+import { ProductSkeleton } from '../ProductSkeleton';
 import { Trophy, TrendingUp, ArrowRight } from 'lucide-react';
 
 interface BestsellersRankingProps {
@@ -14,6 +15,8 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
   onQuickView,
   onNavigate,
 }) => {
+  const isProductsEmpty = !products || products.length === 0;
+
   let bestsellers = products.filter((p) => p.isBestSeller || p.tags.includes('Mais Vendido'));
   if (bestsellers.length < 8) {
     bestsellers = [...bestsellers, ...products.filter((p) => !bestsellers.includes(p))].slice(0, 8);
@@ -48,20 +51,28 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
 
         {/* 8 Bestsellers Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {bestsellers.map((product, index) => (
-            <div key={product.id} className="relative group flex flex-col h-full">
-              {/* Discrete Leaderboard Badge */}
-              <div className="absolute top-3 left-3 z-20 bg-white/95 text-[#B45309] font-mono font-black text-xs px-2.5 py-1 rounded-md border border-[#E4E4E7] backdrop-blur-md shadow-sm flex items-center gap-1">
-                <TrendingUp className="w-3 h-3 text-[#B45309]" /> #{String(index + 1).padStart(2, '0')}
+          {isProductsEmpty ? (
+            Array.from({ length: 8 }).map((_, idx) => (
+              <div key={`bs-skel-${idx}`} className="flex flex-col h-full">
+                <ProductSkeleton />
               </div>
+            ))
+          ) : (
+            bestsellers.map((product, index) => (
+              <div key={product.id} className="relative group flex flex-col h-full">
+                {/* Discrete Leaderboard Badge */}
+                <div className="absolute top-3 left-3 z-20 bg-white/95 text-[#B45309] font-mono font-black text-xs px-2.5 py-1 rounded-md border border-[#E4E4E7] backdrop-blur-md shadow-sm flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3 text-[#B45309]" /> #{String(index + 1).padStart(2, '0')}
+                </div>
 
-              <ProductCard
-                product={product}
-                onQuickView={onQuickView}
-                onProductClick={(id) => onNavigate('product', id)}
-              />
-            </div>
-          ))}
+                <ProductCard
+                  product={product}
+                  onQuickView={onQuickView}
+                  onProductClick={(id) => onNavigate('product', id)}
+                />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

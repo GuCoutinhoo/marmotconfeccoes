@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Product } from '../../types';
 import { ProductCard } from '../ProductCard';
+import { ProductSkeleton } from '../ProductSkeleton';
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from 'lucide-react';
 
 interface NewReleasesCarouselProps {
@@ -15,6 +16,8 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
   onNavigate,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const isProductsEmpty = !products || products.length === 0;
 
   let newReleases = products.filter(
     (p) => p.isNewRelease || p.tags.includes('Lançamento')
@@ -86,18 +89,26 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           ref={scrollRef}
           className="flex gap-6 overflow-x-auto scrollbar-none pb-4 scroll-smooth snap-x snap-mandatory"
         >
-          {newReleases.map((product) => (
-            <div
-              key={product.id}
-              className="w-[280px] sm:w-[320px] shrink-0 snap-start"
-            >
-              <ProductCard
-                product={product}
-                onQuickView={onQuickView}
-                onProductClick={(id) => onNavigate('product', id)}
-              />
-            </div>
-          ))}
+          {isProductsEmpty ? (
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div key={`skel-${idx}`} className="w-[280px] sm:w-[320px] shrink-0 snap-start">
+                <ProductSkeleton />
+              </div>
+            ))
+          ) : (
+            newReleases.map((product) => (
+              <div
+                key={product.id}
+                className="w-[280px] sm:w-[320px] shrink-0 snap-start"
+              >
+                <ProductCard
+                  product={product}
+                  onQuickView={onQuickView}
+                  onProductClick={(id) => onNavigate('product', id)}
+                />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>

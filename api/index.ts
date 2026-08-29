@@ -2698,7 +2698,52 @@ export class DatabaseManager {
         updated_at: new Date().toISOString(),
       };
 
-      const { error: saveErr } = await adminClient.from('orders').upsert(orderPayload, { onConflict: 'id' });
+      const { error: fullSaveErr } = await adminClient.from('orders').upsert(orderPayload, { onConflict: 'id' });
+      let saveErr = fullSaveErr;
+
+      // Graceful fallback if schema cache lacks some new columns (PGRST204)
+      if (saveErr && (saveErr.code === 'PGRST204' || saveErr.message?.includes('schema cache'))) {
+        console.warn('[DB] Supabase orders table missing some new columns. Falling back to core columns + JSONB data payload:', saveErr.message);
+
+        const basePayload: Record<string, any> = {
+          id: order.id,
+          user_id: order.userId || null,
+          customer_email: order.customerEmail || 'cliente@marmot.com',
+          customer_name: order.customerName || null,
+          customer_phone: order.customerPhone || null,
+          customer_cpf: order.customerCpf || null,
+          items: order.items || [],
+          shipping_address: order.shippingAddress || {},
+          shipping_option: order.shippingOption || {
+            company: order.shippingCarrier || null,
+            service_name: order.shippingService || null,
+            service_id: order.shippingServiceId || null,
+            delivery_time: order.shippingDeliveryTime || null,
+          },
+          payment_method: order.paymentMethod || null,
+          subtotal: Number(order.subtotal || 0),
+          shipping_fee: Number(order.shippingFee || 0),
+          discount: Number(order.discount || 0),
+          total: Number(order.total || 0),
+          status: order.status || 'Aguardando Pagamento',
+          payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' || order.status === 'Em Separação' ? 'Pago' : 'Pendente'),
+          tracking_code: order.trackingCode || null,
+          tracking_url: (order as any).trackingUrl || (order as any).tracking_url || null,
+          history: order.history || [],
+          notes: (order as any).notes || null,
+          data: order,
+          updated_at: new Date().toISOString(),
+        };
+
+        const { error: baseSaveErr } = await adminClient.from('orders').upsert(basePayload, { onConflict: 'id' });
+        if (!baseSaveErr) {
+          console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase (modo compatibilidade schema). Execute a migration para ativar todas as colunas dedicadas.`);
+          saveErr = null;
+        } else {
+          saveErr = baseSaveErr;
+        }
+      }
+
       if (saveErr) {
         console.error('[DB] Supabase order upsert error details:', saveErr.message, saveErr.details, saveErr.hint);
         throw new Error(`Falha ao persistir pedido no Supabase: ${saveErr.message}`);
@@ -5643,13 +5688,16 @@ app.post('/api/upload', async (req, res) => {
     const filePath = path.join(UPLOADS_DIR, uniqueFilename);
 
     try {
+      if (!fs.existsSync(UPLOADS_DIR)) {
+        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+      }
       fs.writeFileSync(filePath, buffer);
       const publicUrl = `/uploads/${uniqueFilename}`;
       console.log('[UPLOAD] Arquivo original salvo em /uploads/:', publicUrl);
       return res.json({ success: true, url: publicUrl });
-    } catch {
-      // 3. Fallback to original Data URL
-      return res.json({ success: true, url: image });
+    } catch (fsErr: any) {
+      console.error('[UPLOAD] Erro ao salvar arquivo localmente:', fsErr);
+      return res.status(500).json({ error: 'Falha ao salvar arquivo de imagem no servidor.' });
     }
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Falha ao processar upload.' });
