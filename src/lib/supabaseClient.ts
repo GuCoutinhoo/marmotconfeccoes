@@ -1124,6 +1124,12 @@ export function mapSupabaseRowToOrder(row: any): Order {
     estimatedDelivery: d.estimatedDelivery || '3 a 7 dias úteis',
     trackingCode,
     history,
+    paidAt: row.paid_at || d.paidAt || (row.payment_status === 'Pago' ? (row.created_at || d.createdAt) : undefined),
+    separationStartedAt: row.separation_started_at || d.separationStartedAt || undefined,
+    postedAt: row.posted_at || d.postedAt || undefined,
+    inTransitAt: row.in_transit_at || d.inTransitAt || undefined,
+    outForDeliveryAt: row.out_for_delivery_at || d.outForDeliveryAt || undefined,
+    deliveredAt: row.delivered_at || d.deliveredAt || undefined,
     paymentDetails: d.paymentDetails || {
       mercadoPagoPreferenceId: row.mercado_pago_preference_id || null,
       mercadoPagoPaymentId: row.mercado_pago_payment_id || null,

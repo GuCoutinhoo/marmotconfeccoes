@@ -39,10 +39,17 @@ const STATUS_COLOR_MAP: Record<string, { bg: string; text: string; border: strin
   'Em Separação': { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
   'Preparando Envio': { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
   'Pronto para Envio': { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200' },
+  'Postado': { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200' },
   'Despachado': { bg: 'bg-[#F0C84B]/20', text: 'text-[#B45309]', border: 'border-[#F0C84B]/50' },
   'Enviado': { bg: 'bg-[#F0C84B]/20', text: 'text-[#B45309]', border: 'border-[#F0C84B]/50' },
   'Em Transporte': { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
+  'Em trânsito': { bg: 'bg-sky-50', text: 'text-sky-700', border: 'border-sky-200' },
+  'Saiu para entrega': { bg: 'bg-amber-100', text: 'text-amber-900', border: 'border-amber-300' },
   'Entregue': { bg: 'bg-emerald-50', text: 'text-emerald-800', border: 'border-emerald-300' },
+  'Problema no envio': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+  'Problema na entrega': { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+  'Devolvendo ao remetente': { bg: 'bg-rose-100', text: 'text-rose-800', border: 'border-rose-300' },
+  'Devolvido': { bg: 'bg-zinc-100', text: 'text-zinc-700', border: 'border-zinc-300' },
   'Cancelado': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
   'Pagamento Recusado': { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200' },
   'Reembolsado': { bg: 'bg-zinc-100', text: 'text-zinc-700', border: 'border-zinc-300' },
@@ -58,6 +65,32 @@ export const AdminOrdersTab: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isGeneratingShipment, setIsGeneratingShipment] = useState(false);
+  const [isSyncingTracking, setIsSyncingTracking] = useState(false);
+
+  const handleSyncTracking = async () => {
+    setIsSyncingTracking(true);
+    try {
+      const res = await fetch('/api/admin/tracking/sync-active', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(
+          'Rastreios Atualizados',
+          `Sincronização concluída: ${data.stats?.checked || 0} verificados, ${data.stats?.updated || 0} atualizados.`,
+          'success'
+        );
+        await refreshAllAdminOrders();
+      } else {
+        throw new Error(data.message || data.error);
+      }
+    } catch (err: any) {
+      showToast('Erro na Sincronização', err.message || 'Falha ao sincronizar rastreios com transportadora.', 'error');
+    } finally {
+      setIsSyncingTracking(false);
+    }
+  };
   const [statusNote, setStatusNote] = useState('');
   const [targetStatus, setTargetStatus] = useState<OrderStatus | ''>('');
   const [trackingCodeInput, setTrackingCodeInput] = useState('');
@@ -314,6 +347,15 @@ export const AdminOrdersTab: React.FC = () => {
           </div>
 
           <button
+            onClick={handleSyncTracking}
+            disabled={isSyncingTracking}
+            className="px-4 py-2.5 bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-800 rounded-xl text-xs font-bold uppercase transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {isSyncingTracking ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Truck className="w-3.5 h-3.5" />}
+            Sincronizar Rastreios
+          </button>
+
+          <button
             onClick={refreshOrders}
             className="px-4 py-2.5 bg-[#F9F9F7] hover:bg-[#F0EFEA] border border-[#E5E5E1] rounded-xl text-xs font-bold uppercase text-[#171717] transition-all flex items-center justify-center gap-2"
           >
@@ -337,7 +379,11 @@ export const AdminOrdersTab: React.FC = () => {
             'Aguardando Pagamento',
             'Pagamento Aprovado',
             'Em Separação',
+            'Pronto para Envio',
+            'Postado',
             'Despachado',
+            'Em Transporte',
+            'Saiu para entrega',
             'Entregue',
             'Cancelado'
           ].map((st) => {
@@ -687,9 +733,14 @@ export const AdminOrdersTab: React.FC = () => {
                     <option value="Em Separação">Em Separação</option>
                     <option value="Preparando Envio">Preparando Envio</option>
                     <option value="Pronto para Envio">Pronto para Envio</option>
+                    <option value="Postado">Postado (Coletado)</option>
                     <option value="Despachado">Despachado</option>
                     <option value="Em Transporte">Em Transporte</option>
+                    <option value="Saiu para entrega">Saiu para Entrega</option>
                     <option value="Entregue">Entregue</option>
+                    <option value="Problema no envio">Problema no Envio</option>
+                    <option value="Problema na entrega">Problema na Entrega</option>
+                    <option value="Devolvido">Devolvido</option>
                     <option value="Cancelado">Cancelado (Estorno de Estoque)</option>
                   </select>
                 </div>

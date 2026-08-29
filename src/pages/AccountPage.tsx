@@ -1236,8 +1236,28 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                             <span className="text-[11px] text-[#71717A] block">Realizado em {ord?.date || ''}</span>
                           </div>
 
-                          <span className="px-3 py-1 bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A] rounded text-[11px] font-bold uppercase w-fit">
-                            {ord?.status || 'Pendente'}
+                          <span
+                            className={`px-3 py-1 rounded-lg text-[11px] font-bold uppercase w-fit border ${
+                              ord?.status === 'Entregue'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                : ord?.status === 'Saiu para entrega'
+                                ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                : ord?.status === 'Em Transporte' || ord?.status === 'Em trânsito'
+                                ? 'bg-sky-50 text-sky-700 border-sky-200'
+                                : ord?.status === 'Postado' || ord?.status === 'Despachado'
+                                ? 'bg-teal-50 text-teal-700 border-teal-200'
+                                : ord?.status === 'Em Separação'
+                                ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                : ord?.status === 'Pronto para Envio'
+                                ? 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                                : ord?.status === 'Pagamento Aprovado'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : ord?.status === 'Cancelado'
+                                ? 'bg-red-50 text-red-700 border-red-200'
+                                : 'bg-[#FEF3C7] text-[#B45309] border-[#FDE68A]'
+                            }`}
+                          >
+                            {ord?.status || 'Aguardando Pagamento'}
                           </span>
                         </div>
 

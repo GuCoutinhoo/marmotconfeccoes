@@ -176,14 +176,18 @@ export type OrderStatus =
   | 'Em Separação'
   | 'Preparando Envio'
   | 'Pronto para Envio'
+  | 'Postado'
   | 'Enviado'
   | 'Despachado'
   | 'Em Transporte'
+  | 'Saiu para entrega'
   | 'Entregue'
   | 'Pagamento Recusado'
   | 'Cancelado'
   | 'Devolução Solicitada'
   | 'Devolvido'
+  | 'Problema no envio'
+  | 'Problema na entrega'
   | 'Reembolso Pendente'
   | 'Reembolsado';
 
@@ -226,16 +230,23 @@ export interface OrderItem {
 
 export interface OrderStatusHistoryItem {
   id?: string;
+  orderId?: string;
   status: string;
   previousStatus?: string;
+  newStatus?: string;
+  source?: 'mercado_pago' | 'melhor_envio' | 'carrier' | 'tracking' | 'tracking_sync' | 'admin' | 'system';
+  externalEventId?: string;
   timestamp: string;
+  occurredAt?: string;
   date?: string;
   time?: string;
   responsible?: string;
   author?: string;
   description: string;
+  location?: string;
   note?: string;
   trackingCode?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface Order {
@@ -285,12 +296,18 @@ export interface Order {
   shippingDestinationPostalCode?: string;
   trackingCode?: string;
   estimatedDelivery: string;
+  // Lifecycle Timestamps
+  paidAt?: string;
+  separationStartedAt?: string;
+  postedAt?: string;
+  inTransitAt?: string;
+  outForDeliveryAt?: string;
+  deliveredAt?: string;
   // Melhor Envio Integration Fields
   melhorEnvioShipmentId?: string;
   melhorEnvioProtocol?: string;
   melhorEnvioLabelUrl?: string;
   shippingLabelUrl?: string;
-  deliveredAt?: string;
   melhorEnvioStatus?: string;
   history: OrderStatusHistoryItem[];
   notes?: string;

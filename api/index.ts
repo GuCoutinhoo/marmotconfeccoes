@@ -148,16 +148,24 @@ export interface OrderItem {
 }
 
 export interface OrderHistoryEvent {
+  id?: string;
+  orderId?: string;
   status: string;
   timestamp: string;
   description: string;
   previousStatus?: string;
+  newStatus?: string;
+  source?: string;
+  externalEventId?: string;
+  occurredAt?: string;
+  location?: string;
   date?: string;
   time?: string;
   responsible?: string;
   author?: string;
   note?: string;
   trackingCode?: string;
+  [key: string]: any;
 }
 
 export type OrderStatus =
@@ -552,7 +560,7 @@ export interface ShipmentEvent {
   id: string;
   orderId: string;
   shipmentId?: string;
-  provider: 'melhor_envio' | 'correios' | 'manual';
+  provider: 'melhor_envio' | 'correios' | 'manual' | 'carrier' | 'tracking' | 'tracking_sync' | 'admin' | 'system' | string;
   providerEventId?: string;
   status: string;
   description: string;
@@ -2670,9 +2678,20 @@ export class DatabaseManager {
         discount: Number(order.discount || 0),
         total: Number(order.total || 0),
         status: order.status || 'Aguardando Pagamento',
-        payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' ? 'Pago' : 'Pendente'),
+        payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' || order.status === 'Em Separação' ? 'Pago' : 'Pendente'),
+        shipping_status: order.shippingStatus || null,
         tracking_code: order.trackingCode || null,
         tracking_url: (order as any).trackingUrl || (order as any).tracking_url || null,
+        paid_at: order.paidAt || (order.paymentStatus === 'Pago' ? (order.createdAt || new Date().toISOString()) : null),
+        separation_started_at: order.separationStartedAt || null,
+        posted_at: order.postedAt || null,
+        in_transit_at: order.inTransitAt || null,
+        out_for_delivery_at: order.outForDeliveryAt || null,
+        delivered_at: order.deliveredAt || null,
+        mercado_pago_payment_id: order.paymentDetails?.mercadoPagoPaymentId || null,
+        mercado_pago_preference_id: order.paymentDetails?.mercadoPagoPreferenceId || null,
+        melhor_envio_shipment_id: order.melhorEnvioShipmentId || null,
+        shipping_label_url: order.shippingLabelUrl || null,
         history: order.history || [],
         notes: (order as any).notes || null,
         data: order,
@@ -6902,9 +6921,13 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
       return order;
     }
 
-    order.status = 'Pagamento Aprovado';
+    const nowIso = new Date().toISOString();
+    order.status = 'Em Separação';
     order.paymentStatus = 'Pago';
-    order.paymentDetails.paidAt = paymentData.date_approved || new Date().toISOString();
+    order.shippingStatus = 'Preparando';
+    order.paidAt = paymentData.date_approved || order.paidAt || nowIso;
+    order.separationStartedAt = order.separationStartedAt || nowIso;
+    order.paymentDetails.paidAt = paymentData.date_approved || nowIso;
 
     // Call PostgreSQL atomic payment effect registrar
     const effectResult = await db.applyApprovedPaymentAtomic(
@@ -6928,9 +6951,16 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
       }
 
       order.history.push({
-        status: 'Pagamento Aprovado',
+        id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        orderId: order.id,
+        status: 'Em Separação',
+        previousStatus: 'Aguardando Pagamento',
+        newStatus: 'Em Separação',
+        source: 'mercado_pago',
+        externalEventId: String(paymentData.id),
         timestamp: new Date().toLocaleString('pt-BR'),
-        description: `Pagamento de R$ ${transactionAmount > 0 ? transactionAmount.toFixed(2) : order.total.toFixed(2)} aprovado no Mercado Pago (${paymentData.payment_method_id || 'Mercado Pago'}).`,
+        occurredAt: paymentData.date_approved || nowIso,
+        description: `Pagamento de R$ ${transactionAmount > 0 ? transactionAmount.toFixed(2) : order.total.toFixed(2)} aprovado no Mercado Pago (${paymentData.payment_method_id || 'Mercado Pago'}). Pedido encaminhado automaticamente para separação e conferência no estoque.`,
       });
 
       if (order.customerEmail) {
@@ -8631,77 +8661,579 @@ app.delete('/api/admin/reviews/:id', requireAdmin, async (req: any, res) => {
   }
 });
 
-// --- MELHOR ENVIO WEBHOOK & TRACKING TIMELINE ---
-app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhooks/melhorenvio'], async (req, res) => {
-  try {
-    const payload = req.body || {};
-    const trackingCode = payload.tracking || payload.tracking_code || payload.shipment?.tracking;
-    const providerStatus = (payload.status || payload.event || '').toLowerCase();
-    const eventDescription = payload.description || payload.message || `Status Melhor Envio: ${providerStatus}`;
-    const location = payload.location ? `${payload.location.city || ''} - ${payload.location.state || ''}` : undefined;
+// =========================================================================
+// --- ORDER LIFECYCLE STATE MACHINE & TRACKING NORMALIZATION LAYER ---
+// =========================================================================
 
-    console.log(`[Melhor Envio Webhook]: Tracking=${trackingCode}, Status=${providerStatus}`);
+const ORDER_STATUS_RANKS: Record<string, number> = {
+  'Aguardando Pagamento': 10,
+  'Pagamento Pendente': 10,
+  'Pagamento Aprovado': 20,
+  'Pedido Confirmado': 20,
+  'Em Separação': 30,
+  'Preparando Envio': 30,
+  'Pronto para Envio': 40,
+  'Postado': 50,
+  'Despachado': 50,
+  'Em Transporte': 60,
+  'Em trânsito': 60,
+  'Saiu para entrega': 70,
+  'Entregue': 80,
+  'Problema no envio': 45,
+  'Problema na entrega': 65,
+  'Aguardando retirada': 65,
+  'Devolvendo ao remetente': 75,
+  'Devolução Solicitada': 85,
+  'Devolvido': 90,
+  'Pagamento Recusado': 5,
+  'Cancelado': 95,
+  'Reembolsado': 96,
+};
 
-    if (trackingCode) {
-      const order = await db.getOrderByTracking(trackingCode);
-      if (order) {
-        // Record real shipment event
-        await db.recordShipmentEvent({
-          id: `shp-evt-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-          orderId: order.id,
-          shipmentId: order.melhorEnvioShipmentId,
-          provider: 'melhor_envio',
-          providerEventId: payload.id ? String(payload.id) : undefined,
-          status: providerStatus,
-          description: eventDescription,
-          location,
-          occurredAt: payload.created_at || new Date().toISOString(),
-          createdAt: new Date().toISOString(),
-        });
+function normalizeCarrierStatus(statusOrDescription: string): {
+  internalState: string;
+  orderStatus: string;
+  shippingStatus: string;
+  label: string;
+  description: string;
+  rank: number;
+  isTerminal: boolean;
+  isException: boolean;
+} {
+  const raw = String(statusOrDescription || '').trim().toLowerCase();
 
-        // Strictly update order shipment status according to real carrier events
-        if (providerStatus.includes('delivered') || providerStatus === 'entregue') {
-          order.shippingStatus = 'Entregue';
-          order.status = 'Entregue';
-          order.deliveredAt = new Date().toISOString();
-          order.history.push({
-            status: 'Entregue',
-            timestamp: new Date().toLocaleString('pt-BR'),
-            description: `Entrega concluída pela transportadora (${location || 'Destinatário'}).`,
-          });
+  // 1. DELIVERED / ENTREGUE (Terminal Success)
+  if (
+    raw === 'delivered' ||
+    raw === 'entregue' ||
+    raw.includes('objeto entregue') ||
+    raw.includes('entrega realizada') ||
+    raw.includes('entregue ao destinatário') ||
+    raw.includes('concluido') ||
+    raw.includes('concluído')
+  ) {
+    return {
+      internalState: 'delivered',
+      orderStatus: 'Entregue',
+      shippingStatus: 'Entregue',
+      label: 'Entregue',
+      description: 'Objeto entregue ao destinatário com sucesso.',
+      rank: 80,
+      isTerminal: true,
+      isException: false,
+    };
+  }
 
-          // Send delivered email invitation
-          if (order.customerEmail) {
-            sendTransactionalEmail({
-              to: order.customerEmail,
-              subject: `Seu pedido #${order.id} foi entregue! | MARMOT`,
-              template: 'order_delivered',
-              orderId: order.id,
-              userId: order.userId,
-              html: `<div style="font-family: sans-serif; background: #0c0c0c; color: #fff; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto;">
-                <h2 style="letter-spacing: 0.1em; color: #22c55e;">ENTREGA CONFIRMADA // MARMOT</h2>
-                <p>Seu pedido <strong>#${order.id}</strong> chegou ao destino.</p>
-                <p>Esperamos que curta suas peças. Deixe sua avaliação para nos ajudar a continuar elevando a qualidade do streetwear nacional.</p>
-              </div>`,
-            }).catch(() => {});
-          }
-        } else if (providerStatus.includes('transit') || providerStatus.includes('shipped') || providerStatus === 'em trânsito' || providerStatus === 'postado') {
-          order.shippingStatus = 'Em trânsito';
-          order.history.push({
-            status: 'Em trânsito',
-            timestamp: new Date().toLocaleString('pt-BR'),
-            description: `Atualização de rastreio: ${eventDescription} ${location ? `(${location})` : ''}`,
-          });
-        }
+  // 2. OUT FOR DELIVERY / SAIU PARA ENTREGA (Pre-delivery milestone - NOT delivered!)
+  if (
+    raw === 'out_for_delivery' ||
+    raw === 'delivery_route' ||
+    raw.includes('saiu para entrega') ||
+    raw.includes('saiu para entrega ao destinatário') ||
+    raw.includes('em rota de entrega')
+  ) {
+    return {
+      internalState: 'out_for_delivery',
+      orderStatus: 'Saiu para entrega',
+      shippingStatus: 'Saiu para entrega',
+      label: 'Saiu para Entrega',
+      description: 'Objeto saiu para entrega ao destinatário.',
+      rank: 70,
+      isTerminal: false,
+      isException: false,
+    };
+  }
 
-        await db.saveOrder(order);
-      }
+  // 3. RETURNING / RETURNED (Exceptions)
+  if (
+    raw === 'returning_to_sender' ||
+    raw === 'returned' ||
+    raw.includes('devolvido ao remetente') ||
+    raw.includes('devolucao ao remetente') ||
+    raw.includes('devolução ao remetente') ||
+    raw.includes('retornando ao remetente') ||
+    raw.includes('devolvido')
+  ) {
+    return {
+      internalState: 'returning_to_sender',
+      orderStatus: 'Devolvido',
+      shippingStatus: 'Problema na entrega',
+      label: 'Devolvendo ao Remetente',
+      description: 'Objeto em processo de devolução ao remetente.',
+      rank: 75,
+      isTerminal: false,
+      isException: true,
+    };
+  }
+
+  // 4. AWAITING PICKUP (Exception)
+  if (
+    raw === 'awaiting_pickup' ||
+    raw === 'waiting_for_pickup' ||
+    raw.includes('aguardando retirada') ||
+    raw.includes('disponivel para retirada') ||
+    raw.includes('disponível para retirada') ||
+    raw.includes('retirada na agencia') ||
+    raw.includes('retirada na agência')
+  ) {
+    return {
+      internalState: 'awaiting_pickup',
+      orderStatus: 'Em Transporte',
+      shippingStatus: 'Problema na entrega',
+      label: 'Aguardando Retirada',
+      description: 'Objeto disponível para retirada na agência da transportadora.',
+      rank: 65,
+      isTerminal: false,
+      isException: true,
+    };
+  }
+
+  // 5. DELIVERY ATTEMPT / SHIPPING PROBLEM (Exceptions)
+  if (
+    raw === 'delivery_attempt' ||
+    raw === 'shipping_exception' ||
+    raw.includes('destinatário ausente') ||
+    raw.includes('destinatario ausente') ||
+    raw.includes('tentativa de entrega') ||
+    raw.includes('endereco incorreto') ||
+    raw.includes('endereço incorreto') ||
+    raw.includes('extravio') ||
+    raw.includes('avaria') ||
+    raw.includes('objeto com atraso')
+  ) {
+    return {
+      internalState: 'delivery_attempt',
+      orderStatus: 'Em Transporte',
+      shippingStatus: 'Problema na entrega',
+      label: 'Problema na Entrega',
+      description: 'Tentativa de entrega não concluída. Nova tentativa será realizada.',
+      rank: 65,
+      isTerminal: false,
+      isException: true,
+    };
+  }
+
+  // 6. IN TRANSIT / EM TRANSPORTE
+  if (
+    raw === 'in_transit' ||
+    raw === 'transit' ||
+    raw === 'moving' ||
+    raw === 'forwarded' ||
+    raw === 'departed' ||
+    raw === 'arrived_at_facility' ||
+    raw.includes('em transito') ||
+    raw.includes('em trânsito') ||
+    raw.includes('objeto em transferência') ||
+    raw.includes('em transferencia') ||
+    raw.includes('em transferência') ||
+    raw.includes('objeto encaminhado') ||
+    raw.includes('encaminhado') ||
+    raw.includes('transferido')
+  ) {
+    return {
+      internalState: 'in_transit',
+      orderStatus: 'Em Transporte',
+      shippingStatus: 'Em trânsito',
+      label: 'Em Trânsito',
+      description: 'Objeto em transferência entre unidades da transportadora.',
+      rank: 60,
+      isTerminal: false,
+      isException: false,
+    };
+  }
+
+  // 7. POSTED / COLETADO / OBJETO POSTADO
+  if (
+    raw === 'posted' ||
+    raw === 'collected' ||
+    raw === 'picked_up' ||
+    raw === 'accepted' ||
+    raw === 'received_by_carrier' ||
+    raw === 'shipped' ||
+    raw.includes('objeto postado') ||
+    raw.includes('coletado') ||
+    raw.includes('recebido na unidade de postagem') ||
+    raw.includes('recebido pela transportadora') ||
+    raw.includes('postado')
+  ) {
+    return {
+      internalState: 'posted',
+      orderStatus: 'Postado',
+      shippingStatus: 'Postado',
+      label: 'Postado',
+      description: 'Objeto postado e recebido na agência da transportadora.',
+      rank: 50,
+      isTerminal: false,
+      isException: false,
+    };
+  }
+
+  // 8. READY FOR SHIPPING / ETIQUETA GERADA
+  if (
+    raw === 'ready_for_shipping' ||
+    raw === 'label_generated' ||
+    raw.includes('etiqueta gerada') ||
+    raw.includes('pronto para envio') ||
+    raw.includes('envio criado')
+  ) {
+    return {
+      internalState: 'ready_for_shipping',
+      orderStatus: 'Pronto para Envio',
+      shippingStatus: 'Pronto para envio',
+      label: 'Pronto para Envio',
+      description: 'Etiqueta de envio gerada. Aguardando coleta da transportadora.',
+      rank: 40,
+      isTerminal: false,
+      isException: false,
+    };
+  }
+
+  // 9. SEPARATION / EM SEPARAÇÃO
+  if (
+    raw === 'separation' ||
+    raw === 'preparing' ||
+    raw.includes('separação') ||
+    raw.includes('separacao') ||
+    raw.includes('preparando')
+  ) {
+    return {
+      internalState: 'separation',
+      orderStatus: 'Em Separação',
+      shippingStatus: 'Preparando',
+      label: 'Em Separação',
+      description: 'Pagamento confirmado. Peças em separação e conferência.',
+      rank: 30,
+      isTerminal: false,
+      isException: false,
+    };
+  }
+
+  // 10. PAID / PAGAMENTO APROVADO
+  if (raw === 'paid' || raw === 'approved' || raw.includes('aprovado')) {
+    return {
+      internalState: 'paid',
+      orderStatus: 'Pagamento Aprovado',
+      shippingStatus: 'Aguardando preparação',
+      label: 'Pagamento Aprovado',
+      description: 'Pagamento confirmado com sucesso.',
+      rank: 20,
+      isTerminal: false,
+      isException: false,
+    };
+  }
+
+  // Fallback / Unknown
+  return {
+    internalState: 'unknown',
+    orderStatus: 'Em Transporte',
+    shippingStatus: 'Em trânsito',
+    label: 'Atualização de Rastreio',
+    description: statusOrDescription || 'Evento de movimentação registrado.',
+    rank: 55,
+    isTerminal: false,
+    isException: false,
+  };
+}
+
+function canTransitionOrderStatus(currentStatus: string, newStatus: string): boolean {
+  if (currentStatus === newStatus) return false;
+
+  const currentRank = ORDER_STATUS_RANKS[currentStatus] || 0;
+  const newRank = ORDER_STATUS_RANKS[newStatus] || 0;
+
+  // 1. Terminal state protection: Entregue is absolute and cannot be reverted by out-of-order webhooks
+  if (currentStatus === 'Entregue') {
+    return false;
+  }
+
+  // 2. Cancellation / Refund are terminal or override non-delivered orders
+  if (currentStatus === 'Cancelado' || currentStatus === 'Reembolsado') {
+    return false;
+  }
+
+  // 3. Normal forward progression: newRank must be strictly greater than currentRank
+  if (newRank > currentRank) {
+    return true;
+  }
+
+  // 4. Exception transitions (e.g. Devolvido or Cancelado applied after shipping)
+  if (newStatus === 'Devolvido' || newStatus === 'Cancelado' || newStatus === 'Problema no envio' || newStatus === 'Problema na entrega') {
+    return true;
+  }
+
+  return false;
+}
+
+// Central transition engine for logistics tracking events
+async function applyShippingEventToOrder(
+  orderIdentifier: string,
+  event: {
+    rawStatus: string;
+    description?: string;
+    location?: string;
+    occurredAt?: string;
+    source?: 'melhor_envio' | 'carrier' | 'tracking' | 'tracking_sync' | 'admin' | 'system';
+    externalEventId?: string;
+  }
+): Promise<{ order: Order | null; transitionApplied: boolean; message: string }> {
+  const cleanId = String(orderIdentifier || '').trim();
+  if (!cleanId) {
+    return { order: null, transitionApplied: false, message: 'Identificador do pedido ausente.' };
+  }
+
+  let order = await db.getOrderByTracking(cleanId);
+  if (!order) {
+    order = await db.getOrderById(cleanId);
+  }
+  if (!order) {
+    const all = await db.getOrders();
+    order = all.find(
+      (o) =>
+        o.melhorEnvioShipmentId === cleanId ||
+        o.trackingCode?.toLowerCase() === cleanId.toLowerCase() ||
+        o.id === cleanId
+    ) || null;
+  }
+
+  if (!order) {
+    return { order: null, transitionApplied: false, message: `Pedido não encontrado para identificador: ${cleanId}` };
+  }
+
+  const normalized = normalizeCarrierStatus(event.rawStatus);
+  const nowIso = new Date().toISOString();
+  const eventOccurredAt = event.occurredAt || nowIso;
+
+  // Record shipment event in database audit table
+  await db.recordShipmentEvent({
+    id: `shp-evt-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    orderId: order.id,
+    shipmentId: order.melhorEnvioShipmentId,
+    provider: event.source || 'melhor_envio',
+    providerEventId: event.externalEventId,
+    status: event.rawStatus,
+    description: event.description || normalized.description,
+    location: event.location,
+    occurredAt: eventOccurredAt,
+    createdAt: nowIso,
+  });
+
+  const previousStatus = order.status;
+  const canTransition = canTransitionOrderStatus(String(order.status), normalized.orderStatus);
+
+  // Check if this exact history event was already recorded (idempotency check)
+  const isDuplicateHistory = order.history.some(
+    (h: any) =>
+      (event.externalEventId && h.externalEventId === event.externalEventId) ||
+      (h.status === normalized.orderStatus && (h.description === event.description || h.occurredAt === eventOccurredAt))
+  );
+
+  if (canTransition) {
+    order.status = normalized.orderStatus;
+    order.shippingStatus = normalized.shippingStatus;
+
+    if (normalized.internalState === 'posted') {
+      order.postedAt = order.postedAt || eventOccurredAt;
+    } else if (normalized.internalState === 'in_transit') {
+      order.inTransitAt = order.inTransitAt || eventOccurredAt;
+      if (!order.postedAt) order.postedAt = eventOccurredAt;
+    } else if (normalized.internalState === 'out_for_delivery') {
+      order.outForDeliveryAt = order.outForDeliveryAt || eventOccurredAt;
+      if (!order.inTransitAt) order.inTransitAt = eventOccurredAt;
+    } else if (normalized.internalState === 'delivered') {
+      order.deliveredAt = order.deliveredAt || eventOccurredAt;
+      if (!order.outForDeliveryAt) order.outForDeliveryAt = eventOccurredAt;
     }
 
-    res.status(200).json({ success: true, message: 'Evento de rastreamento processado.' });
+    if (!isDuplicateHistory) {
+      order.history.push({
+        id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        orderId: order.id,
+        status: normalized.orderStatus,
+        previousStatus: String(previousStatus),
+        newStatus: normalized.orderStatus,
+        source: event.source || 'melhor_envio',
+        externalEventId: event.externalEventId,
+        timestamp: new Date().toLocaleString('pt-BR'),
+        occurredAt: eventOccurredAt,
+        description: `${normalized.label}: ${event.description || normalized.description}${event.location ? ` (${event.location})` : ''}`,
+        location: event.location,
+        trackingCode: order.trackingCode,
+      });
+    }
+
+    // If delivered, trigger transactional email to customer
+    if (normalized.internalState === 'delivered' && order.customerEmail) {
+      sendTransactionalEmail({
+        to: order.customerEmail,
+        subject: `Seu pedido #${order.id} foi entregue! | MARMOT`,
+        template: 'order_delivered',
+        orderId: order.id,
+        userId: order.userId,
+        html: `<div style="font-family: sans-serif; background: #0c0c0c; color: #fff; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto;">
+          <h2 style="letter-spacing: 0.1em; color: #22c55e;">ENTREGA CONFIRMADA // MARMOT</h2>
+          <p>Seu pedido <strong>#${order.id}</strong> chegou ao destino com sucesso.</p>
+          <p>Esperamos que curta suas novas peças streetwear da MARMOT!</p>
+          <p style="color: #a1a1aa; font-size: 13px; margin-top: 24px;">Código de Rastreamento: ${order.trackingCode || 'N/A'}</p>
+        </div>`,
+      }).catch(() => {});
+    }
+
+    await db.saveOrder(order);
+    return {
+      order,
+      transitionApplied: true,
+      message: `Status do pedido #${order.id} atualizado de '${previousStatus}' para '${normalized.orderStatus}'.`,
+    };
+  } else {
+    // No status transition (e.g. out-of-order event or same status), but record descriptive history if new
+    if (!isDuplicateHistory && event.description && event.description !== normalized.description) {
+      order.history.push({
+        id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        orderId: order.id,
+        status: String(order.status),
+        previousStatus: String(order.status),
+        newStatus: String(order.status),
+        source: event.source || 'melhor_envio',
+        externalEventId: event.externalEventId,
+        timestamp: new Date().toLocaleString('pt-BR'),
+        occurredAt: eventOccurredAt,
+        description: `Movimentação: ${event.description}${event.location ? ` (${event.location})` : ''}`,
+        location: event.location,
+        trackingCode: order.trackingCode,
+      });
+      await db.saveOrder(order);
+    }
+    return {
+      order,
+      transitionApplied: false,
+      message: `Status preservado em '${order.status}' (evento '${event.rawStatus}' não permite transição regressiva ou redundante).`,
+    };
+  }
+}
+
+// Background sync for active orders tracking against Melhor Envio API
+async function syncActiveOrdersTrackingServer(): Promise<{ totalActive: number; checked: number; updated: number; errors: number }> {
+  const token = getMelhorEnvioTokenServer();
+  const allOrders = await db.getOrders();
+  const activeOrders = allOrders.filter(
+    (o) =>
+      ['Em Separação', 'Preparando Envio', 'Pronto para Envio', 'Postado', 'Despachado', 'Em Transporte', 'Em trânsito', 'Saiu para entrega'].includes(String(o.status)) &&
+      (Boolean(o.melhorEnvioShipmentId) || (Boolean(o.trackingCode) && !o.trackingCode?.startsWith('BR-SIMULATED-')))
+  );
+
+  let updatedCount = 0;
+  let errorCount = 0;
+
+  if (activeOrders.length === 0) {
+    return { totalActive: 0, checked: 0, updated: 0, errors: 0 };
+  }
+
+  if (token && token.length >= 10) {
+    const baseUrl = 'https://melhorenvio.com.br/api/v2';
+    const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confeccoes';
+    const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
+    const userAgent = `${appName} (${appEmail})`;
+
+    const shipmentIds = activeOrders.map((o) => o.melhorEnvioShipmentId || o.trackingCode).filter(Boolean) as string[];
+
+    for (let i = 0; i < shipmentIds.length; i += 20) {
+      const batch = shipmentIds.slice(i, i + 20);
+      try {
+        const trackRes = await fetch(`${baseUrl}/me/shipment/tracking`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            'User-Agent': userAgent,
+          },
+          body: JSON.stringify({ orders: batch }),
+        });
+
+        if (trackRes.ok) {
+          const trackData: any = await trackRes.json();
+          for (const sId of batch) {
+            const info = trackData[sId];
+            if (info && (info.status || info.tracking)) {
+              const res = await applyShippingEventToOrder(sId, {
+                rawStatus: info.status || 'in_transit',
+                description: info.description || info.message,
+                occurredAt: info.posted_at || info.delivered_at || info.created_at,
+                source: 'tracking_sync',
+                externalEventId: info.id ? String(info.id) : undefined,
+              });
+              if (res.transitionApplied) {
+                updatedCount++;
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[Tracking Sync Batch Error]:', err);
+        errorCount++;
+      }
+    }
+  }
+
+  return {
+    totalActive: activeOrders.length,
+    checked: activeOrders.length,
+    updated: updatedCount,
+    errors: errorCount,
+  };
+}
+
+// Background recurring sync every 5 minutes
+setInterval(() => {
+  syncActiveOrdersTrackingServer().catch((e) => console.warn('[Background Tracking Sync Notice]:', e.message));
+}, 5 * 60 * 1000);
+
+// --- MELHOR ENVIO & CARRIER WEBHOOKS ---
+app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhooks/melhorenvio', '/api/webhooks/tracking'], async (req, res) => {
+  try {
+    const payload = req.body || {};
+    const trackingCode = payload.tracking || payload.tracking_code || payload.shipment?.tracking || payload.id || payload.shipment_id;
+    const providerStatus = String(payload.status || payload.event || payload.tag || '').toLowerCase();
+    const eventDescription = payload.description || payload.message || payload.title || `Status: ${providerStatus}`;
+    const location = payload.location ? `${payload.location.city || ''} ${payload.location.state ? `- ${payload.location.state}` : ''}`.trim() : undefined;
+
+    console.log(`[Melhor Envio Webhook]: Tracking/Shipment=${trackingCode}, Status=${providerStatus}`);
+
+    if (trackingCode) {
+      const result = await applyShippingEventToOrder(trackingCode, {
+        rawStatus: providerStatus,
+        description: eventDescription,
+        location,
+        occurredAt: payload.created_at || payload.occurred_at || new Date().toISOString(),
+        source: 'melhor_envio',
+        externalEventId: payload.id ? String(payload.id) : undefined,
+      });
+
+      return res.status(200).json({ success: true, message: result.message, transitionApplied: result.transitionApplied });
+    }
+
+    res.status(200).json({ success: true, message: 'Webhook recebido sem identificador de rastreio.' });
   } catch (err: any) {
     console.error('[Melhor Envio Webhook Error]:', err);
     res.status(200).json({ success: false, error: err.message });
+  }
+});
+
+// Admin Manual Sync Endpoint for Active Logistics
+app.post('/api/admin/tracking/sync-active', requireAdmin, async (req: any, res) => {
+  try {
+    const stats = await syncActiveOrdersTrackingServer();
+    await db.logAdminAction(
+      req.user?.email || 'admin@marmot.com',
+      req.user?.name || 'Admin',
+      'sync_tracking_active',
+      'order',
+      'all_active',
+      `Sincronização de rastreamento executada. Verificados: ${stats.checked}, Atualizados: ${stats.updated}`
+    );
+    res.json({ success: true, stats });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Erro ao sincronizar rastreios ativos.', message: err.message });
   }
 });
 
@@ -8725,6 +9257,12 @@ app.get(['/api/tracking/:code', '/api/orders/track/:code'], async (req, res) => 
         trackingCode: order.trackingCode,
         estimatedDelivery: order.estimatedDelivery,
         shippingAddress: order.shippingAddress,
+        paidAt: order.paidAt,
+        separationStartedAt: order.separationStartedAt,
+        postedAt: order.postedAt,
+        inTransitAt: order.inTransitAt,
+        outForDeliveryAt: order.outForDeliveryAt,
+        deliveredAt: order.deliveredAt,
         history: order.history,
       },
       events,

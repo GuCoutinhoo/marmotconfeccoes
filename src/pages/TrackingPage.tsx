@@ -81,23 +81,33 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({
     await fetchLiveTracking(searchCode);
   };
 
-  const steps: { title: OrderStatus; icon: any; label: string }[] = [
-    { title: 'Aguardando Pagamento', icon: Clock, label: 'Pedido Recebido' },
-    { title: 'Pagamento Aprovado', icon: CheckCircle2, label: 'Pagamento Aprovado' },
-    { title: 'Em Separação', icon: Box, label: 'Em Separação' },
-    { title: 'Enviado', icon: Truck, label: 'Em Trânsito' },
-    { title: 'Entregue', icon: MapPin, label: 'Entregue' },
+  const steps: { key: string; icon: any; label: string }[] = [
+    { key: 'paid', icon: CheckCircle2, label: 'Pagamento Aprovado' },
+    { key: 'separation', icon: Box, label: 'Em Separação' },
+    { key: 'posted', icon: Package, label: 'Postado / Coletado' },
+    { key: 'transit', icon: Truck, label: 'Em Trânsito' },
+    { key: 'delivered', icon: MapPin, label: 'Entregue' },
   ];
 
-  const getStepIndex = (status: OrderStatus) => {
+  const getStepIndex = (status: OrderStatus | string) => {
     switch (status) {
       case 'Aguardando Pagamento':
+      case 'Pagamento Pendente':
         return 0;
       case 'Pagamento Aprovado':
-        return 1;
+      case 'Pedido Confirmado':
+        return 0;
       case 'Em Separação':
-        return 2;
+      case 'Preparando Envio':
+      case 'Pronto para Envio':
+        return 1;
+      case 'Postado':
+      case 'Despachado':
       case 'Enviado':
+        return 2;
+      case 'Em Transporte':
+      case 'Em trânsito':
+      case 'Saiu para entrega':
         return 3;
       case 'Entregue':
         return 4;
