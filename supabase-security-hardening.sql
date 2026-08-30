@@ -895,4 +895,70 @@ GRANT EXECUTE ON FUNCTION public.claim_webhook_event(TEXT, TEXT, TEXT, JSONB) TO
 GRANT EXECUTE ON FUNCTION public.complete_webhook_event(TEXT, TEXT, TEXT, TEXT) TO authenticated, service_role, anon;
 GRANT EXECUTE ON FUNCTION public.apply_approved_payment_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT) TO authenticated, service_role, anon;
 
+-- ==============================================================================
+-- 15. TABELA SHIPMENT_OPERATIONS & APP_SETTINGS (Segurança e RLS)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.shipment_operations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id TEXT NOT NULL UNIQUE,
+    status TEXT NOT NULL CHECK (status IN ('processing', 'completed', 'failed')),
+    shipment_id TEXT,
+    tracking_code TEXT,
+    print_url TEXT,
+    current_step TEXT,
+    error TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_shipment_operations_order_id ON public.shipment_operations (order_id);
+CREATE INDEX IF NOT EXISTS idx_shipment_operations_status ON public.shipment_operations (status);
+CREATE INDEX IF NOT EXISTS idx_shipment_operations_updated_at ON public.shipment_operations (updated_at);
+
+ALTER TABLE public.shipment_operations ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Shipment operations admin and service read" ON public.shipment_operations;
+CREATE POLICY "Shipment operations admin and service read"
+    ON public.shipment_operations FOR SELECT
+    USING (public.is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Shipment operations admin and service insert" ON public.shipment_operations;
+CREATE POLICY "Shipment operations admin and service insert"
+    ON public.shipment_operations FOR INSERT
+    WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Shipment operations admin and service update" ON public.shipment_operations;
+CREATE POLICY "Shipment operations admin and service update"
+    ON public.shipment_operations FOR UPDATE
+    USING (public.is_admin() OR auth.role() = 'service_role')
+    WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Shipment operations admin delete" ON public.shipment_operations;
+CREATE POLICY "Shipment operations admin delete"
+    ON public.shipment_operations FOR DELETE
+    USING (public.is_admin());
+
+CREATE TABLE IF NOT EXISTS public.app_settings (
+    key TEXT PRIMARY KEY,
+    value JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "App settings read" ON public.app_settings;
+CREATE POLICY "App settings read"
+    ON public.app_settings FOR SELECT
+    USING (true);
+
+DROP POLICY IF EXISTS "App settings admin write" ON public.app_settings;
+CREATE POLICY "App settings admin write"
+    ON public.app_settings FOR ALL
+    USING (public.is_admin() OR auth.role() = 'service_role')
+    WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+
+NOTIFY pgrst, 'reload schema';
+
+
 

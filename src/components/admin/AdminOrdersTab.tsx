@@ -199,13 +199,23 @@ export const AdminOrdersTab: React.FC = () => {
     }
 
     setIsGeneratingShipment(true);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 40000);
+
     try {
       const res = await fetch(`/api/admin/orders/${orderId}/generate-melhor-envio-shipment`, {
         method: 'POST',
         headers: getAdminHeaders(),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
       if (!res.ok) {
+        if (res.status === 409) {
+          showToast('Processamento em Andamento', data.error || 'A emissão deste frete já está em andamento. Aguarde alguns instantes.', 'warning');
+          await refreshAllAdminOrders();
+          return;
+        }
         throw new Error(data.error || 'Erro ao gerar remessa no Melhor Envio.');
       }
 
@@ -219,8 +229,13 @@ export const AdminOrdersTab: React.FC = () => {
       }
       await refreshAllAdminOrders();
     } catch (err: any) {
-      showToast('Erro no Melhor Envio', err.message, 'error');
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+        showToast('Tempo Esgotado', 'A requisição ao Melhor Envio demorou mais que o esperado. Verifique o status da remessa em instantes.', 'error');
+      } else {
+        showToast('Erro no Melhor Envio', err.message, 'error');
+      }
     } finally {
+      clearTimeout(timeoutId);
       setIsGeneratingShipment(false);
     }
   };

@@ -889,7 +889,9 @@ export class DatabaseManager {
       await this.loadFromPostgres().catch(() => {});
     }
 
-    this.cleanUpArtificialTrackingCodes();
+    try {
+      await this.cleanUpArtificialTrackingCodes();
+    } catch {}
     this.isInitialized = true;
   }
 
@@ -4843,10 +4845,13 @@ export class DatabaseManager {
   // ==========================================
   // SHIPMENT OPERATIONS & IDEMPOTENCY
   // ==========================================
+  // SHIPMENT OPERATIONS & IDEMPOTENCY (DATABASE-BACKED)
+  // ==========================================
   private shipmentOperations: any[] = [];
 
-  public cleanUpArtificialTrackingCodes(): void {
+  public async cleanUpArtificialTrackingCodes(): Promise<void> {
     let count = 0;
+    const toClean: string[] = [];
     for (const order of this.orders) {
       if (
         order.trackingCode &&
@@ -4855,57 +4860,99 @@ export class DatabaseManager {
         !order.shippingLabelUrl
       ) {
         order.trackingCode = undefined;
+        toClean.push(order.id);
         count++;
       }
     }
     if (count > 0) {
       console.log(`[DB] ${count} pedidos com códigos de rastreio artificiais legados foram normalizados.`);
       this.writeJsonFile(ORDERS_FILE, this.orders);
+
+      if (this.mode === 'supabase' && this.supabase) {
+        for (const ordId of toClean) {
+          try {
+            const ordObj = this.orders.find((o) => o.id === ordId);
+            await this.supabase.from('orders').update({
+              tracking_code: null,
+              data: ordObj,
+              updated_at: new Date().toISOString(),
+            }).eq('id', ordId);
+          } catch (err) {
+            console.warn(`[DB] Erro ao limpar código de rastreio legado do pedido #${ordId} no Supabase:`, err);
+          }
+        }
+      }
     }
   }
 
-  public async claimShipmentGeneration(orderId: string): Promise<{ shouldProcess: boolean; existing?: any }> {
+  public async claimShipmentGeneration(orderId: string): Promise<{ shouldProcess: boolean; isLocked?: boolean; existing?: any }> {
     await this.initialize();
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
+    const now = new Date().toISOString();
+
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data } = await this.supabase
+        const { data: existingOp, error: selectErr } = await this.supabase
           .from('shipment_operations')
           .select('*')
           .eq('order_id', orderId)
           .maybeSingle();
 
-        if (data) {
-          if (data.status === 'completed') {
-            return { shouldProcess: false, existing: data };
-          }
-          if (data.status === 'processing') {
-            const claimedTime = new Date(data.updated_at || data.created_at).getTime();
-            if (Date.now() - claimedTime < 2 * 60 * 1000) {
-              return { shouldProcess: false, existing: data };
-            }
+        if (selectErr) {
+          console.error('[DB] Supabase claimShipmentGeneration query error:', selectErr.message);
+          if (isProd) {
+            throw new Error(`Infraestrutura de logística não configurada no Supabase (tabela shipment_operations: ${selectErr.message}). Execute a migration.`);
           }
         }
 
-        await this.supabase.from('shipment_operations').upsert({
+        if (existingOp) {
+          if (existingOp.status === 'completed' && (existingOp.print_url || existingOp.shipment_id)) {
+            return { shouldProcess: false, isLocked: false, existing: existingOp };
+          }
+          if (existingOp.status === 'processing') {
+            const ageMs = Date.now() - new Date(existingOp.updated_at || existingOp.created_at).getTime();
+            // Lock ativo se a operação foi iniciada a menos de 2 minutos
+            if (ageMs < 2 * 60 * 1000) {
+              return { shouldProcess: false, isLocked: true, existing: existingOp };
+            }
+            console.warn(`[DB] Lock expirado (${Math.round(ageMs / 1000)}s atrás) para o pedido ${orderId}. Reconciliando operação.`);
+          }
+        }
+
+        // Adquire lock atômico no banco
+        const { error: upsertErr } = await this.supabase.from('shipment_operations').upsert({
           order_id: orderId,
           status: 'processing',
-          updated_at: new Date().toISOString(),
+          shipment_id: existingOp?.shipment_id || null,
+          current_step: 'validating',
+          error: null,
+          updated_at: now,
         });
-        return { shouldProcess: true };
-      } catch (err) {
+
+        if (upsertErr) {
+          console.error('[DB] Supabase claim lock error:', upsertErr.message);
+          if (isProd) {
+            throw new Error(`Falha ao adquirir lock de geração de envio: ${upsertErr.message}`);
+          }
+        }
+
+        return { shouldProcess: true, existing: existingOp };
+      } catch (err: any) {
+        if (isProd) throw err;
         console.warn('[DB] Supabase claimShipmentGeneration notice:', err);
       }
     }
 
+    // Fallback local em memória (ambiente offline / dev)
     const existing = this.shipmentOperations.find((o) => o.orderId === orderId);
     if (existing) {
-      if (existing.status === 'completed') {
-        return { shouldProcess: false, existing };
+      if (existing.status === 'completed' && (existing.printUrl || existing.shipmentId)) {
+        return { shouldProcess: false, isLocked: false, existing };
       }
       if (existing.status === 'processing') {
-        const claimedTime = new Date(existing.updatedAt).getTime();
-        if (Date.now() - claimedTime < 2 * 60 * 1000) {
-          return { shouldProcess: false, existing };
+        const ageMs = Date.now() - new Date(existing.updatedAt).getTime();
+        if (ageMs < 2 * 60 * 1000) {
+          return { shouldProcess: false, isLocked: true, existing };
         }
       }
     }
@@ -4913,13 +4960,38 @@ export class DatabaseManager {
     const op = {
       orderId,
       status: 'processing',
-      updatedAt: new Date().toISOString(),
+      currentStep: 'validating',
+      shipmentId: existing?.shipmentId || null,
+      updatedAt: now,
     };
     const idx = this.shipmentOperations.findIndex((o) => o.orderId === orderId);
     if (idx >= 0) this.shipmentOperations[idx] = op;
     else this.shipmentOperations.push(op);
 
-    return { shouldProcess: true };
+    return { shouldProcess: true, existing };
+  }
+
+  public async updateShipmentStep(orderId: string, step: string, shipmentId?: string): Promise<void> {
+    const now = new Date().toISOString();
+    if (this.mode === 'supabase' && this.supabase) {
+      try {
+        const updateData: any = {
+          current_step: step,
+          updated_at: now,
+        };
+        if (shipmentId) updateData.shipment_id = shipmentId;
+        await this.supabase.from('shipment_operations').update(updateData).eq('order_id', orderId);
+      } catch (err) {
+        console.warn('[DB] Supabase updateShipmentStep notice:', err);
+      }
+    }
+
+    const op = this.shipmentOperations.find((o) => o.orderId === orderId);
+    if (op) {
+      op.currentStep = step;
+      if (shipmentId) op.shipmentId = shipmentId;
+      op.updatedAt = now;
+    }
   }
 
   public async completeShipmentGeneration(
@@ -4927,7 +4999,8 @@ export class DatabaseManager {
     shipmentId?: string,
     trackingCode?: string,
     printUrl?: string,
-    error?: string
+    error?: string,
+    currentStep?: string
   ): Promise<void> {
     await this.initialize();
     const status = error ? 'failed' : 'completed';
@@ -4941,6 +5014,7 @@ export class DatabaseManager {
           shipment_id: shipmentId || null,
           tracking_code: trackingCode || null,
           print_url: printUrl || null,
+          current_step: currentStep || status,
           error: error || null,
           updated_at: now,
         });
@@ -4956,6 +5030,7 @@ export class DatabaseManager {
       trackingCode,
       printUrl,
       error,
+      currentStep: currentStep || status,
       updatedAt: now,
     };
     const idx = this.shipmentOperations.findIndex((o) => o.orderId === orderId);
@@ -4965,6 +5040,8 @@ export class DatabaseManager {
 
   public async getShippingSettings(): Promise<any> {
     await this.initialize();
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
+
     if (this.mode === 'supabase' && this.supabase) {
       try {
         const { data, error } = await this.supabase
@@ -4973,10 +5050,18 @@ export class DatabaseManager {
           .eq('key', 'shipping_settings')
           .maybeSingle();
 
-        if (!error && data && data.value) {
+        if (error) {
+          console.error('[DB] Supabase getShippingSettings error:', error.message);
+          if (isProd) {
+            throw new Error(`Configurações de frete não encontradas no banco (app_settings: ${error.message}). Execute as migrations.`);
+          }
+        } else if (data && data.value) {
           return data.value;
+        } else if (isProd) {
+          return {};
         }
-      } catch (err) {
+      } catch (err: any) {
+        if (isProd) throw err;
         console.warn('[DB] Supabase getShippingSettings notice:', err);
       }
     }
@@ -4992,6 +5077,28 @@ export class DatabaseManager {
 
   public async saveShippingSettings(settings: any): Promise<void> {
     await this.initialize();
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
+    const now = new Date().toISOString();
+
+    if (this.mode === 'supabase' && this.supabase) {
+      try {
+        const { error } = await this.supabase.from('app_settings').upsert({
+          key: 'shipping_settings',
+          value: settings,
+          updated_at: now,
+        });
+        if (error) {
+          console.error('[DB] Supabase saveShippingSettings error:', error.message);
+          if (isProd) {
+            throw new Error(`Erro ao salvar configurações de frete no Supabase: ${error.message}`);
+          }
+        }
+      } catch (err: any) {
+        if (isProd) throw err;
+        console.warn('[DB] Supabase saveShippingSettings notice:', err);
+      }
+    }
+
     const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
     const dir = path.dirname(settingsPath);
     if (!fs.existsSync(dir)) {
@@ -5000,18 +5107,6 @@ export class DatabaseManager {
     try {
       fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
     } catch {}
-
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('app_settings').upsert({
-          key: 'shipping_settings',
-          value: settings,
-          updated_at: new Date().toISOString(),
-        });
-      } catch (err) {
-        console.warn('[DB] Supabase saveShippingSettings notice:', err);
-      }
-    }
   }
 }
 
@@ -5155,6 +5250,25 @@ export async function validateAndFetchCep(cep: string): Promise<{
     };
   } catch {
     return { exists: true, cep: clean };
+  }
+}
+
+export async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs: number = 15000): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    return response;
+  } catch (err: any) {
+    if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+      throw new Error(`Timeout de ${Math.round(timeoutMs / 1000)}s excedido ao comunicar com o servidor remoto.`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -7766,18 +7880,18 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
     let sender = saved.sender;
     if (!sender) {
       sender = {
-        name: 'Marmot Confecções Ltda',
-        document: '42.123.456/0001-90',
+        name: 'Marmot Confecções',
+        document: '',
         stateRegister: 'ISENTO',
-        phone: '(11) 98842-1092',
+        phone: '11988421092',
         email: 'contato@marmot.com.br',
         street: 'Avenida Celso Garcia',
         number: '1200',
-        complement: 'Galpão 03',
+        complement: '',
         neighborhood: 'Brás',
         city: 'São Paulo',
         state: 'SP',
-        cep: originPostalCode.length === 8 ? `${originPostalCode.slice(0, 5)}-${originPostalCode.slice(5)}` : originPostalCode,
+        cep: originPostalCode.length === 8 ? originPostalCode : '03806010',
       };
     }
 
@@ -7859,13 +7973,13 @@ app.get('/api/admin/melhor-envio/test-connection', requireAdmin, async (req, res
       });
     }
 
-    const meRes = await fetch(`${config.baseUrl}/me`, {
+    const meRes = await fetchWithTimeout(`${config.baseUrl}/me`, {
       headers: {
         Accept: 'application/json',
         Authorization: `Bearer ${config.token}`,
         'User-Agent': config.userAgent,
       },
-    });
+    }, 8000);
 
     if (!meRes.ok) {
       const errText = await meRes.text().catch(() => '');
@@ -7909,17 +8023,13 @@ app.get('/api/admin/melhor-envio/diagnostics', requireAdmin, async (req, res) =>
 
     if (tokenConfigured) {
       try {
-        const timeoutController = new AbortController();
-        const timeoutId = setTimeout(() => timeoutController.abort(), 6000);
-        const meRes = await fetch(`${config.baseUrl}/me`, {
+        const meRes = await fetchWithTimeout(`${config.baseUrl}/me`, {
           headers: {
             Accept: 'application/json',
             Authorization: `Bearer ${config.token}`,
             'User-Agent': config.userAgent,
           },
-          signal: timeoutController.signal,
-        });
-        clearTimeout(timeoutId);
+        }, 6000);
         apiReachable = true;
         authenticated = meRes.ok;
       } catch {
@@ -7928,12 +8038,7 @@ app.get('/api/admin/melhor-envio/diagnostics', requireAdmin, async (req, res) =>
       }
     } else {
       try {
-        const timeoutController = new AbortController();
-        const timeoutId = setTimeout(() => timeoutController.abort(), 6000);
-        const pingRes = await fetch(`${config.baseUrl}/me/shipment/services`, {
-          signal: timeoutController.signal,
-        });
-        clearTimeout(timeoutId);
+        const pingRes = await fetchWithTimeout(`${config.baseUrl}/me/shipment/services`, {}, 6000);
         apiReachable = pingRes.status < 500;
       } catch {
         apiReachable = false;
@@ -7956,13 +8061,7 @@ app.get('/api/admin/melhor-envio/diagnostics', requireAdmin, async (req, res) =>
 app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
   try {
     const config = getMelhorEnvioConfig();
-    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
-    let saved: any = {};
-    if (fs.existsSync(settingsPath)) {
-      try {
-        saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-      } catch {}
-    }
+    const saved = await db.getShippingSettings();
 
     const clientId = saved.clientId || process.env.MELHOR_ENVIO_CLIENT_ID;
     const host = req.get('host') || 'localhost:3000';
@@ -7985,14 +8084,17 @@ app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
   }
 });
 
-// --- ADMIN: GERAR ENVIO REAL NO MELHOR ENVIO COM ESTADOS E VALIDAÇÕES RIGOROSAS ---
+// --- ADMIN: GERAR ENVIO REAL NO MELHOR ENVIO COM MÁQUINA DE ESTADOS E VALIDAÇÕES RIGOROSAS ---
 app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, async (req: any, res) => {
   const orderId = req.params.id;
+  const startTime = Date.now();
+  console.log(`[ME_SHIPMENT_START] orderId: ${orderId}`);
 
   try {
     const order = await db.getOrderById(orderId);
     if (!order) {
-      return res.status(404).json({ error: 'Pedido não encontrado no sistema.' });
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=order_lookup httpStatus=404 errorCode=ORDER_NOT_FOUND durationMs: ${Date.now() - startTime}`);
+      return res.status(404).json({ error: 'Pedido não encontrado no sistema.', code: 'ORDER_NOT_FOUND' });
     }
 
     const isApproved =
@@ -8003,11 +8105,16 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       order.status === 'Pronto para Envio';
 
     if (!isApproved) {
-      return res.status(400).json({ error: 'A etiqueta e o envio só podem ser gerados após a confirmação do pagamento.' });
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=payment_check httpStatus=400 errorCode=PAYMENT_NOT_CONFIRMED durationMs: ${Date.now() - startTime}`);
+      return res.status(400).json({
+        error: 'A etiqueta e o envio só podem ser gerados após a confirmação do pagamento.',
+        code: 'PAYMENT_NOT_CONFIRMED',
+      });
     }
 
-    // 1. Check if already generated in order object and has a valid live label URL
+    // 1. Se já possui etiqueta válida e ID de remessa real, retornar imediatamente
     if (order.shippingLabelUrl && order.melhorEnvioShipmentId && !order.trackingCode?.startsWith('BR-SIMULATED-')) {
+      console.log(`[ME_SHIPMENT_SUCCESS] orderId: ${orderId} shipmentId: ${order.melhorEnvioShipmentId} (cached) durationMs: ${Date.now() - startTime}`);
       return res.json({
         success: true,
         message: 'Etiqueta já emitida anteriormente.',
@@ -8018,13 +8125,14 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       });
     }
 
-    // 2. Persistent Distributed Lock & Operation Claim
+    // 2. Lock Atômico Distribuído & Idempotência
     const claim = await db.claimShipmentGeneration(orderId);
-    if (!claim.shouldProcess && claim.existing) {
-      if (claim.existing.status === 'completed' && claim.existing.print_url) {
+    if (!claim.shouldProcess) {
+      if (claim.existing?.status === 'completed' && claim.existing?.print_url) {
         order.melhorEnvioShipmentId = claim.existing.shipment_id || order.melhorEnvioShipmentId;
         order.trackingCode = claim.existing.tracking_code || order.trackingCode;
         order.shippingLabelUrl = claim.existing.print_url || order.shippingLabelUrl;
+        console.log(`[ME_SHIPMENT_SUCCESS] orderId: ${orderId} shipmentId: ${order.melhorEnvioShipmentId} (recovered from DB) durationMs: ${Date.now() - startTime}`);
         return res.json({
           success: true,
           message: 'Etiqueta recuperada de operação já concluída.',
@@ -8034,45 +8142,71 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
           order,
         });
       }
-      return res.status(429).json({ error: 'Geração de etiqueta em andamento por outro processo. Aguarde alguns instantes.' });
+      if (claim.isLocked || claim.existing?.status === 'processing') {
+        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=lock httpStatus=409 errorCode=GENERATION_IN_PROGRESS durationMs: ${Date.now() - startTime}`);
+        return res.status(409).json({
+          error: 'Geração de etiqueta já está em andamento para este pedido.',
+          code: 'GENERATION_IN_PROGRESS',
+          step: claim.existing?.current_step || 'processing',
+        });
+      }
     }
+
+    // STEP 1: VALIDATION
+    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=validation`);
+    await db.updateShipmentStep(orderId, 'validating');
 
     const config = getMelhorEnvioConfig();
     const token = config.token;
     if (!token || token.length < 10) {
-      await db.completeShipmentGeneration(orderId, '', '', '', 'Token do Melhor Envio ausente');
+      await db.completeShipmentGeneration(orderId, '', '', '', 'Token do Melhor Envio ausente', 'failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=503 errorCode=MISSING_TOKEN durationMs: ${Date.now() - startTime}`);
       return res.status(503).json({
-        error: 'Token do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN na Vercel.',
+        error: 'Token do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN nas variáveis de ambiente da Vercel (escopo Production).',
+        code: 'MISSING_TOKEN',
+        step: 'validation',
       });
     }
 
-    const savedSettings = await db.getShippingSettings();
+    let savedSettings: any;
+    try {
+      savedSettings = await db.getShippingSettings();
+    } catch (settingsErr: any) {
+      await db.completeShipmentGeneration(orderId, '', '', '', settingsErr.message, 'failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=500 errorCode=SETTINGS_ERROR durationMs: ${Date.now() - startTime}`);
+      return res.status(500).json({
+        error: settingsErr.message || 'Erro ao carregar configurações de frete no banco de dados.',
+        code: 'SETTINGS_ERROR',
+        step: 'validation',
+      });
+    }
 
     const baseUrl = config.baseUrl;
     const userAgent = config.userAgent;
     const appEmail = config.appEmail;
+    const senderConfig = savedSettings.sender;
 
-    const senderConfig = savedSettings.sender || {
-      name: 'Marmot Confecções Ltda',
-      document: '42.123.456/0001-90',
-      stateRegister: 'ISENTO',
-      phone: '(11) 98842-1092',
-      email: 'contato@marmot.com.br',
-      street: 'Avenida Celso Garcia',
-      number: '1200',
-      complement: 'Galpão 03',
-      neighborhood: 'Brás',
-      city: 'São Paulo',
-      state: 'SP',
-      cep: config.originPostalCode,
-    };
+    if (!senderConfig || !senderConfig.document) {
+      const errMsg = 'Documento do remetente não configurado nas Configurações de Frete.';
+      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=MISSING_SENDER_DOCUMENT durationMs: ${Date.now() - startTime}`);
+      return res.status(400).json({
+        error: errMsg,
+        code: 'MISSING_SENDER_DOCUMENT',
+        step: 'validation',
+      });
+    }
 
-    // Strict validation of store sender document
+    // Validação estrita de dígitos verificadores do documento do remetente (CPF ou CNPJ)
     const senderDocValidation = validateSenderDocument(senderConfig.document);
     if (!senderDocValidation.valid) {
-      await db.completeShipmentGeneration(orderId, '', '', '', senderDocValidation.error);
+      const errMsg = senderDocValidation.error || 'Documento do remetente inválido.';
+      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=INVALID_SENDER_DOCUMENT durationMs: ${Date.now() - startTime}`);
       return res.status(400).json({
-        error: `Erro nos dados do remetente da loja: ${senderDocValidation.error}. Atualize o documento do remetente na aba "Configurações de Frete" do painel administrativo.`,
+        error: errMsg,
+        code: 'INVALID_SENDER_DOCUMENT',
+        step: 'validation',
       });
     }
 
@@ -8081,14 +8215,20 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     const customerCpf = cleanCpf(order.customerCpf || (order.shippingAddress as any)?.cpf || '');
 
     if (cleanDest.length !== 8) {
-      await db.completeShipmentGeneration(orderId, '', '', '', 'CEP de destino inválido');
-      return res.status(400).json({ error: 'CEP de entrega do cliente inválido.' });
+      const errMsg = 'CEP de entrega do destinatário inválido.';
+      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=INVALID_DEST_CEP durationMs: ${Date.now() - startTime}`);
+      return res.status(400).json({ error: errMsg, code: 'INVALID_DEST_CEP', step: 'validation' });
     }
 
     if (!customerCpf || !isValidCpf(customerCpf)) {
-      await db.completeShipmentGeneration(orderId, '', '', '', 'CPF do destinatário inválido ou ausente');
+      const errMsg = 'CPF do destinatário obrigatório e válido para emissão de frete pelo Melhor Envio. Adicione ou edite o CPF do cliente neste pedido antes de gerar a etiqueta.';
+      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=INVALID_CUSTOMER_CPF durationMs: ${Date.now() - startTime}`);
       return res.status(400).json({
-        error: 'CPF do destinatário obrigatório e válido para emissão de frete pelo Melhor Envio. Adicione ou edite o CPF do cliente neste pedido antes de gerar a etiqueta.',
+        error: errMsg,
+        code: 'INVALID_CUSTOMER_CPF',
+        step: 'validation',
       });
     }
 
@@ -8096,10 +8236,10 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     const meProducts: any[] = [];
     for (const item of order.items) {
       const prod = productsStore.find((p) => String(p.id) === String(item.productId) || String(p.slug) === String(item.productId));
-      const weight = Math.max(0.05, Number(prod?.weight || item.weight || 0.35));
-      const height = Math.max(2, Number(prod?.height || item.height || 4));
-      const width = Math.max(11, Number(prod?.width || item.width || 20));
-      const length = Math.max(16, Number(prod?.length || item.length || 25));
+      const weight = Math.max(0.05, Number(prod?.weight || item.weight || savedSettings.defaultWeight || 0.35));
+      const height = Math.max(2, Number(prod?.height || item.height || savedSettings.defaultHeight || 4));
+      const width = Math.max(11, Number(prod?.width || item.width || savedSettings.defaultWidth || 20));
+      const length = Math.max(16, Number(prod?.length || item.length || savedSettings.defaultLength || 25));
 
       meProducts.push({
         name: item.title || item.productTitle || 'Peça Marmot',
@@ -8113,26 +8253,33 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     }
 
     const senderDoc = senderDocValidation.digits;
-    const senderPhone = senderConfig.phone.replace(/\D/g, '');
+    const senderPhone = (senderConfig.phone || '11988421092').replace(/\D/g, '');
+
+    // Construção do payload do remetente sem misturar document e company_document
+    const fromPayload: any = {
+      name: senderConfig.name || 'Marmot Confecções',
+      phone: senderPhone,
+      email: senderConfig.email || appEmail,
+      address: senderConfig.street || 'Avenida Celso Garcia',
+      number: senderConfig.number || '1200',
+      complement: senderConfig.complement || '',
+      district: senderConfig.neighborhood || 'Brás',
+      city: senderConfig.city || 'São Paulo',
+      state_abbr: (senderConfig.state || 'SP').toUpperCase(),
+      country_id: 'BR',
+      postal_code: cleanOrigin,
+    };
+
+    if (senderDocValidation.type === 'cpf') {
+      fromPayload.document = senderDoc;
+    } else {
+      fromPayload.company_document = senderDoc;
+      fromPayload.state_register = senderConfig.stateRegister || 'ISENTO';
+    }
 
     const cartPayload = {
       service: Number(order.shippingServiceId) || 1,
-      from: {
-        name: senderConfig.name,
-        phone: senderPhone,
-        email: senderConfig.email || appEmail,
-        document: senderDocValidation.type === 'cpf' ? senderDoc : undefined,
-        company_document: senderDocValidation.type === 'cnpj' ? senderDoc : undefined,
-        state_register: senderDocValidation.type === 'cnpj' ? (senderConfig.stateRegister || 'ISENTO') : 'ISENTO',
-        address: senderConfig.street,
-        number: senderConfig.number || 'S/N',
-        complement: senderConfig.complement || '',
-        district: senderConfig.neighborhood || 'Centro',
-        city: senderConfig.city,
-        state_abbr: (senderConfig.state || 'SP').toUpperCase(),
-        country_id: 'BR',
-        postal_code: cleanOrigin,
-      },
+      from: fromPayload,
       to: {
         name: order.shippingAddress?.recipientName || order.customerName || 'Destinatário',
         phone: (order.customerPhone || (order.shippingAddress as any)?.phone || '11988421092').replace(/\D/g, ''),
@@ -8165,23 +8312,32 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       },
     };
 
-    let shipmentId = order.melhorEnvioShipmentId || '';
-    let protocol = '';
+    let shipmentId = claim.existing?.shipment_id || order.melhorEnvioShipmentId || '';
     let printUrl = '';
     let realTracking = '';
 
-    // STEP 1: Add to Cart on Melhor Envio
+    // STEP 2: CART (Adicionar ao carrinho)
     if (!shipmentId) {
-      const cartRes = await fetch(`${baseUrl}/me/cart`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-          'User-Agent': userAgent,
-        },
-        body: JSON.stringify(cartPayload),
-      });
+      console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=cart`);
+      await db.updateShipmentStep(orderId, 'creating_cart');
+
+      let cartRes: Response;
+      try {
+        cartRes = await fetchWithTimeout(`${baseUrl}/me/cart`, {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            'User-Agent': userAgent,
+          },
+          body: JSON.stringify(cartPayload),
+        }, 15000);
+      } catch (timeoutErr: any) {
+        await db.completeShipmentGeneration(orderId, '', '', '', timeoutErr.message, 'failed');
+        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=cart httpStatus=504 errorCode=TIMEOUT durationMs: ${Date.now() - startTime}`);
+        return res.status(504).json({ error: timeoutErr.message, code: 'TIMEOUT', step: 'cart' });
+      }
 
       if (!cartRes.ok) {
         const cartErrText = await cartRes.text().catch(() => '');
@@ -8191,96 +8347,44 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
           const j = JSON.parse(cartErrText);
           if (j.message) msg += `: ${j.message}`;
           else if (j.error) msg += `: ${j.error}`;
+          if (j.errors) {
+            const errDetails = Object.entries(j.errors).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('; ');
+            msg += ` (${errDetails})`;
+          }
         } catch {
-          if (cartErrText) msg += `: ${cartErrText.slice(0, 100)}`;
+          if (cartErrText) msg += `: ${cartErrText.slice(0, 150)}`;
         }
-        await db.completeShipmentGeneration(orderId, '', '', '', msg);
-        return res.status(400).json({ error: msg });
+        await db.completeShipmentGeneration(orderId, '', '', '', msg, 'failed');
+        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=cart httpStatus=${cartRes.status} errorCode=CART_ERROR durationMs: ${Date.now() - startTime}`);
+        return res.status(400).json({ error: msg, code: 'CART_ERROR', step: 'cart' });
       }
 
       const cartData: any = await cartRes.json();
       shipmentId = String(cartData.id || cartData.protocol);
-      protocol = cartData.protocol || '';
 
       if (!shipmentId) {
-        await db.completeShipmentGeneration(orderId, '', '', '', 'ID de remessa não retornado pelo Melhor Envio');
-        return res.status(502).json({ error: 'Melhor Envio não retornou um ID de envio válido.' });
+        const errMsg = 'ID de remessa não retornado pelo Melhor Envio.';
+        await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=cart httpStatus=502 errorCode=MISSING_SHIPMENT_ID durationMs: ${Date.now() - startTime}`);
+        return res.status(502).json({ error: errMsg, code: 'MISSING_SHIPMENT_ID', step: 'cart' });
       }
 
-      // Persist created shipment ID immediately
+      // Persiste o shipmentId IMEDIATAMENTE no banco para evitar duplicação em caso de retry
       order.melhorEnvioShipmentId = shipmentId;
       await db.saveOrder(order);
+      await db.updateShipmentStep(orderId, 'cart_created', shipmentId);
+      console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=cart_created shipmentId: ${shipmentId}`);
+    } else {
+      console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=cart_reused shipmentId: ${shipmentId}`);
     }
 
-    // STEP 2: Checkout / Purchase shipment with balance
-    const checkoutRes = await fetch(`${baseUrl}/me/shipment/checkout`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        'User-Agent': userAgent,
-      },
-      body: JSON.stringify({ orders: [shipmentId] }),
-    });
+    // STEP 3: CHECKOUT (Compra do frete com saldo)
+    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=checkout shipmentId: ${shipmentId}`);
+    await db.updateShipmentStep(orderId, 'checking_out', shipmentId);
 
-    if (!checkoutRes.ok) {
-      const chkErrText = await checkoutRes.text().catch(() => '');
-      console.warn('[Melhor Envio Checkout Notice]:', checkoutRes.status, chkErrText);
-      let isInsufficientBalance = false;
-      try {
-        const chkJ = JSON.parse(chkErrText);
-        if (chkJ.message?.toLowerCase().includes('saldo') || chkJ.error?.toLowerCase().includes('saldo')) {
-          isInsufficientBalance = true;
-        }
-      } catch {}
-
-      if (isInsufficientBalance) {
-        await db.completeShipmentGeneration(orderId, shipmentId, '', '', 'Saldo insuficiente no Melhor Envio');
-        return res.status(402).json({
-          error: 'Saldo insuficiente na sua carteira do Melhor Envio para comprar este envio. Adicione créditos no painel do Melhor Envio e tente novamente.',
-          shipmentId,
-        });
-      }
-    }
-
-    // STEP 3: Generate label
-    const genRes = await fetch(`${baseUrl}/me/shipment/generate`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        'User-Agent': userAgent,
-      },
-      body: JSON.stringify({ orders: [shipmentId] }),
-    });
-
-    if (!genRes.ok) {
-      const genErrText = await genRes.text().catch(() => '');
-      console.warn('[Melhor Envio Generate Notice]:', genRes.status, genErrText);
-    }
-
-    // STEP 4: Print label / Get live URL
-    const printRes = await fetch(`${baseUrl}/me/shipment/print`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        'User-Agent': userAgent,
-      },
-      body: JSON.stringify({ mode: 'public', orders: [shipmentId] }),
-    });
-
-    if (printRes.ok) {
-      const printData: any = await printRes.json();
-      printUrl = printData.url || (printData.orders && printData.orders[0]?.url) || '';
-    }
-
-    // STEP 5: Retrieve official carrier tracking code (only if officially assigned by carrier)
+    let checkoutRes: Response;
     try {
-      const trackRes = await fetch(`${baseUrl}/me/shipment/tracking`, {
+      checkoutRes = await fetchWithTimeout(`${baseUrl}/me/shipment/checkout`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -8289,7 +8393,112 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
           'User-Agent': userAgent,
         },
         body: JSON.stringify({ orders: [shipmentId] }),
-      });
+      }, 20000);
+    } catch (timeoutErr: any) {
+      await db.completeShipmentGeneration(orderId, shipmentId, '', '', timeoutErr.message, 'checking_out');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=checkout httpStatus=504 errorCode=TIMEOUT durationMs: ${Date.now() - startTime}`);
+      return res.status(504).json({ error: timeoutErr.message, code: 'TIMEOUT', step: 'checkout', shipmentId });
+    }
+
+    if (!checkoutRes.ok) {
+      const chkErrText = await checkoutRes.text().catch(() => '');
+      console.warn('[Melhor Envio Checkout Notice]:', checkoutRes.status, chkErrText);
+      let isInsufficientBalance = false;
+      let isAlreadyPaid = false;
+
+      try {
+        const chkJ = JSON.parse(chkErrText);
+        const combined = `${chkJ.message || ''} ${chkJ.error || ''}`.toLowerCase();
+        if (combined.includes('saldo') || combined.includes('balance') || combined.includes('carteira')) {
+          isInsufficientBalance = true;
+        }
+        if (combined.includes('já foi pago') || combined.includes('already') || combined.includes('pago')) {
+          isAlreadyPaid = true;
+        }
+      } catch {}
+
+      if (isInsufficientBalance) {
+        const errMsg = 'Saldo insuficiente na sua carteira do Melhor Envio para comprar este envio. Adicione créditos no painel do Melhor Envio e tente novamente.';
+        await db.completeShipmentGeneration(orderId, shipmentId, '', '', errMsg, 'checkout_failed_balance');
+        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=checkout httpStatus=402 errorCode=INSUFFICIENT_BALANCE durationMs: ${Date.now() - startTime}`);
+        return res.status(402).json({
+          error: errMsg,
+          code: 'INSUFFICIENT_BALANCE',
+          step: 'checkout',
+          shipmentId,
+        });
+      }
+
+      if (!isAlreadyPaid && checkoutRes.status !== 200) {
+        console.warn(`[Melhor Envio Checkout Warning]: Tentando prosseguir para geração (status: ${checkoutRes.status})`);
+      }
+    }
+
+    await db.updateShipmentStep(orderId, 'checkout_completed', shipmentId);
+
+    // STEP 4: GENERATE (Geração da etiqueta)
+    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=generate shipmentId: ${shipmentId}`);
+    await db.updateShipmentStep(orderId, 'generating_label', shipmentId);
+
+    try {
+      const genRes = await fetchWithTimeout(`${baseUrl}/me/shipment/generate`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'User-Agent': userAgent,
+        },
+        body: JSON.stringify({ orders: [shipmentId] }),
+      }, 20000);
+
+      if (!genRes.ok) {
+        const genErrText = await genRes.text().catch(() => '');
+        console.warn('[Melhor Envio Generate Notice]:', genRes.status, genErrText);
+      }
+    } catch (genErr: any) {
+      console.warn('[Melhor Envio Generate Exception]:', genErr.message);
+    }
+
+    await db.updateShipmentStep(orderId, 'label_generated', shipmentId);
+
+    // STEP 5: PRINT (Obtenção da URL pública de impressão)
+    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=print shipmentId: ${shipmentId}`);
+    await db.updateShipmentStep(orderId, 'getting_print_url', shipmentId);
+
+    try {
+      const printRes = await fetchWithTimeout(`${baseUrl}/me/shipment/print`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'User-Agent': userAgent,
+        },
+        body: JSON.stringify({ mode: 'public', orders: [shipmentId] }),
+      }, 15000);
+
+      if (printRes.ok) {
+        const printData: any = await printRes.json();
+        printUrl = printData.url || (printData.orders && printData.orders[0]?.url) || '';
+      }
+    } catch (printErr: any) {
+      console.warn('[Melhor Envio Print Exception]:', printErr.message);
+    }
+
+    // STEP 6: TRACKING (Obtenção do rastreio oficial)
+    try {
+      const trackRes = await fetchWithTimeout(`${baseUrl}/me/shipment/tracking`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'User-Agent': userAgent,
+        },
+        body: JSON.stringify({ orders: [shipmentId] }),
+      }, 10000);
+
       if (trackRes.ok) {
         const trackData: any = await trackRes.json();
         if (trackData && trackData[shipmentId]) {
@@ -8298,6 +8507,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       }
     } catch {}
 
+    // STEP 7: COMPLETE (Finalização com sucesso e persistência)
     order.melhorEnvioShipmentId = shipmentId;
     if (realTracking) {
       order.trackingCode = realTracking;
@@ -8316,7 +8526,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     });
 
     await db.saveOrder(order);
-    await db.completeShipmentGeneration(order.id, shipmentId, realTracking || undefined, printUrl);
+    await db.completeShipmentGeneration(order.id, shipmentId, realTracking || undefined, printUrl, undefined, 'completed');
 
     await db.logAdminAction(
       req.user?.email || 'admin@marmot.com',
@@ -8328,6 +8538,8 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       { shipmentId, trackingCode: realTracking || undefined, printUrl }
     );
 
+    console.log(`[ME_SHIPMENT_SUCCESS] orderId: ${orderId} shipmentId: ${shipmentId} durationMs: ${Date.now() - startTime}`);
+
     return res.json({
       success: true,
       order,
@@ -8336,8 +8548,10 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       shipmentId,
     });
   } catch (err: any) {
-    console.error('[Generate Shipment Error]:', err);
-    return res.status(500).json({ error: err.message || 'Erro ao gerar envio no Melhor Envio.' });
+    console.error('[Generate Shipment Fatal Error]:', err);
+    await db.completeShipmentGeneration(orderId, '', '', '', err.message, 'failed');
+    console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=fatal httpStatus=500 errorCode=INTERNAL_ERROR durationMs: ${Date.now() - startTime}`);
+    return res.status(500).json({ error: err.message || 'Erro ao gerar envio no Melhor Envio.', code: 'INTERNAL_ERROR' });
   }
 });
 

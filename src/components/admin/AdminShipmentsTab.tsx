@@ -111,13 +111,25 @@ export const AdminShipmentsTab: React.FC = () => {
     }
 
     setGeneratingId(order.id);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 40000);
+
     try {
       const res = await fetch(`/api/admin/orders/${order.id}/generate-melhor-envio-shipment`, {
         method: 'POST',
         headers: getAdminHeaders(),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Falha ao gerar remessa no Melhor Envio.');
+      if (!res.ok) {
+        if (res.status === 409) {
+          showToast('Processamento em Andamento', data.error || 'A emissão deste frete já está em andamento. Aguarde alguns instantes.', 'warning');
+          await refreshAllAdminOrders();
+          return;
+        }
+        throw new Error(data.error || 'Falha ao gerar remessa no Melhor Envio.');
+      }
 
       showToast(
         'Envio Real Gerado!',
@@ -126,8 +138,13 @@ export const AdminShipmentsTab: React.FC = () => {
       );
       await refreshAllAdminOrders();
     } catch (err: any) {
-      showToast('Erro Melhor Envio', err.message, 'error');
+      if (err.name === 'AbortError' || err.message?.includes('aborted')) {
+        showToast('Tempo Esgotado', 'A requisição ao Melhor Envio demorou mais que o esperado. Verifique o status da remessa em instantes.', 'error');
+      } else {
+        showToast('Erro Melhor Envio', err.message, 'error');
+      }
     } finally {
+      clearTimeout(timeoutId);
       setGeneratingId(null);
     }
   };
