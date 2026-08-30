@@ -6335,7 +6335,42 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
     }
 
     const token = getMelhorEnvioTokenServer();
+    const isSandbox = (process.env.MELHOR_ENVIO_ENV || '').toLowerCase() === 'sandbox';
+    const environment = isSandbox ? 'sandbox' : 'production';
     const originPostalCode = (process.env.STORE_ORIGIN_CEP || process.env.ORIGIN_CEP || '03806010').replace(/\D/g, '');
+
+    const tokenPresent = Boolean(token && token.length >= 10);
+    console.log('[SHIPPING_CONFIG]', {
+      environment,
+      tokenPresent,
+      tokenLengthValid: tokenPresent,
+      originCepPresent: Boolean(originPostalCode && originPostalCode.length === 8),
+    });
+
+    const requestId = `ship-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+    const startTime = Date.now();
+
+    console.log('[SHIPPING_REQUEST_START]', {
+      requestId,
+      CEP: cleanCep,
+      itemCount: shippingProducts.length,
+    });
+
+    if (!token || token.length < 10) {
+      console.log('[SHIPPING_REQUEST_END]', {
+        requestId,
+        result: 'error',
+        code: 'MELHOR_ENVIO_TOKEN_MISSING',
+        durationMs: Date.now() - startTime,
+      });
+      return res.status(503).json({
+        success: false,
+        error: 'MELHOR_ENVIO_TOKEN_MISSING',
+        message: 'Token de autenticação do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN nas configurações da Vercel ou na aba de Frete do painel administrativo.',
+        quotes: [],
+        options: [],
+      });
+    }
 
     // Format products for Melhor Envio payload (unit dimensions + quantity)
     const melhorEnvioProducts = shippingProducts.map((p) => ({
@@ -6348,78 +6383,6 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       quantity: Number(p.quantity),
     }));
 
-    // Carrier Whitelist & Priority Mapping
-    // 1: Correios, 2: Jadlog, 8: Loggi, 9: Azul Cargo Express, 10: J&T Express
-    const CARRIER_WHITELIST = [
-      { companyId: 1, canonicalName: 'Correios', regex: /correios|empresa brasileira de correios/i, priority: 1 },
-      { companyId: 2, canonicalName: 'Jadlog', regex: /jadlog|jad\s*log/i, priority: 2 },
-      { companyId: 8, canonicalName: 'Loggi', regex: /loggi/i, priority: 3 },
-      { companyId: 9, canonicalName: 'Azul Cargo Express', regex: /azul\s*cargo|azul/i, priority: 4 },
-      { companyId: 10, canonicalName: 'J&T Express', regex: /j&t|jt\s*express|j\s*and\s*t/i, priority: 5 },
-    ];
-
-    const getCarrierMatch = (item: { companyId?: number; company?: any; carrier?: string; name?: string }) => {
-      const cId = Number(item.companyId || (typeof item.company === 'object' ? item.company?.id : undefined));
-      if (Number.isFinite(cId) && cId > 0) {
-        const found = CARRIER_WHITELIST.find((r) => r.companyId === cId);
-        if (found) return { allowed: true, priority: found.priority, canonicalName: found.canonicalName, companyId: found.companyId };
-        return { allowed: false, priority: 9999, canonicalName: '' };
-      }
-
-      const str = [
-        typeof item.company === 'string' ? item.company : (item.company?.name || ''),
-        item.carrier || '',
-        item.name || '',
-      ].filter(Boolean).join(' ').toLowerCase();
-
-      if (/buslog|total\s*express|latam\s*cargo|via\s*brasil/i.test(str)) {
-        return { allowed: false, priority: 9999, canonicalName: '' };
-      }
-
-      const found = CARRIER_WHITELIST.find((r) => r.regex.test(str));
-      if (found) return { allowed: true, priority: found.priority, canonicalName: found.canonicalName, companyId: found.companyId };
-      return { allowed: false, priority: 9999, canonicalName: '' };
-    };
-
-    const filterAndSortOptions = (rawList: ShippingOption[]): ShippingOption[] => {
-      const allowed: Array<{ quote: ShippingOption; priority: number }> = [];
-      for (const q of rawList) {
-        const match = getCarrierMatch(q);
-        if (match.allowed) {
-          allowed.push({
-            quote: {
-              ...q,
-              carrier: q.carrier || match.canonicalName,
-              company: q.company || match.canonicalName,
-            },
-            priority: match.priority,
-          });
-        }
-      }
-
-      // Sort by carrier priority (Correios 1 -> Jadlog 2 -> Loggi 3 -> Azul Cargo 4 -> J&T 5),
-      // then by price (cheapest first)
-      allowed.sort((a, b) => {
-        if (a.priority !== b.priority) {
-          return a.priority - b.priority;
-        }
-        return (Number(a.quote.price) || 0) - (Number(b.quote.price) || 0);
-      });
-
-      return allowed.map((item) => item.quote);
-    };
-
-    if (!token || token.length < 10) {
-      return res.status(503).json({
-        success: false,
-        error: 'MELHOR_ENVIO_TOKEN_MISSING',
-        message: 'Token do Melhor Envio não configurado no servidor. Configure nas configurações de frete do painel administrativo.',
-        quotes: [],
-        options: [],
-      });
-    }
-
-    const isSandbox = (process.env.MELHOR_ENVIO_ENV || '').toLowerCase() === 'sandbox';
     const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
     
     const payload = {
@@ -6429,20 +6392,64 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       options: { receipt: false, own_hand: false },
     };
 
-    const meResponse = await fetch(`${baseUrl}/me/shipment/calculate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'User-Agent': 'Marmot Confeccoes (contato@marmot.com.br)',
-      },
-      body: JSON.stringify(payload),
+    console.log('[SHIPPING_ME_REQUEST]', {
+      requestId,
+      environment,
+      originCep: originPostalCode,
+      destinationCep: cleanCep,
+      productCount: melhorEnvioProducts.length,
     });
+
+    const abortController = new AbortController();
+    const timeoutId = setTimeout(() => abortController.abort(), 10000);
+    let meResponse: any;
+
+    try {
+      meResponse = await fetch(`${baseUrl}/me/shipment/calculate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'User-Agent': 'Marmot Confeccoes (contato@marmot.com.br)',
+        },
+        body: JSON.stringify(payload),
+        signal: abortController.signal,
+      });
+    } catch (netErr: any) {
+      clearTimeout(timeoutId);
+      const isTimeout = netErr.name === 'AbortError';
+      console.error('[SHIPPING_ME_NETWORK_ERROR]', {
+        requestId,
+        isTimeout,
+        message: netErr.message,
+      });
+      console.log('[SHIPPING_REQUEST_END]', {
+        requestId,
+        result: 'error',
+        code: isTimeout ? 'GATEWAY_TIMEOUT' : 'SHIPPING_SERVICE_UNAVAILABLE',
+        durationMs: Date.now() - startTime,
+      });
+      return res.status(isTimeout ? 504 : 503).json({
+        success: false,
+        error: isTimeout ? 'GATEWAY_TIMEOUT' : 'SHIPPING_SERVICE_UNAVAILABLE',
+        message: isTimeout
+          ? 'O cálculo de frete excedeu o tempo limite no Melhor Envio. Tente novamente.'
+          : 'Falha de conexão com o serviço de frete do Melhor Envio.',
+        quotes: [],
+        options: [],
+      });
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
     if (!meResponse.ok) {
       const errText = await meResponse.text().catch(() => '');
-      console.error('[Melhor Envio API Error]:', meResponse.status, errText);
+      console.error('[SHIPPING_ME_ERROR_RESPONSE]', {
+        requestId,
+        status: meResponse.status,
+        body: errText.substring(0, 300),
+      });
       let msg = 'Erro ao consultar taxas reais no Melhor Envio.';
       try {
         const j = JSON.parse(errText);
@@ -6450,9 +6457,16 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
         else if (j.error) msg = j.error;
       } catch {}
 
+      console.log('[SHIPPING_REQUEST_END]', {
+        requestId,
+        result: 'error',
+        status: meResponse.status,
+        durationMs: Date.now() - startTime,
+      });
+
       return res.status(meResponse.status === 401 ? 401 : 503).json({
         success: false,
-        error: 'SHIPPING_API_ERROR',
+        error: meResponse.status === 401 ? 'MELHOR_ENVIO_AUTH_ERROR' : 'SHIPPING_API_ERROR',
         message: msg,
         quotes: [],
         options: [],
@@ -6461,6 +6475,12 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
 
     const meData: any = await meResponse.json();
     if (!Array.isArray(meData)) {
+      console.log('[SHIPPING_REQUEST_END]', {
+        requestId,
+        result: 'error',
+        code: 'INVALID_API_RESPONSE',
+        durationMs: Date.now() - startTime,
+      });
       return res.status(502).json({
         success: false,
         error: 'INVALID_API_RESPONSE',
@@ -6470,14 +6490,22 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       });
     }
 
+    console.log('[SHIPPING_ME_RESPONSE]', {
+      requestId,
+      status: meResponse.status,
+      serviceCount: meData.length,
+    });
+
+    // Validar e extrair todas as cotações válidas SEM WHITELIST OU RESTRIÇÃO DE TRANSPORTADORA
     const rawApiQuotes: ShippingOption[] = meData
-      .filter((item: any) => !item.error && item.price)
+      .filter((item: any) => !item.error && (item.custom_price || item.price) && (item.id || item.name))
       .map((item: any) => {
         const carrierName = item.company?.name || item.name || 'Transportadora';
         const serviceName = item.name || carrierName;
         const price = parseFloat(item.custom_price || item.price || 0);
         const originalPrice = parseFloat(item.price || item.custom_price || 0);
-        const days = parseInt(item.custom_delivery_time || item.delivery_time || 5, 10);
+        const days = parseInt(item.custom_delivery_time || item.delivery_time || 0, 10);
+        const deliveryDaysText = days === 1 ? '1 dia útil' : days > 1 ? `${days} dias úteis` : 'A consultar';
 
         return {
           id: String(item.id || item.name).toLowerCase().replace(/\s+/g, '-'),
@@ -6490,21 +6518,28 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
           originalPrice: Number(originalPrice.toFixed(2)),
           discount: parseFloat(item.discount || 0),
           deliveryTime: days,
-          deliveryDays: `${days} a ${days + 2} dias úteis`,
+          deliveryDays: deliveryDaysText,
           picture: item.company?.picture || undefined,
           currency: item.currency || 'R$',
         };
       });
 
-    // Filter by whitelist and sort by priority & lowest price
-    const filteredQuotes = filterAndSortOptions(rawApiQuotes);
+    // Ordenação simples por menor preço
+    rawApiQuotes.sort((a, b) => a.price - b.price);
 
-    if (filteredQuotes.length === 0) {
+    console.log('[SHIPPING_REQUEST_END]', {
+      requestId,
+      result: 'success',
+      returnedServices: rawApiQuotes.length,
+      durationMs: Date.now() - startTime,
+    });
+
+    if (rawApiQuotes.length === 0) {
       return res.json({
         success: true,
         quotes: [],
         options: [],
-        message: 'Nenhuma transportadora disponível para este trecho com os produtos informados.',
+        message: 'Nenhuma transportadora disponível para este trecho com as dimensões dos produtos informados.',
         originPostalCode,
         fromMelhorEnvio: true,
       });
@@ -6512,8 +6547,8 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
 
     return res.json({
       success: true,
-      quotes: filteredQuotes,
-      options: filteredQuotes,
+      quotes: rawApiQuotes,
+      options: rawApiQuotes,
       originPostalCode,
       fromMelhorEnvio: true,
     });

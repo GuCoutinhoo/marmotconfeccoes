@@ -47,8 +47,9 @@ interface CartContextData {
   shippingPostalCode: string;
   shippingOptions: ShippingOption[];
   isCalculatingShipping: boolean;
+  shippingStatus: 'idle' | 'loading' | 'success' | 'error';
   shippingError: string | null;
-  calculateShipping: (postalCode?: string) => Promise<ShippingOption[]>;
+  calculateShipping: (postalCode?: string, overrideItems?: CartItem[]) => Promise<ShippingOption[]>;
   setSelectedShipping: (option: ShippingOption | null) => void;
   setShippingPostalCode: (cep: string) => void;
   resetShipping: () => void;
@@ -130,7 +131,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
   const [isCalculatingShipping, setIsCalculatingShipping] = useState<boolean>(false);
+  const [shippingStatus, setShippingStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [shippingError, setShippingError] = useState<string | null>(null);
+
+  const shippingAbortControllerRef = useRef<AbortController | null>(null);
+  const lastCalculatedParamsRef = useRef<{ cep: string; cartHash: string } | null>(null);
 
   const [recentViewed, setRecentViewed] = useState<Product[]>(() => {
     try {
@@ -351,9 +356,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [recentViewed]);
 
   const resetShipping = useCallback(() => {
+    if (shippingAbortControllerRef.current) {
+      shippingAbortControllerRef.current.abort();
+      shippingAbortControllerRef.current = null;
+    }
     setSelectedShippingState(null);
     setShippingOptions([]);
     setShippingError(null);
+    setShippingStatus('idle');
+    lastCalculatedParamsRef.current = null;
   }, []);
 
   const setShippingPostalCode = useCallback((cep: string) => {
@@ -361,9 +372,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setShippingPostalCodeState((prev) => {
       if (prev !== clean) {
         // Invalidate previous quotes immediately if CEP changes
+        if (shippingAbortControllerRef.current) {
+          shippingAbortControllerRef.current.abort();
+          shippingAbortControllerRef.current = null;
+        }
         setSelectedShippingState(null);
         setShippingOptions([]);
         setShippingError(null);
+        setShippingStatus('idle');
+        lastCalculatedParamsRef.current = null;
       }
       return clean;
     });
@@ -398,50 +415,48 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch {}
       }
 
-      console.log('[CALCULAR AGORA FRETE] 1. Início do cálculo. CEP:', targetCep, 'Raw:', rawTarget, 'Itens no carrinho:', activeCart ? activeCart.length : 0);
+      console.log('[CALCULAR FRETE] Início da cotação. CEP:', targetCep, 'Itens:', activeCart ? activeCart.length : 0);
 
       if (!isValidCepFormat(targetCep) || targetCep.length !== 8) {
-        const errorMsg = `[Validação Bloqueou] CEP "${rawTarget || ''}" inválido. Digite 8 dígitos numéricos.`;
-        console.warn('[CALCULAR AGORA FRETE] Bloqueado na validação de formato de CEP:', errorMsg);
+        const errorMsg = `CEP "${rawTarget || ''}" inválido. Digite os 8 dígitos numéricos do seu CEP.`;
+        console.warn('[CALCULAR FRETE] Bloqueado por validação de formato:', errorMsg);
         setShippingError(errorMsg);
         setSelectedShippingState(null);
         setShippingOptions([]);
+        setShippingStatus('error');
         return [];
       }
 
       if (!activeCart || activeCart.length === 0) {
         if (isHydratingRef.current) {
-          console.log('[CALCULAR AGORA FRETE] Carrinho ainda sincronizando. Aguardando...');
+          console.log('[CALCULAR FRETE] Carrinho sincronizando...');
           return [];
         }
-        const errorMsg = '[Validação Bloqueou] O carrinho está vazio (cart.length === 0). Adicione um produto para calcular o frete.';
-        console.warn('[CALCULAR AGORA FRETE] Bloqueado:', errorMsg);
+        const errorMsg = 'O carrinho está vazio. Adicione um produto para calcular o frete.';
+        console.warn('[CALCULAR FRETE] Carrinho vazio:', errorMsg);
         setShippingError(errorMsg);
         setSelectedShippingState(null);
         setShippingOptions([]);
+        setShippingStatus('error');
         return [];
       }
 
+      // Abort previous running request to avoid race conditions
+      if (shippingAbortControllerRef.current) {
+        shippingAbortControllerRef.current.abort();
+      }
+      const currentController = new AbortController();
+      shippingAbortControllerRef.current = currentController;
+
       setIsCalculatingShipping(true);
+      setShippingStatus('loading');
       setShippingError(null);
 
       try {
-        // Step 1: Optional background ViaCEP address check (non-blocking for shipping calculate)
-        console.log('[CALCULAR AGORA FRETE] 2. Consultando ViaCEP para:', targetCep);
-        try {
-          const cepCheck = await validateAndFetchCep(targetCep);
-          console.log('[CALCULAR AGORA FRETE] 2.1 Resposta ViaCEP:', cepCheck);
-          if (!cepCheck.exists && !cepCheck.isServiceUnavailable) {
-            console.warn('[CALCULAR AGORA FRETE] Aviso: ViaCEP informou CEP não encontrado, mas prosseguindo com a cotação.');
-          }
-        } catch (cepErr: any) {
-          console.warn('[CALCULAR AGORA FRETE] Aviso ViaCEP ignorado para não travar cotação:', cepErr.message);
-        }
-
-        // Step 2: Build and log actual product parameters (weight, dimensions, price, id)
+        // Build product parameters
         const payloadItems = activeCart.map((item, idx) => {
           const p = item.product || ({} as any);
-          const itemPayload = {
+          return {
             productId: p.id || `prod-${idx + 1}`,
             id: p.id || `prod-${idx + 1}`,
             quantity: item.quantity || 1,
@@ -452,8 +467,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             price: Number(p.promoPrice || p.price) || 150,
             insurance_value: Number(p.promoPrice || p.price) || 150,
           };
-          console.log(`[CALCULAR AGORA FRETE] 3. Dados do Produto #${idx + 1} (${p.title || 'Sem título'}):`, itemPayload);
-          return itemPayload;
         });
 
         const requestBody = {
@@ -463,23 +476,20 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           items: payloadItems,
         };
 
-        console.log('[CALCULAR AGORA FRETE] 4. Disparando POST /api/shipping/calculate com body:', JSON.stringify(requestBody));
-
         const response = await fetch('/api/shipping/calculate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(requestBody),
+          signal: currentController.signal,
         });
 
-        console.log('[CALCULAR AGORA FRETE] 5. Resposta HTTP status:', response.status, response.statusText);
-
         const data = await response.json().catch(() => ({}));
-        console.log('[CALCULAR AGORA FRETE] 6. Resposta JSON recebida:', data);
 
         if (!response.ok) {
           setSelectedShippingState(null);
           setShippingOptions([]);
-          const errorMsg = data.message || data.error || `Erro HTTP ${response.status} ao calcular frete no servidor.`;
+          setShippingStatus('error');
+          const errorMsg = data.message || data.error || `Não foi possível calcular o frete (Erro ${response.status}).`;
           throw new Error(errorMsg);
         }
 
@@ -489,13 +499,16 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (options.length === 0) {
           setSelectedShippingState(null);
           setShippingOptions([]);
-          setShippingError('[Validação] Nenhuma opção de entrega disponível para este CEP.');
+          setShippingStatus('error');
+          const noOptMsg = data.message || 'Nenhuma opção de entrega disponível para este CEP.';
+          setShippingError(noOptMsg);
           return [];
         }
 
         setShippingOptions(options);
         setShippingPostalCodeState(targetCep);
         setShippingError(null);
+        setShippingStatus('success');
 
         // Select cheapest or preserve match
         setSelectedShippingState((current) => {
@@ -508,34 +521,36 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return options;
       } catch (err: any) {
-        console.error('[CALCULAR AGORA FRETE] ❌ Erro durante o cálculo:', err);
+        if (err.name === 'AbortError') {
+          console.log('[CALCULAR FRETE] Requisição cancelada por nova ação do usuário.');
+          return [];
+        }
+        console.error('[CALCULAR FRETE] ❌ Erro durante o cálculo:', err.message);
         setSelectedShippingState(null);
         setShippingOptions([]);
-        setShippingError(err.message || 'Não foi possível calcular o frete neste momento.');
+        setShippingStatus('error');
+        setShippingError(err.message || 'Não foi possível consultar as transportadoras neste momento.');
         return [];
       } finally {
-        setIsCalculatingShipping(false);
+        if (shippingAbortControllerRef.current === currentController) {
+          setIsCalculatingShipping(false);
+        }
       }
     },
     [cart, shippingPostalCode]
   );
 
-  // Auto-clear stale cart-empty errors and auto-calculate when cart becomes available
+  // Clear stale cart-empty error if products get added
   useEffect(() => {
     if (cart.length > 0) {
       setShippingError((prev) => {
-        if (prev && prev.includes('cart.length === 0')) {
+        if (prev && prev.includes('carrinho está vazio')) {
           return null;
         }
         return prev;
       });
-
-      const clean = normalizeCep(shippingPostalCode);
-      if (isValidCepFormat(clean) && clean.length === 8 && shippingOptions.length === 0 && !isCalculatingShipping) {
-        calculateShipping(clean, cart);
-      }
     }
-  }, [cart, shippingPostalCode, shippingOptions.length, isCalculatingShipping, calculateShipping]);
+  }, [cart.length]);
 
   const addToCart = (product: Product, selectedSize: string, selectedColor: ProductVariant, quantity = 1): boolean => {
     // 1. Strict Authentication Enforcement: Unauthenticated visitors cannot add items to the cart
@@ -815,6 +830,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         shippingPostalCode,
         shippingOptions,
         isCalculatingShipping,
+        shippingStatus,
         shippingError,
         calculateShipping,
         setSelectedShipping,
