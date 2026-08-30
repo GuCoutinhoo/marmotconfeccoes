@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Heart, ShoppingBag, User, UserPlus, ChevronDown, Menu, X, Sparkles, Truck, ShieldCheck, Tag, ArrowRight } from 'lucide-react';
+import { Search, Heart, ShoppingBag, User, UserPlus, ChevronDown, Menu, X, Sparkles, Truck, ShieldCheck, Tag, ArrowRight, Crown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
@@ -188,21 +188,30 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           <div className="relative">
             <button
               onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-              className={`h-10 sm:h-11 px-3 sm:px-4.5 transition-all duration-200 flex items-center gap-2 border text-xs shadow-sm cursor-pointer ${
+              className={`h-10 sm:h-11 px-3.5 sm:px-4 rounded-lg transition-all duration-200 flex items-center gap-2 border text-xs shadow-sm cursor-pointer ${
                 user
                   ? isUserDropdownOpen
                     ? 'border-[#18181B] bg-[#18181B] text-white shadow-md'
                     : user.role === 'admin'
-                    ? 'border-[#B45309] bg-[#FEF3C7] text-[#92400E]'
-                    : 'bg-[#F4F4F5] border-[#E4E4E7] text-[#18181B] hover:border-[#18181B]'
+                    ? 'bg-[#18181B] border-[#27272A] text-white hover:bg-[#27272A] hover:border-[#3F3F46]'
+                    : 'bg-[#F4F4F5] border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7]'
                   : 'bg-[#F4F4F5] border-[#E4E4E7] text-[#18181B] hover:bg-[#E4E4E7] hover:border-[#D4D4D8] active:scale-95'
               }`}
               title="Conta do Usuário"
             >
-              <User className={`w-4 h-4 ${user ? 'text-[#B45309]' : 'text-[#18181B]'}`} />
-              <span className={`hidden sm:inline font-black uppercase tracking-wider text-[12px] ${user ? 'text-[#18181B]' : 'text-[#18181B]'}`}>
+              {user?.role === 'admin' ? (
+                <Crown className="w-4 h-4 text-[#F4C400]" />
+              ) : (
+                <User className={`w-4 h-4 ${user ? 'text-[#71717A]' : 'text-[#18181B]'}`} />
+              )}
+              <span className={`hidden sm:inline font-black uppercase tracking-wider text-[12px] ${user?.role === 'admin' ? 'text-white' : 'text-[#18181B]'}`}>
                 {user ? user.name.split(' ')[0] : 'Entrar'}
               </span>
+              {user?.role === 'admin' && (
+                <span className="hidden md:inline-flex px-1.5 py-0.5 rounded bg-[#F4C400]/20 border border-[#F4C400]/40 text-[#F4C400] text-[9.5px] font-mono font-black tracking-wider">
+                  ADM
+                </span>
+              )}
             </button>
 
             {isUserDropdownOpen && (
@@ -214,11 +223,11 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
             )}
           </div>
 
-          {/* Cadastrar Button - High Impact Yellow CTA with Radiant Glow */}
+          {/* Cadastrar Button */}
           {!user && (
             <button
               onClick={() => onNavigate('account', 'register')}
-              className="h-10 sm:h-11 px-4 sm:px-5 flex items-center gap-2 bg-gradient-to-r from-[#FFD700] via-[#F4C400] to-[#E5B500] hover:from-[#FFE033] hover:to-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_16px_rgba(244,196,0,0.35)] hover:shadow-[0_0_25px_rgba(244,196,0,0.55)] hover:scale-[1.02] active:scale-95 shrink-0 cursor-pointer border border-[#FFF080]/50"
+              className="h-10 sm:h-11 px-4 sm:px-5 rounded-lg flex items-center gap-2 bg-[#F4C400] hover:bg-[#E5B500] text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-sm active:scale-95 shrink-0 cursor-pointer border border-[#E5B500]"
               title="Criar nova conta"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
@@ -230,12 +239,12 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {user && (
             <button
               onClick={openMiniCart}
-              className="h-10 sm:h-11 px-3.5 sm:px-5 rounded-lg flex items-center gap-2 bg-[#18181B] hover:bg-black text-white font-black text-xs uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(0,0,0,0.15)] active:scale-95 shrink-0 cursor-pointer"
+              className="h-10 sm:h-11 px-3.5 sm:px-4.5 rounded-lg flex items-center gap-2.5 bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] text-white font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-sm active:scale-95 shrink-0 cursor-pointer"
               title="Abrir Carrinho"
             >
-              <ShoppingBag className="w-4 h-4 stroke-[2.5] text-[#F4C400]" />
+              <ShoppingBag className="w-4 h-4 stroke-[2.2] text-[#F4C400]" />
               <span className="hidden sm:inline text-[12px]">Carrinho</span>
-              <span className="w-5 h-5 bg-white text-[#18181B] text-[10.5px] font-mono font-black flex items-center justify-center ml-0.5 shadow-sm">
+              <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#F4C400] text-[#0B0B0E] text-[10.5px] font-mono font-black flex items-center justify-center shadow-sm">
                 {totalCartItems}
               </span>
             </button>

@@ -246,14 +246,10 @@ export class MelhorEnvioClient {
 
     // In production, token is strictly required. No fake fallback without explicit token.
     if (!token || token.length < 10) {
-      if (environment === 'production' && process.env.NODE_ENV === 'production') {
-        const err: any = new Error('Token do Melhor Envio não configurado no servidor.');
-        err.code = 'MELHOR_ENVIO_TOKEN_MISSING';
-        err.status = 503;
-        throw err;
-      }
-      console.warn('[SHIPPING] Token ausente em ambiente de testes/sandbox. Retornando cotações com base na tabela oficial das transportadoras.');
-      return this.calculateFallbackQuotes(fromCep, toCep, params.products);
+      const err: any = new Error('Token do Melhor Envio não configurado no servidor. Configure o token no painel administrativo.');
+      err.code = 'MELHOR_ENVIO_TOKEN_MISSING';
+      err.status = 503;
+      throw err;
     }
 
     const bodyPayload: any = {
@@ -345,13 +341,10 @@ export class MelhorEnvioClient {
       });
     } catch (networkErr: any) {
       console.error('[MELHOR ENVIO NETWORK ERROR]', networkErr.message || networkErr);
-      if (environment === 'production' && process.env.NODE_ENV === 'production') {
-        const err: any = new Error('Falha de conexão com o serviço de frete do Melhor Envio.');
-        err.code = 'SHIPPING_SERVICE_UNAVAILABLE';
-        err.status = 503;
-        throw err;
-      }
-      return this.calculateFallbackQuotes(fromCep, toCep, params.products);
+      const err: any = new Error('Falha de conexão com o serviço de frete do Melhor Envio.');
+      err.code = 'SHIPPING_SERVICE_UNAVAILABLE';
+      err.status = 503;
+      throw err;
     }
 
     const rawResponse = await response.text();
@@ -364,11 +357,6 @@ export class MelhorEnvioClient {
 
     if (!response.ok) {
       const responseStatus = response.status;
-
-      if ((responseStatus === 401 || responseStatus === 403 || responseStatus >= 500) && (environment === 'sandbox' || process.env.NODE_ENV !== 'production')) {
-        console.warn(`[Melhor Envio Sandbox/Dev Fallback] HTTP ${responseStatus}. Utilizando tabela oficial para ambiente de testes.`);
-        return this.calculateFallbackQuotes(fromCep, toCep, params.products);
-      }
 
       let userErrorMessage = 'Não foi possível calcular o frete no Melhor Envio.';
       let errorCode = 'SHIPPING_CALCULATION_FAILED';
@@ -454,161 +442,6 @@ export class MelhorEnvioClient {
       options: returnedOptions,
       originPostalCode: fromCep,
       fromMelhorEnvio: true,
-    };
-  }
-
-  private calculateFallbackQuotes(fromCep: string, toCep: string, products?: any[]): {
-    success: boolean;
-    quotes: ShippingOption[];
-    options: ShippingOption[];
-    originPostalCode: string;
-    fromMelhorEnvio: boolean;
-    isMockFallback: boolean;
-  } {
-    let totalWeight = 0.35;
-    if (products && products.length > 0) {
-      totalWeight = products.reduce((acc, p) => acc + (Number(p.weight || 0.35) * Number(p.quantity || 1)), 0);
-    }
-    const weightKg = Math.max(0.1, totalWeight);
-    const prefix = parseInt(toCep.substring(0, 2), 10);
-
-    let pacBase = 22.90;
-    let sedexBase = 32.90;
-    let jadlogPkgBase = 21.50;
-    let jadlogComBase = 29.00;
-    let pacDays = 5;
-    let sedexDays = 2;
-    let jadlogDays = 4;
-
-    if (prefix >= 1 && prefix <= 9) {
-      pacBase = 14.90;
-      sedexBase = 19.90;
-      jadlogPkgBase = 13.50;
-      jadlogComBase = 18.00;
-      pacDays = 3;
-      sedexDays = 1;
-      jadlogDays = 2;
-    } else if (prefix >= 11 && prefix <= 19) {
-      pacBase = 18.90;
-      sedexBase = 24.90;
-      jadlogPkgBase = 17.50;
-      jadlogComBase = 22.00;
-      pacDays = 4;
-      sedexDays = 2;
-      jadlogDays = 3;
-    } else if ((prefix >= 20 && prefix <= 28) || (prefix >= 30 && prefix <= 39)) {
-      pacBase = 22.90;
-      sedexBase = 31.90;
-      jadlogPkgBase = 21.00;
-      jadlogComBase = 28.50;
-      pacDays = 5;
-      sedexDays = 2;
-      jadlogDays = 4;
-    } else if (prefix >= 80 && prefix <= 99) {
-      pacBase = 24.90;
-      sedexBase = 35.90;
-      jadlogPkgBase = 23.50;
-      jadlogComBase = 31.00;
-      pacDays = 6;
-      sedexDays = 3;
-      jadlogDays = 5;
-    } else if (prefix >= 70 && prefix <= 79) {
-      pacBase = 28.90;
-      sedexBase = 42.90;
-      jadlogPkgBase = 27.50;
-      jadlogComBase = 38.00;
-      pacDays = 7;
-      sedexDays = 3;
-      jadlogDays = 6;
-    } else if ((prefix >= 40 && prefix <= 48) || (prefix >= 50 && prefix <= 65)) {
-      pacBase = 32.90;
-      sedexBase = 49.90;
-      jadlogPkgBase = 31.50;
-      jadlogComBase = 44.00;
-      pacDays = 8;
-      sedexDays = 4;
-      jadlogDays = 7;
-    } else {
-      pacBase = 39.90;
-      sedexBase = 59.90;
-      jadlogPkgBase = 38.50;
-      jadlogComBase = 52.00;
-      pacDays = 10;
-      sedexDays = 5;
-      jadlogDays = 8;
-    }
-
-    const weightExtra = Math.max(0, weightKg - 0.5) * 3.5;
-
-    const pacPrice = Number((pacBase + weightExtra).toFixed(2));
-    const sedexPrice = Number((sedexBase + weightExtra * 1.3).toFixed(2));
-    const jadPkgPrice = Number((jadlogPkgBase + weightExtra * 0.9).toFixed(2));
-    const jadComPrice = Number((jadlogComBase + weightExtra * 1.1).toFixed(2));
-
-    const rawQuotes: ShippingOption[] = [
-      {
-        id: '1',
-        serviceId: 1,
-        companyId: 1,
-        name: 'PAC',
-        carrier: 'Correios',
-        company: 'Correios',
-        price: pacPrice,
-        originalPrice: pacPrice,
-        deliveryTime: pacDays,
-        deliveryDays: `${pacDays} a ${pacDays + 2} dias úteis`,
-        currency: 'R$',
-      },
-      {
-        id: '2',
-        serviceId: 2,
-        companyId: 1,
-        name: 'SEDEX',
-        carrier: 'Correios',
-        company: 'Correios',
-        price: sedexPrice,
-        originalPrice: sedexPrice,
-        deliveryTime: sedexDays,
-        deliveryDays: `${sedexDays} a ${sedexDays + 1} dias úteis`,
-        currency: 'R$',
-      },
-      {
-        id: '3',
-        serviceId: 3,
-        companyId: 2,
-        name: '.Package',
-        carrier: 'Jadlog',
-        company: 'Jadlog',
-        price: jadPkgPrice,
-        originalPrice: jadPkgPrice,
-        deliveryTime: jadlogDays,
-        deliveryDays: `${jadlogDays} a ${jadlogDays + 2} dias úteis`,
-        currency: 'R$',
-      },
-      {
-        id: '4',
-        serviceId: 4,
-        companyId: 2,
-        name: '.Com',
-        carrier: 'Jadlog',
-        company: 'Jadlog',
-        price: jadComPrice,
-        originalPrice: jadComPrice,
-        deliveryTime: Math.max(1, jadlogDays - 1),
-        deliveryDays: `${Math.max(1, jadlogDays - 1)} a ${jadlogDays + 1} dias úteis`,
-        currency: 'R$',
-      },
-    ];
-
-    const quotes = filterAndSortShippingQuotes(rawQuotes);
-
-    return {
-      success: true,
-      quotes,
-      options: quotes,
-      originPostalCode: fromCep,
-      fromMelhorEnvio: false,
-      isMockFallback: true,
     };
   }
 }

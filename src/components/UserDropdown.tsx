@@ -84,13 +84,13 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
               {/* Avatar com badge */}
-              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#FDE68A] bg-[#FEF3C7] font-black text-[#B45309] shadow-inner text-base">
+              <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#27272A] bg-[#18181B] font-black text-[#F4C400] shadow-sm text-base">
                 {isAdmin ? (
-                  <Crown className="h-5 w-5 text-[#B45309]" />
+                  <Crown className="h-5 w-5 text-[#F4C400]" />
                 ) : (
                   <span>{user.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
                 )}
-                <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#B45309] ring-2 ring-white">
+                <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#22C55E] ring-2 ring-white">
                   <CheckCircle2 className="h-2.5 w-2.5 text-white stroke-[3]" />
                 </span>
               </div>
@@ -110,7 +110,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
 
             {/* Role Badge */}
             {isAdmin ? (
-              <span className="inline-flex items-center gap-1 rounded bg-[#FEF3C7] border border-[#FDE68A] px-2 py-0.5 font-mono text-[9px] font-black uppercase tracking-wider text-[#92400E]">
+              <span className="inline-flex items-center gap-1 rounded bg-[#18181B] border border-[#27272A] px-2 py-0.5 font-mono text-[9.5px] font-black uppercase tracking-wider text-[#F4C400]">
                 ADMIN
               </span>
             ) : (
@@ -136,14 +136,14 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
               className="flex items-center justify-between rounded-lg bg-[#F8F9FA] px-3 py-1.5 text-left border border-[#E4E4E7] hover:border-[#18181B] hover:bg-white transition-all cursor-pointer"
             >
               <span className="font-mono text-[10px] uppercase text-[#71717A]">Favoritos</span>
-              <span className="font-mono text-xs font-bold text-[#B45309]">{wishlistCount}</span>
+              <span className="font-mono text-xs font-bold text-[#18181B]">{wishlistCount}</span>
             </button>
           </div>
         </div>
       ) : (
         <div className="border-b border-[#E4E4E7] bg-gradient-to-b from-[#F8F9FA] to-white p-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E4E4E7] bg-[#F4F4F5] text-[#B45309]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#E4E4E7] bg-[#F4F4F5] text-[#18181B]">
               <User className="h-5 w-5" />
             </div>
             <div>
@@ -184,13 +184,13 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
             <button
               type="button"
               onClick={() => handleAction('admin')}
-              className="group flex w-full items-center justify-between rounded-lg bg-[#FEF3C7] border border-[#FDE68A] px-3 py-2.5 text-left text-xs font-black uppercase tracking-wider text-[#92400E] hover:bg-[#FDE68A] transition-all cursor-pointer"
+              className="group flex w-full items-center justify-between rounded-lg bg-[#18181B] border border-[#27272A] px-3 py-2.5 text-left text-xs font-black uppercase tracking-wider text-white hover:bg-[#27272A] transition-all cursor-pointer shadow-sm"
             >
               <span className="flex items-center gap-2.5">
-                <ShieldAlert className="h-4 w-4 text-[#92400E]" />
+                <ShieldAlert className="h-4 w-4 text-[#F4C400]" />
                 <span>Painel Administrativo</span>
               </span>
-              <ChevronRight className="h-4 w-4 text-[#92400E] transition-transform group-hover:translate-x-0.5" />
+              <ChevronRight className="h-4 w-4 text-[#A1A1AA] transition-transform group-hover:translate-x-0.5 group-hover:text-white" />
             </button>
           </div>
         )}
@@ -202,7 +202,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
           className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#18181B] transition-colors cursor-pointer"
         >
           <span className="flex items-center gap-2.5">
-            <Package className="h-4 w-4 text-[#71717A] group-hover:text-[#B45309] transition-colors" />
+            <Package className="h-4 w-4 text-[#71717A] group-hover:text-[#18181B] transition-colors" />
             <span>Meus Pedidos</span>
           </span>
           <div className="flex items-center gap-1.5">
@@ -222,12 +222,12 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
           className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#18181B] transition-colors cursor-pointer"
         >
           <span className="flex items-center gap-2.5">
-            <Heart className="h-4 w-4 text-[#71717A] group-hover:text-[#B45309] transition-colors" />
+            <Heart className="h-4 w-4 text-[#71717A] group-hover:text-[#18181B] transition-colors" />
             <span>Lista de Desejos</span>
           </span>
           <div className="flex items-center gap-1.5">
             {wishlistCount > 0 && (
-              <span className="rounded bg-[#FEF3C7] border border-[#FDE68A] px-1.5 py-0.2 font-mono text-[10px] font-bold text-[#92400E]">
+              <span className="rounded-full bg-[#18181B] text-[#F4C400] px-2 py-0.2 font-mono text-[10px] font-bold">
                 {wishlistCount}
               </span>
             )}
@@ -242,7 +242,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
           className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#18181B] transition-colors cursor-pointer"
         >
           <span className="flex items-center gap-2.5">
-            <MapPin className="h-4 w-4 text-[#71717A] group-hover:text-[#B45309] transition-colors" />
+            <MapPin className="h-4 w-4 text-[#71717A] group-hover:text-[#18181B] transition-colors" />
             <span>Endereços de Entrega</span>
           </span>
           <ChevronRight className="h-3.5 w-3.5 text-[#A1A1AA] group-hover:text-[#18181B] transition-transform group-hover:translate-x-0.5" />
@@ -255,7 +255,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
           className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#18181B] transition-colors cursor-pointer"
         >
           <span className="flex items-center gap-2.5">
-            <User className="h-4 w-4 text-[#71717A] group-hover:text-[#B45309] transition-colors" />
+            <User className="h-4 w-4 text-[#71717A] group-hover:text-[#18181B] transition-colors" />
             <span>Dados Cadastrais</span>
           </span>
           <ChevronRight className="h-3.5 w-3.5 text-[#A1A1AA] group-hover:text-[#18181B] transition-transform group-hover:translate-x-0.5" />
@@ -268,7 +268,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
           className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#18181B] transition-colors cursor-pointer"
         >
           <span className="flex items-center gap-2.5">
-            <KeyRound className="h-4 w-4 text-[#71717A] group-hover:text-[#B45309] transition-colors" />
+            <KeyRound className="h-4 w-4 text-[#71717A] group-hover:text-[#18181B] transition-colors" />
             <span>Segurança & Senha</span>
           </span>
           <ChevronRight className="h-3.5 w-3.5 text-[#A1A1AA] group-hover:text-[#18181B] transition-transform group-hover:translate-x-0.5" />
@@ -281,7 +281,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
           className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#3F3F46] hover:bg-[#F4F4F5] hover:text-[#18181B] transition-colors border-t border-[#E4E4E7] pt-2 mt-1 cursor-pointer"
         >
           <span className="flex items-center gap-2.5">
-            <Truck className="h-4 w-4 text-[#B45309]" />
+            <Truck className="h-4 w-4 text-[#71717A] group-hover:text-[#18181B]" />
             <span>Rastrear Envio</span>
           </span>
           <ChevronRight className="h-3.5 w-3.5 text-[#A1A1AA] group-hover:text-[#18181B] transition-transform group-hover:translate-x-0.5" />
@@ -305,7 +305,7 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ isOpen, onClose, onN
       ) : (
         <div className="border-t border-[#E4E4E7] bg-[#F8F9FA] px-3 py-2 flex items-center justify-between text-[10px] font-mono text-[#71717A]">
           <span>SUPORTE MARMOT</span>
-          <span className="text-[#B45309]">SEG - SEX 9h às 18h</span>
+          <span className="text-[#18181B] font-bold">SEG - SEX 9h às 18h</span>
         </div>
       )}
     </div>
