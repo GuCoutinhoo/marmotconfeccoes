@@ -69,12 +69,11 @@ export interface ShippingCalculationResult {
 }
 
 /**
- * 1. Read centralized configuration (Environment variables + persistent JSON fallback)
- * Never contains hardcoded JWTs or API keys.
+ * 1. Read centralized configuration (Environment variables only for secrets)
+ * Never contains hardcoded JWTs or API keys, never stores tokens in local json.
  */
 export function getMelhorEnvioConfig(): MelhorEnvioConfig {
   let savedSettings: Partial<ShippingSettings & {
-    token?: string;
     refreshToken?: string;
     clientId?: string;
     clientSecret?: string;
@@ -91,12 +90,11 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
     // In serverless / read-only environment, ignore read error
   }
 
-  // Support all standard environment variable names
+  // Official production variable: MELHOR_ENVIO_TOKEN
   const token = (
     process.env.MELHOR_ENVIO_TOKEN ||
-    process.env.MELHORENVIO_TOKEN ||
     process.env.TOKEN_MELHOR_ENVIO ||
-    savedSettings.token ||
+    process.env.MELHORENVIO_TOKEN ||
     ''
   ).trim();
 
@@ -128,8 +126,8 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
   ).trim();
 
   const originPostalCode = (
-    process.env.STORE_ORIGIN_CEP ||
     process.env.MELHOR_ENVIO_ORIGIN_CEP ||
+    process.env.STORE_ORIGIN_CEP ||
     process.env.ORIGIN_CEP ||
     process.env.ORIGIN_POSTAL_CODE ||
     savedSettings.originPostalCode ||
@@ -163,7 +161,7 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
     clientId,
     clientSecret,
     redirectUri,
-    originPostalCode: originPostalCode || '03806010',
+    originPostalCode: originPostalCode.length === 8 ? originPostalCode : '03806010',
     userAgent,
     appName,
     appEmail,
@@ -172,10 +170,9 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
 }
 
 /**
- * Save configuration update (e.g. from Admin UI)
+ * Save non-secret configuration update (e.g. from Admin UI for sender details, dimensions)
  */
 export function saveMelhorEnvioConfig(newSettings: Partial<ShippingSettings & {
-  token?: string;
   refreshToken?: string;
   clientId?: string;
   clientSecret?: string;
@@ -188,7 +185,6 @@ export function saveMelhorEnvioConfig(newSettings: Partial<ShippingSettings & {
     environment: (newSettings.environment || current.environment) as 'production' | 'sandbox',
     appName: newSettings.appName || current.appName,
     appEmail: newSettings.appEmail || current.appEmail,
-    token: newSettings.token !== undefined ? newSettings.token.trim() : current.token,
     refreshToken: newSettings.refreshToken !== undefined ? newSettings.refreshToken.trim() : current.refreshToken,
     clientId: newSettings.clientId !== undefined ? newSettings.clientId.trim() : current.clientId,
     clientSecret: newSettings.clientSecret !== undefined ? newSettings.clientSecret.trim() : current.clientSecret,
@@ -210,7 +206,7 @@ export function saveMelhorEnvioConfig(newSettings: Partial<ShippingSettings & {
     environment: updated.environment,
     appName: updated.appName,
     appEmail: updated.appEmail,
-    isTokenConfigured: Boolean(updated.token && updated.token.length >= 10),
+    isTokenConfigured: Boolean(current.token && current.token.length >= 10),
   };
 }
 

@@ -6169,23 +6169,60 @@ app.delete('/api/coupons/:code', requireAdmin, async (req, res) => {
   }
 });
 
-// Helper to resolve Melhor Envio token with file and env fallbacks
-function getMelhorEnvioTokenServer(): string {
-  const envToken = (process.env.MELHOR_ENVIO_TOKEN || process.env.TOKEN_MELHOR_ENVIO || process.env.MELHORENVIO_TOKEN || '').trim();
-  if (envToken) return envToken;
-  try {
-    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
-    if (fs.existsSync(settingsPath)) {
-      const data = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-      if (data.token && typeof data.token === 'string' && data.token.trim()) {
-        return data.token.trim();
-      }
-    }
-  } catch {}
-  return '';
+// Centralized server-side Melhor Envio configuration helper
+export interface ServerMelhorEnvioConfig {
+  token: string;
+  environment: 'production' | 'sandbox';
+  baseUrl: string;
+  originPostalCode: string;
+  appName: string;
+  appEmail: string;
+  userAgent: string;
 }
 
-// --- Shipping Calculation (Melhor Envio & Fallback) ---
+export function getMelhorEnvioConfig(): ServerMelhorEnvioConfig {
+  // Official standard variable: MELHOR_ENVIO_TOKEN
+  const token = (
+    process.env.MELHOR_ENVIO_TOKEN ||
+    process.env.TOKEN_MELHOR_ENVIO ||
+    process.env.MELHORENVIO_TOKEN ||
+    ''
+  ).trim();
+
+  const rawEnv = (process.env.MELHOR_ENVIO_ENV || 'production').toLowerCase().trim();
+  const environment: 'production' | 'sandbox' = rawEnv === 'sandbox' ? 'sandbox' : 'production';
+  const baseUrl = environment === 'sandbox'
+    ? 'https://sandbox.melhorenvio.com.br/api/v2'
+    : 'https://melhorenvio.com.br/api/v2';
+
+  const originPostalCode = (
+    process.env.MELHOR_ENVIO_ORIGIN_CEP ||
+    process.env.STORE_ORIGIN_CEP ||
+    process.env.ORIGIN_CEP ||
+    '03806010'
+  ).replace(/\D/g, '');
+
+  const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confecções';
+  const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
+  const userAgent = `${appName} (${appEmail})`.trim();
+
+  return {
+    token,
+    environment,
+    baseUrl,
+    originPostalCode: originPostalCode.length === 8 ? originPostalCode : '03806010',
+    appName,
+    appEmail,
+    userAgent,
+  };
+}
+
+// Backward compatibility alias for any older internal references
+function getMelhorEnvioTokenServer(): string {
+  return getMelhorEnvioConfig().token;
+}
+
+// --- Shipping Calculation (Melhor Envio Real API) ---
 app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) => {
   try {
     const { cep, postalCode, destinationPostalCode, items, products: reqProducts } = req.body || {};
@@ -6213,6 +6250,16 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       ? items 
       : (Array.isArray(reqProducts) && reqProducts.length > 0 ? reqProducts : []);
 
+    if (rawItemsList.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'EMPTY_CART',
+        message: 'Nenhum produto fornecido para o cálculo de frete.',
+        quotes: [],
+        options: [],
+      });
+    }
+
     const shippingProducts: Array<{
       id: string;
       weight: number;
@@ -6223,121 +6270,80 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       insurance_value: number;
     }> = [];
 
-    if (rawItemsList.length > 0) {
-      for (const item of rawItemsList) {
-        const prodId = String(item.productId || item.id || '');
-        const dbProduct = prodId ? await db.getProductById(prodId) : null;
+    for (const item of rawItemsList) {
+      const prodId = String(item.productId || item.id || '');
+      const dbProduct = prodId ? await db.getProductById(prodId) : null;
 
-        const rawWeight = item.weight !== undefined && item.weight !== null && String(item.weight).trim() !== '' 
-          ? parseFloat(String(item.weight).replace(',', '.'))
-          : (dbProduct?.weight !== undefined ? Number(dbProduct.weight) : NaN);
+      const rawWeight = item.weight !== undefined && item.weight !== null && String(item.weight).trim() !== '' 
+        ? parseFloat(String(item.weight).replace(',', '.'))
+        : (dbProduct?.weight !== undefined ? Number(dbProduct.weight) : NaN);
 
-        const rawHeight = item.height !== undefined && item.height !== null && String(item.height).trim() !== '' 
-          ? parseFloat(String(item.height).replace(',', '.'))
-          : (dbProduct?.height !== undefined ? Number(dbProduct.height) : NaN);
+      const rawHeight = item.height !== undefined && item.height !== null && String(item.height).trim() !== '' 
+        ? parseFloat(String(item.height).replace(',', '.'))
+        : (dbProduct?.height !== undefined ? Number(dbProduct.height) : NaN);
 
-        const rawWidth = item.width !== undefined && item.width !== null && String(item.width).trim() !== '' 
-          ? parseFloat(String(item.width).replace(',', '.'))
-          : (dbProduct?.width !== undefined ? Number(dbProduct.width) : NaN);
+      const rawWidth = item.width !== undefined && item.width !== null && String(item.width).trim() !== '' 
+        ? parseFloat(String(item.width).replace(',', '.'))
+        : (dbProduct?.width !== undefined ? Number(dbProduct.width) : NaN);
 
-        const rawLength = item.length !== undefined && item.length !== null && String(item.length).trim() !== '' 
-          ? parseFloat(String(item.length).replace(',', '.'))
-          : (dbProduct?.length !== undefined ? Number(dbProduct.length) : NaN);
+      const rawLength = item.length !== undefined && item.length !== null && String(item.length).trim() !== '' 
+        ? parseFloat(String(item.length).replace(',', '.'))
+        : (dbProduct?.length !== undefined ? Number(dbProduct.length) : NaN);
 
-        const qty = Math.max(1, parseInt(String(item.quantity || 1), 10));
-        const price = Number(item.insurance_value || item.price || dbProduct?.promoPrice || dbProduct?.price || 0);
+      const qty = Math.max(1, parseInt(String(item.quantity || 1), 10));
+      const price = Number(item.insurance_value || item.price || dbProduct?.promoPrice || dbProduct?.price || 0);
 
-        if (
-          !Number.isFinite(rawWeight) || rawWeight <= 0 ||
-          !Number.isFinite(rawHeight) || rawHeight <= 0 ||
-          !Number.isFinite(rawWidth) || rawWidth <= 0 ||
-          !Number.isFinite(rawLength) || rawLength <= 0
-        ) {
-          console.error('[SHIPPING ERROR] Produto sem peso ou dimensões cadastradas:', {
-            id: prodId || 'desconhecido',
-            title: dbProduct?.title,
-            weight: rawWeight,
-            height: rawHeight,
-            width: rawWidth,
-            length: rawLength,
-          });
-          return res.status(400).json({
-            success: false,
-            error: 'INVALID_PRODUCT_SPECS',
-            message: `Produto "${dbProduct?.title || prodId || 'Item'}" sem peso ou dimensões cadastradas.`,
-            quotes: [],
-            options: [],
-          });
-        }
-
-        const productData = {
-          id: prodId || `prod-${shippingProducts.length + 1}`,
-          weight: Number(rawWeight),
-          height: Number(rawHeight),
-          width: Number(rawWidth),
-          length: Number(rawLength),
-          quantity: qty,
-          insurance_value: price > 0 ? price : 150,
-        };
-
-        // Temporary diagnostic log as requested by prompt
-        console.log('[SHIPPING PRODUCT DATA]', {
-          id: productData.id,
-          weight: productData.weight,
-          height: productData.height,
-          width: productData.width,
-          length: productData.length,
-          quantity: productData.quantity,
+      if (
+        !Number.isFinite(rawWeight) || rawWeight <= 0 ||
+        !Number.isFinite(rawHeight) || rawHeight <= 0 ||
+        !Number.isFinite(rawWidth) || rawWidth <= 0 ||
+        !Number.isFinite(rawLength) || rawLength <= 0
+      ) {
+        console.error('[SHIPPING ERROR] Produto sem peso ou dimensões cadastradas:', {
+          id: prodId || 'desconhecido',
+          title: dbProduct?.title,
+          weight: rawWeight,
+          height: rawHeight,
+          width: rawWidth,
+          length: rawLength,
         });
-
-        shippingProducts.push(productData);
-      }
-    } else {
-      // Default: fetch first active product from database or fail if catalog is empty
-      const catalog = await db.getProducts({ limit: 1 });
-      if (catalog.length > 0) {
-        const p = catalog[0];
-        const pWeight = Number(p.weight);
-        const pHeight = Number(p.height);
-        const pWidth = Number(p.width);
-        const pLength = Number(p.length);
-
-        if (!Number.isFinite(pWeight) || pWeight <= 0 || !Number.isFinite(pHeight) || pHeight <= 0 || !Number.isFinite(pWidth) || pWidth <= 0 || !Number.isFinite(pLength) || pLength <= 0) {
-          return res.status(400).json({
-            success: false,
-            error: 'INVALID_PRODUCT_SPECS',
-            message: 'Produto sem peso ou dimensões cadastradas.',
-            quotes: [],
-            options: [],
-          });
-        }
-
-        const fallbackItem = {
-          id: p.id,
-          weight: pWeight,
-          height: pHeight,
-          width: pWidth,
-          length: pLength,
-          quantity: 1,
-          insurance_value: Number(p.promoPrice || p.price || 150),
-        };
-        console.log('[SHIPPING PRODUCT DATA]', fallbackItem);
-        shippingProducts.push(fallbackItem);
-      } else {
         return res.status(400).json({
           success: false,
-          error: 'EMPTY_CART',
-          message: 'Nenhum produto fornecido para o cálculo de frete.',
+          error: 'INVALID_PRODUCT_SPECS',
+          message: `Produto "${dbProduct?.title || prodId || 'Item'}" sem peso ou dimensões cadastradas.`,
           quotes: [],
           options: [],
         });
       }
+
+      const productData = {
+        id: prodId || `prod-${shippingProducts.length + 1}`,
+        weight: Number(rawWeight),
+        height: Number(rawHeight),
+        width: Number(rawWidth),
+        length: Number(rawLength),
+        quantity: qty,
+        insurance_value: price > 0 ? price : 150,
+      };
+
+      console.log('[SHIPPING PRODUCT DATA]', {
+        id: productData.id,
+        weight: productData.weight,
+        height: productData.height,
+        width: productData.width,
+        length: productData.length,
+        quantity: productData.quantity,
+      });
+
+      shippingProducts.push(productData);
     }
 
-    const token = getMelhorEnvioTokenServer();
-    const isSandbox = (process.env.MELHOR_ENVIO_ENV || '').toLowerCase() === 'sandbox';
-    const environment = isSandbox ? 'sandbox' : 'production';
-    const originPostalCode = (process.env.STORE_ORIGIN_CEP || process.env.ORIGIN_CEP || '03806010').replace(/\D/g, '');
+    const config = getMelhorEnvioConfig();
+    const token = config.token;
+    const environment = config.environment;
+    const baseUrl = config.baseUrl;
+    const originPostalCode = config.originPostalCode;
+    const userAgent = config.userAgent;
 
     const tokenPresent = Boolean(token && token.length >= 10);
     console.log('[SHIPPING_CONFIG]', {
@@ -6366,7 +6372,7 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       return res.status(503).json({
         success: false,
         error: 'MELHOR_ENVIO_TOKEN_MISSING',
-        message: 'Token de autenticação do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN nas configurações da Vercel ou na aba de Frete do painel administrativo.',
+        message: 'Token de autenticação do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN nas variáveis de ambiente da Vercel (escopo Production).',
         quotes: [],
         options: [],
       });
@@ -6382,8 +6388,6 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       insurance_value: Number(p.insurance_value),
       quantity: Number(p.quantity),
     }));
-
-    const baseUrl = isSandbox ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
     
     const payload = {
       from: { postal_code: originPostalCode },
@@ -6411,7 +6415,7 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'User-Agent': 'Marmot Confeccoes (contato@marmot.com.br)',
+          'User-Agent': userAgent,
         },
         body: JSON.stringify(payload),
         signal: abortController.signal,
@@ -6552,11 +6556,12 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
       originPostalCode,
       fromMelhorEnvio: true,
     });
-  } catch (error: any) {
-    res.status(500).json({
+  } catch (err: any) {
+    console.error('[SHIPPING_UNHANDLED_ERROR]', err);
+    return res.status(500).json({
       success: false,
-      error: 'SHIPPING_CALCULATION_ERROR',
-      message: error.message || 'Não foi possível calcular o frete neste momento.',
+      error: 'SHIPPING_INTERNAL_ERROR',
+      message: err.message || 'Erro ao processar cálculo de frete.',
       quotes: [],
       options: [],
     });
@@ -7501,6 +7506,7 @@ app.put('/api/admin/shipments/:orderId/status', requireAdmin, async (req: any, r
 // --- ADMIN: CONFIGURAÇÕES DE FRETE E MELHOR ENVIO ---
 app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
   try {
+    const config = getMelhorEnvioConfig();
     const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
     let saved: any = {};
     if (fs.existsSync(settingsPath)) {
@@ -7509,11 +7515,10 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
       } catch {}
     }
 
-    const token = getMelhorEnvioTokenServer();
-    const originPostalCode = (saved.originPostalCode || process.env.STORE_ORIGIN_CEP || process.env.ORIGIN_CEP || '03806010').replace(/\D/g, '');
-    const environment = (saved.environment || process.env.MELHOR_ENVIO_ENV || 'production').toLowerCase() === 'sandbox' ? 'sandbox' : 'production';
-    const appName = saved.appName || process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confecções';
-    const appEmail = saved.appEmail || process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
+    const originPostalCode = config.originPostalCode;
+    const environment = config.environment;
+    const appName = config.appName;
+    const appEmail = config.appEmail;
     const clientId = saved.clientId || process.env.MELHOR_ENVIO_CLIENT_ID || '';
 
     let sender = saved.sender;
@@ -7540,8 +7545,8 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
       appName,
       appEmail,
       clientId,
-      isTokenConfigured: Boolean(token && token.length >= 10),
-      tokenMasked: token && token.length >= 10 ? `${token.slice(0, 8)}...${token.slice(-6)} (Ativo)` : '',
+      isTokenConfigured: Boolean(config.token && config.token.length >= 10),
+      tokenMasked: config.token && config.token.length >= 10 ? `${config.token.slice(0, 8)}...${config.token.slice(-6)} (Ativo via Vercel Env)` : '',
       sender,
       defaultWeight: Number(saved.defaultWeight || 0.35),
       defaultHeight: Number(saved.defaultHeight || 4),
@@ -7555,7 +7560,7 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
 
 app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
   try {
-    const { originPostalCode, environment, token, clientId, clientSecret, appName, appEmail, sender, defaultWeight, defaultHeight, defaultWidth, defaultLength } = req.body;
+    const { originPostalCode, environment, clientId, clientSecret, appName, appEmail, sender, defaultWeight, defaultHeight, defaultWidth, defaultLength } = req.body;
     const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
     let current: any = {};
     if (fs.existsSync(settingsPath)) {
@@ -7579,15 +7584,13 @@ app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
       defaultLength: Number(defaultLength || current.defaultLength || 25),
     };
 
-    if (token && typeof token === 'string' && token.trim().length >= 10) {
-      updated.token = token.trim();
-    }
-
     const dataDir = path.join(process.cwd(), 'data');
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
     fs.writeFileSync(settingsPath, JSON.stringify(updated, null, 2), 'utf-8');
+
+    const config = getMelhorEnvioConfig();
 
     await db.logAdminAction(
       req.user?.email || 'admin@marmot.com',
@@ -7603,7 +7606,7 @@ app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
       success: true,
       originPostalCode: updated.originPostalCode,
       environment: updated.environment,
-      isTokenConfigured: Boolean(updated.token || process.env.MELHOR_ENVIO_TOKEN),
+      isTokenConfigured: Boolean(config.token && config.token.length >= 10),
       sender: updated.sender,
     });
   } catch (err: any) {
@@ -7614,32 +7617,21 @@ app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
 // --- ADMIN: TESTAR CONEXÃO EM TEMPO REAL COM MELHOR ENVIO ---
 app.get('/api/admin/melhor-envio/test-connection', requireAdmin, async (req, res) => {
   try {
-    const token = getMelhorEnvioTokenServer();
-    if (!token || token.length < 10) {
+    const config = getMelhorEnvioConfig();
+    if (!config.token || config.token.length < 10) {
       return res.json({
         connected: false,
-        environment: 'unknown',
-        message: 'Token de autenticação do Melhor Envio não está configurado no servidor.',
+        environment: config.environment,
+        tokenConfigured: false,
+        message: 'Token de autenticação do Melhor Envio não está configurado no servidor (variável MELHOR_ENVIO_TOKEN ausente).',
       });
     }
 
-    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
-    let env = 'production';
-    if (fs.existsSync(settingsPath)) {
-      try {
-        const saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-        if (saved.environment === 'sandbox') env = 'sandbox';
-      } catch {}
-    }
-
-    const baseUrl = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
-    const userAgent = 'Marmot Confeccoes (contato@marmot.com.br)';
-
-    const meRes = await fetch(`${baseUrl}/me`, {
+    const meRes = await fetch(`${config.baseUrl}/me`, {
       headers: {
         Accept: 'application/json',
-        Authorization: `Bearer ${token}`,
-        'User-Agent': userAgent,
+        Authorization: `Bearer ${config.token}`,
+        'User-Agent': config.userAgent,
       },
     });
 
@@ -7647,7 +7639,9 @@ app.get('/api/admin/melhor-envio/test-connection', requireAdmin, async (req, res
       const errText = await meRes.text().catch(() => '');
       return res.json({
         connected: false,
-        environment: env,
+        environment: config.environment,
+        tokenConfigured: true,
+        authenticated: false,
         message: `Melhor Envio recusou as credenciais (HTTP ${meRes.status}): ${errText.slice(0, 100)}`,
       });
     }
@@ -7655,7 +7649,9 @@ app.get('/api/admin/melhor-envio/test-connection', requireAdmin, async (req, res
     const meData: any = await meRes.json();
     return res.json({
       connected: true,
-      environment: env,
+      environment: config.environment,
+      tokenConfigured: true,
+      authenticated: true,
       accountName: meData.name || meData.firstname || 'Conta Marmot',
       accountEmail: meData.email || '',
       balance: Number(meData.balance || 0),
@@ -7670,9 +7666,64 @@ app.get('/api/admin/melhor-envio/test-connection', requireAdmin, async (req, res
   }
 });
 
+// --- ADMIN: DIAGNÓSTICO DO MELHOR ENVIO ---
+app.get('/api/admin/melhor-envio/diagnostics', requireAdmin, async (req, res) => {
+  try {
+    const config = getMelhorEnvioConfig();
+    const tokenConfigured = Boolean(config.token && config.token.length >= 10);
+    const originCepConfigured = Boolean(config.originPostalCode && config.originPostalCode.length === 8);
+    let apiReachable = false;
+    let authenticated = false;
+
+    if (tokenConfigured) {
+      try {
+        const timeoutController = new AbortController();
+        const timeoutId = setTimeout(() => timeoutController.abort(), 6000);
+        const meRes = await fetch(`${config.baseUrl}/me`, {
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${config.token}`,
+            'User-Agent': config.userAgent,
+          },
+          signal: timeoutController.signal,
+        });
+        clearTimeout(timeoutId);
+        apiReachable = true;
+        authenticated = meRes.ok;
+      } catch {
+        apiReachable = false;
+        authenticated = false;
+      }
+    } else {
+      try {
+        const timeoutController = new AbortController();
+        const timeoutId = setTimeout(() => timeoutController.abort(), 6000);
+        const pingRes = await fetch(`${config.baseUrl}/me/shipment/services`, {
+          signal: timeoutController.signal,
+        });
+        clearTimeout(timeoutId);
+        apiReachable = pingRes.status < 500;
+      } catch {
+        apiReachable = false;
+      }
+    }
+
+    res.json({
+      environment: config.environment,
+      tokenConfigured,
+      originCepConfigured,
+      apiReachable,
+      authenticated,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Erro ao obter diagnósticos do Melhor Envio.' });
+  }
+});
+
 // --- ADMIN: URL DE AUTORIZAÇÃO OAUTH2 DO MELHOR ENVIO ---
 app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
   try {
+    const config = getMelhorEnvioConfig();
     const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
     let saved: any = {};
     if (fs.existsSync(settingsPath)) {
@@ -7682,7 +7733,6 @@ app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
     }
 
     const clientId = saved.clientId || process.env.MELHOR_ENVIO_CLIENT_ID;
-    const env = (saved.environment || process.env.MELHOR_ENVIO_ENV || 'production') === 'sandbox' ? 'sandbox' : 'production';
     const host = req.get('host') || 'localhost:3000';
     const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
     const redirectUri = `${protocol}://${host}/admin?tab=shipping&oauth=melhor-envio`;
@@ -7693,7 +7743,7 @@ app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
       });
     }
 
-    const authBase = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/oauth/authorize' : 'https://melhorenvio.com.br/oauth/authorize';
+    const authBase = config.environment === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/oauth/authorize' : 'https://melhorenvio.com.br/oauth/authorize';
     const scopes = 'cart-read cart-write orders-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-tracking ecommerce-shipping';
     const authUrl = `${authBase}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=marmot_admin_oauth`;
 
@@ -7755,11 +7805,12 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       return res.status(429).json({ error: 'Geração de etiqueta em andamento por outro processo. Aguarde alguns instantes.' });
     }
 
-    const token = getMelhorEnvioTokenServer();
+    const config = getMelhorEnvioConfig();
+    const token = config.token;
     if (!token || token.length < 10) {
       await db.completeShipmentGeneration(orderId, '', '', '', 'Token do Melhor Envio ausente');
       return res.status(503).json({
-        error: 'Token do Melhor Envio não configurado no servidor. Configure na aba de Frete do painel administrativo.',
+        error: 'Token do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN na Vercel.',
       });
     }
 
@@ -7771,11 +7822,9 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       } catch {}
     }
 
-    const env = (savedSettings.environment || process.env.MELHOR_ENVIO_ENV || 'production') === 'sandbox' ? 'sandbox' : 'production';
-    const baseUrl = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
-    const appName = savedSettings.appName || process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confecções';
-    const appEmail = savedSettings.appEmail || process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
-    const userAgent = `${appName} (${appEmail})`;
+    const baseUrl = config.baseUrl;
+    const userAgent = config.userAgent;
+    const appEmail = config.appEmail;
 
     const senderConfig = savedSettings.sender || {
       name: 'Marmot Confecções Ltda',
@@ -7789,10 +7838,10 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       neighborhood: 'Brás',
       city: 'São Paulo',
       state: 'SP',
-      cep: savedSettings.originPostalCode || '03806010',
+      cep: config.originPostalCode,
     };
 
-    const cleanOrigin = (senderConfig.cep || savedSettings.originPostalCode || '03806010').replace(/\D/g, '');
+    const cleanOrigin = (senderConfig.cep || config.originPostalCode || '03806010').replace(/\D/g, '');
     const cleanDest = (order.shippingAddress?.cep || '').replace(/\D/g, '');
     const customerCpf = (order.customerCpf || '').replace(/\D/g, '');
 
@@ -7848,16 +7897,16 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
         postal_code: cleanOrigin,
       },
       to: {
-        name: order.shippingAddress.recipientName || order.customerName || 'Cliente Marmot',
-        phone: (order.customerPhone || '11988421092').replace(/\D/g, ''),
-        email: order.customerEmail || 'cliente@marmot.com.br',
+        name: order.shippingAddress?.recipientName || order.customerName || 'Destinatário',
+        phone: (order.customerPhone || (order.shippingAddress as any)?.phone || '11988421092').replace(/\D/g, ''),
+        email: order.customerEmail || 'contato@marmot.com.br',
         document: customerCpf,
-        address: order.shippingAddress.street,
-        number: order.shippingAddress.number || 'S/N',
-        complement: order.shippingAddress.complement || '',
-        district: order.shippingAddress.neighborhood,
-        city: order.shippingAddress.city,
-        state_abbr: (order.shippingAddress.state || 'SP').toUpperCase(),
+        address: order.shippingAddress?.street,
+        number: order.shippingAddress?.number || 'S/N',
+        complement: order.shippingAddress?.complement || '',
+        district: order.shippingAddress?.neighborhood || '',
+        city: order.shippingAddress?.city,
+        state_abbr: (order.shippingAddress?.state || 'SP').toUpperCase(),
         country_id: 'BR',
         postal_code: cleanDest,
       },
@@ -8066,25 +8115,16 @@ app.get('/api/admin/orders/:id/print-label', requireAdmin, async (req: any, res)
       return res.json({ success: true, url: order.shippingLabelUrl });
     }
 
-    const token = getMelhorEnvioTokenServer();
+    const config = getMelhorEnvioConfig();
+    const token = config.token;
     if (token && order.melhorEnvioShipmentId) {
-      const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
-      let env = 'production';
-      if (fs.existsSync(settingsPath)) {
-        try {
-          const saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-          if (saved.environment === 'sandbox') env = 'sandbox';
-        } catch {}
-      }
-
-      const baseUrl = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
-      const printRes = await fetch(`${baseUrl}/me/shipment/print`, {
+      const printRes = await fetch(`${config.baseUrl}/me/shipment/print`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
-          'User-Agent': 'Marmot Confeccoes (contato@marmot.com.br)',
+          'User-Agent': config.userAgent,
         },
         body: JSON.stringify({ mode: 'public', orders: [order.melhorEnvioShipmentId] }),
       });

@@ -288,8 +288,8 @@ export const AdminShippingTab: React.FC = () => {
 
       const quotes = data.quotes || data.options || [];
       setTestResults(quotes);
-      setTestSource(data.fromMelhorEnvio ? 'API Oficial Melhor Envio' : 'Tabela de Contingência');
-      showToast('Cotação Concluída', `${quotes.length} transportadoras disponíveis para o CEP ${cleanCep}.`, 'success');
+      setTestSource('API Oficial Melhor Envio (Produção)');
+      showToast('Cotação Concluída', `${quotes.length} transportadoras reais cotadas para o CEP ${cleanCep}.`, 'success');
     } catch (err: any) {
       showToast('Falha na Cotação', err.message || 'Erro ao calcular cotação de teste.', 'error');
     } finally {
@@ -411,16 +411,19 @@ export const AdminShippingTab: React.FC = () => {
               <label className="block text-sm font-medium text-stone-700 mb-1">
                 Token de Acesso (Bearer Token)
               </label>
-              <input
-                type="password"
-                value={newTokenInput}
-                onChange={(e) => setNewTokenInput(e.target.value)}
-                placeholder={settings.isTokenConfigured ? '•••••••••••••••••••••••• (Token já ativo no servidor)' : 'Insira o token gerado no Melhor Envio'}
-                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
-              />
-              <p className="text-xs text-stone-500 mt-1">
-                Deixe em branco para manter o token atual seguro no servidor.
-              </p>
+              <div className="p-3 bg-stone-50 border border-stone-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-mono text-stone-800 font-medium">
+                    {settings.isTokenConfigured ? (settings.tokenMasked || '•••••••••••••••••••••••• (Ativo)') : 'Nenhum token configurado'}
+                  </span>
+                  <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${settings.isTokenConfigured ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                    {settings.isTokenConfigured ? 'Configurado na Vercel' : 'Pendente na Vercel'}
+                  </span>
+                </div>
+                <p className="text-xs text-stone-500 mt-2">
+                  Em conformidade com a segurança da Vercel Production, o token é injetado via variável de ambiente <code>MELHOR_ENVIO_TOKEN</code>.
+                </p>
+              </div>
             </div>
 
             <div>
