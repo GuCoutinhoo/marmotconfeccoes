@@ -5160,6 +5160,36 @@ function sanitizeInput(str: any): string {
   return str.trim().replace(/[<>]/g, '');
 }
 
+function cleanCpf(cpf: string | undefined | null): string {
+  if (!cpf || typeof cpf !== 'string') return '';
+  return cpf.replace(/\D/g, '').slice(0, 11);
+}
+
+function isValidCpf(cpf: string | undefined | null): boolean {
+  if (!cpf || typeof cpf !== 'string') return false;
+  const digits = cpf.replace(/\D/g, '');
+  if (digits.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(digits)) return false;
+
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += parseInt(digits.charAt(i), 10) * (10 - i);
+  }
+  let remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits.charAt(9), 10)) return false;
+
+  sum = 0;
+  for (let i = 0; i < 10; i++) {
+    sum += parseInt(digits.charAt(i), 10) * (11 - i);
+  }
+  remainder = (sum * 10) % 11;
+  if (remainder === 10 || remainder === 11) remainder = 0;
+  if (remainder !== parseInt(digits.charAt(10), 10)) return false;
+
+  return true;
+}
+
 // Cryptographic token validation with HMAC and Supabase Auth
 async function verifyAuthToken(token: string): Promise<{ userId: string; email: string | null; role: string; name: string } | null> {
   if (!token || typeof token !== 'string') return null;
@@ -6137,6 +6167,40 @@ app.put('/api/admin/orders/:id/status', requireAdmin, async (req: any, res) => {
   }
 });
 
+app.put('/api/admin/orders/:id/customer-cpf', requireAdmin, async (req: any, res) => {
+  try {
+    const rawCpf = req.body?.customerCpf || req.body?.cpf;
+    const digits = cleanCpf(rawCpf);
+
+    if (!digits) {
+      return res.status(400).json({ error: 'Informe o CPF do destinatário.' });
+    }
+
+    if (!isValidCpf(digits)) {
+      return res.status(400).json({ error: 'CPF inválido. Verifique os dígitos digitados.' });
+    }
+
+    const order = await db.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+
+    order.customerCpf = digits;
+    if (order.shippingAddress) {
+      (order.shippingAddress as any).cpf = digits;
+    }
+    if (!order.history) order.history = [];
+    order.history.push({
+      status: order.status,
+      timestamp: new Date().toLocaleString('pt-BR'),
+      description: `CPF do destinatário atualizado para ${digits.slice(0, 3)}.***.***-${digits.slice(9)} por ${req.user?.name || 'Administrador'}.`,
+    });
+
+    const updated = await db.saveOrder(order);
+    res.json({ success: true, order: updated, message: 'CPF do destinatário atualizado com sucesso!' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Erro ao atualizar CPF do pedido.' });
+  }
+});
+
 // --- Coupons ---
 app.get('/api/coupons', async (req, res) => {
   const coupons = await db.getCoupons();
@@ -6732,7 +6796,7 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       customerName: payer?.name || req.body?.payerName || shippingAddress?.recipientName || (req as any).user?.name || existingOrder?.customerName || 'Cliente Marmot',
       customerEmail: payer?.email || req.body?.payerEmail || (req as any).user?.email || existingOrder?.customerEmail || 'contato@marmot.com.br',
       customerPhone: payer?.phone || req.body?.payerPhone || existingOrder?.customerPhone || '',
-      customerCpf: payer?.cpf || req.body?.payerCpf || existingOrder?.customerCpf || '',
+      customerCpf: cleanCpf(payer?.cpf || req.body?.payerCpf || req.body?.customerCpf || (shippingAddress as any)?.cpf || (req as any).user?.cpf || existingOrder?.customerCpf || ''),
       date: existingOrder?.date || new Date().toLocaleDateString('pt-BR'),
       status: 'Aguardando Pagamento',
       paymentStatus: 'Pendente',
@@ -7843,16 +7907,18 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
 
     const cleanOrigin = (senderConfig.cep || config.originPostalCode || '03806010').replace(/\D/g, '');
     const cleanDest = (order.shippingAddress?.cep || '').replace(/\D/g, '');
-    const customerCpf = (order.customerCpf || '').replace(/\D/g, '');
+    const customerCpf = cleanCpf(order.customerCpf || (order.shippingAddress as any)?.cpf || '');
 
     if (cleanDest.length !== 8) {
       await db.completeShipmentGeneration(orderId, '', '', '', 'CEP de destino inválido');
       return res.status(400).json({ error: 'CEP de entrega do cliente inválido.' });
     }
 
-    if (customerCpf.length < 11) {
-      await db.completeShipmentGeneration(orderId, '', '', '', 'CPF do destinatário ausente');
-      return res.status(400).json({ error: 'CPF do destinatário obrigatório para emissão de frete pelo Melhor Envio.' });
+    if (!customerCpf || !isValidCpf(customerCpf)) {
+      await db.completeShipmentGeneration(orderId, '', '', '', 'CPF do destinatário inválido ou ausente');
+      return res.status(400).json({
+        error: 'CPF do destinatário obrigatório e válido para emissão de frete pelo Melhor Envio. Adicione ou edite o CPF do cliente neste pedido antes de gerar a etiqueta.',
+      });
     }
 
     const productsStore = await db.getAllProducts();

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { Order, ShipmentRecord } from '../../types';
+import { isValidCpf, cleanCpf, formatCpf } from '../../utils/cpfValidator';
 import {
   Truck,
   Package,
@@ -19,7 +20,8 @@ import {
   FileText,
   User,
   ChevronRight,
-  Filter
+  Filter,
+  ShieldAlert
 } from 'lucide-react';
 
 export const AdminShipmentsTab: React.FC = () => {
@@ -98,6 +100,16 @@ export const AdminShipmentsTab: React.FC = () => {
   });
 
   const handleGenerateMelhorEnvio = async (order: Order) => {
+    const cleanCustomerCpf = cleanCpf(order.customerCpf || (order.shippingAddress as any)?.cpf);
+    if (!cleanCustomerCpf || !isValidCpf(cleanCustomerCpf)) {
+      showToast(
+        'CPF do destinatário não informado',
+        'Este pedido não possui CPF válido para o Melhor Envio. Acesse a aba "Pedidos" e clique em "+ Adicionar CPF" para cadastrá-lo.',
+        'error'
+      );
+      return;
+    }
+
     setGeneratingId(order.id);
     try {
       const res = await fetch(`/api/admin/orders/${order.id}/generate-melhor-envio-shipment`, {
@@ -307,8 +319,18 @@ export const AdminShipmentsTab: React.FC = () => {
                   </p>
 
                   <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] font-mono text-[#6B6B66]">
-                    <span>Transportadora: <strong className="text-[#171717]">{order.shippingCarrier || 'Melhor Envio'} ({order.shippingService || 'Padrão'})</strong></span>
-                    <span>• Peso Total: <strong className="text-[#171717]">{totalWeight.toFixed(2)} kg</strong></span>
+                    <span>
+                      CPF Destinatário:{' '}
+                      {order.customerCpf && isValidCpf(order.customerCpf) ? (
+                        <strong className="text-[#171717]">{formatCpf(order.customerCpf)}</strong>
+                      ) : (
+                        <span className="text-amber-800 font-bold bg-amber-100 px-1.5 py-0.5 rounded text-[10px]">
+                          Pendente
+                        </span>
+                      )}
+                    </span>
+                    <span>• Transportadora: <strong className="text-[#171717]">{order.shippingCarrier || 'Melhor Envio'} ({order.shippingService || 'Padrão'})</strong></span>
+                    <span>• Peso: <strong className="text-[#171717]">{totalWeight.toFixed(2)} kg</strong></span>
                     <span>• {itemCount} {itemCount === 1 ? 'item' : 'itens'}</span>
                   </div>
                 </div>

@@ -27,6 +27,7 @@ import {
 } from 'lucide-react';
 import { Order, Address, ShippingOption } from '../types';
 import { validateAndFetchCep, normalizeCep, isValidCepFormat, formatCep } from '../services/cepService';
+import { isValidCpf, formatCpf, cleanCpf } from '../utils/cpfValidator';
 import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
 interface CheckoutPageProps {
@@ -101,8 +102,18 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
   const [contactEmail, setContactEmail] = useState(user ? user.email : '');
   const [contactPhone, setContactPhone] = useState(user?.phone || '');
-  const [contactCpf, setContactCpf] = useState(user?.cpf || '');
+  const [contactCpf, setContactCpf] = useState(user?.cpf ? formatCpf(user.cpf) : '');
+  const [cpfError, setCpfError] = useState<string | null>(null);
   const [draftOrderId, setDraftOrderId] = useState<string>('');
+
+  // Keep contact info and CPF synced if user finishes loading
+  useEffect(() => {
+    if (user) {
+      if (!contactEmail && user.email) setContactEmail(user.email);
+      if (!contactPhone && user.phone) setContactPhone(user.phone);
+      if (!contactCpf && user.cpf) setContactCpf(formatCpf(user.cpf));
+    }
+  }, [user]);
 
   // Keep address updated if user finishes loading
   useEffect(() => {
@@ -413,6 +424,20 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       showToast('Dados incompletos', 'Informe seu e-mail para receber a confirmação.', 'error');
       return;
     }
+
+    const cleanCustomerCpf = cleanCpf(contactCpf);
+    if (!cleanCustomerCpf) {
+      setCpfError('Informe seu CPF para continuar.');
+      showToast('CPF Obrigatório', 'Informe seu CPF para emissão da etiqueta de envio.', 'error');
+      return;
+    }
+    if (!isValidCpf(cleanCustomerCpf)) {
+      setCpfError('Informe um CPF válido.');
+      showToast('CPF Inválido', 'Por favor, informe um CPF válido com os 11 dígitos corretos.', 'error');
+      return;
+    }
+    setCpfError(null);
+
     if (!activeShippingOption) {
       showToast('Frete obrigatório', 'Aguarde o cálculo ou selecione uma opção de frete.', 'error');
       return;
@@ -499,15 +524,16 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         shippingServiceId: activeShippingOption?.serviceId ? String(activeShippingOption.serviceId) : undefined,
         shippingDeliveryTime: activeShippingOption?.deliveryTime,
         payer: {
-          email: contactEmail,
-          name: address.recipientName,
-          cpf: contactCpf,
-          phone: contactPhone,
+          email: contactEmail.trim(),
+          name: address.recipientName.trim(),
+          cpf: cleanCpf(contactCpf),
+          phone: contactPhone.trim(),
         },
-        payerEmail: contactEmail,
-        payerName: address.recipientName,
-        payerPhone: contactPhone,
-        payerCpf: contactCpf,
+        payerEmail: contactEmail.trim(),
+        payerName: address.recipientName.trim(),
+        payerPhone: contactPhone.trim(),
+        payerCpf: cleanCpf(contactCpf),
+        customerCpf: cleanCpf(contactCpf),
       };
 
       const headers: Record<string, string> = {
@@ -943,9 +969,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">E-mail para Confirmação</label>
+                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">E-mail para Confirmação *</label>
                         <input
                           type="email"
                           value={contactEmail}
@@ -955,7 +981,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">Telefone WhatsApp</label>
+                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">Telefone WhatsApp *</label>
                         <input
                           type="text"
                           value={contactPhone}
@@ -963,6 +989,37 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                           placeholder="(11) 99999-9999"
                           className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
                         />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-[#71717A] flex items-center justify-between mb-1">
+                          <span>CPF *</span>
+                          {contactCpf && (
+                            <span className={`text-[10px] font-mono font-bold ${isValidCpf(contactCpf) ? 'text-emerald-600' : 'text-red-500'}`}>
+                              {isValidCpf(contactCpf) ? '✓ Válido' : 'Inválido'}
+                            </span>
+                          )}
+                        </label>
+                        <input
+                          type="text"
+                          value={contactCpf}
+                          onChange={(e) => {
+                            setContactCpf(formatCpf(e.target.value));
+                            if (cpfError) setCpfError(null);
+                          }}
+                          placeholder="000.000.000-00"
+                          maxLength={14}
+                          className={`w-full bg-[#F8F9FA] border px-3.5 py-3 rounded-xl text-xs text-[#18181B] font-mono focus:outline-none ${
+                            cpfError ? 'border-red-500 bg-red-50/30' : 'border-[#E4E4E7] focus:border-[#18181B]'
+                          }`}
+                        />
+                        <p className="text-[10px] text-[#71717A] mt-1 leading-tight">
+                          Necessário para emissão da etiqueta de envio.
+                        </p>
+                        {cpfError && (
+                          <p className="text-[10px] text-red-600 font-bold mt-0.5">
+                            {cpfError}
+                          </p>
+                        )}
                       </div>
                     </div>
 

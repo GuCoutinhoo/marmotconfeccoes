@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { Order, OrderStatus } from '../../types';
+import { isValidCpf, formatCpf, cleanCpf } from '../../utils/cpfValidator';
 import {
   ShoppingBag,
   Search,
@@ -28,7 +29,9 @@ import {
   Ban,
   DollarSign,
   PackageCheck,
-  Tag
+  Tag,
+  Edit2,
+  ShieldAlert
 } from 'lucide-react';
 
 const STATUS_COLOR_MAP: Record<string, { bg: string; text: string; border: string }> = {
@@ -66,6 +69,53 @@ export const AdminOrdersTab: React.FC = () => {
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
   const [isGeneratingShipment, setIsGeneratingShipment] = useState(false);
   const [isSyncingTracking, setIsSyncingTracking] = useState(false);
+  const [isEditingCpf, setIsEditingCpf] = useState(false);
+  const [editingCpfValue, setEditingCpfValue] = useState('');
+  const [isSavingCpf, setIsSavingCpf] = useState(false);
+
+  useEffect(() => {
+    if (selectedOrder) {
+      setEditingCpfValue(selectedOrder.customerCpf ? formatCpf(selectedOrder.customerCpf) : '');
+      setIsEditingCpf(!selectedOrder.customerCpf || !isValidCpf(selectedOrder.customerCpf));
+    }
+  }, [selectedOrder?.id]);
+
+  const handleSaveCustomerCpf = async () => {
+    if (!selectedOrder) return;
+    const clean = cleanCpf(editingCpfValue);
+    if (!clean) {
+      showToast('CPF Obrigatório', 'Informe o CPF do cliente para salvar.', 'error');
+      return;
+    }
+    if (!isValidCpf(clean)) {
+      showToast('CPF Inválido', 'Informe um CPF válido com os 11 dígitos corretos.', 'error');
+      return;
+    }
+    setIsSavingCpf(true);
+    try {
+      const res = await fetch(`/api/admin/orders/${selectedOrder.id}/customer-cpf`, {
+        method: 'PUT',
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ customerCpf: clean }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Erro ao atualizar CPF do cliente.');
+      }
+      showToast('CPF Atualizado', 'CPF do cliente atualizado com sucesso no pedido!', 'success');
+      if (data.order) {
+        setSelectedOrder(data.order);
+      } else {
+        setSelectedOrder({ ...selectedOrder, customerCpf: clean });
+      }
+      setIsEditingCpf(false);
+      await refreshAllAdminOrders();
+    } catch (err: any) {
+      showToast('Erro ao Salvar CPF', err.message, 'error');
+    } finally {
+      setIsSavingCpf(false);
+    }
+  };
 
   const handleSyncTracking = async () => {
     setIsSyncingTracking(true);
@@ -133,6 +183,21 @@ export const AdminOrdersTab: React.FC = () => {
   });
 
   const handleGenerateMelhorEnvioShipment = async (orderId: string) => {
+    const currentOrder = selectedOrder?.id === orderId ? selectedOrder : allOrders.find((o) => o.id === orderId);
+    const recipientCpf = cleanCpf(currentOrder?.customerCpf || (currentOrder?.shippingAddress as any)?.cpf);
+
+    if (!recipientCpf || !isValidCpf(recipientCpf)) {
+      showToast(
+        'CPF do destinatário não informado',
+        'Este pedido não possui um CPF válido para o Melhor Envio. Adicione o CPF do cliente abaixo antes de emitir o frete.',
+        'error'
+      );
+      if (selectedOrder?.id === orderId) {
+        setIsEditingCpf(true);
+      }
+      return;
+    }
+
     setIsGeneratingShipment(true);
     try {
       const res = await fetch(`/api/admin/orders/${orderId}/generate-melhor-envio-shipment`, {
@@ -567,8 +632,78 @@ export const AdminOrdersTab: React.FC = () => {
                   {selectedOrder.shippingAddress?.recipientName || selectedOrder.customerName || 'Cliente'}
                 </p>
                 <p className="text-xs text-[#6B6B66]">E-mail: {selectedOrder.customerEmail || 'Não informado'}</p>
-                <p className="text-xs text-[#6B6B66]">CPF: {selectedOrder.customerCpf || 'Não informado'}</p>
                 <p className="text-xs text-[#6B6B66]">Telefone: {selectedOrder.customerPhone || 'Não informado'}</p>
+
+                {/* CPF Field & Action */}
+                {!isEditingCpf ? (
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#E5E5E1]/70">
+                    <div className="flex items-center gap-1.5 text-xs text-[#6B6B66]">
+                      <span className="font-semibold text-[#171717]">CPF:</span>
+                      {selectedOrder.customerCpf && isValidCpf(selectedOrder.customerCpf) ? (
+                        <span className="font-mono text-[#171717]">{formatCpf(selectedOrder.customerCpf)}</span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-amber-800 font-semibold bg-amber-100 px-2 py-0.5 rounded text-[11px]">
+                          <ShieldAlert className="w-3 h-3 text-amber-700" /> Não informado
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingCpfValue(selectedOrder.customerCpf ? formatCpf(selectedOrder.customerCpf) : '');
+                        setIsEditingCpf(true);
+                      }}
+                      className="text-[11px] font-bold text-[#B45309] hover:text-[#92400E] flex items-center gap-1 transition-colors"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                      {selectedOrder.customerCpf ? 'Editar' : '+ Adicionar CPF'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="pt-2 border-t border-[#E5E5E1] space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="text-[11px] font-bold text-[#171717]">
+                        CPF do Destinatário (Melhor Envio) *
+                      </label>
+                      <span className={`text-[10px] font-mono font-bold ${isValidCpf(editingCpfValue) ? 'text-emerald-600' : 'text-amber-700'}`}>
+                        {isValidCpf(editingCpfValue) ? '✓ Válido' : '11 dígitos obrigatórios'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={editingCpfValue}
+                        onChange={(e) => setEditingCpfValue(formatCpf(e.target.value))}
+                        placeholder="000.000.000-00"
+                        maxLength={14}
+                        className="flex-1 bg-white border border-[#D4D4D0] px-2.5 py-1.5 rounded-lg text-xs font-mono text-[#171717] focus:outline-none focus:border-[#B45309]"
+                        autoFocus
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSaveCustomerCpf}
+                        disabled={isSavingCpf || !isValidCpf(editingCpfValue)}
+                        className="px-3 py-1.5 bg-[#B45309] hover:bg-[#92400E] disabled:bg-zinc-300 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1"
+                      >
+                        {isSavingCpf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+                        Salvar
+                      </button>
+                      {selectedOrder.customerCpf && (
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingCpf(false)}
+                          className="p-1.5 hover:bg-[#E5E5E1] text-[#6B6B66] rounded-lg transition-colors"
+                          title="Cancelar"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-[#6B6B66] leading-tight">
+                      Necessário para emissão e geração da etiqueta de frete no Melhor Envio.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Shipping Address */}
