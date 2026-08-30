@@ -889,6 +889,7 @@ export class DatabaseManager {
       await this.loadFromPostgres().catch(() => {});
     }
 
+    this.cleanUpArtificialTrackingCodes();
     this.isInitialized = true;
   }
 
@@ -4091,66 +4092,6 @@ export class DatabaseManager {
     }
   }
 
-  public async claimShipmentGeneration(orderId: string): Promise<{ shouldProcess: boolean; existing?: any }> {
-    await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        const { data: existingOp } = await this.supabase
-          .from('shipment_operations')
-          .select('*')
-          .eq('order_id', orderId)
-          .maybeSingle();
-
-        if (existingOp) {
-          if (existingOp.status === 'completed' && (existingOp.print_url || existingOp.shipment_id)) {
-            return { shouldProcess: false, existing: existingOp };
-          }
-          if (existingOp.status === 'processing') {
-            const ageMs = Date.now() - new Date(existingOp.updated_at || existingOp.created_at).getTime();
-            if (ageMs < 60000) {
-              return { shouldProcess: false, existing: existingOp };
-            }
-          }
-        }
-
-        await this.supabase.from('shipment_operations').upsert({
-          order_id: orderId,
-          status: 'processing',
-          updated_at: new Date().toISOString(),
-        });
-        return { shouldProcess: true };
-      } catch (err) {
-        console.warn('[DB] Supabase claimShipmentGeneration notice:', err);
-      }
-    }
-    return { shouldProcess: true };
-  }
-
-  public async completeShipmentGeneration(
-    orderId: string,
-    shipmentId: string,
-    trackingCode: string,
-    printUrl: string,
-    errorMsg?: string
-  ): Promise<void> {
-    await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('shipment_operations').upsert({
-          order_id: orderId,
-          status: errorMsg ? 'failed' : 'completed',
-          shipment_id: shipmentId,
-          tracking_code: trackingCode,
-          print_url: printUrl,
-          error: errorMsg || null,
-          updated_at: new Date().toISOString(),
-        });
-      } catch (err) {
-        console.warn('[DB] Supabase completeShipmentGeneration error:', err);
-      }
-    }
-  }
-
   public async deductStockAtomic(
     productId: string,
     quantity: number,
@@ -4898,6 +4839,180 @@ export class DatabaseManager {
     await this.initialize();
     return this.campaignRecords;
   }
+
+  // ==========================================
+  // SHIPMENT OPERATIONS & IDEMPOTENCY
+  // ==========================================
+  private shipmentOperations: any[] = [];
+
+  public cleanUpArtificialTrackingCodes(): void {
+    let count = 0;
+    for (const order of this.orders) {
+      if (
+        order.trackingCode &&
+        (order.trackingCode.startsWith('BR-SIMULATED-') || /^MM\d+BR$/i.test(order.trackingCode) || /^MM-\d+-\d+$/i.test(order.trackingCode)) &&
+        !order.melhorEnvioShipmentId &&
+        !order.shippingLabelUrl
+      ) {
+        order.trackingCode = undefined;
+        count++;
+      }
+    }
+    if (count > 0) {
+      console.log(`[DB] ${count} pedidos com códigos de rastreio artificiais legados foram normalizados.`);
+      this.writeJsonFile(ORDERS_FILE, this.orders);
+    }
+  }
+
+  public async claimShipmentGeneration(orderId: string): Promise<{ shouldProcess: boolean; existing?: any }> {
+    await this.initialize();
+    if (this.mode === 'supabase' && this.supabase) {
+      try {
+        const { data } = await this.supabase
+          .from('shipment_operations')
+          .select('*')
+          .eq('order_id', orderId)
+          .maybeSingle();
+
+        if (data) {
+          if (data.status === 'completed') {
+            return { shouldProcess: false, existing: data };
+          }
+          if (data.status === 'processing') {
+            const claimedTime = new Date(data.updated_at || data.created_at).getTime();
+            if (Date.now() - claimedTime < 2 * 60 * 1000) {
+              return { shouldProcess: false, existing: data };
+            }
+          }
+        }
+
+        await this.supabase.from('shipment_operations').upsert({
+          order_id: orderId,
+          status: 'processing',
+          updated_at: new Date().toISOString(),
+        });
+        return { shouldProcess: true };
+      } catch (err) {
+        console.warn('[DB] Supabase claimShipmentGeneration notice:', err);
+      }
+    }
+
+    const existing = this.shipmentOperations.find((o) => o.orderId === orderId);
+    if (existing) {
+      if (existing.status === 'completed') {
+        return { shouldProcess: false, existing };
+      }
+      if (existing.status === 'processing') {
+        const claimedTime = new Date(existing.updatedAt).getTime();
+        if (Date.now() - claimedTime < 2 * 60 * 1000) {
+          return { shouldProcess: false, existing };
+        }
+      }
+    }
+
+    const op = {
+      orderId,
+      status: 'processing',
+      updatedAt: new Date().toISOString(),
+    };
+    const idx = this.shipmentOperations.findIndex((o) => o.orderId === orderId);
+    if (idx >= 0) this.shipmentOperations[idx] = op;
+    else this.shipmentOperations.push(op);
+
+    return { shouldProcess: true };
+  }
+
+  public async completeShipmentGeneration(
+    orderId: string,
+    shipmentId?: string,
+    trackingCode?: string,
+    printUrl?: string,
+    error?: string
+  ): Promise<void> {
+    await this.initialize();
+    const status = error ? 'failed' : 'completed';
+    const now = new Date().toISOString();
+
+    if (this.mode === 'supabase' && this.supabase) {
+      try {
+        await this.supabase.from('shipment_operations').upsert({
+          order_id: orderId,
+          status,
+          shipment_id: shipmentId || null,
+          tracking_code: trackingCode || null,
+          print_url: printUrl || null,
+          error: error || null,
+          updated_at: now,
+        });
+      } catch (err) {
+        console.warn('[DB] Supabase completeShipmentGeneration notice:', err);
+      }
+    }
+
+    const op = {
+      orderId,
+      status,
+      shipmentId,
+      trackingCode,
+      printUrl,
+      error,
+      updatedAt: now,
+    };
+    const idx = this.shipmentOperations.findIndex((o) => o.orderId === orderId);
+    if (idx >= 0) this.shipmentOperations[idx] = op;
+    else this.shipmentOperations.push(op);
+  }
+
+  public async getShippingSettings(): Promise<any> {
+    await this.initialize();
+    if (this.mode === 'supabase' && this.supabase) {
+      try {
+        const { data, error } = await this.supabase
+          .from('app_settings')
+          .select('*')
+          .eq('key', 'shipping_settings')
+          .maybeSingle();
+
+        if (!error && data && data.value) {
+          return data.value;
+        }
+      } catch (err) {
+        console.warn('[DB] Supabase getShippingSettings notice:', err);
+      }
+    }
+
+    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+    if (fs.existsSync(settingsPath)) {
+      try {
+        return JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+      } catch {}
+    }
+    return {};
+  }
+
+  public async saveShippingSettings(settings: any): Promise<void> {
+    await this.initialize();
+    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+    const dir = path.dirname(settingsPath);
+    if (!fs.existsSync(dir)) {
+      try { fs.mkdirSync(dir, { recursive: true }); } catch {}
+    }
+    try {
+      fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
+    } catch {}
+
+    if (this.mode === 'supabase' && this.supabase) {
+      try {
+        await this.supabase.from('app_settings').upsert({
+          key: 'shipping_settings',
+          value: settings,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn('[DB] Supabase saveShippingSettings notice:', err);
+      }
+    }
+  }
 }
 
 export const db = new DatabaseManager();
@@ -5160,9 +5275,19 @@ function sanitizeInput(str: any): string {
   return str.trim().replace(/[<>]/g, '');
 }
 
+function cleanDocument(doc: string | undefined | null): string {
+  if (!doc || typeof doc !== 'string') return '';
+  return doc.replace(/\D/g, '');
+}
+
 function cleanCpf(cpf: string | undefined | null): string {
   if (!cpf || typeof cpf !== 'string') return '';
   return cpf.replace(/\D/g, '').slice(0, 11);
+}
+
+function cleanCnpj(cnpj: string | undefined | null): string {
+  if (!cnpj || typeof cnpj !== 'string') return '';
+  return cnpj.replace(/\D/g, '').slice(0, 14);
 }
 
 function isValidCpf(cpf: string | undefined | null): boolean {
@@ -5188,6 +5313,63 @@ function isValidCpf(cpf: string | undefined | null): boolean {
   if (remainder !== parseInt(digits.charAt(10), 10)) return false;
 
   return true;
+}
+
+function isValidCnpj(cnpj: string | undefined | null): boolean {
+  if (!cnpj || typeof cnpj !== 'string') return false;
+  const digits = cnpj.replace(/\D/g, '');
+  if (digits.length !== 14) return false;
+  if (/^(\d)\1{13}$/.test(digits)) return false;
+
+  const weights1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(digits.charAt(i), 10) * weights1[i];
+  }
+  let remainder = sum % 11;
+  const digit1 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit1 !== parseInt(digits.charAt(12), 10)) return false;
+
+  const weights2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  sum = 0;
+  for (let i = 0; i < 13; i++) {
+    sum += parseInt(digits.charAt(i), 10) * weights2[i];
+  }
+  remainder = sum % 11;
+  const digit2 = remainder < 2 ? 0 : 11 - remainder;
+  if (digit2 !== parseInt(digits.charAt(13), 10)) return false;
+
+  return true;
+}
+
+function validateSenderDocument(doc: string | undefined | null): {
+  valid: boolean;
+  type: 'cpf' | 'cnpj' | 'invalid';
+  digits: string;
+  error?: string;
+} {
+  const digits = cleanDocument(doc);
+  if (!digits) {
+    return { valid: false, type: 'invalid', digits: '', error: 'Documento do remetente não informado nas configurações de frete.' };
+  }
+  if (digits.length === 11) {
+    if (!isValidCpf(digits)) {
+      return { valid: false, type: 'cpf', digits, error: 'CPF do remetente inválido nos dígitos verificadores. Verifique na aba Configurações de Frete.' };
+    }
+    return { valid: true, type: 'cpf', digits };
+  }
+  if (digits.length === 14) {
+    if (!isValidCnpj(digits)) {
+      return { valid: false, type: 'cnpj', digits, error: 'CNPJ do remetente inválido nos dígitos verificadores. Verifique na aba Configurações de Frete.' };
+    }
+    return { valid: true, type: 'cnpj', digits };
+  }
+  return {
+    valid: false,
+    type: 'invalid',
+    digits,
+    error: `Documento do remetente deve conter 11 dígitos (CPF) ou 14 dígitos (CNPJ) válidos. Foram informados ${digits.length} dígitos.`,
+  };
 }
 
 // Cryptographic token validation with HMAC and Supabase Auth
@@ -6821,7 +7003,9 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       shippingServiceId: shippingServiceId ? String(shippingServiceId) : existingOrder?.shippingServiceId,
       shippingDeliveryTime: shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5,
       estimatedDelivery: `${shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5} a ${(shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5) + 2} dias úteis`,
-      trackingCode: existingOrder?.trackingCode || `MM${Date.now().toString().slice(-8)}BR`,
+      trackingCode: existingOrder?.trackingCode || undefined,
+      melhorEnvioShipmentId: existingOrder?.melhorEnvioShipmentId || undefined,
+      shippingLabelUrl: existingOrder?.shippingLabelUrl || undefined,
       history: existingOrder?.history && existingOrder.history.length > 0 ? existingOrder.history : [
         {
           status: 'Aguardando Pagamento',
@@ -7571,13 +7755,7 @@ app.put('/api/admin/shipments/:orderId/status', requireAdmin, async (req: any, r
 app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
   try {
     const config = getMelhorEnvioConfig();
-    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
-    let saved: any = {};
-    if (fs.existsSync(settingsPath)) {
-      try {
-        saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-      } catch {}
-    }
+    const saved = await db.getShippingSettings();
 
     const originPostalCode = config.originPostalCode;
     const environment = config.environment;
@@ -7625,13 +7803,7 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
 app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
   try {
     const { originPostalCode, environment, clientId, clientSecret, appName, appEmail, sender, defaultWeight, defaultHeight, defaultWidth, defaultLength } = req.body;
-    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
-    let current: any = {};
-    if (fs.existsSync(settingsPath)) {
-      try {
-        current = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-      } catch {}
-    }
+    const current = await db.getShippingSettings();
 
     const updated = {
       ...current,
@@ -7648,11 +7820,7 @@ app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
       defaultLength: Number(defaultLength || current.defaultLength || 25),
     };
 
-    const dataDir = path.join(process.cwd(), 'data');
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-    fs.writeFileSync(settingsPath, JSON.stringify(updated, null, 2), 'utf-8');
+    await db.saveShippingSettings(updated);
 
     const config = getMelhorEnvioConfig();
 
@@ -7878,13 +8046,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       });
     }
 
-    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
-    let savedSettings: any = {};
-    if (fs.existsSync(settingsPath)) {
-      try {
-        savedSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
-      } catch {}
-    }
+    const savedSettings = await db.getShippingSettings();
 
     const baseUrl = config.baseUrl;
     const userAgent = config.userAgent;
@@ -7904,6 +8066,15 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       state: 'SP',
       cep: config.originPostalCode,
     };
+
+    // Strict validation of store sender document
+    const senderDocValidation = validateSenderDocument(senderConfig.document);
+    if (!senderDocValidation.valid) {
+      await db.completeShipmentGeneration(orderId, '', '', '', senderDocValidation.error);
+      return res.status(400).json({
+        error: `Erro nos dados do remetente da loja: ${senderDocValidation.error}. Atualize o documento do remetente na aba "Configurações de Frete" do painel administrativo.`,
+      });
+    }
 
     const cleanOrigin = (senderConfig.cep || config.originPostalCode || '03806010').replace(/\D/g, '');
     const cleanDest = (order.shippingAddress?.cep || '').replace(/\D/g, '');
@@ -7941,7 +8112,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       });
     }
 
-    const senderDoc = senderConfig.document.replace(/\D/g, '');
+    const senderDoc = senderDocValidation.digits;
     const senderPhone = senderConfig.phone.replace(/\D/g, '');
 
     const cartPayload = {
@@ -7950,9 +8121,9 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
         name: senderConfig.name,
         phone: senderPhone,
         email: senderConfig.email || appEmail,
-        document: senderDoc,
-        company_document: senderDoc.length === 14 ? senderDoc : undefined,
-        state_register: senderConfig.stateRegister || 'ISENTO',
+        document: senderDocValidation.type === 'cpf' ? senderDoc : undefined,
+        company_document: senderDocValidation.type === 'cnpj' ? senderDoc : undefined,
+        state_register: senderDocValidation.type === 'cnpj' ? (senderConfig.stateRegister || 'ISENTO') : 'ISENTO',
         address: senderConfig.street,
         number: senderConfig.number || 'S/N',
         complement: senderConfig.complement || '',
@@ -8107,7 +8278,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       printUrl = printData.url || (printData.orders && printData.orders[0]?.url) || '';
     }
 
-    // STEP 5: Retrieve official carrier tracking code
+    // STEP 5: Retrieve official carrier tracking code (only if officially assigned by carrier)
     try {
       const trackRes = await fetch(`${baseUrl}/me/shipment/tracking`, {
         method: 'POST',
@@ -8122,14 +8293,15 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       if (trackRes.ok) {
         const trackData: any = await trackRes.json();
         if (trackData && trackData[shipmentId]) {
-          realTracking = trackData[shipmentId].tracking || trackData[shipmentId].protocol || '';
+          realTracking = trackData[shipmentId].tracking || '';
         }
       }
     } catch {}
 
-    const finalTracking = realTracking || protocol || shipmentId;
     order.melhorEnvioShipmentId = shipmentId;
-    order.trackingCode = finalTracking;
+    if (realTracking) {
+      order.trackingCode = realTracking;
+    }
     if (printUrl) {
       order.shippingLabelUrl = printUrl;
     }
@@ -8140,11 +8312,11 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     order.history.push({
       status: 'Pronto para Envio',
       timestamp: now.toLocaleString('pt-BR'),
-      description: `Remessa oficial #${shipmentId} gerada no Melhor Envio. Código de Rastreio: ${finalTracking}.`,
+      description: `Remessa oficial #${shipmentId} gerada no Melhor Envio.${realTracking ? ` Código de Rastreio Oficial: ${realTracking}.` : ' Etiqueta pronta para impressão.'}`,
     });
 
     await db.saveOrder(order);
-    await db.completeShipmentGeneration(order.id, shipmentId, finalTracking, printUrl);
+    await db.completeShipmentGeneration(order.id, shipmentId, realTracking || undefined, printUrl);
 
     await db.logAdminAction(
       req.user?.email || 'admin@marmot.com',
@@ -8152,15 +8324,15 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       'generate_shipment',
       'shipping',
       order.id,
-      `Envio gerado no Melhor Envio (ID: ${shipmentId}, Rastreio: ${finalTracking})`,
-      { shipmentId, trackingCode: finalTracking, printUrl }
+      `Envio gerado no Melhor Envio (ID: ${shipmentId}${realTracking ? `, Rastreio: ${realTracking}` : ''})`,
+      { shipmentId, trackingCode: realTracking || undefined, printUrl }
     );
 
     return res.json({
       success: true,
       order,
       labelUrl: printUrl,
-      trackingCode: finalTracking,
+      trackingCode: realTracking || undefined,
       shipmentId,
     });
   } catch (err: any) {
@@ -8173,8 +8345,10 @@ app.get('/api/admin/orders/:id/print-label', requireAdmin, async (req: any, res)
   try {
     const order = await db.getOrderById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
-    if (!order.melhorEnvioShipmentId && !order.trackingCode && !order.shippingLabelUrl) {
-      return res.status(400).json({ error: 'Etiqueta ainda não foi gerada para este pedido.' });
+    if (!order.melhorEnvioShipmentId && !order.shippingLabelUrl) {
+      return res.status(400).json({
+        error: 'Etiqueta ainda não foi gerada para este pedido no Melhor Envio. Clique primeiro em "Gerar Envio Real (Melhor Envio)".',
+      });
     }
 
     if (order.shippingLabelUrl) {
@@ -8206,7 +8380,7 @@ app.get('/api/admin/orders/:id/print-label', requireAdmin, async (req: any, res)
       }
     }
 
-    return res.status(404).json({
+    return res.status(400).json({
       error: 'Link de impressão da etiqueta não disponível. Certifique-se de que a etiqueta foi comprada e gerada no Melhor Envio.',
     });
   } catch (err: any) {

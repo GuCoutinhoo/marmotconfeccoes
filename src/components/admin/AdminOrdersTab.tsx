@@ -209,7 +209,11 @@ export const AdminOrdersTab: React.FC = () => {
         throw new Error(data.error || 'Erro ao gerar remessa no Melhor Envio.');
       }
 
-      showToast('Envio Real Gerado!', `Remessa #${data.shipmentId} gerada no Melhor Envio. Código: ${data.trackingCode}`, 'success');
+      showToast(
+        'Envio Real Gerado!',
+        `Remessa #${data.shipmentId} gerada no Melhor Envio.${data.trackingCode ? ` Código: ${data.trackingCode}` : ' Etiqueta pronta para impressão.'}`,
+        'success'
+      );
       if (data.order) {
         setSelectedOrder(data.order);
       }
@@ -764,7 +768,7 @@ export const AdminOrdersTab: React.FC = () => {
                   </button>
 
                   {/* Print Shipping Label */}
-                  {(selectedOrder.shippingLabelUrl || selectedOrder.melhorEnvioShipmentId || selectedOrder.trackingCode) && (
+                  {(selectedOrder.shippingLabelUrl || selectedOrder.melhorEnvioShipmentId) && (
                     <button
                       onClick={() => handlePrintLabel(selectedOrder)}
                       className="px-3 py-1.5 bg-white hover:bg-[#F9F9F7] border border-[#E5E5E1] text-[#171717] font-bold text-xs uppercase rounded-xl transition-all flex items-center gap-1.5 shadow-xs"

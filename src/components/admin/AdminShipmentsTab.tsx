@@ -119,7 +119,11 @@ export const AdminShipmentsTab: React.FC = () => {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Falha ao gerar remessa no Melhor Envio.');
 
-      showToast('Envio Real Gerado!', `Remessa #${data.shipmentId} gerada no Melhor Envio. Código: ${data.trackingCode}`, 'success');
+      showToast(
+        'Envio Real Gerado!',
+        `Remessa #${data.shipmentId} gerada no Melhor Envio.${data.trackingCode ? ` Código: ${data.trackingCode}` : ' Etiqueta pronta para impressão.'}`,
+        'success'
+      );
       await refreshAllAdminOrders();
     } catch (err: any) {
       showToast('Erro Melhor Envio', err.message, 'error');
@@ -357,7 +361,7 @@ export const AdminShipmentsTab: React.FC = () => {
                     {generatingId === order.id ? 'Gerando...' : order.melhorEnvioShipmentId ? 'Regerar ME' : 'Gerar ME'}
                   </button>
 
-                  {(order.shippingLabelUrl || order.melhorEnvioShipmentId || order.trackingCode) && (
+                  {(order.shippingLabelUrl || order.melhorEnvioShipmentId) && (
                     <button
                       onClick={() => handlePrintLabel(order)}
                       className="px-3 py-1.5 bg-white hover:bg-[#F9F9F7] border border-[#E5E5E1] text-[#171717] text-xs font-bold uppercase rounded-xl transition-all flex items-center gap-1.5 shadow-xs"

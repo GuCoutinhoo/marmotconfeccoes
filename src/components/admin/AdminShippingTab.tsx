@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext';
+import { validateSenderDocument, formatDocument } from '../../utils/cpfValidator';
 import {
   Truck,
   ShieldCheck,
@@ -215,6 +216,13 @@ export const AdminShippingTab: React.FC = () => {
       return;
     }
 
+    const docValidation = validateSenderDocument(senderForm.document);
+    if (!docValidation.valid) {
+      showToast('Documento Inválido', docValidation.error || 'Informe um CPF ou CNPJ válido para o remetente.', 'error');
+      setIsSaving(false);
+      return;
+    }
+
     try {
       const payload: any = {
         originPostalCode: cleanOrigin,
@@ -223,6 +231,7 @@ export const AdminShippingTab: React.FC = () => {
         clientSecret: clientSecretInput.trim() || undefined,
         sender: {
           ...senderForm,
+          document: formatDocument(docValidation.digits),
           cep: cleanOrigin,
         },
       };
@@ -482,16 +491,35 @@ export const AdminShippingTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
-                CNPJ ou CPF do Remetente *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-stone-700">
+                  CNPJ ou CPF do Remetente *
+                </label>
+                {senderForm.document && (
+                  <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
+                    validateSenderDocument(senderForm.document).valid
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {validateSenderDocument(senderForm.document).valid
+                      ? validateSenderDocument(senderForm.document).type.toUpperCase() + ' VÁLIDO'
+                      : 'DOCUMENTO INCOMPLETO'}
+                  </span>
+                )}
+              </div>
               <input
                 type="text"
                 required
                 value={senderForm.document}
-                onChange={(e) => setSenderForm({ ...senderForm, document: e.target.value })}
-                placeholder="Ex: 42.123.456/0001-90"
-                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const digits = val.replace(/\D/g, '');
+                  if (digits.length <= 14) {
+                    setSenderForm({ ...senderForm, document: formatDocument(digits) });
+                  }
+                }}
+                placeholder="Ex: 42.123.456/0001-90 ou CPF"
+                className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none font-mono"
               />
             </div>
 

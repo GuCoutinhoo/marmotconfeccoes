@@ -1,6 +1,7 @@
 import { ShippingOption, ShippingSettings, Order } from '../types';
 import { normalizeCep } from './cepService';
 import { getMelhorEnvioConfig, saveMelhorEnvioConfig, MelhorEnvioClient, ProductShippingSpec } from './melhorEnvioClient';
+import { isValidCpf, validateSenderDocument, cleanCpf } from '../utils/cpfValidator';
 
 export interface ShippingItemInput {
   productId: string;
@@ -106,7 +107,14 @@ export async function createMelhorEnvioShipment(
 
   // Sender details validation
   const senderName = senderConfig?.name || config.sender?.name || config.appName;
-  const senderDoc = (senderConfig?.document || config.sender?.document || '').replace(/\D/g, '');
+  const rawSenderDoc = senderConfig?.document || config.sender?.document || '';
+  const senderDocValidation = validateSenderDocument(rawSenderDoc);
+  if (!senderDocValidation.valid) {
+    throw new Error(
+      `Dados do remetente inválidos: ${senderDocValidation.error || 'CPF ou CNPJ inválido'}. Corrija os dados do remetente nas configurações de frete.`
+    );
+  }
+
   const senderPhone = (senderConfig?.phone || config.sender?.phone || '').replace(/\D/g, '');
   const senderEmail = senderConfig?.email || config.sender?.email || config.appEmail;
   const senderStreet = senderConfig?.street || config.sender?.street;
@@ -116,23 +124,23 @@ export async function createMelhorEnvioShipment(
   const senderCity = senderConfig?.city || config.sender?.city;
   const senderState = (senderConfig?.state || config.sender?.state || 'SP').toUpperCase();
 
-  if (!senderName || !senderDoc || senderDoc.length < 11 || !senderPhone || !senderStreet || !senderCity) {
+  if (!senderName || !senderPhone || !senderStreet || !senderCity) {
     throw new Error(
-      'Dados do remetente incompletos para emissão de frete. Configure o nome, CNPJ/CPF, telefone e endereço do remetente nas configurações de frete.'
+      'Dados do remetente incompletos para emissão de frete. Configure o nome, telefone e endereço do remetente nas configurações de frete.'
     );
   }
 
   // Recipient details validation
   const recipientName = order.shippingAddress.recipientName || order.customerName;
-  const recipientDoc = (order.customerCpf || '').replace(/\D/g, '');
-  const recipientPhone = (order.customerPhone || '').replace(/\D/g, '');
+  const recipientDoc = cleanCpf(order.customerCpf || (order.shippingAddress as any)?.cpf || '');
+  const recipientPhone = (order.customerPhone || (order.shippingAddress as any)?.phone || '').replace(/\D/g, '');
   const recipientEmail = order.customerEmail || 'cliente@marmot.com.br';
 
   if (!recipientName || recipientName.trim().length < 3) {
     throw new Error('Nome do destinatário inválido no pedido.');
   }
-  if (!recipientDoc || recipientDoc.length < 11) {
-    throw new Error('CPF do destinatário obrigatório para emissão da etiqueta de envio.');
+  if (!recipientDoc || !isValidCpf(recipientDoc)) {
+    throw new Error('CPF do destinatário ausente ou inválido. O CPF é obrigatório pela Receita Federal e Melhor Envio para gerar a etiqueta.');
   }
 
   // Build physical package products
@@ -155,24 +163,30 @@ export async function createMelhorEnvioShipment(
     });
   }
 
+  const fromPayload: any = {
+    name: senderName,
+    phone: senderPhone,
+    email: senderEmail,
+    address: senderStreet,
+    number: senderNumber,
+    complement: senderComplement,
+    district: senderDistrict,
+    city: senderCity,
+    state_abbr: senderState,
+    country_id: 'BR',
+    postal_code: cleanOrigin,
+  };
+
+  if (senderDocValidation.type === 'cpf') {
+    fromPayload.document = senderDocValidation.digits;
+  } else if (senderDocValidation.type === 'cnpj') {
+    fromPayload.company_document = senderDocValidation.digits;
+    fromPayload.state_register = senderConfig?.stateRegister || config.sender?.stateRegister || 'ISENTO';
+  }
+
   const payload: any = {
     service: Number(order.shippingServiceId) || 1,
-    from: {
-      name: senderName,
-      phone: senderPhone,
-      email: senderEmail,
-      document: senderDoc,
-      company_document: senderDoc.length === 14 ? senderDoc : undefined,
-      state_register: senderConfig?.stateRegister || config.sender?.stateRegister || undefined,
-      address: senderStreet,
-      number: senderNumber,
-      complement: senderComplement,
-      district: senderDistrict,
-      city: senderCity,
-      state_abbr: senderState,
-      country_id: 'BR',
-      postal_code: cleanOrigin,
-    },
+    from: fromPayload,
     to: {
       name: recipientName,
       phone: recipientPhone || '11988421092',
