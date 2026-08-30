@@ -107,46 +107,46 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
         </div>
 
         {/* Center: Desktop Navigation Links with Animated Glow Pill */}
-        <nav className="hidden lg:flex items-center rounded-full gap-1.5 xl:gap-2 px-3 py-1.5 bg-[#F4F4F5] border border-[#E4E4E7] shadow-inner text-[12.5px] font-bold uppercase tracking-[0.12em] text-[#52525B]">
+        <nav className="hidden lg:flex items-center h-10 sm:h-11 rounded-md gap-2 xl:gap-4 px-3 xl:px-4 bg-[#F4F4F5] border border-[#E4E4E7] shadow-inner text-[12.5px] font-bold uppercase tracking-[0.12em] text-[#52525B]">
           <button
             onClick={() => onNavigate('home')}
-            className="px-4 py-2 rounded-full hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group"
+            className="h-7 sm:h-8 px-3 xl:px-4 rounded-md hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group flex items-center justify-center"
           >
             <span>Início</span>
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
 
           <button
             onClick={() => onNavigate('shop')}
-            className="px-4 py-2 rounded-full hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group"
+            className="h-7 sm:h-8 px-3 xl:px-4 rounded-md hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group flex items-center justify-center"
           >
             <span>Catálogo</span>
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
 
           <div
             onMouseEnter={() => setIsMegaMenuOpen(true)}
-            className="px-4 py-2 rounded-full cursor-pointer hover:text-[#18181B] hover:bg-white transition-all duration-200 flex items-center gap-1.5 group relative"
+            className="h-7 sm:h-8 px-3 xl:px-4 rounded-md cursor-pointer hover:text-[#18181B] hover:bg-white transition-all duration-200 flex items-center justify-center gap-1.5 group relative"
           >
             <span>Categorias</span>
             <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 text-[#71717A] group-hover:text-[#18181B] ${isMegaMenuOpen ? 'rotate-180 text-[#18181B]' : ''}`} />
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
           <button
             onClick={() => onNavigate('tracking')}
-            className="px-4 py-2 rounded-full hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group"
+            className="h-7 sm:h-8 px-3 xl:px-4 rounded-md hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group flex items-center justify-center"
           >
             <span>Rastreio</span>
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
 
           <button
             onClick={() => onNavigate('institutional', 'sobre')}
-            className="px-4 py-2 rounded-full hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group"
+            className="h-7 sm:h-8 px-3 xl:px-4 rounded-md hover:text-[#18181B] hover:bg-white transition-all duration-200 cursor-pointer relative group flex items-center justify-center"
           >
             <span>Ateliê</span>
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+            <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#18181B] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
         </nav>
 
@@ -156,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {/* Search Trigger */}
           <button
             onClick={onOpenSearch}
-            className="h-10 sm:h-11 flex items-center gap-2.5 px-3.5 sm:px-4 rounded-lg bg-[#F4F4F5] border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all shadow-sm group w-10 sm:w-44 md:w-52 lg:w-60 justify-center sm:justify-start cursor-pointer"
+            className="h-10 sm:h-11 flex items-center gap-2.5 px-3.5 sm:px-4 bg-[#F4F4F5] border border-[#E4E4E7] text-[#18181B] hover:border-[#D4D4D8] hover:bg-[#E4E4E7] transition-all shadow-sm group w-10 sm:w-44 md:w-52 lg:w-60 justify-center sm:justify-start cursor-pointer"
             title="Buscar produtos (Ctrl+K)"
             aria-label="Pesquisar na loja"
           >
@@ -188,7 +188,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           <div className="relative">
             <button
               onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-              className={`h-10 sm:h-11 px-3 sm:px-4.5 rounded-lg transition-all duration-200 flex items-center gap-2 border text-xs shadow-sm cursor-pointer ${
+              className={`h-10 sm:h-11 px-3 sm:px-4.5 transition-all duration-200 flex items-center gap-2 border text-xs shadow-sm cursor-pointer ${
                 user
                   ? isUserDropdownOpen
                     ? 'border-[#18181B] bg-[#18181B] text-white shadow-md'
@@ -218,7 +218,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           {!user && (
             <button
               onClick={() => onNavigate('account', 'register')}
-              className="h-10 sm:h-11 px-4 sm:px-5 rounded-lg flex items-center gap-2 bg-gradient-to-r from-[#FFD700] via-[#F4C400] to-[#E5B500] hover:from-[#FFE033] hover:to-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_16px_rgba(244,196,0,0.35)] hover:shadow-[0_0_25px_rgba(244,196,0,0.55)] hover:scale-[1.02] active:scale-95 shrink-0 cursor-pointer border border-[#FFF080]/50"
+              className="h-10 sm:h-11 px-4 sm:px-5 flex items-center gap-2 bg-gradient-to-r from-[#FFD700] via-[#F4C400] to-[#E5B500] hover:from-[#FFE033] hover:to-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase tracking-wider transition-all duration-200 shadow-[0_4px_16px_rgba(244,196,0,0.35)] hover:shadow-[0_0_25px_rgba(244,196,0,0.55)] hover:scale-[1.02] active:scale-95 shrink-0 cursor-pointer border border-[#FFF080]/50"
               title="Criar nova conta"
             >
               <UserPlus className="w-4 h-4 stroke-[2.5]" />
@@ -235,7 +235,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
             >
               <ShoppingBag className="w-4 h-4 stroke-[2.5] text-[#F4C400]" />
               <span className="hidden sm:inline text-[12px]">Carrinho</span>
-              <span className="w-5 h-5 rounded-full bg-white text-[#18181B] text-[10.5px] font-mono font-black flex items-center justify-center ml-0.5 shadow-sm">
+              <span className="w-5 h-5 bg-white text-[#18181B] text-[10.5px] font-mono font-black flex items-center justify-center ml-0.5 shadow-sm">
                 {totalCartItems}
               </span>
             </button>

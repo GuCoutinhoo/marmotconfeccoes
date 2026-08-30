@@ -1,7 +1,20 @@
 {
   "originPostalCode": "03806010",
   "environment": "production",
-  "appName": "Aplicação",
-  "appEmail": "gustavohcsantos.mm2020@gmail.com",
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiM2U5MDkwOTY2ZDE1MzU4MjcxN2VlMTU5NzUzMDQ1YzkxNTY2MjUyNTQ1MjE3ZWEyMzBlMWI4MmU3ZTcyM2I3YTlkYTkyMDQyMDcwN2UyZDUiLCJpYXQiOjE3ODcxODkwMjEuNzAwMzcxLCJuYmYiOjE3ODcxODkwMjEuNzAwMzczLCJleHAiOjE4MTg3MjUwMjEuNjg1NDQ1LCJzdWIiOiJhMDY3ZjViYi1mNWQ5LTQ1YTQtYTRmZS0wOTZiMTY2MmY5MDAiLCJzY29wZXMiOlsiY2FydC1yZWFkIiwiY2FydC13cml0ZSIsIm9yZGVycy1yZWFkIiwic2hpcHBpbmctY2FsY3VsYXRlIiwic2hpcHBpbmctY2FuY2VsIiwic2hpcHBpbmctY2hlY2tvdXQiLCJzaGlwcGluZy1jb21wYW5pZXMiLCJzaGlwcGluZy1nZW5lcmF0ZSIsInNoaXBwaW5nLXByZXZpZXciLCJzaGlwcGluZy1wcmludCIsInNoaXBwaW5nLXRyYWNraW5nIiwiZWNvbW1lcmNlLXNoaXBwaW5nIl19.tSai99IpfEhjkQi7icAlEQ5SMiL7NLFER2eq9si5D-qIOOqCbcNdKocTl0ub7TLZH2mHjNqUMTYsXySmxCwjDTImBkBT1Dj38ADnrCW9pXr-YekfYGoA946BkuPnutDMAhJ-tJANL8mqM9nScWF3RNdtXqRN6nSm3Nf124BYu74unOFtkmIvFbklo3Nf0KbGbpX9US3PHy4l8AMWA1bliA2HK-GO8eKOJgYHPGctVXo1Nym8J6mHI8sO4aQcbjBRAFwuLEsw4azxCQROnIJfepmWE5X8A_f7Rfzj__AuaTrbHNuPE2ctwoJG1qx0_NXigUit-tviS-Mu2MJuZihAUwqgktMjuyUgCGRSguOJhCGBHriSpmdMR_MFE-EQOoqcWkgZruIlXKJqWJMRxEFZt9ITKD45FtZm66O-gILggO4AQu27VINniBZNm73TTtdLCvQW2P5883TdsmmrVeFVOtQHN7SUH7TogasP8aIC25Fbt60BApR5xg1I3eZUe2R0PKrX0aAjV0MUo7ChkLc4G7paF4DZG9ulH1PnE0Ni9b-NkejcwxdAnMj7QzFz6yGNtcBWCA82mCIWhCMs7gAxP7Y2krBmOr_AqZgB_8mu-ErQGV4etRXOo2rRprWFW-PaczdmC4AxgZGXwSrNQc1HrVYOfPBQYeUUM4Bxcu451qs"
+  "appName": "Marmot Confeccoes",
+  "appEmail": "contato@marmot.com.br",
+  "sender": {
+    "name": "Marmot Confecções LTDA",
+    "document": "45123987000190",
+    "stateRegister": "123456789110",
+    "phone": "11987654321",
+    "email": "contato@marmot.com.br",
+    "street": "Avenida Celso Garcia",
+    "number": "1200",
+    "complement": "Galpão 3",
+    "neighborhood": "Brás",
+    "city": "São Paulo",
+    "state": "SP",
+    "cep": "03806010"
+  }
 }

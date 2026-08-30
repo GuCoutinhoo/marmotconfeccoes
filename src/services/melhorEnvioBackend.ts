@@ -1,7 +1,5 @@
-import fs from 'fs';
-import path from 'path';
 import { ShippingOption, ShippingSettings, Order } from '../types';
-import { validateAndFetchCep, normalizeCep } from './cepService';
+import { normalizeCep } from './cepService';
 import { getMelhorEnvioConfig, saveMelhorEnvioConfig, MelhorEnvioClient, ProductShippingSpec } from './melhorEnvioClient';
 
 export interface ShippingItemInput {
@@ -26,7 +24,6 @@ function getMelhorEnvioBaseUrl(environment: 'production' | 'sandbox'): string {
 
 /**
  * Calculates shipping quotes via the official Melhor Envio API.
- * NEVER returns fake/mock quotes. If the API fails or CEP is invalid/inexistent, it throws an error.
  */
 export async function calculateMelhorEnvioShipping({
   destinationPostalCode,
@@ -35,13 +32,12 @@ export async function calculateMelhorEnvioShipping({
 }: CalculateShippingParams): Promise<{ options: ShippingOption[]; originPostalCode: string; fromMelhorEnvio: boolean }> {
   const cleanDestination = normalizeCep(destinationPostalCode);
   if (cleanDestination.length !== 8) {
-    throw new Error('CEP inválido. Digite um CEP válido.');
+    throw new Error('CEP inválido. Digite um CEP com 8 dígitos.');
   }
 
   const client = new MelhorEnvioClient();
   const config = getMelhorEnvioConfig();
 
-  // Validate items and resolve dimensions
   const productList: ProductShippingSpec[] = [];
 
   if (Array.isArray(items) && items.length > 0) {
@@ -80,65 +76,108 @@ export async function calculateMelhorEnvioShipping({
   return {
     options: result.options,
     originPostalCode: result.originPostalCode,
-    fromMelhorEnvio: true,
+    fromMelhorEnvio: result.fromMelhorEnvio,
   };
 }
-
 
 /**
  * 1. Prepares/Creates a shipment in Melhor Envio Cart (POST /api/v2/me/cart)
  */
-export async function createMelhorEnvioShipment(order: Order, productsStore: any[]): Promise<{ shipmentId: string; protocol?: string; rawResponse?: any }> {
+export async function createMelhorEnvioShipment(
+  order: Order,
+  productsStore: any[],
+  senderConfig?: any
+): Promise<{ shipmentId: string; protocol?: string; rawResponse?: any }> {
   const config = getShippingConfig();
   if (!config.token || config.token.trim().length < 10) {
     throw new Error('Token do Melhor Envio não configurado no servidor.');
   }
 
   const baseUrl = getMelhorEnvioBaseUrl(config.environment);
-  const cleanOrigin = normalizeCep(config.originPostalCode);
+  const cleanOrigin = normalizeCep(senderConfig?.cep || config.originPostalCode);
   const cleanDest = normalizeCep(order.shippingAddress.cep);
+
+  if (cleanOrigin.length !== 8) {
+    throw new Error('CEP de origem do remetente inválido ou não configurado.');
+  }
+  if (cleanDest.length !== 8) {
+    throw new Error('CEP de destino do pedido inválido.');
+  }
+
+  // Sender details validation
+  const senderName = senderConfig?.name || config.sender?.name || config.appName;
+  const senderDoc = (senderConfig?.document || config.sender?.document || '').replace(/\D/g, '');
+  const senderPhone = (senderConfig?.phone || config.sender?.phone || '').replace(/\D/g, '');
+  const senderEmail = senderConfig?.email || config.sender?.email || config.appEmail;
+  const senderStreet = senderConfig?.street || config.sender?.street;
+  const senderNumber = senderConfig?.number || config.sender?.number || 'S/N';
+  const senderComplement = senderConfig?.complement || config.sender?.complement || '';
+  const senderDistrict = senderConfig?.neighborhood || senderConfig?.district || config.sender?.neighborhood || 'Centro';
+  const senderCity = senderConfig?.city || config.sender?.city;
+  const senderState = (senderConfig?.state || config.sender?.state || 'SP').toUpperCase();
+
+  if (!senderName || !senderDoc || senderDoc.length < 11 || !senderPhone || !senderStreet || !senderCity) {
+    throw new Error(
+      'Dados do remetente incompletos para emissão de frete. Configure o nome, CNPJ/CPF, telefone e endereço do remetente nas configurações de frete.'
+    );
+  }
+
+  // Recipient details validation
+  const recipientName = order.shippingAddress.recipientName || order.customerName;
+  const recipientDoc = (order.customerCpf || '').replace(/\D/g, '');
+  const recipientPhone = (order.customerPhone || '').replace(/\D/g, '');
+  const recipientEmail = order.customerEmail || 'cliente@marmot.com.br';
+
+  if (!recipientName || recipientName.trim().length < 3) {
+    throw new Error('Nome do destinatário inválido no pedido.');
+  }
+  if (!recipientDoc || recipientDoc.length < 11) {
+    throw new Error('CPF do destinatário obrigatório para emissão da etiqueta de envio.');
+  }
 
   // Build physical package products
   const products: any[] = [];
   for (const item of order.items) {
-    const prod = productsStore.find((p) => p.id === item.productId);
-    const weight = Math.max(0.1, Number(prod?.weight || item.weight || 0.35));
+    const prod = productsStore.find((p) => String(p.id) === String(item.productId) || String(p.slug) === String(item.productId));
+    const weight = Math.max(0.05, Number(prod?.weight || item.weight || 0.35));
     const height = Math.max(2, Number(prod?.height || item.height || 4));
     const width = Math.max(11, Number(prod?.width || item.width || 20));
     const length = Math.max(16, Number(prod?.length || item.length || 25));
 
     products.push({
-      name: item.productTitle,
-      quantity: item.quantity,
-      unitary_value: item.price,
-      weight,
-      height,
-      width,
-      length,
+      name: item.productTitle || (item as any).title || 'Peça de Vestuário Marmot',
+      quantity: Math.max(1, Number(item.quantity) || 1),
+      unitary_value: Number(Number(item.price || 0).toFixed(2)),
+      weight: Number(weight.toFixed(2)),
+      height: Math.round(height),
+      width: Math.round(width),
+      length: Math.round(length),
     });
   }
 
-  const payload = {
-    service: Number(order.shippingServiceId) || 1, // 1 = PAC, 2 = SEDEX, 3 = .Package Jadlog, 4 = .Com Jadlog
+  const payload: any = {
+    service: Number(order.shippingServiceId) || 1,
     from: {
-      name: config.appName,
-      phone: '11999990000',
-      email: config.appEmail,
-      document: '00000000000',
-      address: 'Avenida Celso Garcia',
-      number: '1200',
-      complement: 'Galpão 03',
-      district: 'Brás',
-      city: 'São Paulo',
-      state_abbr: 'SP',
+      name: senderName,
+      phone: senderPhone,
+      email: senderEmail,
+      document: senderDoc,
+      company_document: senderDoc.length === 14 ? senderDoc : undefined,
+      state_register: senderConfig?.stateRegister || config.sender?.stateRegister || undefined,
+      address: senderStreet,
+      number: senderNumber,
+      complement: senderComplement,
+      district: senderDistrict,
+      city: senderCity,
+      state_abbr: senderState,
       country_id: 'BR',
       postal_code: cleanOrigin,
     },
     to: {
-      name: order.shippingAddress.recipientName || order.customerName || 'Cliente Marmot',
-      phone: order.customerPhone ? order.customerPhone.replace(/\D/g, '') : '11988421092',
-      email: order.customerEmail || 'cliente@marmot.com',
-      document: order.customerCpf ? order.customerCpf.replace(/\D/g, '') : '00000000000',
+      name: recipientName,
+      phone: recipientPhone || '11988421092',
+      email: recipientEmail,
+      document: recipientDoc,
       address: order.shippingAddress.street,
       number: order.shippingAddress.number || 'S/N',
       complement: order.shippingAddress.complement || '',
@@ -154,15 +193,15 @@ export async function createMelhorEnvioShipment(order: Order, productsStore: any
         height: Math.max(4, Math.max(...products.map((p) => p.height))),
         width: Math.max(15, Math.max(...products.map((p) => p.width))),
         length: Math.max(20, Math.max(...products.map((p) => p.length))),
-        weight: products.reduce((acc, p) => acc + p.weight * p.quantity, 0),
+        weight: Number(products.reduce((acc, p) => acc + p.weight * p.quantity, 0).toFixed(2)),
       },
     ],
     options: {
-      insurance_value: order.subtotal,
+      insurance_value: Number(Number(order.subtotal || 0).toFixed(2)),
       receipt: false,
       own_hand: false,
       reverse: false,
-      non_commercial: true,
+      non_commercial: false,
     },
   };
 
@@ -172,19 +211,32 @@ export async function createMelhorEnvioShipment(order: Order, productsStore: any
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${config.token}`,
-      'User-Agent': `${config.appName} (${config.appEmail})`,
+      'User-Agent': config.userAgent,
     },
     body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
     const errorBody = await response.text().catch(() => '');
-    console.error('[MelhorEnvio createShipment error]:', errorBody);
-    throw new Error(`Erro ao registrar envio no Melhor Envio (HTTP ${response.status}): ${errorBody.slice(0, 150)}`);
+    console.error('[MelhorEnvio createShipment error]:', response.status, errorBody);
+    let friendlyMessage = `Erro ao registrar envio no Melhor Envio (HTTP ${response.status})`;
+    try {
+      const errJson = JSON.parse(errorBody);
+      if (errJson.message) friendlyMessage += `: ${errJson.message}`;
+      else if (errJson.error) friendlyMessage += `: ${errJson.error}`;
+      else if (typeof errJson === 'object') friendlyMessage += `: ${JSON.stringify(errJson).slice(0, 120)}`;
+    } catch {
+      if (errorBody) friendlyMessage += `: ${errorBody.slice(0, 120)}`;
+    }
+    throw new Error(friendlyMessage);
   }
 
   const data = await response.json();
-  const shipmentId = String(data.id || data.protocol || `ME-${Date.now()}`);
+  const shipmentId = String(data.id || data.protocol);
+
+  if (!shipmentId) {
+    throw new Error('Melhor Envio não retornou um ID de remessa válido.');
+  }
 
   return {
     shipmentId,
@@ -206,7 +258,7 @@ export async function checkoutMelhorEnvioShipment(shipmentId: string): Promise<a
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${config.token}`,
-      'User-Agent': `${config.appName} (${config.appEmail})`,
+      'User-Agent': config.userAgent,
     },
     body: JSON.stringify({
       orders: [shipmentId],
@@ -215,7 +267,18 @@ export async function checkoutMelhorEnvioShipment(shipmentId: string): Promise<a
 
   if (!response.ok) {
     const errText = await response.text().catch(() => '');
-    throw new Error(`Erro ao pagar/comprar envio no Melhor Envio: ${errText.slice(0, 150)}`);
+    let msg = `Erro ao pagar/comprar envio no Melhor Envio (HTTP ${response.status})`;
+    try {
+      const errJson = JSON.parse(errText);
+      if (errJson.message?.toLowerCase().includes('saldo') || errJson.error?.toLowerCase().includes('saldo')) {
+        msg = 'Saldo insuficiente na sua carteira do Melhor Envio. Adicione créditos para comprar a etiqueta.';
+      } else if (errJson.message) {
+        msg += `: ${errJson.message}`;
+      }
+    } catch {
+      if (errText) msg += `: ${errText.slice(0, 120)}`;
+    }
+    throw new Error(msg);
   }
 
   return response.json();
@@ -234,7 +297,7 @@ export async function generateMelhorEnvioLabel(shipmentId: string): Promise<any>
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${config.token}`,
-      'User-Agent': `${config.appName} (${config.appEmail})`,
+      'User-Agent': config.userAgent,
     },
     body: JSON.stringify({
       orders: [shipmentId],
@@ -243,7 +306,7 @@ export async function generateMelhorEnvioLabel(shipmentId: string): Promise<any>
 
   if (!response.ok) {
     const errText = await response.text().catch(() => '');
-    throw new Error(`Erro ao gerar etiqueta no Melhor Envio: ${errText.slice(0, 150)}`);
+    throw new Error(`Erro ao gerar etiqueta no Melhor Envio (HTTP ${response.status}): ${errText.slice(0, 150)}`);
   }
 
   return response.json();
@@ -262,7 +325,7 @@ export async function printMelhorEnvioLabel(shipmentId: string): Promise<{ url: 
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${config.token}`,
-      'User-Agent': `${config.appName} (${config.appEmail})`,
+      'User-Agent': config.userAgent,
     },
     body: JSON.stringify({
       mode: 'public',
@@ -272,7 +335,7 @@ export async function printMelhorEnvioLabel(shipmentId: string): Promise<{ url: 
 
   if (!response.ok) {
     const errText = await response.text().catch(() => '');
-    throw new Error(`Erro ao obter link de impressão da etiqueta: ${errText.slice(0, 150)}`);
+    throw new Error(`Erro ao obter link de impressão da etiqueta (HTTP ${response.status}): ${errText.slice(0, 150)}`);
   }
 
   const data = await response.json();
@@ -294,7 +357,7 @@ export async function trackMelhorEnvioShipment(orders: string[]): Promise<any> {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${config.token}`,
-      'User-Agent': `${config.appName} (${config.appEmail})`,
+      'User-Agent': config.userAgent,
     },
     body: JSON.stringify({
       orders,

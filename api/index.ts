@@ -7478,7 +7478,212 @@ app.put('/api/admin/shipments/:orderId/status', requireAdmin, async (req: any, r
   }
 });
 
-// --- ADMIN: GERAR ENVIO REAL NO MELHOR ENVIO COM PROTEÇÃO ATÔMICA E RECONCILIAÇÃO ---
+// --- ADMIN: CONFIGURAÇÕES DE FRETE E MELHOR ENVIO ---
+app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
+  try {
+    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+    let saved: any = {};
+    if (fs.existsSync(settingsPath)) {
+      try {
+        saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+      } catch {}
+    }
+
+    const token = getMelhorEnvioTokenServer();
+    const originPostalCode = (saved.originPostalCode || process.env.STORE_ORIGIN_CEP || process.env.ORIGIN_CEP || '03806010').replace(/\D/g, '');
+    const environment = (saved.environment || process.env.MELHOR_ENVIO_ENV || 'production').toLowerCase() === 'sandbox' ? 'sandbox' : 'production';
+    const appName = saved.appName || process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confecções';
+    const appEmail = saved.appEmail || process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
+    const clientId = saved.clientId || process.env.MELHOR_ENVIO_CLIENT_ID || '';
+
+    let sender = saved.sender;
+    if (!sender) {
+      sender = {
+        name: 'Marmot Confecções Ltda',
+        document: '42.123.456/0001-90',
+        stateRegister: 'ISENTO',
+        phone: '(11) 98842-1092',
+        email: 'contato@marmot.com.br',
+        street: 'Avenida Celso Garcia',
+        number: '1200',
+        complement: 'Galpão 03',
+        neighborhood: 'Brás',
+        city: 'São Paulo',
+        state: 'SP',
+        cep: originPostalCode.length === 8 ? `${originPostalCode.slice(0, 5)}-${originPostalCode.slice(5)}` : originPostalCode,
+      };
+    }
+
+    res.json({
+      originPostalCode,
+      environment,
+      appName,
+      appEmail,
+      clientId,
+      isTokenConfigured: Boolean(token && token.length >= 10),
+      tokenMasked: token && token.length >= 10 ? `${token.slice(0, 8)}...${token.slice(-6)} (Ativo)` : '',
+      sender,
+      defaultWeight: Number(saved.defaultWeight || 0.35),
+      defaultHeight: Number(saved.defaultHeight || 4),
+      defaultWidth: Number(saved.defaultWidth || 20),
+      defaultLength: Number(saved.defaultLength || 25),
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Erro ao carregar configurações de frete.' });
+  }
+});
+
+app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
+  try {
+    const { originPostalCode, environment, token, clientId, clientSecret, appName, appEmail, sender, defaultWeight, defaultHeight, defaultWidth, defaultLength } = req.body;
+    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+    let current: any = {};
+    if (fs.existsSync(settingsPath)) {
+      try {
+        current = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+      } catch {}
+    }
+
+    const updated = {
+      ...current,
+      originPostalCode: originPostalCode ? originPostalCode.replace(/\D/g, '') : current.originPostalCode || '03806010',
+      environment: environment === 'sandbox' ? 'sandbox' : 'production',
+      appName: appName || current.appName || 'Marmot Confecções',
+      appEmail: appEmail || current.appEmail || 'contato@marmot.com.br',
+      clientId: clientId !== undefined ? String(clientId).trim() : current.clientId,
+      clientSecret: clientSecret !== undefined && clientSecret ? String(clientSecret).trim() : current.clientSecret,
+      sender: sender ? { ...current.sender, ...sender } : current.sender,
+      defaultWeight: Number(defaultWeight || current.defaultWeight || 0.35),
+      defaultHeight: Number(defaultHeight || current.defaultHeight || 4),
+      defaultWidth: Number(defaultWidth || current.defaultWidth || 20),
+      defaultLength: Number(defaultLength || current.defaultLength || 25),
+    };
+
+    if (token && typeof token === 'string' && token.trim().length >= 10) {
+      updated.token = token.trim();
+    }
+
+    const dataDir = path.join(process.cwd(), 'data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
+    fs.writeFileSync(settingsPath, JSON.stringify(updated, null, 2), 'utf-8');
+
+    await db.logAdminAction(
+      req.user?.email || 'admin@marmot.com',
+      req.user?.name || 'Admin',
+      'update_shipping_settings',
+      'shipping',
+      'settings',
+      'Configurações de frete e remetente atualizadas',
+      { environment: updated.environment, originPostalCode: updated.originPostalCode }
+    );
+
+    res.json({
+      success: true,
+      originPostalCode: updated.originPostalCode,
+      environment: updated.environment,
+      isTokenConfigured: Boolean(updated.token || process.env.MELHOR_ENVIO_TOKEN),
+      sender: updated.sender,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Erro ao salvar configurações de frete.' });
+  }
+});
+
+// --- ADMIN: TESTAR CONEXÃO EM TEMPO REAL COM MELHOR ENVIO ---
+app.get('/api/admin/melhor-envio/test-connection', requireAdmin, async (req, res) => {
+  try {
+    const token = getMelhorEnvioTokenServer();
+    if (!token || token.length < 10) {
+      return res.json({
+        connected: false,
+        environment: 'unknown',
+        message: 'Token de autenticação do Melhor Envio não está configurado no servidor.',
+      });
+    }
+
+    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+    let env = 'production';
+    if (fs.existsSync(settingsPath)) {
+      try {
+        const saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+        if (saved.environment === 'sandbox') env = 'sandbox';
+      } catch {}
+    }
+
+    const baseUrl = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
+    const userAgent = 'Marmot Confeccoes (contato@marmot.com.br)';
+
+    const meRes = await fetch(`${baseUrl}/me`, {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+        'User-Agent': userAgent,
+      },
+    });
+
+    if (!meRes.ok) {
+      const errText = await meRes.text().catch(() => '');
+      return res.json({
+        connected: false,
+        environment: env,
+        message: `Melhor Envio recusou as credenciais (HTTP ${meRes.status}): ${errText.slice(0, 100)}`,
+      });
+    }
+
+    const meData: any = await meRes.json();
+    return res.json({
+      connected: true,
+      environment: env,
+      accountName: meData.name || meData.firstname || 'Conta Marmot',
+      accountEmail: meData.email || '',
+      balance: Number(meData.balance || 0),
+      message: 'Conexão com a API do Melhor Envio ativa e operacional.',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      connected: false,
+      message: `Erro ao testar conexão: ${err.message}`,
+    });
+  }
+});
+
+// --- ADMIN: URL DE AUTORIZAÇÃO OAUTH2 DO MELHOR ENVIO ---
+app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
+  try {
+    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+    let saved: any = {};
+    if (fs.existsSync(settingsPath)) {
+      try {
+        saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+      } catch {}
+    }
+
+    const clientId = saved.clientId || process.env.MELHOR_ENVIO_CLIENT_ID;
+    const env = (saved.environment || process.env.MELHOR_ENVIO_ENV || 'production') === 'sandbox' ? 'sandbox' : 'production';
+    const host = req.get('host') || 'localhost:3000';
+    const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
+    const redirectUri = `${protocol}://${host}/admin?tab=shipping&oauth=melhor-envio`;
+
+    if (!clientId) {
+      return res.status(400).json({
+        error: 'Client ID do Melhor Envio não configurado. Adicione nas configurações de frete.',
+      });
+    }
+
+    const authBase = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/oauth/authorize' : 'https://melhorenvio.com.br/oauth/authorize';
+    const scopes = 'cart-read cart-write orders-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-tracking ecommerce-shipping';
+    const authUrl = `${authBase}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=marmot_admin_oauth`;
+
+    res.json({ url: authUrl, redirectUri });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Erro ao gerar URL OAuth.' });
+  }
+});
+
+// --- ADMIN: GERAR ENVIO REAL NO MELHOR ENVIO COM ESTADOS E VALIDAÇÕES RIGOROSAS ---
 app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, async (req: any, res) => {
   const orderId = req.params.id;
 
@@ -7488,13 +7693,19 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       return res.status(404).json({ error: 'Pedido não encontrado no sistema.' });
     }
 
-    const isApproved = order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago' || order.status === 'Pedido Confirmado' || order.status === 'Em Separação';
+    const isApproved =
+      order.status === 'Pagamento Aprovado' ||
+      order.paymentStatus === 'Pago' ||
+      order.status === 'Pedido Confirmado' ||
+      order.status === 'Em Separação' ||
+      order.status === 'Pronto para Envio';
+
     if (!isApproved) {
       return res.status(400).json({ error: 'A etiqueta e o envio só podem ser gerados após a confirmação do pagamento.' });
     }
 
-    // 1. Check if already generated in order object
-    if (order.shippingLabelUrl && order.melhorEnvioShipmentId) {
+    // 1. Check if already generated in order object and has a valid live label URL
+    if (order.shippingLabelUrl && order.melhorEnvioShipmentId && !order.trackingCode?.startsWith('BR-SIMULATED-')) {
       return res.json({
         success: true,
         message: 'Etiqueta já emitida anteriormente.',
@@ -7508,7 +7719,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     // 2. Persistent Distributed Lock & Operation Claim
     const claim = await db.claimShipmentGeneration(orderId);
     if (!claim.shouldProcess && claim.existing) {
-      if (claim.existing.status === 'completed' || claim.existing.shipment_id) {
+      if (claim.existing.status === 'completed' && claim.existing.print_url) {
         order.melhorEnvioShipmentId = claim.existing.shipment_id || order.melhorEnvioShipmentId;
         order.trackingCode = claim.existing.tracking_code || order.trackingCode;
         order.shippingLabelUrl = claim.existing.print_url || order.shippingLabelUrl;
@@ -7525,242 +7736,268 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     }
 
     const token = getMelhorEnvioTokenServer();
-    const originPostalCode = (process.env.STORE_ORIGIN_CEP || process.env.ORIGIN_CEP || '03806010').replace(/\D/g, '');
-    const baseUrl = 'https://melhorenvio.com.br/api/v2';
-    const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confeccoes';
-    const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
+    if (!token || token.length < 10) {
+      await db.completeShipmentGeneration(orderId, '', '', '', 'Token do Melhor Envio ausente');
+      return res.status(503).json({
+        error: 'Token do Melhor Envio não configurado no servidor. Configure na aba de Frete do painel administrativo.',
+      });
+    }
+
+    const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+    let savedSettings: any = {};
+    if (fs.existsSync(settingsPath)) {
+      try {
+        savedSettings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+      } catch {}
+    }
+
+    const env = (savedSettings.environment || process.env.MELHOR_ENVIO_ENV || 'production') === 'sandbox' ? 'sandbox' : 'production';
+    const baseUrl = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
+    const appName = savedSettings.appName || process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confecções';
+    const appEmail = savedSettings.appEmail || process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
     const userAgent = `${appName} (${appEmail})`;
 
-    let shipmentId = order.melhorEnvioShipmentId || `ME-${Date.now()}`;
+    const senderConfig = savedSettings.sender || {
+      name: 'Marmot Confecções Ltda',
+      document: '42.123.456/0001-90',
+      stateRegister: 'ISENTO',
+      phone: '(11) 98842-1092',
+      email: 'contato@marmot.com.br',
+      street: 'Avenida Celso Garcia',
+      number: '1200',
+      complement: 'Galpão 03',
+      neighborhood: 'Brás',
+      city: 'São Paulo',
+      state: 'SP',
+      cep: savedSettings.originPostalCode || '03806010',
+    };
+
+    const cleanOrigin = (senderConfig.cep || savedSettings.originPostalCode || '03806010').replace(/\D/g, '');
+    const cleanDest = (order.shippingAddress?.cep || '').replace(/\D/g, '');
+    const customerCpf = (order.customerCpf || '').replace(/\D/g, '');
+
+    if (cleanDest.length !== 8) {
+      await db.completeShipmentGeneration(orderId, '', '', '', 'CEP de destino inválido');
+      return res.status(400).json({ error: 'CEP de entrega do cliente inválido.' });
+    }
+
+    if (customerCpf.length < 11) {
+      await db.completeShipmentGeneration(orderId, '', '', '', 'CPF do destinatário ausente');
+      return res.status(400).json({ error: 'CPF do destinatário obrigatório para emissão de frete pelo Melhor Envio.' });
+    }
+
+    const productsStore = await db.getAllProducts();
+    const meProducts: any[] = [];
+    for (const item of order.items) {
+      const prod = productsStore.find((p) => String(p.id) === String(item.productId) || String(p.slug) === String(item.productId));
+      const weight = Math.max(0.05, Number(prod?.weight || item.weight || 0.35));
+      const height = Math.max(2, Number(prod?.height || item.height || 4));
+      const width = Math.max(11, Number(prod?.width || item.width || 20));
+      const length = Math.max(16, Number(prod?.length || item.length || 25));
+
+      meProducts.push({
+        name: item.title || item.productTitle || 'Peça Marmot',
+        quantity: Math.max(1, Number(item.quantity) || 1),
+        unitary_value: Number(Number(item.price || 0).toFixed(2)),
+        weight: Number(weight.toFixed(2)),
+        height: Math.round(height),
+        width: Math.round(width),
+        length: Math.round(length),
+      });
+    }
+
+    const senderDoc = senderConfig.document.replace(/\D/g, '');
+    const senderPhone = senderConfig.phone.replace(/\D/g, '');
+
+    const cartPayload = {
+      service: Number(order.shippingServiceId) || 1,
+      from: {
+        name: senderConfig.name,
+        phone: senderPhone,
+        email: senderConfig.email || appEmail,
+        document: senderDoc,
+        company_document: senderDoc.length === 14 ? senderDoc : undefined,
+        state_register: senderConfig.stateRegister || 'ISENTO',
+        address: senderConfig.street,
+        number: senderConfig.number || 'S/N',
+        complement: senderConfig.complement || '',
+        district: senderConfig.neighborhood || 'Centro',
+        city: senderConfig.city,
+        state_abbr: (senderConfig.state || 'SP').toUpperCase(),
+        country_id: 'BR',
+        postal_code: cleanOrigin,
+      },
+      to: {
+        name: order.shippingAddress.recipientName || order.customerName || 'Cliente Marmot',
+        phone: (order.customerPhone || '11988421092').replace(/\D/g, ''),
+        email: order.customerEmail || 'cliente@marmot.com.br',
+        document: customerCpf,
+        address: order.shippingAddress.street,
+        number: order.shippingAddress.number || 'S/N',
+        complement: order.shippingAddress.complement || '',
+        district: order.shippingAddress.neighborhood,
+        city: order.shippingAddress.city,
+        state_abbr: (order.shippingAddress.state || 'SP').toUpperCase(),
+        country_id: 'BR',
+        postal_code: cleanDest,
+      },
+      products: meProducts,
+      volumes: [
+        {
+          height: Math.max(4, Math.max(...meProducts.map((p) => p.height))),
+          width: Math.max(15, Math.max(...meProducts.map((p) => p.width))),
+          length: Math.max(20, Math.max(...meProducts.map((p) => p.length))),
+          weight: Number(meProducts.reduce((acc, p) => acc + p.weight * p.quantity, 0).toFixed(2)),
+        },
+      ],
+      options: {
+        insurance_value: Number(Number(order.subtotal || 0).toFixed(2)),
+        receipt: false,
+        own_hand: false,
+        reverse: false,
+        non_commercial: false,
+      },
+    };
+
+    let shipmentId = order.melhorEnvioShipmentId || '';
     let protocol = '';
     let printUrl = '';
     let realTracking = '';
 
-    if (token && token.length >= 10) {
+    // STEP 1: Add to Cart on Melhor Envio
+    if (!shipmentId) {
+      const cartRes = await fetch(`${baseUrl}/me/cart`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'User-Agent': userAgent,
+        },
+        body: JSON.stringify(cartPayload),
+      });
+
+      if (!cartRes.ok) {
+        const cartErrText = await cartRes.text().catch(() => '');
+        console.error('[Melhor Envio Cart Error]:', cartRes.status, cartErrText);
+        let msg = `Erro no Melhor Envio ao registrar envio no carrinho (HTTP ${cartRes.status})`;
+        try {
+          const j = JSON.parse(cartErrText);
+          if (j.message) msg += `: ${j.message}`;
+          else if (j.error) msg += `: ${j.error}`;
+        } catch {
+          if (cartErrText) msg += `: ${cartErrText.slice(0, 100)}`;
+        }
+        await db.completeShipmentGeneration(orderId, '', '', '', msg);
+        return res.status(400).json({ error: msg });
+      }
+
+      const cartData: any = await cartRes.json();
+      shipmentId = String(cartData.id || cartData.protocol);
+      protocol = cartData.protocol || '';
+
+      if (!shipmentId) {
+        await db.completeShipmentGeneration(orderId, '', '', '', 'ID de remessa não retornado pelo Melhor Envio');
+        return res.status(502).json({ error: 'Melhor Envio não retornou um ID de envio válido.' });
+      }
+
+      // Persist created shipment ID immediately
+      order.melhorEnvioShipmentId = shipmentId;
+      await db.saveOrder(order);
+    }
+
+    // STEP 2: Checkout / Purchase shipment with balance
+    const checkoutRes = await fetch(`${baseUrl}/me/shipment/checkout`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'User-Agent': userAgent,
+      },
+      body: JSON.stringify({ orders: [shipmentId] }),
+    });
+
+    if (!checkoutRes.ok) {
+      const chkErrText = await checkoutRes.text().catch(() => '');
+      console.warn('[Melhor Envio Checkout Notice]:', checkoutRes.status, chkErrText);
+      let isInsufficientBalance = false;
       try {
-        // 3. RECONCILIATION: Check if shipment already exists on Melhor Envio before adding new cart item
-        let alreadyExistsInME = false;
-        const targetShipmentId = order.melhorEnvioShipmentId || claim.existing?.shipment_id;
-
-        if (targetShipmentId) {
-          try {
-            const checkRes = await fetch(`${baseUrl}/me/orders/${targetShipmentId}`, {
-              headers: { Authorization: `Bearer ${token}`, Accept: 'application/json', 'User-Agent': userAgent },
-            });
-            if (checkRes.ok) {
-              const checkData: any = await checkRes.json();
-              if (checkData && checkData.id) {
-                alreadyExistsInME = true;
-                shipmentId = String(checkData.id);
-                protocol = checkData.protocol || '';
-              }
-            }
-          } catch (recErr) {
-            console.warn('[Melhor Envio Reconciliation Notice]:', recErr);
-          }
+        const chkJ = JSON.parse(chkErrText);
+        if (chkJ.message?.toLowerCase().includes('saldo') || chkJ.error?.toLowerCase().includes('saldo')) {
+          isInsufficientBalance = true;
         }
+      } catch {}
 
-        const cleanOrigin = originPostalCode;
-        const cleanDest = (order.shippingAddress.cep || '').replace(/\D/g, '');
-
-        // Search cart if orderId was not found directly
-        if (!alreadyExistsInME) {
-          try {
-            const cartSearchRes = await fetch(`${baseUrl}/me/cart`, {
-              headers: { Authorization: `Bearer ${token}`, Accept: 'application/json', 'User-Agent': userAgent },
-            });
-            if (cartSearchRes.ok) {
-              const cartSearchData: any = await cartSearchRes.json();
-              const cartItems = Array.isArray(cartSearchData) ? cartSearchData : (cartSearchData?.data || []);
-              const matchedCart = cartItems.find((cItem: any) => 
-                cItem.to?.postal_code === cleanDest &&
-                (cItem.to?.document === (order.customerCpf ? order.customerCpf.replace(/\D/g, '') : '') ||
-                 cItem.id === targetShipmentId)
-              );
-              if (matchedCart && matchedCart.id) {
-                alreadyExistsInME = true;
-                shipmentId = String(matchedCart.id);
-                protocol = matchedCart.protocol || '';
-              }
-            }
-          } catch (cartSearchErr) {
-            console.warn('[Melhor Envio Cart Search Notice]:', cartSearchErr);
-          }
-        }
-
-        if (!alreadyExistsInME) {
-          const productsStore = await db.getAllProducts();
-          const meProducts: any[] = [];
-          for (const item of order.items) {
-            const prod = productsStore.find((p) => p.id === item.productId);
-            const weight = Math.max(0.1, Number(prod?.weight || item.weight || 0.35));
-            const height = Math.max(2, Number(prod?.height || item.height || 4));
-            const width = Math.max(11, Number(prod?.width || item.width || 20));
-            const length = Math.max(16, Number(prod?.length || item.length || 25));
-
-            meProducts.push({
-              name: item.title,
-              quantity: item.quantity,
-              unitary_value: item.price,
-              weight,
-              height,
-              width,
-              length,
-            });
-          }
-
-          const cartPayload = {
-            service: Number(order.shippingServiceId) || 1,
-            from: {
-              name: appName,
-              phone: '11999990000',
-              email: appEmail,
-              document: '00000000000',
-              address: 'Avenida Celso Garcia',
-              number: '1200',
-              complement: 'Galpão 03',
-              district: 'Brás',
-              city: 'São Paulo',
-              state_abbr: 'SP',
-              country_id: 'BR',
-              postal_code: cleanOrigin,
-            },
-            to: {
-              name: order.shippingAddress.recipientName || order.customerName || 'Cliente Marmot',
-              phone: order.customerPhone ? order.customerPhone.replace(/\D/g, '') : '11988421092',
-              email: order.customerEmail || 'cliente@marmot.com',
-              document: order.customerCpf ? order.customerCpf.replace(/\D/g, '') : '00000000000',
-              address: order.shippingAddress.street,
-              number: order.shippingAddress.number || 'S/N',
-              complement: order.shippingAddress.complement || '',
-              district: order.shippingAddress.neighborhood,
-              city: order.shippingAddress.city,
-              state_abbr: order.shippingAddress.state,
-              country_id: 'BR',
-              postal_code: cleanDest,
-            },
-            products: meProducts,
-            volumes: [
-              {
-                height: Math.max(4, Math.max(...meProducts.map((p) => p.height))),
-                width: Math.max(15, Math.max(...meProducts.map((p) => p.width))),
-                length: Math.max(20, Math.max(...meProducts.map((p) => p.length))),
-                weight: meProducts.reduce((acc, p) => acc + p.weight * p.quantity, 0),
-              },
-            ],
-            options: {
-              insurance_value: order.subtotal,
-              receipt: false,
-              own_hand: false,
-              reverse: false,
-              non_commercial: true,
-            },
-          };
-
-          // Step 1: Add to cart
-          const cartRes = await fetch(`${baseUrl}/me/cart`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-              'User-Agent': userAgent,
-            },
-            body: JSON.stringify(cartPayload),
-          });
-
-          if (cartRes.ok) {
-            const cartData: any = await cartRes.json();
-            shipmentId = String(cartData.id || cartData.protocol || shipmentId);
-            protocol = cartData.protocol || '';
-
-            // Immediately persist intermediate state in shipment_operations to guard against crash
-            await db.completeShipmentGeneration(order.id, shipmentId, '', '');
-
-            // Step 2: Checkout / Purchase
-            try {
-              await fetch(`${baseUrl}/me/shipment/checkout`, {
-                method: 'POST',
-                headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`,
-                  'User-Agent': userAgent,
-                },
-                body: JSON.stringify({ orders: [shipmentId] }),
-              });
-            } catch (e) {
-              console.warn('[Melhor Envio Checkout Warning]:', e);
-            }
-          }
-        }
-
-        // Step 3: Generate label
-        try {
-          await fetch(`${baseUrl}/me/shipment/generate`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-              'User-Agent': userAgent,
-            },
-            body: JSON.stringify({ orders: [shipmentId] }),
-          });
-        } catch (e) {
-          console.warn('[Melhor Envio Generate Warning]:', e);
-        }
-
-        // Step 4: Print URL
-        try {
-          const printRes = await fetch(`${baseUrl}/me/shipment/print`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-              'User-Agent': userAgent,
-            },
-            body: JSON.stringify({ mode: 'public', orders: [shipmentId] }),
-          });
-          if (printRes.ok) {
-            const printData: any = await printRes.json();
-            printUrl = printData.url || (printData.orders && printData.orders[0]?.url) || '';
-          }
-        } catch (e) {
-          console.warn('[Melhor Envio Print Warning]:', e);
-        }
-
-        // Step 5: Tracking code
-        try {
-          const trackRes = await fetch(`${baseUrl}/me/shipment/tracking`, {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`,
-              'User-Agent': userAgent,
-            },
-            body: JSON.stringify({ orders: [shipmentId] }),
-          });
-          if (trackRes.ok) {
-            const trackData: any = await trackRes.json();
-            if (trackData && trackData[shipmentId]) {
-              realTracking = trackData[shipmentId].tracking || trackData[shipmentId].protocol || '';
-            }
-          }
-        } catch (e) {
-          console.warn('[Melhor Envio Track Warning]:', e);
-        }
-      } catch (meError: any) {
-        console.error('[Melhor Envio Integration Error]:', meError);
+      if (isInsufficientBalance) {
+        await db.completeShipmentGeneration(orderId, shipmentId, '', '', 'Saldo insuficiente no Melhor Envio');
+        return res.status(402).json({
+          error: 'Saldo insuficiente na sua carteira do Melhor Envio para comprar este envio. Adicione créditos no painel do Melhor Envio e tente novamente.',
+          shipmentId,
+        });
       }
     }
 
-    const finalTracking = realTracking || protocol || `BR-${order.id.slice(-6)}-ME`;
+    // STEP 3: Generate label
+    const genRes = await fetch(`${baseUrl}/me/shipment/generate`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'User-Agent': userAgent,
+      },
+      body: JSON.stringify({ orders: [shipmentId] }),
+    });
+
+    if (!genRes.ok) {
+      const genErrText = await genRes.text().catch(() => '');
+      console.warn('[Melhor Envio Generate Notice]:', genRes.status, genErrText);
+    }
+
+    // STEP 4: Print label / Get live URL
+    const printRes = await fetch(`${baseUrl}/me/shipment/print`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'User-Agent': userAgent,
+      },
+      body: JSON.stringify({ mode: 'public', orders: [shipmentId] }),
+    });
+
+    if (printRes.ok) {
+      const printData: any = await printRes.json();
+      printUrl = printData.url || (printData.orders && printData.orders[0]?.url) || '';
+    }
+
+    // STEP 5: Retrieve official carrier tracking code
+    try {
+      const trackRes = await fetch(`${baseUrl}/me/shipment/tracking`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          'User-Agent': userAgent,
+        },
+        body: JSON.stringify({ orders: [shipmentId] }),
+      });
+      if (trackRes.ok) {
+        const trackData: any = await trackRes.json();
+        if (trackData && trackData[shipmentId]) {
+          realTracking = trackData[shipmentId].tracking || trackData[shipmentId].protocol || '';
+        }
+      }
+    } catch {}
+
+    const finalTracking = realTracking || protocol || shipmentId;
     order.melhorEnvioShipmentId = shipmentId;
     order.trackingCode = finalTracking;
-    order.shippingLabelUrl = printUrl || order.shippingLabelUrl;
+    if (printUrl) {
+      order.shippingLabelUrl = printUrl;
+    }
     order.shippingStatus = 'Pronto para envio';
     order.status = 'Pronto para Envio';
 
@@ -7768,7 +8005,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     order.history.push({
       status: 'Pronto para Envio',
       timestamp: now.toLocaleString('pt-BR'),
-      description: `Etiqueta oficial gerada via Melhor Envio (ID: ${shipmentId}, Rastreio: ${finalTracking}).`,
+      description: `Remessa oficial #${shipmentId} gerada no Melhor Envio. Código de Rastreio: ${finalTracking}.`,
     });
 
     await db.saveOrder(order);
@@ -7780,7 +8017,7 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       'generate_shipment',
       'shipping',
       order.id,
-      `Envio e etiqueta gerados no Melhor Envio (ID: ${shipmentId}, Rastreio: ${finalTracking})`,
+      `Envio gerado no Melhor Envio (ID: ${shipmentId}, Rastreio: ${finalTracking})`,
       { shipmentId, trackingCode: finalTracking, printUrl }
     );
 
@@ -7811,17 +8048,27 @@ app.get('/api/admin/orders/:id/print-label', requireAdmin, async (req: any, res)
 
     const token = getMelhorEnvioTokenServer();
     if (token && order.melhorEnvioShipmentId) {
-      const baseUrl = 'https://melhorenvio.com.br/api/v2';
+      const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
+      let env = 'production';
+      if (fs.existsSync(settingsPath)) {
+        try {
+          const saved = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+          if (saved.environment === 'sandbox') env = 'sandbox';
+        } catch {}
+      }
+
+      const baseUrl = env === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/api/v2' : 'https://melhorenvio.com.br/api/v2';
       const printRes = await fetch(`${baseUrl}/me/shipment/print`, {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'User-Agent': 'Marmot Confeccoes (contato@marmot.com.br)',
         },
         body: JSON.stringify({ mode: 'public', orders: [order.melhorEnvioShipmentId] }),
       });
+
       if (printRes.ok) {
         const printData: any = await printRes.json();
         const url = printData.url || (printData.orders && printData.orders[0]?.url) || '';

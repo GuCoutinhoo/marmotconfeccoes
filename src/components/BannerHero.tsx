@@ -79,7 +79,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
             <div className="mt-8 sm:mt-9 lg:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto">
               <button
                 onClick={() => onNavigate('shop')}
-                className="h-[54px] sm:h-[58px] px-8 sm:px-10 bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] font-black text-sm sm:text-[15px] uppercase tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(244,196,0,0.3)] hover:scale-[1.02] active:scale-[0.98] group shrink-0 cursor-pointer rounded-xl"
+                className="h-[54px] sm:h-[58px] px-8 sm:px-10 bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] font-black text-sm sm:text-[15px] uppercase tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(244,196,0,0.3)] hover:scale-[1.02] active:scale-[0.98] group shrink-0 cursor-pointer"
               >
                 <span>EXPLORAR O DROP</span>
                 <ArrowRight className="w-4.5 h-4.5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -87,7 +87,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
 
               <button
                 onClick={() => onNavigate('shop', 'oversized')}
-                className="h-[54px] sm:h-[58px] px-7 sm:px-9 bg-black/40 hover:bg-black/60 text-white border border-white/30 hover:border-white font-bold text-sm sm:text-[15px] uppercase tracking-[0.08em] backdrop-blur-sm transition-all duration-200 flex items-center justify-center shrink-0 cursor-pointer shadow-sm active:scale-[0.98] rounded-xl"
+                className="h-[54px] sm:h-[58px] px-7 sm:px-9 bg-black/40 hover:bg-black/60 text-white border border-white/30 hover:border-white font-bold text-sm sm:text-[15px] uppercase tracking-[0.08em] backdrop-blur-sm transition-all duration-200 flex items-center justify-center shrink-0 cursor-pointer shadow-sm active:scale-[0.98]"
               >
                 <span>VER CAMISETAS & MOLETONS</span>
               </button>

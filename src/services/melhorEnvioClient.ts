@@ -10,10 +10,28 @@ export interface MelhorEnvioConfig {
   baseUrl: string;
   environment: 'production' | 'sandbox';
   token: string;
+  refreshToken?: string;
+  clientId?: string;
+  clientSecret?: string;
+  redirectUri?: string;
   originPostalCode: string;
   userAgent: string;
   appName: string;
   appEmail: string;
+  sender?: {
+    name: string;
+    document: string;
+    stateRegister?: string;
+    phone: string;
+    email: string;
+    street: string;
+    number: string;
+    complement?: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+    cep: string;
+  };
 }
 
 export interface PackageDimensions {
@@ -47,29 +65,66 @@ export interface ShippingCalculationResult {
   options: ShippingOption[];
   originPostalCode: string;
   fromMelhorEnvio: boolean;
+  isMockFallback?: boolean;
 }
 
 /**
  * 1. Read centralized configuration (Environment variables + persistent JSON fallback)
+ * Never contains hardcoded JWTs or API keys.
  */
 export function getMelhorEnvioConfig(): MelhorEnvioConfig {
-  let savedSettings: Partial<ShippingSettings & { token: string }> = {};
+  let savedSettings: Partial<ShippingSettings & {
+    token?: string;
+    refreshToken?: string;
+    clientId?: string;
+    clientSecret?: string;
+    redirectUri?: string;
+    sender?: any;
+  }> = {};
+
   try {
     if (fs.existsSync(SHIPPING_SETTINGS_FILE)) {
       const data = fs.readFileSync(SHIPPING_SETTINGS_FILE, 'utf-8');
       savedSettings = JSON.parse(data);
     }
-  } catch (err) {
+  } catch {
     // In serverless / read-only environment, ignore read error
   }
 
-  // Support all common environment variable names across Vercel / Cloud deployments
+  // Support all standard environment variable names
   const token = (
     process.env.MELHOR_ENVIO_TOKEN ||
     process.env.MELHORENVIO_TOKEN ||
     process.env.TOKEN_MELHOR_ENVIO ||
     savedSettings.token ||
-    'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiM2U5MDkwOTY2ZDE1MzU4MjcxN2VlMTU5NzUzMDQ1YzkxNTY2MjUyNTQ1MjE3ZWEyMzBlMWI4MmU3ZTcyM2I3YTlkYTkyMDQyMDcwN2UyZDUiLCJpYXQiOjE3ODcxODkwMjEuNzAwMzcxLCJuYmYiOjE3ODcxODkwMjEuNzAwMzczLCJleHAiOjE4MTg3MjUwMjEuNjg1NDQ1LCJzdWIiOiJhMDY3ZjViYi1mNWQ5LTQ1YTQtYTRmZS0wOTZiMTY2MmY5MDAiLCJzY29wZXMiOlsiY2FydC1yZWFkIiwiY2FydC13cml0ZSIsIm9yZGVycy1yZWFkIiwic2hpcHBpbmctY2FsY3VsYXRlIiwic2hpcHBpbmctY2FuY2VsIiwic2hpcHBpbmctY2hlY2tvdXQiLCJzaGlwcGluZy1jb21wYW5pZXMiLCJzaGlwcGluZy1nZW5lcmF0ZSIsInNoaXBwaW5nLXByZXZpZXciLCJzaGlwcGluZy1wcmludCIsInNoaXBwaW5nLXRyYWNraW5nIiwiZWNvbW1lcmNlLXNoaXBwaW5nIl19.tSai99IpfEhjkQi7icAlEQ5SMiL7NLFER2eq9si5D-qIOOqCbcNdKocTl0ub7TLZH2mHjNqUMTYsXySmxCwjDTImBkBT1Dj38ADnrCW9pXr-YekfYGoA946BkuPnutDMAhJ-tJANL8mqM9nScWF3RNdtXqRN6nSm3Nf124BYu74unOFtkmIvFbklo3Nf0KbGbpX9US3PHy4l8AMWA1bliA2HK-GO8eKOJgYHPGctVXo1Nym8J6mHI8sO4aQcbjBRAFwuLEsw4azxCQROnIJfepmWE5X8A_f7Rfzj__AuaTrbHNuPE2ctwoJG1qx0_NXigUit-tviS-Mu2MJuZihAUwqgktMjuyUgCGRSguOJhCGBHriSpmdMR_MFE-EQOoqcWkgZruIlXKJqWJMRxEFZt9ITKD45FtZm66O-gILggO4AQu27VINniBZNm73TTtdLCvQW2P5883TdsmmrVeFVOtQHN7SUH7TogasP8aIC25Fbt60BApR5xg1I3eZUe2R0PKrX0aAjV0MUo7ChkLc4G7paF4DZG9ulH1PnE0Ni9b-NkejcwxdAnMj7QzFz6yGNtcBWCA82mCIWhCMs7gAxP7Y2krBmOr_AqZgB_8mu-ErQGV4etRXOo2rRprWFW-PaczdmC4AxgZGXwSrNQc1HrVYOfPBQYeUUM4Bxcu451qs'
+    ''
+  ).trim();
+
+  const refreshToken = (
+    process.env.MELHOR_ENVIO_REFRESH_TOKEN ||
+    process.env.MELHORENVIO_REFRESH_TOKEN ||
+    savedSettings.refreshToken ||
+    ''
+  ).trim();
+
+  const clientId = (
+    process.env.MELHOR_ENVIO_CLIENT_ID ||
+    process.env.MELHORENVIO_CLIENT_ID ||
+    savedSettings.clientId ||
+    ''
+  ).trim();
+
+  const clientSecret = (
+    process.env.MELHOR_ENVIO_CLIENT_SECRET ||
+    process.env.MELHORENVIO_CLIENT_SECRET ||
+    savedSettings.clientSecret ||
+    ''
+  ).trim();
+
+  const redirectUri = (
+    process.env.MELHOR_ENVIO_REDIRECT_URI ||
+    savedSettings.redirectUri ||
+    ''
   ).trim();
 
   const originPostalCode = (
@@ -77,7 +132,6 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
     process.env.MELHOR_ENVIO_ORIGIN_CEP ||
     process.env.ORIGIN_CEP ||
     process.env.ORIGIN_POSTAL_CODE ||
-    process.env.MELHOR_ENVIO_ORIGIN_POSTAL_CODE ||
     savedSettings.originPostalCode ||
     '03806010'
   ).replace(/\D/g, '');
@@ -99,35 +153,35 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
     ? 'https://sandbox.melhorenvio.com.br/api/v2'
     : 'https://melhorenvio.com.br/api/v2');
 
-  // Format: "NomeDaApp (email@dominio.com)"
   const userAgent = `${appName} (${appEmail})`.trim();
-
-  // Transparent safe environment diagnostic logging (never exposes token)
-  console.log('[VERCEL SHIPPING ENV]', {
-    hasToken: Boolean(token && token.length >= 10),
-    tokenLength: token ? token.length : 0,
-    hasOriginCep: Boolean(originPostalCode && originPostalCode.length === 8),
-    originPostalCode: originPostalCode || 'MISSING',
-    environment,
-    baseUrl,
-    nodeEnv: process.env.NODE_ENV || 'development',
-  });
 
   return {
     baseUrl,
     environment,
     token,
+    refreshToken,
+    clientId,
+    clientSecret,
+    redirectUri,
     originPostalCode: originPostalCode || '03806010',
     userAgent,
     appName,
     appEmail,
+    sender: savedSettings.sender,
   };
 }
 
 /**
  * Save configuration update (e.g. from Admin UI)
  */
-export function saveMelhorEnvioConfig(newSettings: Partial<ShippingSettings & { token?: string }>): ShippingSettings {
+export function saveMelhorEnvioConfig(newSettings: Partial<ShippingSettings & {
+  token?: string;
+  refreshToken?: string;
+  clientId?: string;
+  clientSecret?: string;
+  redirectUri?: string;
+  sender?: any;
+}>): ShippingSettings {
   const current = getMelhorEnvioConfig();
   const updated = {
     originPostalCode: (newSettings.originPostalCode || current.originPostalCode).replace(/\D/g, ''),
@@ -135,6 +189,11 @@ export function saveMelhorEnvioConfig(newSettings: Partial<ShippingSettings & { 
     appName: newSettings.appName || current.appName,
     appEmail: newSettings.appEmail || current.appEmail,
     token: newSettings.token !== undefined ? newSettings.token.trim() : current.token,
+    refreshToken: newSettings.refreshToken !== undefined ? newSettings.refreshToken.trim() : current.refreshToken,
+    clientId: newSettings.clientId !== undefined ? newSettings.clientId.trim() : current.clientId,
+    clientSecret: newSettings.clientSecret !== undefined ? newSettings.clientSecret.trim() : current.clientSecret,
+    redirectUri: newSettings.redirectUri !== undefined ? newSettings.redirectUri.trim() : current.redirectUri,
+    sender: newSettings.sender || current.sender,
   };
 
   try {
@@ -142,8 +201,8 @@ export function saveMelhorEnvioConfig(newSettings: Partial<ShippingSettings & { 
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     fs.writeFileSync(SHIPPING_SETTINGS_FILE, JSON.stringify(updated, null, 2), 'utf-8');
-  } catch (err) {
-    console.warn('[MelhorEnvioConfig] Notice: Running on read-only file system or failed to persist shipping_settings.json');
+  } catch {
+    console.warn('[MelhorEnvioConfig] Running on read-only file system or could not write shipping_settings.json');
   }
 
   return {
@@ -166,7 +225,6 @@ export class MelhorEnvioClient {
   }
 
   public async calculateShipment(params: CalculateShippingInput): Promise<ShippingCalculationResult> {
-    console.log('[SHIPPING] Function started');
     const { token, baseUrl, environment, userAgent, originPostalCode } = this.config;
 
     const fromCep = (params.originPostalCode || originPostalCode).replace(/\D/g, '');
@@ -186,9 +244,15 @@ export class MelhorEnvioClient {
       throw err;
     }
 
+    // In production, token is strictly required. No fake fallback without explicit token.
     if (!token || token.length < 10) {
-      console.error('[VERCEL SHIPPING ERROR]', 'MELHOR_ENVIO_TOKEN não configurado nas Environment Variables da Vercel.');
-      console.log('[SHIPPING] Token ausente. Retornando cotações com base na tabela oficial das transportadoras para o CEP destino.');
+      if (environment === 'production' && process.env.NODE_ENV === 'production') {
+        const err: any = new Error('Token do Melhor Envio não configurado no servidor.');
+        err.code = 'MELHOR_ENVIO_TOKEN_MISSING';
+        err.status = 503;
+        throw err;
+      }
+      console.warn('[SHIPPING] Token ausente em ambiente de testes/sandbox. Retornando cotações com base na tabela oficial das transportadoras.');
       return this.calculateFallbackQuotes(fromCep, toCep, params.products);
     }
 
@@ -212,7 +276,6 @@ export class MelhorEnvioClient {
       const l = Number(params.package.length);
 
       if (!Number.isFinite(w) || w <= 0 || !Number.isFinite(h) || h <= 0 || !Number.isFinite(wd) || wd <= 0 || !Number.isFinite(l) || l <= 0) {
-        console.error('[Melhor Envio] Dimensões do pacote inválidas:', params.package);
         const err: any = new Error('Dimensões do pacote inválidas para cálculo.');
         err.code = 'INVALID_PACKAGE_DIMENSIONS';
         err.status = 422;
@@ -240,7 +303,6 @@ export class MelhorEnvioClient {
         const insurance = Number(p.insurance_value || 0);
 
         if (!Number.isFinite(w) || w <= 0 || !Number.isFinite(h) || h <= 0 || !Number.isFinite(wd) || wd <= 0 || !Number.isFinite(l) || l <= 0) {
-          console.error(`[Melhor Envio] Produto incompleto no catálogo: ID ${p.id} possui dimensões inválidas (w=${w}, h=${h}, wd=${wd}, l=${l})`);
           const err: any = new Error(`Produto #${p.id} possui peso ou dimensões inválidas no cadastro.`);
           err.code = 'INVALID_PRODUCT_SPECS';
           err.status = 422;
@@ -274,20 +336,6 @@ export class MelhorEnvioClient {
       'User-Agent': userAgent,
     };
 
-    // Mandatory detailed logging of outgoing payload
-    console.log('[VERCEL SHIPPING PAYLOAD]', {
-      from: bodyPayload.from,
-      to: bodyPayload.to,
-      products: bodyPayload.products,
-      package: bodyPayload.package,
-    });
-
-    console.log('[SHIPPING] Calling Melhor Envio', {
-      url: endpoint,
-      environment,
-      userAgent,
-    });
-
     let response: Response;
     try {
       response = await fetch(endpoint, {
@@ -296,21 +344,17 @@ export class MelhorEnvioClient {
         body: JSON.stringify(bodyPayload),
       });
     } catch (networkErr: any) {
-      console.error('[VERCEL SHIPPING ERROR]', networkErr.message || networkErr);
-      console.log('[SHIPPING] Falha de rede ao conectar com Melhor Envio. Retornando cotações com base na tabela oficial das transportadoras.');
+      console.error('[MELHOR ENVIO NETWORK ERROR]', networkErr.message || networkErr);
+      if (environment === 'production' && process.env.NODE_ENV === 'production') {
+        const err: any = new Error('Falha de conexão com o serviço de frete do Melhor Envio.');
+        err.code = 'SHIPPING_SERVICE_UNAVAILABLE';
+        err.status = 503;
+        throw err;
+      }
       return this.calculateFallbackQuotes(fromCep, toCep, params.products);
     }
 
-    console.log('[SHIPPING] Melhor Envio status:', response.status);
-
     const rawResponse = await response.text();
-
-    console.log('[MELHOR ENVIO VERCEL]', {
-      status: response.status,
-      statusText: response.statusText,
-      body: rawResponse,
-    });
-
     let responseData: any = null;
     try {
       responseData = JSON.parse(rawResponse);
@@ -320,17 +364,9 @@ export class MelhorEnvioClient {
 
     if (!response.ok) {
       const responseStatus = response.status;
-      console.warn('[Melhor Envio] Aviso HTTP:', {
-        status: responseStatus,
-        statusText: response.statusText,
-        data: responseData,
-      });
 
-      // If token is invalid (401), AWS WAF blocks (403), or upstream service is down (500),
-      // generate official carrier rates based on destination CEP and package specs
-      // so the checkout and payment flows work seamlessly on Vercel and local.
-      if (responseStatus === 401 || responseStatus === 403 || responseStatus >= 500) {
-        console.log(`[Melhor Envio] Resposta HTTP ${responseStatus}. Calculando tabelas oficiais de PAC, SEDEX e Jadlog para garantir funcionamento do checkout.`);
+      if ((responseStatus === 401 || responseStatus === 403 || responseStatus >= 500) && (environment === 'sandbox' || process.env.NODE_ENV !== 'production')) {
+        console.warn(`[Melhor Envio Sandbox/Dev Fallback] HTTP ${responseStatus}. Utilizando tabela oficial para ambiente de testes.`);
         return this.calculateFallbackQuotes(fromCep, toCep, params.products);
       }
 
@@ -348,65 +384,58 @@ export class MelhorEnvioClient {
         errorCode = 'UNPROCESSABLE_ENTITY';
       } else if (responseStatus === 429) {
         userErrorMessage = 'Limite de requisições ao Melhor Envio atingido. Tente novamente em instantes.';
-        errorCode = 'TOO_MANY_REQUESTS';
+        errorCode = 'RATE_LIMIT_EXCEEDED';
       }
 
       const err: any = new Error(userErrorMessage);
       err.code = errorCode;
       err.status = responseStatus;
-      err.apiResponse = responseData;
+      err.details = responseData;
       throw err;
     }
 
     if (!Array.isArray(responseData)) {
-      console.error('[Melhor Envio] Resposta inesperada (não é array):', responseData);
-      const err: any = new Error('Resposta do Melhor Envio em formato inesperado.');
+      const err: any = new Error('Formato de resposta inesperado do Melhor Envio.');
       err.code = 'INVALID_API_RESPONSE';
       err.status = 502;
       throw err;
     }
 
-    // Separate valid quotes and log any carrier specific warnings
     const validQuotes: ShippingOption[] = [];
-    const unavailableCarriers: any[] = [];
+    const unavailableCarriers: string[] = [];
 
     for (const item of responseData) {
       if (item.error) {
-        unavailableCarriers.push({
-          carrier: item.company?.name || item.name,
-          error: item.error,
-        });
+        unavailableCarriers.push(`${item.company?.name || 'Carrier'} (${item.name}): ${item.error}`);
         continue;
       }
 
-      const price = parseFloat(item.custom_price || item.price || 0);
-      const originalPrice = parseFloat(item.price || item.custom_price || 0);
-      const deliveryDaysNum = parseInt(item.custom_delivery_time || item.delivery_time || 0, 10);
+      const rawPrice = item.custom_price !== undefined && item.custom_price !== null
+        ? item.custom_price
+        : item.price;
 
-      if (price > 0) {
-        const carrierName = item.company?.name || item.name || 'Transportadora';
-        const serviceName = item.name || carrierName;
-
-        validQuotes.push({
-          id: String(item.id),
-          serviceId: item.id,
-          companyId: item.company?.id ? Number(item.company.id) : undefined,
-          name: serviceName,
-          carrier: carrierName,
-          company: carrierName,
-          price: Number(price.toFixed(2)),
-          originalPrice: Number(originalPrice.toFixed(2)),
-          discount: parseFloat(item.discount || 0),
-          deliveryTime: deliveryDaysNum || 3,
-          deliveryDays: `${deliveryDaysNum || 3} a ${(deliveryDaysNum || 3) + 2} dias úteis`,
-          picture: item.company?.picture || undefined,
-          currency: item.currency || 'R$',
-        });
+      const numPrice = Number(rawPrice);
+      if (!Number.isFinite(numPrice) || numPrice <= 0) {
+        continue;
       }
-    }
 
-    if (unavailableCarriers.length > 0) {
-      console.log('[Melhor Envio] Transportadoras indisponíveis para este trecho:', unavailableCarriers);
+      const deliveryDaysNum = Number(item.custom_delivery_time || item.delivery_time || 0);
+
+      validQuotes.push({
+        id: String(item.id),
+        serviceId: Number(item.id),
+        companyId: Number(item.company?.id),
+        name: item.name || 'Envio Padrão',
+        carrier: item.company?.name || 'Transportadora',
+        company: item.company?.name || 'Transportadora',
+        price: Number(numPrice.toFixed(2)),
+        originalPrice: Number(Number(item.price || numPrice).toFixed(2)),
+        discount: item.discount ? Number(Number(item.discount).toFixed(2)) : undefined,
+        deliveryTime: deliveryDaysNum || 3,
+        deliveryDays: `${deliveryDaysNum || 3} a ${(deliveryDaysNum || 3) + 2} dias úteis`,
+        picture: item.company?.picture || undefined,
+        currency: item.currency || 'R$',
+      });
     }
 
     if (validQuotes.length === 0) {
@@ -416,17 +445,8 @@ export class MelhorEnvioClient {
       throw err;
     }
 
-    // Filter allowed whitelist carriers (Correios, Jadlog, Loggi, Azul Cargo Express, J&T Express)
-    // and sort by carrier priority then cheapest price
     const finalQuotes = filterAndSortShippingQuotes(validQuotes);
-
-    if (finalQuotes.length === 0) {
-      console.warn('[Melhor Envio] Nenhuma das opções retornadas está na lista de transportadoras permitidas. Utilizando opções válidas disponíveis.');
-    }
-
     const returnedOptions = finalQuotes.length > 0 ? finalQuotes : validQuotes;
-
-    console.log(`[Melhor Envio] Cotação realizada com sucesso: ${returnedOptions.length} opções selecionadas para exibição.`);
 
     return {
       success: true,
@@ -437,16 +457,13 @@ export class MelhorEnvioClient {
     };
   }
 
-  /**
-   * Calculates standard carrier options when the development environment
-   * is blocked by AWS WAF or upstream cloud firewalls.
-   */
   private calculateFallbackQuotes(fromCep: string, toCep: string, products?: any[]): {
     success: boolean;
     quotes: ShippingOption[];
     options: ShippingOption[];
     originPostalCode: string;
     fromMelhorEnvio: boolean;
+    isMockFallback: boolean;
   } {
     let totalWeight = 0.35;
     if (products && products.length > 0) {
@@ -464,7 +481,6 @@ export class MelhorEnvioClient {
     let jadlogDays = 4;
 
     if (prefix >= 1 && prefix <= 9) {
-      // SP Capital & Grande SP
       pacBase = 14.90;
       sedexBase = 19.90;
       jadlogPkgBase = 13.50;
@@ -473,7 +489,6 @@ export class MelhorEnvioClient {
       sedexDays = 1;
       jadlogDays = 2;
     } else if (prefix >= 11 && prefix <= 19) {
-      // SP Interior / Litoral
       pacBase = 18.90;
       sedexBase = 24.90;
       jadlogPkgBase = 17.50;
@@ -482,7 +497,6 @@ export class MelhorEnvioClient {
       sedexDays = 2;
       jadlogDays = 3;
     } else if ((prefix >= 20 && prefix <= 28) || (prefix >= 30 && prefix <= 39)) {
-      // RJ / ES / MG
       pacBase = 22.90;
       sedexBase = 31.90;
       jadlogPkgBase = 21.00;
@@ -491,7 +505,6 @@ export class MelhorEnvioClient {
       sedexDays = 2;
       jadlogDays = 4;
     } else if (prefix >= 80 && prefix <= 99) {
-      // Sul (PR, SC, RS)
       pacBase = 24.90;
       sedexBase = 35.90;
       jadlogPkgBase = 23.50;
@@ -500,7 +513,6 @@ export class MelhorEnvioClient {
       sedexDays = 3;
       jadlogDays = 5;
     } else if (prefix >= 70 && prefix <= 79) {
-      // Centro-Oeste
       pacBase = 28.90;
       sedexBase = 42.90;
       jadlogPkgBase = 27.50;
@@ -509,7 +521,6 @@ export class MelhorEnvioClient {
       sedexDays = 3;
       jadlogDays = 6;
     } else if ((prefix >= 40 && prefix <= 48) || (prefix >= 50 && prefix <= 65)) {
-      // Nordeste
       pacBase = 32.90;
       sedexBase = 49.90;
       jadlogPkgBase = 31.50;
@@ -518,7 +529,6 @@ export class MelhorEnvioClient {
       sedexDays = 4;
       jadlogDays = 7;
     } else {
-      // Norte
       pacBase = 39.90;
       sedexBase = 59.90;
       jadlogPkgBase = 38.50;
@@ -597,8 +607,8 @@ export class MelhorEnvioClient {
       quotes,
       options: quotes,
       originPostalCode: fromCep,
-      fromMelhorEnvio: true,
+      fromMelhorEnvio: false,
+      isMockFallback: true,
     };
   }
 }
-
