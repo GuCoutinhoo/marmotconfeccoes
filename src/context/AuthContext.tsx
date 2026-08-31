@@ -113,10 +113,9 @@ function mapSupabaseUserToProfile(sbUser: User, sessionToken?: string): UserProf
   const appMeta = (sbUser as any).app_metadata || {};
   const userMeta = sbUser.user_metadata || {};
 
-  // Security rule: admin privilege must come strictly from app_metadata.role === 'admin'
+  // Security rule: admin privilege must come strictly from app_metadata.role === 'admin' or profiles.is_admin
   const isSupabaseAdminRole = appMeta.role === 'admin';
-  const isHardcodedAdmin = (sbUser.email || '').toLowerCase() === 'admin@marmot.com';
-  const role = (isSupabaseAdminRole || isHardcodedAdmin) ? 'admin' : 'customer';
+  const role = isSupabaseAdminRole ? 'admin' : 'customer';
 
   return {
     id: sbUser.id,
@@ -313,6 +312,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (isMounted) {
             if (session?.user) {
               const mapped = mapSupabaseUserToProfile(session.user, session.access_token);
+              // Fetch saved profile and role from public.profiles table
+              try {
+                const { data: dbProfile } = await supabase
+                  .from('profiles')
+                  .select('role, is_admin, name, phone, cpf')
+                  .eq('id', session.user.id)
+                  .maybeSingle();
+
+                if (dbProfile) {
+                  if (dbProfile.role === 'admin' || dbProfile.is_admin === true) {
+                    mapped.role = 'admin';
+                  }
+                  if (dbProfile.name) mapped.name = dbProfile.name;
+                  if (dbProfile.phone) mapped.phone = dbProfile.phone;
+                  if (dbProfile.cpf) mapped.cpf = dbProfile.cpf;
+                }
+              } catch (profErr) {
+                console.warn('[Supabase Auth] Profile fetch notice:', profErr);
+              }
+
               // Fetch saved addresses from public.user_addresses table
               const addressesFromDb = await fetchUserAddressesDirect(session.user.id);
               if (addressesFromDb.length > 0) {
@@ -387,6 +406,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           if (session?.user) {
             const mapped = mapSupabaseUserToProfile(session.user, session.access_token);
+            try {
+              const { data: dbProfile } = await supabase
+                .from('profiles')
+                .select('role, is_admin, name, phone, cpf')
+                .eq('id', session.user.id)
+                .maybeSingle();
+
+              if (dbProfile) {
+                if (dbProfile.role === 'admin' || dbProfile.is_admin === true) {
+                  mapped.role = 'admin';
+                }
+                if (dbProfile.name) mapped.name = dbProfile.name;
+                if (dbProfile.phone) mapped.phone = dbProfile.phone;
+                if (dbProfile.cpf) mapped.cpf = dbProfile.cpf;
+              }
+            } catch {}
+
             try {
               const addressesFromDb = await fetchUserAddressesDirect(session.user.id);
               if (addressesFromDb.length > 0) {
@@ -540,9 +576,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (isSupabaseConfigured()) {
       try {
-        const isHardcodedAdmin = cleanEmail === 'admin@marmot.com';
-        const role = isHardcodedAdmin ? 'admin' : 'customer';
-
         const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/auth/confirm` : undefined;
 
         console.log('[Supabase Register] Initiating registration request...', {
@@ -559,7 +592,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               name: cleanName,
               phone: userData.phone?.trim() || '',
               cpf: userData.cpf?.trim() || '',
-              role,
+              role: 'customer',
               addresses: [],
             },
           },
@@ -696,14 +729,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // =========================================================
   // 4. ADMIN AUTHENTICATION
   // =========================================================
-  const adminLogin = async (arg1: string, arg2?: string): Promise<boolean> => {
-    const email = arg2 !== undefined ? arg1 : 'admin@marmot.com';
-    const password = arg2 !== undefined ? arg2 : arg1;
+  const adminLogin = async (emailOrPassword: string, optionalPassword?: string): Promise<boolean> => {
+    const email = optionalPassword !== undefined ? emailOrPassword.trim() : '';
+    const password = optionalPassword !== undefined ? optionalPassword : emailOrPassword;
+
+    if (!email) {
+      safeToast('Acesso Restrito', 'Informe o e-mail do administrador.', 'error');
+      return false;
+    }
 
     const result = await login(email, password);
-    if (result.success && (result.user?.role === 'admin' || result.user?.email.toLowerCase() === 'admin@marmot.com')) {
+    if (!result.success || !result.user) {
+      return false;
+    }
+
+    // Verify admin role strictly from user profile / backend
+    if (result.user.role === 'admin') {
       return true;
     }
+
+    // Double check with backend /api/auth/me
+    try {
+      const activeToken = localStorage.getItem('@marmot_auth_token');
+      if (activeToken) {
+        const res = await fetch('/api/auth/me', {
+          headers: { Authorization: `Bearer ${activeToken}` },
+        });
+        if (res.ok) {
+          const meData = await res.json();
+          if (meData.user?.role === 'admin') {
+            setUser((prev) => (prev ? { ...prev, role: 'admin' } : meData.user));
+            return true;
+          }
+        }
+      }
+    } catch {}
+
+    safeToast('Acesso Restrito', 'Esta conta não possui privilégios de administrador.', 'error');
     return false;
   };
 
@@ -1184,7 +1246,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const isAuthenticated = Boolean(user);
-  const isAdmin = user?.role === 'admin' || (user?.email?.toLowerCase() === 'admin@marmot.com');
+  const isAdmin = user?.role === 'admin';
 
   return (
     <AuthContext.Provider

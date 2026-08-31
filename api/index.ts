@@ -1392,7 +1392,6 @@ export class DatabaseManager {
   public async getSupabaseAdminClient(): Promise<SupabaseClient | null> {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
-    const anonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
 
     if (serviceKey && serviceKey.trim() !== '') {
       if (!this.supabaseAdmin) {
@@ -1401,37 +1400,6 @@ export class DatabaseManager {
         });
       }
       return this.supabaseAdmin;
-    }
-
-    const now = Date.now();
-    if (this.supabaseAdmin && this.adminToken && now < this.adminTokenExpiresAt - 60000) {
-      return this.supabaseAdmin;
-    }
-
-    try {
-      const baseSb = this.supabase || createClient(supabaseUrl, anonKey);
-      const { data, error } = await baseSb.auth.signInWithPassword({
-        email: 'admin@marmot.com',
-        password: 'marmot',
-      });
-
-      if (!error && data?.session?.access_token) {
-        this.adminToken = data.session.access_token;
-        this.adminTokenExpiresAt = data.session.expires_at ? data.session.expires_at * 1000 : now + 3600 * 1000;
-        this.supabaseAdmin = createClient(supabaseUrl, anonKey, {
-          global: {
-            headers: {
-              Authorization: `Bearer ${this.adminToken}`,
-            },
-          },
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-        return this.supabaseAdmin;
-      } else {
-        console.warn('[DB] Supabase admin authentication notice:', error?.message);
-      }
-    } catch (err) {
-      console.warn('[DB] Supabase admin client initialization exception:', err);
     }
 
     return this.supabase;
@@ -5480,8 +5448,7 @@ function validateSenderDocument(doc: string | undefined | null): {
 function getAdminEmailList(): string[] {
   const envAdmins = process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '';
   const parsed = envAdmins.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
-  if (parsed.length > 0) return parsed;
-  return ['gustavohcsantos.mm2020@gmail.com'];
+  return parsed;
 }
 
 // Cryptographic token validation with HMAC and Supabase Auth (Strict signature enforcement)
@@ -5496,7 +5463,7 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
     if (decoded && (decoded.userId || decoded.sub)) {
       const email = decoded.email ? String(decoded.email).toLowerCase().trim() : null;
       const isOfficialAdmin = Boolean(
-        (email && adminEmails.includes(email)) ||
+        (email && adminEmails.length > 0 && adminEmails.includes(email)) ||
         decoded.app_metadata?.role === 'admin' ||
         decoded.role === 'admin'
       );
@@ -5513,7 +5480,7 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
   }
 
   // 2. Validate with Supabase Auth Server (Cryptographic asymmetric signature checked by Supabase Auth)
-  const supabase = db.getSupabaseClient();
+  const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.getUser(token);
@@ -5524,7 +5491,7 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
         // Strict role validation: Check profiles table or app_metadata
         let isDbAdmin = false;
         try {
-          const { data: profile } = await supabase
+          const { data: profile, error: profErr } = await supabase
             .from('profiles')
             .select('role, is_admin')
             .eq('id', data.user.id)
@@ -5533,10 +5500,15 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
           if (profile) {
             isDbAdmin = profile.role === 'admin' || profile.is_admin === true;
           }
-        } catch {}
+          if (profErr) {
+            console.warn('[AUTH] Profile query notice:', profErr.message);
+          }
+        } catch (dbErr) {
+          console.warn('[AUTH] Database check exception:', dbErr);
+        }
 
         const isOfficialAdmin = Boolean(
-          (email && adminEmails.includes(email)) ||
+          (email && adminEmails.length > 0 && adminEmails.includes(email)) ||
           appRole === 'admin' ||
           isDbAdmin
         );
@@ -5644,7 +5616,7 @@ app.get(['/api/health', '/health'], async (req, res) => {
 app.get('/api/admin/health', requireAdmin, async (req, res) => {
   try {
     await db.initialize();
-    const supabase = db.getSupabaseClient();
+    const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
     const isSupabase = db.getMode() === 'supabase' && Boolean(supabase);
 
     const tablesStatus: Record<string, boolean> = {};
@@ -5664,9 +5636,18 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
     const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
     const resendKey = process.env.RESEND_API_KEY;
 
+    const missingTables = isSupabase
+      ? Object.entries(tablesStatus).filter(([_, exists]) => !exists).map(([tbl]) => tbl)
+      : [];
+    const dbReady = isSupabase ? missingTables.length === 0 : true;
+    const mpReady = Boolean(mpToken && mpToken.length >= 10);
+    const meReady = Boolean(meConfig.token && meConfig.token.length >= 10);
+    const readyForProduction = dbReady && mpReady && meReady;
+
     res.json({
-      status: 'ok',
-      readyForProduction: true,
+      status: readyForProduction ? 'ok' : 'degraded',
+      readyForProduction,
+      missingTables,
       timestamp: new Date().toISOString(),
       database: {
         mode: db.getMode(),
@@ -5675,12 +5656,12 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
       },
       integrations: {
         mercadoPago: {
-          configured: Boolean(mpToken && mpToken.length >= 10),
+          configured: mpReady,
           environment: process.env.MERCADOPAGO_ENV || 'production',
           webhookConfigured: Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET),
         },
         melhorEnvio: {
-          configured: Boolean(meConfig.token && meConfig.token.length >= 10),
+          configured: meReady,
           environment: meConfig.environment,
           originCep: meConfig.originPostalCode,
         },

@@ -10,7 +10,35 @@ CREATE TABLE IF NOT EXISTS public.schema_migrations (
     applied_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- 2. FUNÇÃO AUXILIAR DE SEGURANÇA: is_admin()
+-- 2. GARANTIR TABELA PROFILES E COLUNAS PRIMEIRO (Evita erro de coluna inexistente no is_admin)
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id TEXT PRIMARY KEY,
+    email TEXT,
+    name TEXT,
+    role TEXT DEFAULT 'customer',
+    is_admin BOOLEAN DEFAULT false,
+    phone TEXT,
+    cpf TEXT,
+    data JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT now(),
+    updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'customer';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT false;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS name TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS cpf TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT now();
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON public.profiles (role);
+CREATE INDEX IF NOT EXISTS idx_profiles_is_admin ON public.profiles (is_admin);
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles (email);
+
+-- 3. FUNÇÃO AUXILIAR DE SEGURANÇA: is_admin() (Com cast seguro UUID::text = id::text)
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE sql
@@ -20,26 +48,19 @@ STABLE
 AS $$
   SELECT (
     auth.role() = 'service_role' OR
+    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin' OR
     EXISTS (
       SELECT 1 FROM public.profiles
-      WHERE id = auth.uid()
+      WHERE id::text = auth.uid()::text
       AND (role = 'admin' OR is_admin = true)
-    ) OR
-    (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+    )
   );
 $$;
 
 REVOKE EXECUTE ON FUNCTION public.is_admin() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, service_role, anon;
 
--- 3. AJUSTES E COLUNAS NA TABELA profiles
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT false;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS cpf TEXT;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone TEXT;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
-
--- Trigger para impedir que clientes alterem seu próprio campo 'role' ou 'is_admin'
+-- 4. TRIGGER PARA PROTEGER role E is_admin NA TABELA PROFILES
 CREATE OR REPLACE FUNCTION public.protect_profile_role()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -63,37 +84,104 @@ BEFORE UPDATE ON public.profiles
 FOR EACH ROW
 EXECUTE FUNCTION public.protect_profile_role();
 
--- RLS para profiles
+-- 5. TRIGGER AUTOMÁTICO PARA NOVOS USUÁRIOS DO SUPABASE AUTH
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, name, role, is_admin, phone, cpf, data, created_at, updated_at)
+  VALUES (
+    NEW.id::text,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'name', NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
+    COALESCE(NEW.raw_app_meta_data->>'role', 'customer'),
+    CASE WHEN (NEW.raw_app_meta_data->>'role') = 'admin' THEN true ELSE false END,
+    NEW.raw_user_meta_data->>'phone',
+    NEW.raw_user_meta_data->>'cpf',
+    '{}'::jsonb,
+    now(),
+    now()
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    updated_at = now();
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 6. RLS PARA PROFILES
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Users can view own profile or admin" ON public.profiles;
 CREATE POLICY "Users can view own profile or admin"
     ON public.profiles FOR SELECT
-    USING (auth.uid() = id OR public.is_admin() OR auth.role() = 'service_role');
+    USING (auth.uid()::text = id::text OR public.is_admin() OR auth.role() = 'service_role');
 
 DROP POLICY IF EXISTS "Users can update own profile data" ON public.profiles;
 CREATE POLICY "Users can update own profile data"
     ON public.profiles FOR UPDATE
-    USING (auth.uid() = id OR public.is_admin() OR auth.role() = 'service_role')
-    WITH CHECK (auth.uid() = id OR public.is_admin() OR auth.role() = 'service_role');
+    USING (auth.uid()::text = id::text OR public.is_admin() OR auth.role() = 'service_role')
+    WITH CHECK (auth.uid()::text = id::text OR public.is_admin() OR auth.role() = 'service_role');
 
 DROP POLICY IF EXISTS "Profiles insert policy" ON public.profiles;
 CREATE POLICY "Profiles insert policy"
     ON public.profiles FOR INSERT
-    WITH CHECK (auth.uid() = id OR public.is_admin() OR auth.role() = 'service_role');
+    WITH CHECK (auth.uid()::text = id::text OR public.is_admin() OR auth.role() = 'service_role');
 
--- 4. AJUSTES E COLUNAS CRÍTICAS NA TABELA orders
+-- 7. TABELA ORDERS E COLUNAS CRÍTICAS DE RASTREIO E FRETE
+CREATE TABLE IF NOT EXISTS public.orders (
+    id TEXT PRIMARY KEY,
+    user_id TEXT,
+    customer JSONB NOT NULL DEFAULT '{}'::jsonb,
+    items JSONB NOT NULL DEFAULT '[]'::jsonb,
+    subtotal NUMERIC(10,2) NOT NULL DEFAULT 0,
+    shipping NUMERIC(10,2) NOT NULL DEFAULT 0,
+    discount NUMERIC(10,2) NOT NULL DEFAULT 0,
+    total NUMERIC(10,2) NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'Aguardando Pagamento',
+    payment_status TEXT DEFAULT 'Pendente',
+    payment_method TEXT,
+    payment_details JSONB DEFAULT '{}'::jsonb,
+    shipping_address JSONB DEFAULT '{}'::jsonb,
+    shipping_details JSONB DEFAULT '{}'::jsonb,
+    shipping_status TEXT DEFAULT 'Aguardando preparação',
+    tracking_code TEXT,
+    shipping_label_url TEXT,
+    melhor_envio_shipment_id TEXT,
+    mercado_pago_payment_id TEXT,
+    mercado_pago_preference_id TEXT,
+    paid_at TIMESTAMPTZ,
+    separation_started_at TIMESTAMPTZ,
+    posted_at TIMESTAMPTZ,
+    in_transit_at TIMESTAMPTZ,
+    out_for_delivery_at TIMESTAMPTZ,
+    delivered_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_status TEXT DEFAULT 'Aguardando preparação';
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tracking_code TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_label_url TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS melhor_envio_shipment_id TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS mercado_pago_payment_id TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS mercado_pago_preference_id TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS separation_started_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS posted_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS in_transit_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS out_for_delivery_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivered_at TIMESTAMPTZ;
-ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS mercado_pago_payment_id TEXT;
-ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS mercado_pago_preference_id TEXT;
-ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS melhor_envio_shipment_id TEXT;
-ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_label_url TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'Pendente';
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
 
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders (user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders (status);
@@ -103,14 +191,13 @@ CREATE INDEX IF NOT EXISTS idx_orders_mp_payment_id ON public.orders (mercado_pa
 CREATE INDEX IF NOT EXISTS idx_orders_me_shipment_id ON public.orders (melhor_envio_shipment_id);
 CREATE INDEX IF NOT EXISTS idx_orders_tracking_code ON public.orders (tracking_code);
 
--- RLS para orders (Seguro: apenas dono lê, inserts e updates via backend/service_role ou admin)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Orders select policy" ON public.orders;
 CREATE POLICY "Orders select policy"
     ON public.orders FOR SELECT
     USING (
-      (auth.uid() IS NOT NULL AND user_id = auth.uid()) OR
+      (auth.uid() IS NOT NULL AND user_id::text = auth.uid()::text) OR
       public.is_admin() OR
       auth.role() = 'service_role'
     );
@@ -120,7 +207,8 @@ CREATE POLICY "Orders insert policy"
     ON public.orders FOR INSERT
     WITH CHECK (
       auth.role() = 'service_role' OR
-      public.is_admin()
+      public.is_admin() OR
+      (auth.uid() IS NOT NULL AND user_id::text = auth.uid()::text)
     );
 
 DROP POLICY IF EXISTS "Orders update policy" ON public.orders;
@@ -129,7 +217,7 @@ CREATE POLICY "Orders update policy"
     USING (public.is_admin() OR auth.role() = 'service_role')
     WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 
--- 5. TABELA shipment_operations (Idempotência e Lock de Emissão de Frete)
+-- 8. TABELA shipment_operations (Idempotência e Lock de Emissão de Frete)
 CREATE TABLE IF NOT EXISTS public.shipment_operations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id TEXT NOT NULL UNIQUE,
@@ -154,7 +242,7 @@ CREATE POLICY "Shipment operations admin access"
     USING (public.is_admin() OR auth.role() = 'service_role')
     WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 
--- 6. TABELA app_settings (Configurações Privadas e Operacionais)
+-- 9. TABELA app_settings (Configurações Privadas e Operacionais)
 CREATE TABLE IF NOT EXISTS public.app_settings (
     key TEXT PRIMARY KEY,
     value JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -179,12 +267,12 @@ CREATE POLICY "App settings write"
     USING (public.is_admin() OR auth.role() = 'service_role')
     WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 
--- 7. TABELAS DE SUPORTE OPERACIONAL E E-COMMERCE
+-- 10. TABELAS DE SUPORTE OPERACIONAL E E-COMMERCE
 
 -- user_addresses
 CREATE TABLE IF NOT EXISTS public.user_addresses (
     id TEXT PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL,
     recipient_name TEXT NOT NULL,
     cep TEXT NOT NULL,
     street TEXT NOT NULL,
@@ -203,13 +291,13 @@ ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "User addresses policy" ON public.user_addresses;
 CREATE POLICY "User addresses policy"
     ON public.user_addresses FOR ALL
-    USING (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'service_role')
-    WITH CHECK (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'service_role');
+    USING (auth.uid()::text = user_id::text OR public.is_admin() OR auth.role() = 'service_role')
+    WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin() OR auth.role() = 'service_role');
 
 -- cart_items
 CREATE TABLE IF NOT EXISTS public.cart_items (
     id TEXT PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL,
     product_id TEXT NOT NULL,
     variant JSONB NOT NULL DEFAULT '{}'::jsonb,
     quantity INTEGER NOT NULL CHECK (quantity > 0),
@@ -222,13 +310,13 @@ ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Cart items policy" ON public.cart_items;
 CREATE POLICY "Cart items policy"
     ON public.cart_items FOR ALL
-    USING (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'service_role')
-    WITH CHECK (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'service_role');
+    USING (auth.uid()::text = user_id::text OR public.is_admin() OR auth.role() = 'service_role')
+    WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin() OR auth.role() = 'service_role');
 
 -- wishlist_items
 CREATE TABLE IF NOT EXISTS public.wishlist_items (
     id TEXT PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL,
     product_id TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT now(),
     UNIQUE (user_id, product_id)
@@ -239,14 +327,14 @@ ALTER TABLE public.wishlist_items ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Wishlist items policy" ON public.wishlist_items;
 CREATE POLICY "Wishlist items policy"
     ON public.wishlist_items FOR ALL
-    USING (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'service_role')
-    WITH CHECK (auth.uid() = user_id OR public.is_admin() OR auth.role() = 'service_role');
+    USING (auth.uid()::text = user_id::text OR public.is_admin() OR auth.role() = 'service_role')
+    WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin() OR auth.role() = 'service_role');
 
 -- product_reviews
 CREATE TABLE IF NOT EXISTS public.product_reviews (
     id TEXT PRIMARY KEY,
     product_id TEXT NOT NULL,
-    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    user_id TEXT,
     user_name TEXT NOT NULL,
     user_email TEXT,
     rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
@@ -280,7 +368,7 @@ CREATE POLICY "Product reviews admin policy"
 CREATE TABLE IF NOT EXISTS public.returns (
     id TEXT PRIMARY KEY,
     order_id TEXT NOT NULL,
-    user_id UUID,
+    user_id TEXT,
     customer_name TEXT NOT NULL,
     customer_email TEXT NOT NULL,
     customer_phone TEXT,
@@ -303,12 +391,12 @@ DROP POLICY IF EXISTS "Returns access policy" ON public.returns;
 CREATE POLICY "Returns access policy"
     ON public.returns FOR ALL
     USING (
-      (auth.uid() IS NOT NULL AND user_id = auth.uid()) OR
+      (auth.uid() IS NOT NULL AND user_id::text = auth.uid()::text) OR
       public.is_admin() OR
       auth.role() = 'service_role'
     )
     WITH CHECK (
-      (auth.uid() IS NOT NULL AND user_id = auth.uid()) OR
+      (auth.uid() IS NOT NULL AND user_id::text = auth.uid()::text) OR
       public.is_admin() OR
       auth.role() = 'service_role'
     );
@@ -496,7 +584,7 @@ CREATE POLICY "Payment effects admin access"
     USING (public.is_admin() OR auth.role() = 'service_role')
     WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 
--- 8. STORAGE BUCKET: product-images
+-- 11. STORAGE BUCKET: product-images
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 VALUES (
     'product-images',
@@ -540,7 +628,10 @@ CREATE POLICY "Product images admin delete"
         (public.is_admin() OR auth.role() = 'service_role')
     );
 
--- 9. REGISTRAR MIGRATION CONCLUÍDA
+-- 12. NOTIFICAR RECARGA DE SCHEMA POSTGREST
+NOTIFY pgrst, 'reload schema';
+
+-- 13. REGISTRAR MIGRATION CONCLUÍDA
 INSERT INTO public.schema_migrations (version, description)
-VALUES ('v1.0.0-production-readiness', 'Schema completo e seguro para venda real: tabelas, RLS, storage, índices e colunas de rastreio')
+VALUES ('v1.0.0-production-readiness', 'Schema completo e seguro para venda real: profiles.is_admin, orders, shipment_operations, app_settings, RLS, storage e indices')
 ON CONFLICT (version) DO UPDATE SET applied_at = now();

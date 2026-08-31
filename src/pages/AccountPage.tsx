@@ -213,13 +213,6 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
     }
   };
 
-  // Handle Quick Demo Fill
-  const handleQuickDemo = (email: string, pass: string) => {
-    setLoginEmail(email);
-    setLoginPassword(pass);
-    setAuthError(null);
-  };
-
   // Handle Register
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -556,40 +549,6 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
       <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-12 px-4 sm:px-6">
         <div className="max-w-xl mx-auto space-y-6">
           <Breadcrumb items={[{ label: 'Autenticação de Conta' }]} />
-
-          {/* Quick Demo Credentials Info Banner */}
-          <div className="bg-white border border-[#E4E4E7] p-4 rounded-xl text-xs space-y-2.5 shadow-xs">
-            <div className="flex items-center gap-2 text-[#B45309] font-bold uppercase tracking-wider text-[11px]">
-              <ShieldCheck className="w-4 h-4" /> Credenciais de Demonstração Rápidas
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('admin@marmot.com', 'marmot')}
-                className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] hover:border-[#18181B]/40 p-2.5 rounded-lg text-left transition-all group cursor-pointer"
-              >
-                <div className="flex justify-between items-center text-[10px] text-[#B45309] font-mono font-bold">
-                  <span>ADMINISTRADOR</span>
-                  <span className="group-hover:translate-x-0.5 transition-transform">Usar →</span>
-                </div>
-                <p className="text-[#18181B] font-bold mt-0.5">admin@marmot.com</p>
-                <p className="text-[10px] text-[#71717A]">Senha: marmot</p>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('cliente@marmot.com', 'cliente123')}
-                className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] hover:border-[#18181B]/40 p-2.5 rounded-lg text-left transition-all group cursor-pointer"
-              >
-                <div className="flex justify-between items-center text-[10px] text-[#71717A] group-hover:text-[#18181B] font-mono font-bold">
-                  <span>CLIENTE VIP</span>
-                  <span className="group-hover:translate-x-0.5 transition-transform">Usar →</span>
-                </div>
-                <p className="text-[#18181B] font-bold mt-0.5">cliente@marmot.com</p>
-                <p className="text-[10px] text-[#71717A]">Senha: cliente123</p>
-              </button>
-            </div>
-          </div>
 
           {/* Main Auth Card */}
           <div className="bg-white border border-[#E4E4E7] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
