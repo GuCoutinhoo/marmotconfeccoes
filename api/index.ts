@@ -1389,20 +1389,47 @@ export class DatabaseManager {
     return this.supabase;
   }
 
+  /**
+   * Returns authoritative Supabase client with service_role secret for administrative writes.
+   * Fail-Closed Security Policy: Never falls back to anon client for admin operations.
+   */
   public async getSupabaseAdminClient(): Promise<SupabaseClient | null> {
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
 
     if (serviceKey && serviceKey.trim() !== '') {
+      const cleanKey = serviceKey.trim();
+      const anonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      // Fail-closed guard: Reject anon/publishable keys passed erroneously as service role key
+      if (cleanKey.startsWith('sb_publishable_') || (anonKey && cleanKey === anonKey.trim())) {
+        console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_KEY contém uma chave anon/publishable em vez de uma service_role secret válida! Acesso administrativo bloqueado.');
+        return null;
+      }
+
       if (!this.supabaseAdmin) {
-        this.supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+        this.supabaseAdmin = createClient(supabaseUrl, cleanKey, {
           auth: { persistSession: false, autoRefreshToken: false },
         });
       }
       return this.supabaseAdmin;
     }
 
-    return this.supabase;
+    // Strict fail-closed: Never fall back to anon key for administrative mutations
+    return null;
+  }
+
+  /**
+   * Requires an authoritative Supabase client with service_role secret.
+   * Throws an explicit configuration error if SUPABASE_SERVICE_ROLE_KEY is absent.
+   */
+  public async getRequiredSupabaseAdminClient(operationName = 'operação administrativa'): Promise<SupabaseClient> {
+    const adminClient = await this.getSupabaseAdminClient();
+    if (!adminClient) {
+      console.error(`[DB CONFIG ERROR] SUPABASE_SERVICE_ROLE_KEY_NOT_CONFIGURED: Impossível executar '${operationName}' no Supabase sem a chave SUPABASE_SERVICE_ROLE_KEY configurada no servidor.`);
+      throw new Error(`SUPABASE_SERVICE_ROLE_KEY_NOT_CONFIGURED: A chave SUPABASE_SERVICE_ROLE_KEY é obrigatória para executar '${operationName}' no banco de dados com integridade e segurança. Verifique as variáveis de ambiente na Vercel.`);
+    }
+    return adminClient;
   }
 
   public getMode(): 'supabase' | 'postgres' | 'durable_file' {
@@ -1599,52 +1626,51 @@ export class DatabaseManager {
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
     // 2. Synchronize to Supabase database with direct await
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (adminClient) {
-          const { error } = await adminClient.from('products').insert({
-            id: newProduct.id,
-            slug: newProduct.slug,
-            title: newProduct.title,
-            subtitle: newProduct.subtitle,
-            description: newProduct.description,
-            price: newProduct.price,
-            promo_price: newProduct.promoPrice ?? null,
-            category: newProduct.category,
-            subcategory: newProduct.subcategory,
-            collection: newProduct.collection,
-            tags: newProduct.tags,
-            rating: newProduct.rating,
-            review_count: newProduct.reviewCount,
-            stock_count: newProduct.stockCount,
-            sku: newProduct.sku,
-            sizes: newProduct.sizes,
-            colors: newProduct.colors,
-            image: newProduct.image,
-            images: newProduct.images,
-            details: newProduct.details,
-            care_instructions: newProduct.careInstructions,
-            composition: newProduct.composition,
-            weight: newProduct.weight,
-            height: newProduct.height,
-            width: newProduct.width,
-            length: newProduct.length,
-            is_new_release: newProduct.isNewRelease,
-            is_best_seller: newProduct.isBestSeller,
-            featured: newProduct.featured,
-            status: newProduct.status,
-            data: null,
-          });
+        const adminClient = await this.getRequiredSupabaseAdminClient('createProduct');
+        const { error } = await adminClient.from('products').insert({
+          id: newProduct.id,
+          slug: newProduct.slug,
+          title: newProduct.title,
+          subtitle: newProduct.subtitle,
+          description: newProduct.description,
+          price: newProduct.price,
+          promo_price: newProduct.promoPrice ?? null,
+          category: newProduct.category,
+          subcategory: newProduct.subcategory,
+          collection: newProduct.collection,
+          tags: newProduct.tags,
+          rating: newProduct.rating,
+          review_count: newProduct.reviewCount,
+          stock_count: newProduct.stockCount,
+          sku: newProduct.sku,
+          sizes: newProduct.sizes,
+          colors: newProduct.colors,
+          image: newProduct.image,
+          images: newProduct.images,
+          details: newProduct.details,
+          care_instructions: newProduct.careInstructions,
+          composition: newProduct.composition,
+          weight: newProduct.weight,
+          height: newProduct.height,
+          width: newProduct.width,
+          length: newProduct.length,
+          is_new_release: newProduct.isNewRelease,
+          is_best_seller: newProduct.isBestSeller,
+          featured: newProduct.featured,
+          status: newProduct.status,
+          data: null,
+        });
 
-          if (error) {
-            console.warn('[DB] Supabase product insert notice:', error.message);
-          } else {
-            console.log('[DB] Produto criado no Supabase com sucesso:', newProduct.id);
-          }
+        if (error) {
+          console.warn('[DB] Supabase product insert notice:', error.message);
+        } else {
+          console.log('[DB] Produto criado no Supabase com sucesso:', newProduct.id);
         }
       } catch (sbErr: any) {
         console.warn('[DB] Supabase insert exception:', sbErr?.message);
+        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
       }
     }
 
@@ -1664,10 +1690,10 @@ export class DatabaseManager {
     );
 
     if (idx === -1 && this.mode === 'supabase' && this.supabase) {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
+      const client = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (client) {
         try {
-          const { data, error } = await adminClient
+          const { data, error } = await client
             .from('products')
             .select('*')
             .or(`id.eq.${clean},slug.eq.${clean}`)
@@ -1736,59 +1762,58 @@ export class DatabaseManager {
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
     // 2. Synchronize to Supabase database via direct UPDATE with await
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (adminClient) {
-          const updatePayload: Record<string, any> = {
-            updated_at: new Date().toISOString(),
-            data: null,
-          };
-          if (updates.title !== undefined) updatePayload.title = cleanProduct.title;
-          if (updates.slug !== undefined) updatePayload.slug = cleanProduct.slug;
-          if (updates.subtitle !== undefined) updatePayload.subtitle = cleanProduct.subtitle || '';
-          if (updates.description !== undefined) updatePayload.description = cleanProduct.description || '';
-          if (updates.price !== undefined) updatePayload.price = cleanProduct.price;
-          if (updates.promoPrice !== undefined) updatePayload.promo_price = cleanProduct.promoPrice ?? null;
-          if (updates.category !== undefined) updatePayload.category = cleanProduct.category;
-          if (updates.subcategory !== undefined) updatePayload.subcategory = cleanProduct.subcategory || 'Essenciais';
-          if (updates.collection !== undefined) updatePayload.collection = cleanProduct.collection || 'Vol. 04: Cyber Dystopia';
-          if (updates.tags !== undefined) updatePayload.tags = cleanProduct.tags || [];
-          if (updates.rating !== undefined) updatePayload.rating = cleanProduct.rating || 5.0;
-          if (updates.reviewCount !== undefined) updatePayload.review_count = cleanProduct.reviewCount || 0;
-          if (updates.stockCount !== undefined) updatePayload.stock_count = cleanProduct.stockCount ?? 20;
-          if (updates.sku !== undefined) updatePayload.sku = cleanProduct.sku || '';
-          if (updates.sizes !== undefined) updatePayload.sizes = cleanProduct.sizes || ['P', 'M', 'G', 'GG'];
-          if (updates.colors !== undefined) updatePayload.colors = cleanProduct.colors || [];
-          if (updates.image !== undefined || updates.images !== undefined) {
-            updatePayload.image = cleanProduct.image || '';
-            updatePayload.images = cleanProduct.images || [];
-          }
-          if (updates.details !== undefined) updatePayload.details = cleanProduct.details || [];
-          if (updates.careInstructions !== undefined) updatePayload.care_instructions = cleanProduct.careInstructions || [];
-          if (updates.composition !== undefined) updatePayload.composition = cleanProduct.composition || [];
-          if (updates.weight !== undefined) updatePayload.weight = cleanProduct.weight || 0.35;
-          if (updates.height !== undefined) updatePayload.height = cleanProduct.height || 4;
-          if (updates.width !== undefined) updatePayload.width = cleanProduct.width || 20;
-          if (updates.length !== undefined) updatePayload.length = cleanProduct.length || 25;
-          if (updates.isNewRelease !== undefined) updatePayload.is_new_release = Boolean(cleanProduct.isNewRelease);
-          if (updates.isBestSeller !== undefined) updatePayload.is_best_seller = Boolean(cleanProduct.isBestSeller);
-          if (updates.featured !== undefined) updatePayload.featured = Boolean(cleanProduct.featured);
-          if (updates.status !== undefined) updatePayload.status = cleanProduct.status || 'active';
+        const adminClient = await this.getRequiredSupabaseAdminClient('updateProduct');
+        const updatePayload: Record<string, any> = {
+          updated_at: new Date().toISOString(),
+          data: null,
+        };
+        if (updates.title !== undefined) updatePayload.title = cleanProduct.title;
+        if (updates.slug !== undefined) updatePayload.slug = cleanProduct.slug;
+        if (updates.subtitle !== undefined) updatePayload.subtitle = cleanProduct.subtitle || '';
+        if (updates.description !== undefined) updatePayload.description = cleanProduct.description || '';
+        if (updates.price !== undefined) updatePayload.price = cleanProduct.price;
+        if (updates.promoPrice !== undefined) updatePayload.promo_price = cleanProduct.promoPrice ?? null;
+        if (updates.category !== undefined) updatePayload.category = cleanProduct.category;
+        if (updates.subcategory !== undefined) updatePayload.subcategory = cleanProduct.subcategory || 'Essenciais';
+        if (updates.collection !== undefined) updatePayload.collection = cleanProduct.collection || 'Vol. 04: Cyber Dystopia';
+        if (updates.tags !== undefined) updatePayload.tags = cleanProduct.tags || [];
+        if (updates.rating !== undefined) updatePayload.rating = cleanProduct.rating || 5.0;
+        if (updates.reviewCount !== undefined) updatePayload.review_count = cleanProduct.reviewCount || 0;
+        if (updates.stockCount !== undefined) updatePayload.stock_count = cleanProduct.stockCount ?? 20;
+        if (updates.sku !== undefined) updatePayload.sku = cleanProduct.sku || '';
+        if (updates.sizes !== undefined) updatePayload.sizes = cleanProduct.sizes || ['P', 'M', 'G', 'GG'];
+        if (updates.colors !== undefined) updatePayload.colors = cleanProduct.colors || [];
+        if (updates.image !== undefined || updates.images !== undefined) {
+          updatePayload.image = cleanProduct.image || '';
+          updatePayload.images = cleanProduct.images || [];
+        }
+        if (updates.details !== undefined) updatePayload.details = cleanProduct.details || [];
+        if (updates.careInstructions !== undefined) updatePayload.care_instructions = cleanProduct.careInstructions || [];
+        if (updates.composition !== undefined) updatePayload.composition = cleanProduct.composition || [];
+        if (updates.weight !== undefined) updatePayload.weight = cleanProduct.weight || 0.35;
+        if (updates.height !== undefined) updatePayload.height = cleanProduct.height || 4;
+        if (updates.width !== undefined) updatePayload.width = cleanProduct.width || 20;
+        if (updates.length !== undefined) updatePayload.length = cleanProduct.length || 25;
+        if (updates.isNewRelease !== undefined) updatePayload.is_new_release = Boolean(cleanProduct.isNewRelease);
+        if (updates.isBestSeller !== undefined) updatePayload.is_best_seller = Boolean(cleanProduct.isBestSeller);
+        if (updates.featured !== undefined) updatePayload.featured = Boolean(cleanProduct.featured);
+        if (updates.status !== undefined) updatePayload.status = cleanProduct.status || 'active';
 
-          const { error } = await adminClient
-            .from('products')
-            .update(updatePayload)
-            .eq('id', cleanProduct.id);
+        const { error } = await adminClient
+          .from('products')
+          .update(updatePayload)
+          .eq('id', cleanProduct.id);
 
-          if (error) {
-            console.warn('[DB] Supabase product update notice:', error.message);
-          } else {
-            console.log('[DB] Produto atualizado no Supabase com sucesso via UPDATE:', cleanProduct.id);
-          }
+        if (error) {
+          console.warn('[DB] Supabase product update notice:', error.message);
+        } else {
+          console.log('[DB] Produto atualizado no Supabase com sucesso via UPDATE:', cleanProduct.id);
         }
       } catch (sbErr: any) {
         console.warn('[DB] Supabase product update exception:', sbErr?.message);
+        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
       }
     }
 
@@ -1808,10 +1833,10 @@ export class DatabaseManager {
     );
 
     if (idx === -1 && this.mode === 'supabase' && this.supabase) {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
+      const client = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (client) {
         try {
-          const { data, error } = await adminClient
+          const { data, error } = await client
             .from('products')
             .select('*')
             .or(`id.eq.${clean},slug.eq.${clean}`)
@@ -1842,22 +1867,21 @@ export class DatabaseManager {
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
     // 2. Sync to Supabase
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (adminClient) {
-          const { error } = await adminClient.from('products').update({
-            stock_count: newStock,
-            status: status,
-            data: null,
-          }).eq('id', current.id);
+        const adminClient = await this.getRequiredSupabaseAdminClient('updateProductStock');
+        const { error } = await adminClient.from('products').update({
+          stock_count: newStock,
+          status: status,
+          data: null,
+        }).eq('id', current.id);
 
-          if (error) {
-            console.warn('[DB] Supabase stock update notice:', error.message);
-          }
+        if (error) {
+          console.warn('[DB] Supabase stock update notice:', error.message);
         }
       } catch (sbErr: any) {
         console.warn('[DB] Supabase stock update exception:', sbErr?.message);
+        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
       }
     }
 
@@ -1881,21 +1905,20 @@ export class DatabaseManager {
     this.writeJsonFile(PRODUCTS_FILE, this.products);
 
     // 2. Delete in Supabase
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
         console.log('[PRODUCTS] excluindo produto no Supabase:', cleanId);
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (adminClient) {
-          const { error } = await adminClient
-            .from('products')
-            .delete()
-            .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-          if (error) {
-            console.warn('[DB] Supabase delete product notice:', error.message);
-          }
+        const adminClient = await this.getRequiredSupabaseAdminClient('deleteProduct');
+        const { error } = await adminClient
+          .from('products')
+          .delete()
+          .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
+        if (error) {
+          console.warn('[DB] Supabase delete product notice:', error.message);
         }
       } catch (sbErr: any) {
         console.warn('[DB] Supabase delete exception:', sbErr?.message);
+        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
       }
     }
 
@@ -1948,25 +1971,23 @@ export class DatabaseManager {
     };
 
     if (this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
-        const { error } = await adminClient.from('categories').upsert({
-          id: newCategory.id,
-          slug: newCategory.slug,
-          name: newCategory.name,
-          tagline: newCategory.tagline,
-          description: newCategory.description,
-          image: newCategory.image,
-          subcategories: newCategory.subcategories,
-          product_count: newCategory.productCount,
-          order: newCategory.order,
-          active: newCategory.active,
-          data: newCategory,
-        });
-        if (error) {
-          console.error('[DB] Supabase category insert error:', error);
-          throw new Error(`Falha ao salvar categoria no Supabase: ${error.message}`);
-        }
+      const adminClient = await this.getRequiredSupabaseAdminClient('createCategory');
+      const { error } = await adminClient.from('categories').upsert({
+        id: newCategory.id,
+        slug: newCategory.slug,
+        name: newCategory.name,
+        tagline: newCategory.tagline,
+        description: newCategory.description,
+        image: newCategory.image,
+        subcategories: newCategory.subcategories,
+        product_count: newCategory.productCount,
+        order: newCategory.order,
+        active: newCategory.active,
+        data: newCategory,
+      });
+      if (error) {
+        console.error('[DB] Supabase category insert error:', error);
+        throw new Error(`Falha ao salvar categoria no Supabase: ${error.message}`);
       }
     }
 
@@ -1989,10 +2010,10 @@ export class DatabaseManager {
     );
 
     if (idx === -1 && this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
+      const client = (await this.getSupabaseAdminClient()) || this.supabase;
+      if (client) {
         try {
-          const { data, error } = await adminClient
+          const { data, error } = await client
             .from('categories')
             .select('*')
             .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
@@ -2016,25 +2037,23 @@ export class DatabaseManager {
     };
 
     if (this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
-        const { error } = await adminClient.from('categories').upsert({
-          id: updated.id,
-          slug: updated.slug,
-          name: updated.name,
-          tagline: updated.tagline,
-          description: updated.description,
-          image: updated.image,
-          subcategories: updated.subcategories,
-          product_count: updated.productCount,
-          order: updated.order,
-          active: updated.active,
-          data: updated,
-        });
-        if (error) {
-          console.error('[DB] Supabase category update error:', error);
-          throw new Error(`Falha ao atualizar categoria no Supabase: ${error.message}`);
-        }
+      const adminClient = await this.getRequiredSupabaseAdminClient('updateCategory');
+      const { error } = await adminClient.from('categories').upsert({
+        id: updated.id,
+        slug: updated.slug,
+        name: updated.name,
+        tagline: updated.tagline,
+        description: updated.description,
+        image: updated.image,
+        subcategories: updated.subcategories,
+        product_count: updated.productCount,
+        order: updated.order,
+        active: updated.active,
+        data: updated,
+      });
+      if (error) {
+        console.error('[DB] Supabase category update error:', error);
+        throw new Error(`Falha ao atualizar categoria no Supabase: ${error.message}`);
       }
     }
 
@@ -2052,13 +2071,11 @@ export class DatabaseManager {
     const lowerId = cleanId.toLowerCase();
 
     if (this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
-        const { error } = await adminClient.from('categories').delete().or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-        if (error) {
-          console.error('[DB] Supabase category delete error:', error);
-          throw new Error(`Falha ao excluir categoria no Supabase: ${error.message}`);
-        }
+      const adminClient = await this.getRequiredSupabaseAdminClient('deleteCategory');
+      const { error } = await adminClient.from('categories').delete().or(`id.eq.${cleanId},slug.eq.${cleanId}`);
+      if (error) {
+        console.error('[DB] Supabase category delete error:', error);
+        throw new Error(`Falha ao excluir categoria no Supabase: ${error.message}`);
       }
     }
 
@@ -2094,13 +2111,11 @@ export class DatabaseManager {
     });
 
     if (this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
-        for (const c of reordered) {
-          const { error } = await adminClient.from('categories').update({ order: c.order, data: c }).eq('id', c.id);
-          if (error) {
-            console.error('[DB] Supabase reorder categories error:', error);
-          }
+      const adminClient = await this.getRequiredSupabaseAdminClient('reorderCategories');
+      for (const c of reordered) {
+        const { error } = await adminClient.from('categories').update({ order: c.order, data: c }).eq('id', c.id);
+        if (error) {
+          console.error('[DB] Supabase reorder categories error:', error);
         }
       }
     }
@@ -2635,18 +2650,16 @@ export class DatabaseManager {
     this.writeJsonFile(ORDERS_FILE, this.orders);
 
     if (this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (!adminClient) {
-        throw new Error('[DB] Cliente Supabase não configurado para persistência de pedidos.');
-      }
+      const adminClient = await this.getRequiredSupabaseAdminClient(`saveOrder #${order.id}`);
 
       const orderPayload = {
         id: order.id,
         user_id: order.userId || null,
-        customer_email: order.customerEmail || 'cliente@marmot.com',
-        customer_name: order.customerName || null,
-        customer_phone: order.customerPhone || null,
-        customer_cpf: order.customerCpf || null,
+        customer: (order as any).customer || {},
+        customer_email: order.customerEmail || (order as any).customer?.email || 'cliente@marmot.com',
+        customer_name: order.customerName || (order as any).customer?.name || order.shippingAddress?.recipientName || null,
+        customer_phone: order.customerPhone || (order as any).customer?.phone || null,
+        customer_cpf: order.customerCpf || (order as any).customer?.cpf || null,
         items: order.items || [],
         shipping_address: order.shippingAddress || {},
         shipping_option: order.shippingOption || {
@@ -2655,14 +2668,17 @@ export class DatabaseManager {
           service_id: order.shippingServiceId || null,
           delivery_time: order.shippingDeliveryTime || null,
         },
+        shipping_details: (order as any).shippingDetails || null,
         payment_method: order.paymentMethod || null,
+        payment_details: order.paymentDetails || {},
         subtotal: Number(order.subtotal || 0),
-        shipping_fee: Number(order.shippingFee || 0),
+        shipping: Number(order.shippingFee || (order as any).shipping || 0),
+        shipping_fee: Number(order.shippingFee || (order as any).shipping || 0),
         discount: Number(order.discount || 0),
         total: Number(order.total || 0),
         status: order.status || 'Aguardando Pagamento',
         payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' || order.status === 'Em Separação' ? 'Pago' : 'Pendente'),
-        shipping_status: order.shippingStatus || null,
+        shipping_status: order.shippingStatus || 'Aguardando preparação',
         tracking_code: order.trackingCode || null,
         tracking_url: (order as any).trackingUrl || (order as any).tracking_url || null,
         paid_at: order.paidAt || (order.paymentStatus === 'Pago' ? (order.createdAt || new Date().toISOString()) : null),
@@ -2671,69 +2687,25 @@ export class DatabaseManager {
         in_transit_at: order.inTransitAt || null,
         out_for_delivery_at: order.outForDeliveryAt || null,
         delivered_at: order.deliveredAt || null,
-        mercado_pago_payment_id: order.paymentDetails?.mercadoPagoPaymentId || null,
-        mercado_pago_preference_id: order.paymentDetails?.mercadoPagoPreferenceId || null,
-        melhor_envio_shipment_id: order.melhorEnvioShipmentId || null,
-        shipping_label_url: order.shippingLabelUrl || null,
+        mercado_pago_payment_id: order.paymentDetails?.mercadoPagoPaymentId || (order as any).mercado_pago_payment_id || null,
+        mercado_pago_preference_id: order.paymentDetails?.mercadoPagoPreferenceId || (order as any).mercado_pago_preference_id || null,
+        melhor_envio_shipment_id: order.melhorEnvioShipmentId || (order as any).melhor_envio_shipment_id || null,
+        shipping_label_url: order.shippingLabelUrl || (order as any).shipping_label_url || null,
         history: order.history || [],
         notes: (order as any).notes || null,
         data: order,
         updated_at: new Date().toISOString(),
       };
 
-      const { error: fullSaveErr } = await adminClient.from('orders').upsert(orderPayload, { onConflict: 'id' });
-      let saveErr = fullSaveErr;
-
-      // Graceful fallback if schema cache lacks some new columns (PGRST204)
-      if (saveErr && (saveErr.code === 'PGRST204' || saveErr.message?.includes('schema cache'))) {
-        console.warn('[DB] Supabase orders table missing some new columns. Falling back to core columns + JSONB data payload:', saveErr.message);
-
-        const basePayload: Record<string, any> = {
-          id: order.id,
-          user_id: order.userId || null,
-          customer_email: order.customerEmail || 'cliente@marmot.com',
-          customer_name: order.customerName || null,
-          customer_phone: order.customerPhone || null,
-          customer_cpf: order.customerCpf || null,
-          items: order.items || [],
-          shipping_address: order.shippingAddress || {},
-          shipping_option: order.shippingOption || {
-            company: order.shippingCarrier || null,
-            service_name: order.shippingService || null,
-            service_id: order.shippingServiceId || null,
-            delivery_time: order.shippingDeliveryTime || null,
-          },
-          payment_method: order.paymentMethod || null,
-          subtotal: Number(order.subtotal || 0),
-          shipping_fee: Number(order.shippingFee || 0),
-          discount: Number(order.discount || 0),
-          total: Number(order.total || 0),
-          status: order.status || 'Aguardando Pagamento',
-          payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' || order.status === 'Em Separação' ? 'Pago' : 'Pendente'),
-          tracking_code: order.trackingCode || null,
-          tracking_url: (order as any).trackingUrl || (order as any).tracking_url || null,
-          history: order.history || [],
-          notes: (order as any).notes || null,
-          data: order,
-          updated_at: new Date().toISOString(),
-        };
-
-        const { error: baseSaveErr } = await adminClient.from('orders').upsert(basePayload, { onConflict: 'id' });
-        if (!baseSaveErr) {
-          console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase (modo compatibilidade schema). Execute a migration para ativar todas as colunas dedicadas.`);
-          saveErr = null;
-        } else {
-          saveErr = baseSaveErr;
-        }
-      }
+      const { error: saveErr } = await adminClient.from('orders').upsert(orderPayload, { onConflict: 'id' });
 
       if (saveErr) {
         console.error('[DB] Supabase order upsert error details:', saveErr.message, saveErr.details, saveErr.hint);
         throw new Error(`Falha ao persistir pedido no Supabase: ${saveErr.message}`);
       }
-      console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase`);
+      console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase via Service Role.`);
 
-      // Also save order_items if table exists
+      // Persist normalized order_items
       if (Array.isArray(order.items) && order.items.length > 0) {
         for (const item of order.items) {
           try {
@@ -2784,9 +2756,10 @@ export class DatabaseManager {
     }
     this.writeJsonFile(COUPONS_FILE, this.coupons);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('coupons').upsert({
+        const adminClient = await this.getRequiredSupabaseAdminClient('saveCoupon');
+        await adminClient.from('coupons').upsert({
           code: coupon.code,
           discount_percentage: coupon.discountPercentage,
           min_order_value: coupon.minOrderValue,
@@ -2807,9 +2780,10 @@ export class DatabaseManager {
     this.coupons = this.coupons.filter((c) => c.code.toUpperCase() !== code.toUpperCase());
     this.writeJsonFile(COUPONS_FILE, this.coupons);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('coupons').delete().eq('code', code.toUpperCase());
+        const adminClient = await this.getRequiredSupabaseAdminClient('deleteCoupon');
+        await adminClient.from('coupons').delete().eq('code', code.toUpperCase());
       } catch (err) {
         console.error('[DB] Supabase coupon delete error:', err);
       }
@@ -3304,9 +3278,10 @@ export class DatabaseManager {
     }
     this.writeJsonFile(RETURNS_FILE, this.returns);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('returns').upsert({
+        const adminClient = await this.getRequiredSupabaseAdminClient('saveReturn');
+        await adminClient.from('returns').upsert({
           id: returnReq.id,
           order_id: returnReq.orderId,
           user_id: returnReq.userId || null,
@@ -3349,9 +3324,10 @@ export class DatabaseManager {
     this.inventoryMovements.unshift(mov);
     this.writeJsonFile(INVENTORY_MOVEMENTS_FILE, this.inventoryMovements);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('inventory_movements').insert({
+        const adminClient = await this.getRequiredSupabaseAdminClient('recordInventoryMovement');
+        await adminClient.from('inventory_movements').insert({
           id: mov.id,
           product_id: mov.productId,
           product_title: mov.productTitle,
@@ -3392,9 +3368,10 @@ export class DatabaseManager {
     }
     this.writeJsonFile(STORE_BANNERS_FILE, this.storeBanners);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('store_banners').upsert({
+        const adminClient = await this.getRequiredSupabaseAdminClient('saveStoreBanner');
+        await adminClient.from('store_banners').upsert({
           id: banner.id,
           title: banner.title,
           subtitle: banner.subtitle || null,
@@ -3419,9 +3396,10 @@ export class DatabaseManager {
     this.storeBanners = this.storeBanners.filter((b) => b.id !== id);
     this.writeJsonFile(STORE_BANNERS_FILE, this.storeBanners);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('store_banners').delete().eq('id', id);
+        const adminClient = await this.getRequiredSupabaseAdminClient('deleteStoreBanner');
+        await adminClient.from('store_banners').delete().eq('id', id);
       } catch (err) {
         console.error('[DB] Supabase store banner delete error:', err);
       }
@@ -3442,9 +3420,10 @@ export class DatabaseManager {
     this.storeSettings = { ...this.storeSettings, ...settings };
     this.writeJsonFile(STORE_SETTINGS_FILE, this.storeSettings);
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('store_settings').upsert({
+        const adminClient = await this.getRequiredSupabaseAdminClient('saveStoreSettings');
+        await adminClient.from('store_settings').upsert({
           id: 'default',
           store_name: this.storeSettings.storeName,
           contact_email: this.storeSettings.contactEmail,
@@ -7051,6 +7030,9 @@ function verifyMercadoPagoWebhookSignature(req: express.Request, secret?: string
 
 // Preference creation handler (dynamic pricing from DB)
 async function handleCreatePreference(req: express.Request, res: express.Response) {
+  const reqStart = Date.now();
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+
   try {
     const {
       items: rawItems,
@@ -7168,6 +7150,17 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       ? existingOrder.id
       : (requestedOrderId && requestedOrderId.startsWith('MM-') ? requestedOrderId : `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`);
 
+    console.log('[CHECKOUT_START]', JSON.stringify({
+      requestId,
+      orderId,
+      userId: orderUserId || 'guest',
+      itemCount: validatedItems.length,
+      subtotal,
+      shippingFee: validatedShippingFee,
+      discount,
+      total,
+    }));
+
     const newOrder: Order = {
       id: orderId,
       userId: orderUserId || existingOrder?.userId || undefined,
@@ -7213,7 +7206,26 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       createdAt: existingOrder?.createdAt || new Date().toISOString(),
     };
 
-    await db.saveOrder(newOrder);
+    // Save pending order in database BEFORE calling Mercado Pago
+    const persistStart = Date.now();
+    console.log('[ORDER_PERSIST_START]', JSON.stringify({ requestId, orderId, step: 'db_save_pending_order' }));
+
+    try {
+      await db.saveOrder(newOrder);
+      console.log('[ORDER_PERSIST_SUCCESS]', JSON.stringify({
+        requestId,
+        orderId,
+        durationMs: Date.now() - persistStart,
+      }));
+    } catch (saveErr: any) {
+      console.error('[ORDER_PERSIST_ERROR]', JSON.stringify({
+        requestId,
+        orderId,
+        error: saveErr.message,
+        durationMs: Date.now() - persistStart,
+      }));
+      throw saveErr;
+    }
 
     if (newOrder.customerEmail) {
       sendTransactionalEmail({
@@ -7337,6 +7349,15 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     let initPoint = '';
     let sandboxInitPoint = '';
 
+    const mpStart = Date.now();
+    console.log('[MP_PREFERENCE_START]', JSON.stringify({
+      requestId,
+      orderId: newOrder.id,
+      isSandbox,
+      itemsCount: mpItems.length,
+      total,
+    }));
+
     try {
       const preference = new Preference(mpClient);
       const prefResponse = await preference.create({ body: preferencePayload });
@@ -7349,6 +7370,13 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         throw new Error('Mercado Pago não retornou uma URL de checkout válida (init_point ausente).');
       }
 
+      console.log('[MP_PREFERENCE_SUCCESS]', JSON.stringify({
+        requestId,
+        orderId: newOrder.id,
+        preferenceId,
+        durationMs: Date.now() - mpStart,
+      }));
+
       newOrder.paymentDetails = {
         ...newOrder.paymentDetails,
         mercadoPagoPreferenceId: preferenceId,
@@ -7356,7 +7384,12 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       };
       await db.saveOrder(newOrder);
     } catch (mpErr: any) {
-      console.error('[MERCADO PAGO SDK PREFERENCE ERROR]:', mpErr);
+      console.error('[MP_PREFERENCE_ERROR]', JSON.stringify({
+        requestId,
+        orderId: newOrder.id,
+        error: mpErr.message,
+        durationMs: Date.now() - mpStart,
+      }));
       return res.status(500).json({
         error: 'Erro ao gerar preferência no Mercado Pago.',
         message: mpErr.message || 'Falha na comunicação com a API do Mercado Pago.',
@@ -7364,6 +7397,15 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     }
 
     const targetUrl = (isSandbox && sandboxInitPoint) ? sandboxInitPoint : (initPoint || sandboxInitPoint);
+
+    console.log('[CHECKOUT_SUCCESS]', JSON.stringify({
+      requestId,
+      orderId: newOrder.id,
+      preferenceId,
+      targetUrl,
+      durationMs: Date.now() - reqStart,
+      httpStatus: 201,
+    }));
 
     return res.status(201).json({
       success: true,
@@ -7381,7 +7423,7 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
   } catch (error: any) {
     console.error('[CREATE PREFERENCE ERROR]:', error);
     return res.status(500).json({
-      error: 'Erro ao processar e salvar pedido do Mercado Pago.',
+      error: 'Falha ao persistir pedido no Supabase',
       message: error.message,
     });
   }

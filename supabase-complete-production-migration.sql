@@ -141,9 +141,14 @@ CREATE TABLE IF NOT EXISTS public.orders (
     id TEXT PRIMARY KEY,
     user_id TEXT,
     customer JSONB NOT NULL DEFAULT '{}'::jsonb,
+    customer_email TEXT,
+    customer_name TEXT,
+    customer_phone TEXT,
+    customer_cpf TEXT,
     items JSONB NOT NULL DEFAULT '[]'::jsonb,
     subtotal NUMERIC(10,2) NOT NULL DEFAULT 0,
     shipping NUMERIC(10,2) NOT NULL DEFAULT 0,
+    shipping_fee NUMERIC(10,2) NOT NULL DEFAULT 0,
     discount NUMERIC(10,2) NOT NULL DEFAULT 0,
     total NUMERIC(10,2) NOT NULL DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'Aguardando Pagamento',
@@ -151,9 +156,11 @@ CREATE TABLE IF NOT EXISTS public.orders (
     payment_method TEXT,
     payment_details JSONB DEFAULT '{}'::jsonb,
     shipping_address JSONB DEFAULT '{}'::jsonb,
+    shipping_option JSONB DEFAULT '{}'::jsonb,
     shipping_details JSONB DEFAULT '{}'::jsonb,
     shipping_status TEXT DEFAULT 'Aguardando preparação',
     tracking_code TEXT,
+    tracking_url TEXT,
     shipping_label_url TEXT,
     melhor_envio_shipment_id TEXT,
     mercado_pago_payment_id TEXT,
@@ -164,12 +171,36 @@ CREATE TABLE IF NOT EXISTS public.orders (
     in_transit_at TIMESTAMPTZ,
     out_for_delivery_at TIMESTAMPTZ,
     delivered_at TIMESTAMPTZ,
+    history JSONB DEFAULT '[]'::jsonb,
+    notes TEXT,
+    data JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Adição idempotente de todas as colunas necessárias para compatibilidade total
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer JSONB NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_email TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_name TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_phone TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_cpf TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS items JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS subtotal NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_fee NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS discount NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS total NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'Aguardando Pagamento';
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'Pendente';
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_method TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_details JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_address JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_option JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_details JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_status TEXT DEFAULT 'Aguardando preparação';
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tracking_code TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS tracking_url TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS shipping_label_url TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS melhor_envio_shipment_id TEXT;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS mercado_pago_payment_id TEXT;
@@ -180,7 +211,9 @@ ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS posted_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS in_transit_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS out_for_delivery_at TIMESTAMPTZ;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS delivered_at TIMESTAMPTZ;
-ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'Pendente';
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS history JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
 
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders (user_id);
@@ -207,13 +240,90 @@ CREATE POLICY "Orders insert policy"
     ON public.orders FOR INSERT
     WITH CHECK (
       auth.role() = 'service_role' OR
-      public.is_admin() OR
-      (auth.uid() IS NOT NULL AND user_id::text = auth.uid()::text)
+      public.is_admin()
     );
 
 DROP POLICY IF EXISTS "Orders update policy" ON public.orders;
 CREATE POLICY "Orders update policy"
     ON public.orders FOR UPDATE
+    USING (public.is_admin() OR auth.role() = 'service_role')
+    WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Orders delete policy" ON public.orders;
+CREATE POLICY "Orders delete policy"
+    ON public.orders FOR DELETE
+    USING (public.is_admin() OR auth.role() = 'service_role');
+
+-- 7.1 TABELA ORDER_ITEMS E RLS
+CREATE TABLE IF NOT EXISTS public.order_items (
+    id TEXT PRIMARY KEY,
+    order_id TEXT NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
+    product_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    sku TEXT,
+    size TEXT DEFAULT 'M',
+    color TEXT DEFAULT 'Padrão',
+    color_name TEXT,
+    color_hex TEXT,
+    image TEXT,
+    quantity INTEGER NOT NULL DEFAULT 1,
+    price NUMERIC(10,2) NOT NULL DEFAULT 0,
+    subtotal NUMERIC(10,2) NOT NULL DEFAULT 0,
+    weight NUMERIC(10,3),
+    height NUMERIC(10,2),
+    width NUMERIC(10,2),
+    length NUMERIC(10,2),
+    data JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS title TEXT;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS sku TEXT;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS size TEXT DEFAULT 'M';
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS color TEXT DEFAULT 'Padrão';
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS color_name TEXT;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS color_hex TEXT;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS image TEXT;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS quantity INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS price NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS subtotal NUMERIC(10,2) NOT NULL DEFAULT 0;
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS weight NUMERIC(10,3);
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS height NUMERIC(10,2);
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS width NUMERIC(10,2);
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS length NUMERIC(10,2);
+ALTER TABLE public.order_items ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON public.order_items (order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON public.order_items (product_id);
+
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Order items select policy" ON public.order_items;
+CREATE POLICY "Order items select policy"
+    ON public.order_items FOR SELECT
+    USING (
+      EXISTS (
+        SELECT 1 FROM public.orders o
+        WHERE o.id = public.order_items.order_id
+        AND (
+          (auth.uid() IS NOT NULL AND o.user_id::text = auth.uid()::text) OR
+          public.is_admin() OR
+          auth.role() = 'service_role'
+        )
+      )
+    );
+
+DROP POLICY IF EXISTS "Order items insert policy" ON public.order_items;
+CREATE POLICY "Order items insert policy"
+    ON public.order_items FOR INSERT
+    WITH CHECK (
+      auth.role() = 'service_role' OR
+      public.is_admin()
+    );
+
+DROP POLICY IF EXISTS "Order items update policy" ON public.order_items;
+CREATE POLICY "Order items update policy"
+    ON public.order_items FOR ALL
     USING (public.is_admin() OR auth.role() = 'service_role')
     WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 
