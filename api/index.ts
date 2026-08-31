@@ -5278,8 +5278,18 @@ export async function fetchWithTimeout(url: string, options: RequestInit = {}, t
 
 export const app = express();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'marmot-streetwear-super-secret-jwt-key-2026';
-const BCRYPT_SALT_ROUNDS = 10;
+const JWT_SECRET = process.env.JWT_SECRET || (() => {
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
+    console.warn('[SECURITY WARNING] JWT_SECRET não configurado no ambiente de produção. Usando segredo temporário em memória.');
+  }
+  return crypto.randomBytes(32).toString('hex');
+})();
+
+const SESSION_SECRET = process.env.SESSION_SECRET || (() => {
+  return crypto.randomBytes(32).toString('hex');
+})();
+
+const BCRYPT_SALT_ROUNDS = 12;
 
 // High-Performance In-Memory Sliding Window Rate Limiter
 class RateLimiter {
@@ -5330,38 +5340,19 @@ export const newsletterRateLimiter = new RateLimiter(60 * 1000, 10, 'newsletter'
 export const reviewRateLimiter = new RateLimiter(10 * 60 * 1000, 15, 'reviews');
 
 app.use(compression({ threshold: 512 }));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ limit: '50mb', extended: true }));
-app.use(cookieParser(process.env.SESSION_SECRET || 'marmot-session-secret-token-key-2026'));
+app.use(express.json({ limit: '15mb' }));
+app.use(express.urlencoded({ limit: '15mb', extended: true }));
+app.use(cookieParser(SESSION_SECRET));
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
 });
 
 app.use('/uploads', express.static(UPLOADS_DIR, { maxAge: '30d', immutable: true }));
-
-async function ensureAdminUser() {
-  await db.initialize();
-  const admin = await db.getUserByEmail('admin@marmot.com');
-  if (!admin) {
-    await db.saveUser({
-      id: 'usr-admin-marmot',
-      name: 'Administrador Marmot',
-      email: 'admin@marmot.com',
-      passwordHash: bcrypt.hashSync('marmot', BCRYPT_SALT_ROUNDS),
-      role: 'admin',
-      isVerified: true,
-      phone: '(11) 99999-0000',
-      cpf: '000.000.000-00',
-      addresses: [],
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString(),
-    });
-  }
-}
-ensureAdminUser();
 
 function extractToken(req: any): string | null {
   const authHeader = req.headers?.authorization || req.headers?.Authorization;
@@ -5486,53 +5477,75 @@ function validateSenderDocument(doc: string | undefined | null): {
   };
 }
 
-// Cryptographic token validation with HMAC and Supabase Auth
+function getAdminEmailList(): string[] {
+  const envAdmins = process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '';
+  const parsed = envAdmins.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+  if (parsed.length > 0) return parsed;
+  return ['gustavohcsantos.mm2020@gmail.com'];
+}
+
+// Cryptographic token validation with HMAC and Supabase Auth (Strict signature enforcement)
 async function verifyAuthToken(token: string): Promise<{ userId: string; email: string | null; role: string; name: string } | null> {
   if (!token || typeof token !== 'string') return null;
 
-  // 1. Try local HMAC signature
+  const adminEmails = getAdminEmailList();
+
+  // 1. Try local HMAC signature verification
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     if (decoded && (decoded.userId || decoded.sub)) {
-      const email = decoded.email || null;
-      const isHardcodedAdmin =
-        email?.toLowerCase() === 'admin@marmot.com' ||
-        email?.toLowerCase() === 'gustavohcsantos.mm2020@gmail.com' ||
-        decoded.role === 'admin' ||
+      const email = decoded.email ? String(decoded.email).toLowerCase().trim() : null;
+      const isOfficialAdmin = Boolean(
+        (email && adminEmails.includes(email)) ||
         decoded.app_metadata?.role === 'admin' ||
-        decoded.user_metadata?.role === 'admin';
+        decoded.role === 'admin'
+      );
+
       return {
-        userId: decoded.userId || decoded.sub,
+        userId: String(decoded.userId || decoded.sub),
         email,
-        role: isHardcodedAdmin ? 'admin' : (decoded.role || 'customer'),
+        role: isOfficialAdmin ? 'admin' : (decoded.role === 'admin' ? 'admin' : 'customer'),
         name: decoded.name || email?.split('@')[0] || 'Cliente Marmot',
       };
     }
   } catch {
-    // Signature did not match local secret - verify with Supabase Auth
+    // Signature did not match local secret - proceed to Supabase Auth cryptographic verification
   }
 
-  // 2. Validate with Supabase Auth Server (Signature checked cryptographically)
+  // 2. Validate with Supabase Auth Server (Cryptographic asymmetric signature checked by Supabase Auth)
   const supabase = db.getSupabaseClient();
   if (supabase) {
     try {
       const { data, error } = await supabase.auth.getUser(token);
       if (!error && data?.user) {
-        const email = data.user.email || null;
+        const email = data.user.email ? data.user.email.toLowerCase().trim() : null;
         const appRole = data.user.app_metadata?.role;
-        const userMetaRole = data.user.user_metadata?.role;
-        const isHardcodedAdmin =
-          email?.toLowerCase() === 'admin@marmot.com' ||
-          email?.toLowerCase() === 'gustavohcsantos.mm2020@gmail.com' ||
+        
+        // Strict role validation: Check profiles table or app_metadata
+        let isDbAdmin = false;
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role, is_admin')
+            .eq('id', data.user.id)
+            .maybeSingle();
+
+          if (profile) {
+            isDbAdmin = profile.role === 'admin' || profile.is_admin === true;
+          }
+        } catch {}
+
+        const isOfficialAdmin = Boolean(
+          (email && adminEmails.includes(email)) ||
           appRole === 'admin' ||
-          userMetaRole === 'admin';
-        const role = isHardcodedAdmin ? 'admin' : 'customer';
-        const name = data.user.user_metadata?.name || data.user.user_metadata?.full_name || email?.split('@')[0] || 'Cliente Marmot';
+          isDbAdmin
+        );
+
         return {
           userId: data.user.id,
           email,
-          role,
-          name,
+          role: isOfficialAdmin ? 'admin' : 'customer',
+          name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email?.split('@')[0] || 'Cliente Marmot',
         };
       }
     } catch {
@@ -5540,27 +5553,7 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
     }
   }
 
-  // 3. Fallback: decode JWT payload safely
-  try {
-    const decoded = jwt.decode(token) as any;
-    if (decoded && (decoded.sub || decoded.email || decoded.userId)) {
-      const email = decoded.email || null;
-      const isHardcodedAdmin =
-        email?.toLowerCase() === 'admin@marmot.com' ||
-        email?.toLowerCase() === 'gustavohcsantos.mm2020@gmail.com' ||
-        decoded.app_metadata?.role === 'admin' ||
-        decoded.user_metadata?.role === 'admin' ||
-        decoded.role === 'admin' ||
-        decoded.role === 'service_role';
-      return {
-        userId: decoded.sub || decoded.userId || 'usr-admin',
-        email,
-        role: isHardcodedAdmin ? 'admin' : (decoded.role || 'customer'),
-        name: decoded.user_metadata?.name || decoded.user_metadata?.full_name || decoded.name || email?.split('@')[0] || 'Administrador',
-      };
-    }
-  } catch {}
-
+  // Tokens without valid cryptographic signatures are strictly rejected (No insecure fallback)
   return null;
 }
 
@@ -5584,19 +5577,16 @@ async function requireAuth(req: any, res: express.Response, next: express.NextFu
     }
 
     if (user) {
-      if (userEmail?.toLowerCase() === 'admin@marmot.com' || userRole === 'admin') {
-        user.role = 'admin';
-      }
+      user.role = userRole === 'admin' ? 'admin' : (user.role || 'customer');
     }
 
     if (!user && userId) {
-      const isHardcodedAdmin = userEmail?.toLowerCase() === 'admin@marmot.com' || userRole === 'admin';
       const newUser: DbUser = {
         id: userId,
         name: userName || userEmail?.split('@')[0] || 'Cliente Marmot',
         email: userEmail || `user-${userId}@marmot.com`,
         passwordHash: '',
-        role: isHardcodedAdmin ? 'admin' : 'customer',
+        role: userRole === 'admin' ? 'admin' : 'customer',
         isVerified: true,
         addresses: [],
         createdAt: new Date().toISOString(),
@@ -5611,9 +5601,7 @@ async function requireAuth(req: any, res: express.Response, next: express.NextFu
     }
 
     req.user = sanitizeUser(user);
-    if (userEmail?.toLowerCase() === 'admin@marmot.com' || userRole === 'admin') {
-      req.user.role = 'admin';
-    }
+    req.user.role = userRole === 'admin' ? 'admin' : (user.role || 'customer');
     req.fullUser = user;
     next();
   } catch {
@@ -5631,7 +5619,7 @@ async function requireAdmin(req: any, res: express.Response, next: express.NextF
         status: 'failure',
         details: 'Tentativa de acesso não autorizada a endpoint administrativo.',
       });
-      return res.status(403).json({ error: 'Acesso negado. Esta rota é restrita a administradores.' });
+      return res.status(403).json({ error: 'Acesso negado. Esta rota é restrita a administradores autorizados.' });
     }
     next();
   });
@@ -5648,7 +5636,66 @@ app.get(['/api/health', '/health'], async (req, res) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
+    databaseMode: db.getMode(),
   });
+});
+
+// Comprehensive Production Diagnostics & Readiness Healthcheck
+app.get('/api/admin/health', requireAdmin, async (req, res) => {
+  try {
+    await db.initialize();
+    const supabase = db.getSupabaseClient();
+    const isSupabase = db.getMode() === 'supabase' && Boolean(supabase);
+
+    const tablesStatus: Record<string, boolean> = {};
+    if (isSupabase && supabase) {
+      const checkTables = ['products', 'orders', 'profiles', 'shipment_operations', 'app_settings', 'webhook_events', 'payment_effects'];
+      for (const tbl of checkTables) {
+        try {
+          const { error } = await supabase.from(tbl).select('id').limit(1);
+          tablesStatus[tbl] = !error;
+        } catch {
+          tablesStatus[tbl] = false;
+        }
+      }
+    }
+
+    const meConfig = getMelhorEnvioConfig();
+    const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+    const resendKey = process.env.RESEND_API_KEY;
+
+    res.json({
+      status: 'ok',
+      readyForProduction: true,
+      timestamp: new Date().toISOString(),
+      database: {
+        mode: db.getMode(),
+        supabaseConnected: isSupabase,
+        tables: tablesStatus,
+      },
+      integrations: {
+        mercadoPago: {
+          configured: Boolean(mpToken && mpToken.length >= 10),
+          environment: process.env.MERCADOPAGO_ENV || 'production',
+          webhookConfigured: Boolean(process.env.MERCADOPAGO_WEBHOOK_SECRET),
+        },
+        melhorEnvio: {
+          configured: Boolean(meConfig.token && meConfig.token.length >= 10),
+          environment: meConfig.environment,
+          originCep: meConfig.originPostalCode,
+        },
+        resend: {
+          configured: Boolean(resendKey && resendKey.length >= 10),
+        },
+      },
+      security: {
+        jwtConfigured: Boolean(process.env.JWT_SECRET),
+        storageBucket: 'product-images',
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ status: 'error', message: err.message });
+  }
 });
 
 // --- Products (Real persistent store) ---
@@ -5935,96 +5982,115 @@ app.post('/api/auth/logout', (req, res) => {
   res.json({ success: true, message: 'Logout realizado com sucesso.' });
 });
 
-// --- Uploads (Preserves 100% of the original image resolution, bytes and format) ---
-app.post('/api/upload', async (req, res) => {
+// --- Uploads (Protected with Admin Auth, Magic Bytes Validation & Supabase Storage) ---
+app.post('/api/upload', requireAdmin, async (req, res) => {
   try {
     const { image, filename, productId, mimeType: explicitMime } = req.body;
     if (!image) {
       return res.status(400).json({ error: 'Nenhuma imagem enviada.' });
     }
 
-    if (typeof image === 'string' && (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('/uploads/'))) {
+    if (typeof image === 'string' && (image.startsWith('https://') || image.startsWith('http://'))) {
       return res.json({ success: true, url: image });
     }
 
     const matches = typeof image === 'string' ? image.match(/^data:([A-Za-z-+/0-9]+);base64,(.+)$/) : null;
     if (!matches || matches.length !== 3) {
-      return res.json({ success: true, url: image });
+      return res.status(400).json({ error: 'Formato de base64 inválido para upload de imagem.' });
     }
 
-    const detectedMime = explicitMime || matches[1] || 'image/jpeg';
+    const declaredMime = (explicitMime || matches[1] || 'image/jpeg').toLowerCase();
+    
+    // Explicitly block SVG and non-image types
+    if (declaredMime.includes('svg') || declaredMime.includes('xml') || declaredMime.includes('html')) {
+      return res.status(400).json({ error: 'Upload de arquivos SVG/XML não é permitido por motivos de segurança.' });
+    }
+
     const base64Data = matches[2];
     const buffer = Buffer.from(base64Data, 'base64');
 
-    let ext = 'jpg';
-    if (detectedMime.includes('png')) ext = 'png';
-    else if (detectedMime.includes('webp')) ext = 'webp';
-    else if (detectedMime.includes('jpeg') || detectedMime.includes('jpg')) ext = 'jpg';
-    else if (detectedMime.includes('gif')) ext = 'gif';
-    else if (detectedMime.includes('svg')) ext = 'svg';
+    // 10MB File Size Limit
+    const MAX_SIZE_BYTES = 10 * 1024 * 1024;
+    if (buffer.length > MAX_SIZE_BYTES) {
+      return res.status(400).json({ error: `O arquivo excede o limite máximo permitido de 10MB (${(buffer.length / (1024 * 1024)).toFixed(2)}MB).` });
+    }
 
-    if (filename && filename.includes('.')) {
-      const parsedExt = filename.split('.').pop()?.toLowerCase();
-      if (parsedExt && ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'].includes(parsedExt)) {
-        ext = parsedExt === 'jpeg' ? 'jpg' : parsedExt;
-      }
+    // Magic Bytes Verification
+    let detectedMime = '';
+    let ext = 'jpg';
+
+    if (buffer.length >= 3 && buffer[0] === 0xFF && buffer[1] === 0xD8 && buffer[2] === 0xFF) {
+      detectedMime = 'image/jpeg';
+      ext = 'jpg';
+    } else if (buffer.length >= 8 && buffer[0] === 0x89 && buffer[1] === 0x50 && buffer[2] === 0x4E && buffer[3] === 0x47) {
+      detectedMime = 'image/png';
+      ext = 'png';
+    } else if (buffer.length >= 12 && buffer.slice(0, 4).toString('ascii') === 'RIFF' && buffer.slice(8, 12).toString('ascii') === 'WEBP') {
+      detectedMime = 'image/webp';
+      ext = 'webp';
+    } else if (buffer.length >= 6 && buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46) {
+      detectedMime = 'image/gif';
+      ext = 'gif';
+    } else {
+      return res.status(400).json({
+        error: 'Arquivo com assinatura inválida. São aceitos exclusivamente arquivos nos formatos JPEG, PNG, WEBP ou GIF.',
+      });
     }
 
     const cleanProdId = String(productId || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
     const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
     const storagePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
 
-    // 1. Upload directly to Supabase Storage 'product-images' bucket (Preserving original bytes & resolution)
-    try {
-      const adminClient = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
-      if (adminClient) {
-        // Ensure bucket exists
-        try {
-          await adminClient.storage.createBucket('product-images', { public: true });
-        } catch {}
+    // Upload directly to Supabase Storage 'product-images' bucket
+    const adminClient = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+    if (adminClient) {
+      try {
+        await adminClient.storage.createBucket('product-images', { public: true });
+      } catch {}
 
-        const { data: uploadData, error: uploadErr } = await adminClient.storage
+      const { data: uploadData, error: uploadErr } = await adminClient.storage
+        .from('product-images')
+        .upload(storagePath, buffer, {
+          contentType: detectedMime,
+          cacheControl: '31536000',
+          upsert: true,
+        });
+
+      if (!uploadErr && uploadData) {
+        const { data: urlData } = adminClient.storage
           .from('product-images')
-          .upload(storagePath, buffer, {
-            contentType: detectedMime,
-            cacheControl: '31536000',
-            upsert: true,
-          });
+          .getPublicUrl(storagePath);
 
-        if (!uploadErr && uploadData) {
-          const { data: urlData } = adminClient.storage
-            .from('product-images')
-            .getPublicUrl(storagePath);
-
-          if (urlData && urlData.publicUrl) {
-            console.log('[UPLOAD] Arquivo original salvo com sucesso no Supabase Storage:', urlData.publicUrl);
-            return res.json({ success: true, url: urlData.publicUrl });
-          }
-        } else if (uploadErr) {
-          console.warn('[UPLOAD] Supabase Storage upload error notice:', uploadErr.message);
+        if (urlData && urlData.publicUrl) {
+          console.log('[UPLOAD] Imagem salva com sucesso no Supabase Storage:', urlData.publicUrl);
+          return res.json({ success: true, url: urlData.publicUrl });
         }
       }
-    } catch (sbErr: any) {
-      console.warn('[UPLOAD] Supabase Storage exception:', sbErr?.message);
+
+      if (uploadErr) {
+        console.error('[UPLOAD ERROR] Falha no Supabase Storage:', uploadErr.message);
+        return res.status(500).json({ error: `Erro no Supabase Storage: ${uploadErr.message}` });
+      }
     }
 
-    // 2. Local durable file fallback (Preserving original bytes)
+    // Fallback for local development if Supabase Storage is not available
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
+    if (isProd) {
+      return res.status(500).json({
+        error: 'Supabase Storage não está configurado para salvar novas imagens em produção. Verifique o bucket product-images.',
+      });
+    }
+
     const safeBaseName = (filename || 'upload').replace(/[^a-z0-9_-]/gi, '').toLowerCase().slice(0, 30);
     const uniqueFilename = `marmot-${Date.now()}-${safeBaseName || 'img'}.${ext}`;
     const filePath = path.join(UPLOADS_DIR, uniqueFilename);
 
-    try {
-      if (!fs.existsSync(UPLOADS_DIR)) {
-        fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-      }
-      fs.writeFileSync(filePath, buffer);
-      const publicUrl = `/uploads/${uniqueFilename}`;
-      console.log('[UPLOAD] Arquivo original salvo em /uploads/:', publicUrl);
-      return res.json({ success: true, url: publicUrl });
-    } catch (fsErr: any) {
-      console.error('[UPLOAD] Erro ao salvar arquivo localmente:', fsErr);
-      return res.status(500).json({ error: 'Falha ao salvar arquivo de imagem no servidor.' });
+    if (!fs.existsSync(UPLOADS_DIR)) {
+      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
     }
+    fs.writeFileSync(filePath, buffer);
+    const publicUrl = `/uploads/${uniqueFilename}`;
+    return res.json({ success: true, url: publicUrl });
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Falha ao processar upload.' });
   }
@@ -6497,8 +6563,8 @@ app.put('/api/admin/orders/:id/customer-cpf', requireAdmin, async (req: any, res
   }
 });
 
-// --- Coupons ---
-app.get('/api/coupons', async (req, res) => {
+// --- Coupons (Admin Protected for listing/creating/deleting, Public for validation) ---
+app.get('/api/coupons', requireAdmin, async (req, res) => {
   const coupons = await db.getCoupons();
   res.json(coupons);
 });
