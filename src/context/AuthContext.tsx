@@ -95,7 +95,7 @@ function formatSupabaseAuthError(error: any): string {
   return typeof error === 'string' ? error : error.message || error.error_description || String(error);
 }
 
-// Convert Supabase User to UserProfile safely
+// Convert Supabase User to UserProfile safely (Initial synchronous mapper)
 function mapSupabaseUserToProfile(sbUser: User, sessionToken?: string): UserProfile {
   if (!sbUser) {
     return {
@@ -113,9 +113,9 @@ function mapSupabaseUserToProfile(sbUser: User, sessionToken?: string): UserProf
   const appMeta = (sbUser as any).app_metadata || {};
   const userMeta = sbUser.user_metadata || {};
 
-  // Security rule: admin privilege must come strictly from app_metadata.role === 'admin' or profiles.is_admin
+  // Security rule: admin privilege must come strictly from app_metadata.role === 'admin' or profiles.role === 'admin'
   const isSupabaseAdminRole = appMeta.role === 'admin';
-  const role = isSupabaseAdminRole ? 'admin' : 'customer';
+  const role: 'admin' | 'customer' = isSupabaseAdminRole ? 'admin' : 'customer';
 
   return {
     id: sbUser.id,
@@ -126,6 +126,111 @@ function mapSupabaseUserToProfile(sbUser: User, sessionToken?: string): UserProf
     role,
     isVerified: Boolean(sbUser.email_confirmed_at || sbUser.confirmed_at),
     addresses: Array.isArray(userMeta.addresses) ? userMeta.addresses : [],
+    createdAt: sbUser.created_at || new Date().toISOString(),
+    lastLogin: sbUser.last_sign_in_at || new Date().toISOString(),
+  };
+}
+
+// Authoritative async profile resolver: Always queries public.profiles and checks app_metadata
+// Never downgrades an admin to customer due to temporary or missing metadata
+async function resolveAuthenticatedProfile(sbUser: User, sessionToken?: string): Promise<UserProfile> {
+  if (!sbUser) {
+    return {
+      id: '',
+      name: 'Cliente Marmot',
+      email: '',
+      role: 'customer',
+      isVerified: false,
+      addresses: [],
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+    };
+  }
+
+  const appMeta = (sbUser as any).app_metadata || {};
+  const userMeta = sbUser.user_metadata || {};
+
+  let profileRole: string | undefined = undefined;
+  let dbName: string | undefined = undefined;
+  let dbPhone: string | undefined = undefined;
+  let dbCpf: string | undefined = undefined;
+  let dbAddresses: Address[] = [];
+
+  // Query public.profiles directly by ID or Email
+  if (isSupabaseConfigured() && sbUser.id) {
+    try {
+      const { data: dbProfile, error: profErr } = await supabase
+        .from('profiles')
+        .select('role, name, phone, cpf, addresses')
+        .eq('id', sbUser.id)
+        .maybeSingle();
+
+      if (!profErr && dbProfile) {
+        profileRole = dbProfile.role;
+        dbName = dbProfile.name;
+        dbPhone = dbProfile.phone;
+        dbCpf = dbProfile.cpf;
+        if (Array.isArray(dbProfile.addresses) && dbProfile.addresses.length > 0) {
+          dbAddresses = dbProfile.addresses;
+        }
+      } else if (sbUser.email) {
+        const { data: emailProfile } = await supabase
+          .from('profiles')
+          .select('role, name, phone, cpf, addresses')
+          .eq('email', sbUser.email.toLowerCase().trim())
+          .maybeSingle();
+
+        if (emailProfile) {
+          profileRole = emailProfile.role;
+          dbName = emailProfile.name;
+          dbPhone = emailProfile.phone;
+          dbCpf = emailProfile.cpf;
+          if (Array.isArray(emailProfile.addresses) && emailProfile.addresses.length > 0) {
+            dbAddresses = emailProfile.addresses;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[AUTH] Profile fetch notice:', err);
+    }
+  }
+
+  // Authoritative Role Resolution (Strictly app_metadata.role === 'admin' OR profiles.role === 'admin')
+  // NEVER rely on user_metadata.role (which could be user-editable)
+  const isAppAdmin = appMeta.role === 'admin';
+  const isProfileAdmin = profileRole === 'admin';
+  const finalRole: 'admin' | 'customer' = (isAppAdmin || isProfileAdmin) ? 'admin' : 'customer';
+
+  console.log('[AUTH ROLE]', {
+    userId: sbUser.id,
+    email: sbUser.email,
+    appMetadataRole: appMeta.role,
+    profileRole,
+    resolvedRole: finalRole,
+  });
+
+  // Try to load addresses from user_addresses table
+  let finalAddresses = dbAddresses;
+  try {
+    const addressesFromDb = await fetchUserAddressesDirect(sbUser.id);
+    if (addressesFromDb.length > 0) {
+      finalAddresses = addressesFromDb;
+    }
+  } catch {}
+
+  const finalName = dbName || userMeta.name || userMeta.full_name || sbUser.email?.split('@')[0] || 'Cliente Marmot';
+  const finalPhone = dbPhone || userMeta.phone || '';
+  const finalCpf = dbCpf || userMeta.cpf || '';
+
+  return {
+    id: sbUser.id,
+    name: finalName,
+    email: sbUser.email || '',
+    phone: finalPhone,
+    cpf: finalCpf,
+    role: finalRole,
+    isVerified: Boolean(sbUser.email_confirmed_at || sbUser.confirmed_at),
+    addresses: finalAddresses,
     createdAt: sbUser.created_at || new Date().toISOString(),
     lastLogin: sbUser.last_sign_in_at || new Date().toISOString(),
   };
@@ -311,40 +416,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
           if (isMounted) {
             if (session?.user) {
-              const mapped = mapSupabaseUserToProfile(session.user, session.access_token);
-              // Fetch saved profile and role from public.profiles table
-              try {
-                const { data: dbProfile } = await supabase
-                  .from('profiles')
-                  .select('role, is_admin, name, phone, cpf')
-                  .eq('id', session.user.id)
-                  .maybeSingle();
+              const profile = await resolveAuthenticatedProfile(session.user, session.access_token);
+              if (isMounted) {
+                setUser(profile);
+                setToken(session.access_token);
+                localStorage.setItem('@marmot_auth_token', session.access_token);
 
-                if (dbProfile) {
-                  if (dbProfile.role === 'admin' || dbProfile.is_admin === true) {
-                    mapped.role = 'admin';
-                  }
-                  if (dbProfile.name) mapped.name = dbProfile.name;
-                  if (dbProfile.phone) mapped.phone = dbProfile.phone;
-                  if (dbProfile.cpf) mapped.cpf = dbProfile.cpf;
+                // Preload orders immediately so F5 never flashes empty state
+                const ordersFromDb = await fetchUserOrdersDirect(session.user.id, session.user.email);
+                if (ordersFromDb.length > 0 && isMounted) {
+                  setOrders(ordersFromDb);
                 }
-              } catch (profErr) {
-                console.warn('[Supabase Auth] Profile fetch notice:', profErr);
-              }
-
-              // Fetch saved addresses from public.user_addresses table
-              const addressesFromDb = await fetchUserAddressesDirect(session.user.id);
-              if (addressesFromDb.length > 0) {
-                mapped.addresses = addressesFromDb;
-              }
-              setUser(mapped);
-              setToken(session.access_token);
-              localStorage.setItem('@marmot_auth_token', session.access_token);
-
-              // Preload orders immediately so F5 never flashes empty state
-              const ordersFromDb = await fetchUserOrdersDirect(session.user.id, session.user.email);
-              if (ordersFromDb.length > 0 && isMounted) {
-                setOrders(ordersFromDb);
               }
             } else {
               setUser(null);
@@ -405,40 +487,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
           if (session?.user) {
-            const mapped = mapSupabaseUserToProfile(session.user, session.access_token);
-            try {
-              const { data: dbProfile } = await supabase
-                .from('profiles')
-                .select('role, is_admin, name, phone, cpf')
-                .eq('id', session.user.id)
-                .maybeSingle();
+            const profile = await resolveAuthenticatedProfile(session.user, session.access_token);
+            if (isMounted) {
+              setUser(profile);
+              setToken(session.access_token);
+              localStorage.setItem('@marmot_auth_token', session.access_token);
 
-              if (dbProfile) {
-                if (dbProfile.role === 'admin' || dbProfile.is_admin === true) {
-                  mapped.role = 'admin';
+              try {
+                const ordersFromDb = await fetchUserOrdersDirect(session.user.id, session.user.email);
+                if (ordersFromDb.length > 0 && isMounted) {
+                  setOrders(ordersFromDb);
                 }
-                if (dbProfile.name) mapped.name = dbProfile.name;
-                if (dbProfile.phone) mapped.phone = dbProfile.phone;
-                if (dbProfile.cpf) mapped.cpf = dbProfile.cpf;
-              }
-            } catch {}
-
-            try {
-              const addressesFromDb = await fetchUserAddressesDirect(session.user.id);
-              if (addressesFromDb.length > 0) {
-                mapped.addresses = addressesFromDb;
-              }
-            } catch {}
-            setUser(mapped);
-            setToken(session.access_token);
-            localStorage.setItem('@marmot_auth_token', session.access_token);
-
-            try {
-              const ordersFromDb = await fetchUserOrdersDirect(session.user.id, session.user.email);
-              if (ordersFromDb.length > 0 && isMounted) {
-                setOrders(ordersFromDb);
-              }
-            } catch {}
+              } catch {}
+            }
           }
         } else if (event === 'SIGNED_OUT') {
           setUser(null);
@@ -497,7 +558,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { success: false, error: 'Não foi possível estabelecer a sessão com o Supabase.' };
         }
 
-        const profile = mapSupabaseUserToProfile(data.user, data.session.access_token);
+        const profile = await resolveAuthenticatedProfile(data.user, data.session.access_token);
         setUser(profile);
         setToken(data.session.access_token);
         localStorage.setItem('@marmot_auth_token', data.session.access_token);
@@ -933,20 +994,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (isSupabaseConfigured()) {
       try {
+        const updatePayload = {
+          name: updatedData.name ?? user.name,
+          phone: updatedData.phone ?? user.phone,
+          cpf: updatedData.cpf ?? user.cpf,
+        };
+
         const { data, error } = await supabase.auth.updateUser({
-          data: {
-            name: updatedData.name ?? user.name,
-            phone: updatedData.phone ?? user.phone,
-            cpf: updatedData.cpf ?? user.cpf,
-          },
+          data: updatePayload,
         });
 
         if (error) {
           return { success: false, error: formatSupabaseAuthError(error) };
         }
 
+        // Also update profiles table fields (name, phone, cpf) without altering role
+        try {
+          await supabase
+            .from('profiles')
+            .update({
+              name: updatePayload.name,
+              phone: updatePayload.phone,
+              cpf: updatePayload.cpf,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.id);
+        } catch (dbErr) {
+          console.warn('[AUTH] Error syncing profile to database:', dbErr);
+        }
+
         if (data.user) {
-          const profile = mapSupabaseUserToProfile(data.user, token || undefined);
+          const profile = await resolveAuthenticatedProfile(data.user, token || undefined);
           setUser(profile);
         }
 

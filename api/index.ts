@@ -2129,12 +2129,18 @@ export class DatabaseManager {
       try {
         const { data, error } = await this.supabase.from('profiles').select('*').eq('email', clean).single();
         if (!error && data) {
-          return data.data || {
+          const legacyData = data.data && typeof data.data === 'object' && Object.keys(data.data).length > 0 ? data.data : null;
+          return {
+            ...legacyData,
             id: data.id,
             email: data.email,
-            name: data.name,
-            role: data.role || 'customer',
-            createdAt: data.created_at,
+            name: data.name || legacyData?.name || 'Cliente Marmot',
+            role: data.role || legacyData?.role || 'customer',
+            phone: data.phone ?? legacyData?.phone ?? '',
+            cpf: data.cpf ?? legacyData?.cpf ?? '',
+            addresses: data.addresses ?? legacyData?.addresses ?? [],
+            createdAt: data.created_at || legacyData?.createdAt || new Date().toISOString(),
+            lastLogin: data.updated_at || legacyData?.lastLogin,
           };
         }
       } catch {
@@ -2154,12 +2160,18 @@ export class DatabaseManager {
       try {
         const { data, error } = await this.supabase.from('profiles').select('*').eq('id', id).single();
         if (!error && data) {
-          return data.data || {
+          const legacyData = data.data && typeof data.data === 'object' && Object.keys(data.data).length > 0 ? data.data : null;
+          return {
+            ...legacyData,
             id: data.id,
             email: data.email,
-            name: data.name,
-            role: data.role || 'customer',
-            createdAt: data.created_at,
+            name: data.name || legacyData?.name || 'Cliente Marmot',
+            role: data.role || legacyData?.role || 'customer',
+            phone: data.phone ?? legacyData?.phone ?? '',
+            cpf: data.cpf ?? legacyData?.cpf ?? '',
+            addresses: data.addresses ?? legacyData?.addresses ?? [],
+            createdAt: data.created_at || legacyData?.createdAt || new Date().toISOString(),
+            lastLogin: data.updated_at || legacyData?.lastLogin,
           };
         }
       } catch {
@@ -5490,16 +5502,31 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
         
         // Strict role validation: Check profiles table or app_metadata
         let isDbAdmin = false;
+        let profileRole: string | undefined = undefined;
+
         try {
           const { data: profile, error: profErr } = await supabase
             .from('profiles')
-            .select('role, is_admin')
+            .select('role')
             .eq('id', data.user.id)
             .maybeSingle();
 
           if (profile) {
-            isDbAdmin = profile.role === 'admin' || profile.is_admin === true;
+            profileRole = profile.role;
+            isDbAdmin = profile.role === 'admin';
+          } else if (email) {
+            const { data: emailProfile } = await supabase
+              .from('profiles')
+              .select('role')
+              .eq('email', email)
+              .maybeSingle();
+
+            if (emailProfile) {
+              profileRole = emailProfile.role;
+              isDbAdmin = emailProfile.role === 'admin';
+            }
           }
+
           if (profErr) {
             console.warn('[AUTH] Profile query notice:', profErr.message);
           }
@@ -5512,6 +5539,14 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
           appRole === 'admin' ||
           isDbAdmin
         );
+
+        console.log('[AUTH ROLE BACKEND]', {
+          userId: data.user.id,
+          email,
+          appMetadataRole: appRole,
+          profileRole,
+          isOfficialAdmin,
+        });
 
         return {
           userId: data.user.id,
