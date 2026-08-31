@@ -6,21 +6,21 @@ export const INITIAL_COUPONS: Coupon[] = [
     discountType: 'percentage',
     discountValue: 10,
     minOrderValue: 150,
-    description: '10% OFF na sua primeira compra acima de R$ 150',
+    description: '10% OFF no seu primeiro pedido acima de R$ 150',
   },
   {
-    code: 'FIRSTAURA',
+    code: 'FIRSTMARMOT',
     discountType: 'percentage',
     discountValue: 10,
     minOrderValue: 150,
     description: '10% OFF no primeiro pedido',
   },
   {
-    code: 'AURA10',
+    code: 'VIPAURA',
     discountType: 'percentage',
-    discountValue: 10,
-    minOrderValue: 150,
-    description: '10% OFF no primeiro pedido',
+    discountValue: 15,
+    minOrderValue: 250,
+    description: '15% OFF para membros da comunidade',
   },
   {
     code: 'STREET20',
@@ -41,7 +41,7 @@ export const INITIAL_COUPONS: Coupon[] = [
     discountType: 'fixed',
     discountValue: 30, // discounts shipping fee up to R$30
     minOrderValue: 200,
-    description: 'Frete Grátis para todo o Brasil',
+    description: 'Frete Grátis para todo o Brasil em compras acima de R$ 200',
   },
 ];
 

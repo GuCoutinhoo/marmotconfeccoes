@@ -31,26 +31,33 @@ export const AdminSettingsTab: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [healthData, setHealthData] = useState<any>(null);
 
-  const fetchSettings = async () => {
+  const fetchSettingsAndHealth = async () => {
     setIsLoading(true);
+    const token = localStorage.getItem('marmot_auth_token') || '';
     try {
-      const res = await fetch('/api/admin/settings', {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const [resSettings, resHealth] = await Promise.all([
+        fetch('/api/admin/settings', { headers: { 'x-auth-token': token } }),
+        fetch('/api/admin/health', { headers: { 'x-auth-token': token } }),
+      ]);
+      if (resSettings.ok) {
+        const data = await resSettings.json();
         setSettings(data);
       }
+      if (resHealth.ok) {
+        const health = await resHealth.json();
+        setHealthData(health);
+      }
     } catch (err) {
-      console.error('Error fetching store settings:', err);
+      console.error('Error fetching settings/health:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchSettings();
+    fetchSettingsAndHealth();
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -227,39 +234,81 @@ export const AdminSettingsTab: React.FC = () => {
 
         {/* Integrations Health Status */}
         <div className="bg-white border border-[#E5E5E1] p-5 rounded-2xl space-y-3 md:col-span-2 shadow-xs">
-          <h4 className="text-xs font-bold uppercase text-[#B45309] flex items-center gap-2 font-mono">
-            <ShieldCheck className="w-4 h-4" /> Status das Integrações do Sistema
-          </h4>
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-bold uppercase text-[#B45309] flex items-center gap-2 font-mono">
+              <ShieldCheck className="w-4 h-4" /> Diagnóstico Real de Integrações
+            </h4>
+            <span className="text-[10px] font-mono text-[#6B6B66]">
+              {healthData?.readyForProduction ? (
+                <span className="text-emerald-700 font-bold">● Pronto para Produção</span>
+              ) : (
+                <span className="text-amber-700 font-bold">▲ Configuração Parcial</span>
+              )}
+            </span>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
+            {/* Mercado Pago */}
             <div className="p-3 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl flex items-center justify-between">
               <div>
                 <p className="font-bold text-[#171717]">Mercado Pago</p>
-                <p className="text-[10px] text-[#6B6B66]">PIX & Cartão de Crédito</p>
+                <p className="text-[10px] text-[#6B6B66]">Gateway & Webhooks</p>
               </div>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold uppercase">
-                Conectado
-              </span>
+              {(() => {
+                const st = healthData?.components?.mercadoPago?.status || 'NOT_CONFIGURED';
+                if (st === 'OK') {
+                  return <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold uppercase">OK</span>;
+                }
+                if (st === 'WARNING') {
+                  return <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-bold uppercase">WARNING</span>;
+                }
+                if (st === 'ERROR') {
+                  return <span className="text-[10px] bg-rose-50 text-rose-800 border border-rose-200 px-2 py-0.5 rounded-full font-bold uppercase">ERROR</span>;
+                }
+                return <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 px-2 py-0.5 rounded-full font-bold uppercase">NOT CONFIGURED</span>;
+              })()}
             </div>
 
+            {/* Melhor Envio */}
             <div className="p-3 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl flex items-center justify-between">
               <div>
                 <p className="font-bold text-[#171717]">Melhor Envio</p>
-                <p className="text-[10px] text-[#6B6B66]">Cotações & Rastreio</p>
+                <p className="text-[10px] text-[#6B6B66]">Cotações & Etiquetas</p>
               </div>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold uppercase">
-                Conectado
-              </span>
+              {(() => {
+                const st = healthData?.components?.melhorEnvio?.status || 'NOT_CONFIGURED';
+                if (st === 'OK') {
+                  return <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold uppercase">OK</span>;
+                }
+                if (st === 'WARNING') {
+                  return <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-bold uppercase">WARNING</span>;
+                }
+                if (st === 'ERROR') {
+                  return <span className="text-[10px] bg-rose-50 text-rose-800 border border-rose-200 px-2 py-0.5 rounded-full font-bold uppercase">ERROR</span>;
+                }
+                return <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 px-2 py-0.5 rounded-full font-bold uppercase">NOT CONFIGURED</span>;
+              })()}
             </div>
 
+            {/* Banco Supabase */}
             <div className="p-3 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl flex items-center justify-between">
               <div>
-                <p className="font-bold text-[#171717]">Banco de Dados</p>
-                <p className="text-[10px] text-[#6B6B66]">Supabase & Armazenamento</p>
+                <p className="font-bold text-[#171717]">Supabase Database</p>
+                <p className="text-[10px] text-[#6B6B66]">Tabelas & RLS</p>
               </div>
-              <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-full font-bold uppercase">
-                Persistente
-              </span>
+              {(() => {
+                const st = healthData?.components?.database?.status || 'NOT_CONFIGURED';
+                if (st === 'OK') {
+                  return <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold uppercase">OK</span>;
+                }
+                if (st === 'WARNING') {
+                  return <span className="text-[10px] bg-amber-50 text-amber-800 border border-amber-200 px-2 py-0.5 rounded-full font-bold uppercase">WARNING</span>;
+                }
+                if (st === 'ERROR') {
+                  return <span className="text-[10px] bg-rose-50 text-rose-800 border border-rose-200 px-2 py-0.5 rounded-full font-bold uppercase">ERROR</span>;
+                }
+                return <span className="text-[10px] bg-zinc-100 text-zinc-600 border border-zinc-300 px-2 py-0.5 rounded-full font-bold uppercase">NOT CONFIGURED</span>;
+              })()}
             </div>
           </div>
         </div>

@@ -80,7 +80,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         // 3. Fallback to user cache
         if (!loadedWishlist || loadedWishlist.length === 0) {
           try {
-            const cached = localStorage.getItem(`@aura_wishlist_${user.id}`);
+            const cached = localStorage.getItem(`@marmot_wishlist_${user.id}`);
             if (cached) {
               const parsed = JSON.parse(cached);
               if (Array.isArray(parsed) && parsed.length > 0) {
@@ -94,7 +94,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const finalWishlist = loadedWishlist || [];
           setWishlist(finalWishlist);
           if (finalWishlist.length > 0) {
-            localStorage.setItem(`@aura_wishlist_${user.id}`, JSON.stringify(finalWishlist));
+            localStorage.setItem(`@marmot_wishlist_${user.id}`, JSON.stringify(finalWishlist));
           }
           isHydratingRef.current = false;
           setIsHydrated(true);
@@ -102,11 +102,11 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       } else {
         // User logged out or guest browsing:
         activeUserIdRef.current = null;
-        localStorage.removeItem('@aura_wishlist');
+        localStorage.removeItem('@marmot_wishlist');
 
         let guestItems: Product[] = [];
         try {
-          const guestSaved = localStorage.getItem('@aura_guest_wishlist');
+          const guestSaved = localStorage.getItem('@marmot_guest_wishlist');
           if (guestSaved) {
             const parsed = JSON.parse(guestSaved);
             if (Array.isArray(parsed)) {
@@ -135,9 +135,9 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (!isHydrated || isHydratingRef.current) return;
 
     if (user?.id && activeUserIdRef.current === user.id) {
-      localStorage.setItem(`@aura_wishlist_${user.id}`, JSON.stringify(wishlist));
+      localStorage.setItem(`@marmot_wishlist_${user.id}`, JSON.stringify(wishlist));
     } else if (!user && activeUserIdRef.current === null) {
-      localStorage.setItem('@aura_guest_wishlist', JSON.stringify(wishlist));
+      localStorage.setItem('@marmot_guest_wishlist', JSON.stringify(wishlist));
     }
   }, [wishlist, isHydrated, user?.id]);
 

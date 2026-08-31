@@ -1,1 +1,234 @@
-[]
+[
+  {
+    "id": "MM-570026-2320",
+    "customerName": "Comprador Teste Marmot",
+    "customerEmail": "comprador.marmot@gmail.com",
+    "customerPhone": "",
+    "customerCpf": "",
+    "date": "31/08/2026",
+    "status": "Aguardando Pagamento",
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
+    "items": [
+      {
+        "id": "item-1788216570026-o4hb",
+        "productId": "prod-mol-016",
+        "sku": "MM-MOL-016",
+        "title": "Moletom Sleeveless Hoodie",
+        "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+        "size": "G",
+        "color": "Preto",
+        "price": 349.9,
+        "quantity": 1,
+        "subtotal": 349.9,
+        "weight": 0.85,
+        "height": 8,
+        "width": 30,
+        "length": 35
+      }
+    ],
+    "subtotal": 349.9,
+    "discount": 52.48,
+    "shippingFee": 20,
+    "total": 317.42,
+    "paymentMethod": "Cartão de Crédito",
+    "shippingAddress": {
+      "id": "addr-1",
+      "recipientName": "Comprador Teste Marmot",
+      "cep": "03806-010",
+      "street": "Rua das Flores",
+      "number": "100",
+      "city": "São Paulo",
+      "state": "SP"
+    },
+    "shippingCarrier": "Melhor Envio",
+    "shippingService": "Transportadora Padrão",
+    "shippingDeliveryTime": 5,
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "31/08/2026, 22:49:30",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "paymentDetails": {
+      "mercadoPagoPreferenceId": "3595359362-bbbd585b-919f-4f1e-8447-206d179f0efc",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-bbbd585b-919f-4f1e-8447-206d179f0efc"
+    },
+    "createdAt": "2026-08-31T22:49:30.044Z"
+  },
+  {
+    "id": "MM-518897-9821",
+    "customerName": "Comprador Teste Marmot",
+    "customerEmail": "comprador.marmot@gmail.com",
+    "customerPhone": "",
+    "customerCpf": "",
+    "date": "31/08/2026",
+    "status": "Aguardando Pagamento",
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
+    "items": [
+      {
+        "id": "item-1788216518897-9lnf",
+        "productId": "prod-mol-016",
+        "sku": "MM-MOL-016",
+        "title": "Moletom Sleeveless Hoodie",
+        "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+        "size": "G",
+        "color": "Preto",
+        "price": 349.9,
+        "quantity": 1,
+        "subtotal": 349.9,
+        "weight": 0.85,
+        "height": 8,
+        "width": 30,
+        "length": 35
+      }
+    ],
+    "subtotal": 349.9,
+    "discount": 0,
+    "shippingFee": 20,
+    "total": 369.9,
+    "paymentMethod": "Cartão de Crédito",
+    "shippingAddress": {
+      "id": "addr-1",
+      "recipientName": "Comprador Teste Marmot",
+      "cep": "03806-010",
+      "street": "Rua das Flores",
+      "number": "100",
+      "city": "São Paulo",
+      "state": "SP"
+    },
+    "shippingCarrier": "Melhor Envio",
+    "shippingService": "Transportadora Padrão",
+    "shippingDeliveryTime": 5,
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "31/08/2026, 22:48:38",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "paymentDetails": {
+      "mercadoPagoPreferenceId": "3595359362-735451af-f202-47ab-a6c4-4e5704193e5c",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-735451af-f202-47ab-a6c4-4e5704193e5c"
+    },
+    "createdAt": "2026-08-31T22:48:38.898Z"
+  },
+  {
+    "id": "MM-497791-4671",
+    "customerName": "Comprador Teste Marmot",
+    "customerEmail": "comprador.marmot@gmail.com",
+    "customerPhone": "11999999999",
+    "customerCpf": "12345678909",
+    "date": "31/08/2026",
+    "status": "Aguardando Pagamento",
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
+    "items": [
+      {
+        "id": "item-1788216497791-4u2d",
+        "productId": "prod-mol-016",
+        "sku": "MM-MOL-016",
+        "title": "Moletom Sleeveless Hoodie",
+        "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+        "size": "G",
+        "color": "Preto",
+        "price": 349.9,
+        "quantity": 1,
+        "subtotal": 349.9,
+        "weight": 0.85,
+        "height": 8,
+        "width": 30,
+        "length": 35
+      }
+    ],
+    "subtotal": 349.9,
+    "discount": 0,
+    "shippingFee": 25,
+    "total": 374.9,
+    "paymentMethod": "Cartão de Crédito",
+    "shippingAddress": {
+      "street": "Rua Augusta",
+      "number": "1000",
+      "neighborhood": "Consolação",
+      "city": "São Paulo",
+      "state": "SP",
+      "cep": "01304-001",
+      "recipientName": "Comprador Teste Marmot"
+    },
+    "shippingCarrier": "Sedex",
+    "shippingService": "SEDEX Express",
+    "shippingDeliveryTime": 5,
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "31/08/2026, 22:48:17",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "paymentDetails": {
+      "mercadoPagoPreferenceId": "3595359362-3544a2cd-d4ac-4e19-8720-371fe7c2185d",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-3544a2cd-d4ac-4e19-8720-371fe7c2185d"
+    },
+    "createdAt": "2026-08-31T22:48:17.809Z"
+  },
+  {
+    "id": "MM-462458-7639",
+    "customerName": "Comprador Teste",
+    "customerEmail": "comprador.teste@gmail.com",
+    "customerPhone": "11999999999",
+    "customerCpf": "12345678909",
+    "date": "31/08/2026",
+    "status": "Aguardando Pagamento",
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
+    "items": [
+      {
+        "id": "item-1788216462458-ciqa",
+        "productId": "prod-mol-016",
+        "sku": "MM-MOL-016",
+        "title": "Moletom Sleeveless Hoodie",
+        "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+        "size": "G",
+        "color": "Preto",
+        "price": 349.9,
+        "quantity": 1,
+        "subtotal": 349.9,
+        "weight": 0.85,
+        "height": 8,
+        "width": 30,
+        "length": 35
+      }
+    ],
+    "subtotal": 349.9,
+    "discount": 0,
+    "shippingFee": 25,
+    "total": 374.9,
+    "paymentMethod": "Cartão de Crédito",
+    "shippingAddress": {
+      "street": "Rua Augusta",
+      "number": "1000",
+      "neighborhood": "Consolação",
+      "city": "São Paulo",
+      "state": "SP",
+      "cep": "01304-001",
+      "recipientName": "Comprador Teste"
+    },
+    "shippingCarrier": "Sedex",
+    "shippingService": "SEDEX Express",
+    "shippingDeliveryTime": 5,
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "31/08/2026, 22:47:42",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "createdAt": "2026-08-31T22:47:42.460Z"
+  }
+]

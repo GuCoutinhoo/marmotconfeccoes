@@ -1,51 +1,65 @@
 [
   {
     "code": "VIPAURA",
-    "description": "15% OFF para membros da comunidade",
-    "discountType": "percentage",
+    "discountPercentage": 15,
     "discountValue": 15,
-    "minOrderValue": 250
+    "discountType": "percentage",
+    "minOrderValue": 250,
+    "description": "15% OFF para membros da comunidade",
+    "active": true
   },
   {
     "code": "MARMOT10",
-    "description": "10% OFF na sua primeira compra acima de R$ 150",
-    "discountType": "percentage",
+    "discountPercentage": 10,
     "discountValue": 10,
-    "minOrderValue": 150
+    "discountType": "percentage",
+    "minOrderValue": 150,
+    "description": "10% OFF na sua primeira compra acima de R$ 150",
+    "active": true
   },
   {
     "code": "FIRSTAURA",
-    "description": "10% OFF no primeiro pedido",
-    "discountType": "percentage",
+    "discountPercentage": 10,
     "discountValue": 10,
-    "minOrderValue": 150
+    "discountType": "percentage",
+    "minOrderValue": 150,
+    "description": "10% OFF no primeiro pedido",
+    "active": true
   },
   {
     "code": "AURA10",
-    "description": "10% OFF no primeiro pedido",
-    "discountType": "percentage",
+    "discountPercentage": 10,
     "discountValue": 10,
-    "minOrderValue": 150
+    "discountType": "percentage",
+    "minOrderValue": 150,
+    "description": "10% OFF no primeiro pedido",
+    "active": true
   },
   {
     "code": "STREET20",
-    "description": "20% OFF em compras acima de R$ 400",
-    "discountType": "percentage",
+    "discountPercentage": 20,
     "discountValue": 20,
-    "minOrderValue": 400
+    "discountType": "percentage",
+    "minOrderValue": 400,
+    "description": "20% OFF em compras acima de R$ 400",
+    "active": true
   },
   {
     "code": "VIPMARMOT",
-    "description": "15% OFF para membros da comunidade Marmot",
-    "discountType": "percentage",
+    "discountPercentage": 15,
     "discountValue": 15,
-    "minOrderValue": 250
+    "discountType": "percentage",
+    "minOrderValue": 250,
+    "description": "15% OFF para membros da comunidade Marmot",
+    "active": true
   },
   {
     "code": "FRETEGRATIS",
-    "description": "Frete Grátis para todo o Brasil",
-    "discountType": "fixed",
+    "discountPercentage": 30,
     "discountValue": 30,
-    "minOrderValue": 200
+    "discountType": "fixed",
+    "minOrderValue": 200,
+    "description": "Frete Grátis para todo o Brasil",
+    "active": true
   }
 ]

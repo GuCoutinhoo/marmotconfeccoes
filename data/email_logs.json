@@ -1,1 +1,29 @@
-[]
+[
+  {
+    "id": "sim-1788216570529-k44i",
+    "recipient": "comprador.marmot@gmail.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-570026-2320 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-570026-2320",
+    "createdAt": "2026-08-31T22:49:30.529Z"
+  },
+  {
+    "id": "sim-1788216519326-hlf4",
+    "recipient": "comprador.marmot@gmail.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-518897-9821 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-518897-9821",
+    "createdAt": "2026-08-31T22:48:39.326Z"
+  },
+  {
+    "id": "sim-1788216498240-kqu9",
+    "recipient": "comprador.marmot@gmail.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-497791-4671 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-497791-4671",
+    "createdAt": "2026-08-31T22:48:18.240Z"
+  }
+]

@@ -76,13 +76,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         uId = parsed?.id || '';
       }
       if (uId) {
-        const savedUserCart = localStorage.getItem(`@aura_cart_${uId}`);
+        const savedUserCart = localStorage.getItem(`@marmot_cart_${uId}`);
         if (savedUserCart) {
           const parsed = JSON.parse(savedUserCart);
           if (Array.isArray(parsed) && parsed.length > 0) return parsed;
         }
       }
-      const generalCart = localStorage.getItem('@aura_cart');
+      const generalCart = localStorage.getItem('@marmot_cart');
       if (generalCart) {
         const parsed = JSON.parse(generalCart);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -102,7 +102,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(() => {
     try {
-      const saved = localStorage.getItem('@aura_coupon');
+      const saved = localStorage.getItem('@marmot_coupon');
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -114,7 +114,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Shipping persistence and state
   const [shippingPostalCode, setShippingPostalCodeState] = useState<string>(() => {
     try {
-      return localStorage.getItem('@aura_shipping_cep') || '';
+      return localStorage.getItem('@marmot_shipping_cep') || '';
     } catch {
       return '';
     }
@@ -122,7 +122,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [selectedShipping, setSelectedShippingState] = useState<ShippingOption | null>(() => {
     try {
-      const saved = localStorage.getItem('@aura_shipping_selected');
+      const saved = localStorage.getItem('@marmot_shipping_selected');
       return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
@@ -139,7 +139,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [recentViewed, setRecentViewed] = useState<Product[]>(() => {
     try {
-      const saved = localStorage.getItem('@aura_recent_viewed');
+      const saved = localStorage.getItem('@marmot_recent_viewed');
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
@@ -164,9 +164,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Check if there are any pending items to add after login
         let pendingItemToAdd: { product: Product; selectedSize: string; selectedColor: ProductVariant; quantity: number } | null = null;
         try {
-          const pendingRaw = sessionStorage.getItem('@aura_pending_add_to_cart');
+          const pendingRaw = sessionStorage.getItem('@marmot_pending_add_to_cart');
           if (pendingRaw) {
-            sessionStorage.removeItem('@aura_pending_add_to_cart');
+            sessionStorage.removeItem('@marmot_pending_add_to_cart');
             pendingItemToAdd = JSON.parse(pendingRaw);
           }
         } catch {}
@@ -204,7 +204,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // 3. Fallback to user-isolated localStorage cached cart
         if (!loadedCart || loadedCart.length === 0) {
           try {
-            const cached = localStorage.getItem(`@aura_cart_${currentUserId}`);
+            const cached = localStorage.getItem(`@marmot_cart_${currentUserId}`);
             if (cached) {
               const parsed = JSON.parse(cached);
               if (Array.isArray(parsed) && parsed.length > 0) {
@@ -259,7 +259,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (!isCancelled) {
           setCart(finalCart);
-          localStorage.setItem(`@aura_cart_${currentUserId}`, JSON.stringify(finalCart));
+          localStorage.setItem(`@marmot_cart_${currentUserId}`, JSON.stringify(finalCart));
           isHydratingRef.current = false;
           setCartHydrated(true);
         }
@@ -267,8 +267,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // User logged out or unauthenticated visitor:
         // Clear in-memory cart state completely. NO anonymous/guest persistence.
         activeUserIdRef.current = null;
-        localStorage.removeItem('@aura_guest_cart');
-        localStorage.removeItem('@aura_cart');
+        localStorage.removeItem('@marmot_guest_cart');
+        localStorage.removeItem('@marmot_cart');
 
         if (!isCancelled) {
           setCart([]);
@@ -290,7 +290,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!cartHydrated || isHydratingRef.current) return;
 
     if (user?.id && activeUserIdRef.current === user.id) {
-      localStorage.setItem(`@aura_cart_${user.id}`, JSON.stringify(cart));
+      localStorage.setItem(`@marmot_cart_${user.id}`, JSON.stringify(cart));
     }
   }, [cart, cartHydrated, user?.id]);
 
@@ -299,7 +299,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (pendingItem) {
       try {
         sessionStorage.setItem(
-          '@aura_pending_add_to_cart',
+          '@marmot_pending_add_to_cart',
           JSON.stringify({
             product: pendingItem.product,
             selectedSize: pendingItem.size,
@@ -329,30 +329,30 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (appliedCoupon) {
-      localStorage.setItem('@aura_coupon', JSON.stringify(appliedCoupon));
+      localStorage.setItem('@marmot_coupon', JSON.stringify(appliedCoupon));
     } else {
-      localStorage.removeItem('@aura_coupon');
+      localStorage.removeItem('@marmot_coupon');
     }
   }, [appliedCoupon]);
 
   useEffect(() => {
     if (shippingPostalCode) {
-      localStorage.setItem('@aura_shipping_cep', shippingPostalCode);
+      localStorage.setItem('@marmot_shipping_cep', shippingPostalCode);
     } else {
-      localStorage.removeItem('@aura_shipping_cep');
+      localStorage.removeItem('@marmot_shipping_cep');
     }
   }, [shippingPostalCode]);
 
   useEffect(() => {
     if (selectedShipping) {
-      localStorage.setItem('@aura_shipping_selected', JSON.stringify(selectedShipping));
+      localStorage.setItem('@marmot_shipping_selected', JSON.stringify(selectedShipping));
     } else {
-      localStorage.removeItem('@aura_shipping_selected');
+      localStorage.removeItem('@marmot_shipping_selected');
     }
   }, [selectedShipping]);
 
   useEffect(() => {
-    localStorage.setItem('@aura_recent_viewed', JSON.stringify(recentViewed));
+    localStorage.setItem('@marmot_recent_viewed', JSON.stringify(recentViewed));
   }, [recentViewed]);
 
   const resetShipping = useCallback(() => {
@@ -405,7 +405,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // If activeCart is empty but user is logged in, check user cached cart
       if ((!activeCart || activeCart.length === 0) && activeUserIdRef.current) {
         try {
-          const cached = localStorage.getItem(`@aura_cart_${activeUserIdRef.current}`);
+          const cached = localStorage.getItem(`@marmot_cart_${activeUserIdRef.current}`);
           if (cached) {
             const parsed = JSON.parse(cached);
             if (Array.isArray(parsed) && parsed.length > 0) {
@@ -715,7 +715,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (user?.id) {
       clearUserCartInSupabase(user.id);
-      localStorage.removeItem(`@aura_cart_${user.id}`);
+      localStorage.removeItem(`@marmot_cart_${user.id}`);
 
       const activeToken = token || localStorage.getItem('@marmot_auth_token');
       fetch('/api/cart', {
@@ -725,7 +725,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       }).catch((err) => console.warn('[Cart] Server clear sync notice:', err));
     } else {
-      localStorage.removeItem('@aura_guest_cart');
+      localStorage.removeItem('@marmot_guest_cart');
     }
   };
 
