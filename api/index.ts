@@ -4067,19 +4067,27 @@ export class DatabaseManager {
     if (this.mode === 'supabase' && this.supabase) {
       try {
         const { data, error } = await this.supabase.rpc('claim_webhook_event', {
-          p_provider: provider,
-          p_event_id: eventId,
-          p_event_type: eventType,
+          p_gateway: provider,
+          p_event_key: eventId,
+          p_topic: eventType,
           p_payload: payload || {},
         });
         if (!error && data) {
           return { shouldProcess: Boolean(data.should_process), status: String(data.status) };
         }
-      } catch (err) {
-        console.warn('[DB] Supabase claim_webhook_event error:', err);
+        if (error) {
+          console.warn('[DB] Supabase claim_webhook_event error:', error.message);
+          return { shouldProcess: false, status: 'claim_error' };
+        }
+      } catch (err: any) {
+        console.warn('[DB] Supabase claim_webhook_event exception:', err?.message || err);
+        return { shouldProcess: false, status: 'claim_exception' };
       }
     }
-    return { shouldProcess: true, status: 'fallback_allowed' };
+    if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
+      return { shouldProcess: false, status: 'unconfigured_production_db' };
+    }
+    return { shouldProcess: true, status: 'fallback_allowed_dev' };
   }
 
   public async completeWebhookEvent(
@@ -4092,13 +4100,14 @@ export class DatabaseManager {
     if (this.mode === 'supabase' && this.supabase) {
       try {
         await this.supabase.rpc('complete_webhook_event', {
-          p_provider: provider,
-          p_event_id: eventId,
+          p_gateway: provider,
+          p_event_key: eventId,
+          p_status: errorMsg ? 'failed' : 'completed',
           p_order_id: orderId || null,
           p_error: errorMsg || null,
         });
-      } catch (err) {
-        console.warn('[DB] Supabase complete_webhook_event error:', err);
+      } catch (err: any) {
+        console.warn('[DB] Supabase complete_webhook_event error:', err?.message || err);
       }
     }
   }
@@ -4681,14 +4690,15 @@ export class DatabaseManager {
     title: string;
     comment: string;
     orderId?: string;
+    verifiedPurchase?: boolean;
   }): Promise<ProductReview> {
     await this.initialize();
 
     // Verify purchase
-    let verified = false;
+    let verified = Boolean(data.verifiedPurchase);
     let orderId = data.orderId;
 
-    if (data.userEmail || data.userId) {
+    if (!verified && (data.userEmail || data.userId)) {
       const check = await this.canUserReviewProduct(data.userEmail || data.userId || '', data.productId);
       if (check.canReview) {
         verified = true;
@@ -5168,8 +5178,25 @@ export async function sendTransactionalEmail(options: {
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'MARMOT Store <onboarding@resend.dev>';
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 
   if (!apiKey || apiKey.trim() === '') {
+    if (isProduction) {
+      console.warn('[Email Warning]: RESEND_API_KEY não configurada no ambiente de produção.');
+      await db.logEmail({
+        id: `unconf-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        recipient: options.to,
+        template: options.template,
+        subject: options.subject,
+        status: 'failed',
+        error: 'RESEND_API_KEY_NOT_CONFIGURED',
+        orderId: options.orderId,
+        userId: options.userId,
+        createdAt: new Date().toISOString(),
+      });
+      return { success: false, error: 'Serviço de e-mail transacional não configurado em produção.' };
+    }
+
     const simulatedId = `sim-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     await db.logEmail({
       id: simulatedId,
@@ -7146,8 +7173,9 @@ function getMercadoPagoClient() {
 }
 
 function verifyMercadoPagoWebhookSignature(req: express.Request, secret?: string): boolean {
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.MERCADOPAGO_ENV === 'production';
   if (!secret || secret.trim().length === 0) {
-    if (process.env.NODE_ENV === 'production') {
+    if (isProduction) {
       console.warn('[Mercado Pago Webhook Warning]: MERCADOPAGO_WEBHOOK_SECRET ausente em produção. Rejeitando requisição por segurança.');
       return false;
     }
@@ -9763,21 +9791,49 @@ app.get('/api/products/:productId/can-review', async (req, res) => {
 app.post(['/api/products/:productId/reviews', '/api/reviews'], async (req, res) => {
   try {
     const productId = req.params.productId || req.body?.productId;
-    const { userId, userName, userEmail, rating, title, comment, orderId } = req.body || {};
+    const { rating, title, comment, orderId } = req.body || {};
 
     if (!productId || !rating || !comment) {
       return res.status(400).json({ error: 'Produto, nota de 1 a 5 e comentário são obrigatórios.' });
     }
 
+    const token = extractToken(req);
+    let resolvedUserId = req.body?.userId;
+    let resolvedUserEmail = req.body?.userEmail;
+    let resolvedUserName = req.body?.userName || 'Cliente Marmot';
+    let isVerified = false;
+
+    if (token) {
+      const authUser = await verifyAuthToken(token);
+      if (authUser) {
+        resolvedUserId = authUser.userId;
+        resolvedUserEmail = authUser.email;
+        resolvedUserName = authUser.name || req.body?.userName || 'Cliente Marmot';
+      }
+    }
+
+    if (orderId) {
+      const order = await db.getOrderById(orderId);
+      if (order) {
+        const matchesBuyer = (resolvedUserId && order.userId === resolvedUserId) ||
+                             (resolvedUserEmail && order.customerEmail?.toLowerCase() === resolvedUserEmail.toLowerCase());
+        const hasProduct = Array.isArray(order.items) && order.items.some((i: any) => (i.productId === productId || i.id === productId));
+        if (matchesBuyer && hasProduct) {
+          isVerified = true;
+        }
+      }
+    }
+
     const review = await db.createReview({
       productId,
-      userId,
-      userName: userName || 'Cliente Marmot',
-      userEmail,
+      userId: resolvedUserId,
+      userName: resolvedUserName,
+      userEmail: resolvedUserEmail,
       rating: Number(rating),
       title: title || 'Avaliação da Peça',
       comment,
       orderId,
+      verifiedPurchase: isVerified,
     });
 
     res.status(201).json(review);
