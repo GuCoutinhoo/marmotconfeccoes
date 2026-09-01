@@ -31,6 +31,9 @@ test('Security & Architecture Audit Assertions', async (t) => {
     // Financial anti-tampering validation
     assert.ok(sql.includes('p_amount < (v_order.total - 0.05)'), 'Financial amount check missing in process_approved_order_atomic');
     assert.ok(sql.includes('FOR UPDATE'), 'Row locking missing in process_approved_order_atomic');
+    assert.ok(sql.includes('INSUFFICIENT_STOCK'), 'Overselling pre-check missing in process_approved_order_atomic');
+    assert.ok(sql.includes('INVALID_ORDER_ITEMS'), 'Zero items validation missing in process_approved_order_atomic');
+    assert.ok(sql.includes("DROP POLICY IF EXISTS \"Orders insert allowed for checkout\""), 'Exhaustive legacy policy drops missing');
   });
 
   await t.test('Backend Server-Authoritative Hardening', () => {
@@ -44,6 +47,10 @@ test('Security & Architecture Audit Assertions', async (t) => {
     assert.ok(backend.includes('p_gateway: provider'), 'claim_webhook_event signature mismatch');
     assert.ok(backend.includes('p_event_key: eventId'), 'claim_webhook_event parameter key mismatch');
     assert.ok(backend.includes('deduct_inventory_atomic') || backend.includes('process_approved_order_atomic'), 'Atomic stock deduction call missing');
+
+    // Logistics carrier fallback and cron fail-closed
+    assert.ok(backend.includes("orderStatus: 'UNMODIFIED'"), 'Carrier unknown status fallback transition must be UNMODIFIED');
+    assert.ok(backend.includes("if (!cronSecret || authHeader !== `Bearer ${cronSecret}`"), 'Cron endpoint must fail closed if CRON_SECRET is missing');
   });
 
   await t.test('Shipping and Remetente Rules Validation', () => {

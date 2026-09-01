@@ -870,6 +870,12 @@ CREATE TRIGGER trg_protect_profile_role
   FOR EACH ROW EXECUTE FUNCTION public.protect_profile_role();
 
 -- 4. Server-Authoritative Atomic Payment Processing & Inventory Deduction RPC
+DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB, JSONB);
+DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB);
+DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ);
+DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT);
+DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC);
+
 CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
   p_order_id TEXT,
   p_payment_id TEXT,
@@ -938,6 +944,7 @@ BEGIN
 
     RETURN jsonb_build_object(
       'success', false,
+      'already_processed', false,
       'error', 'Valor de pagamento divergente do total do pedido.'
     );
   END IF;
@@ -982,9 +989,42 @@ BEGIN
       FROM jsonb_array_elements(v_order.items) AS elem
       ON CONFLICT (id) DO NOTHING;
     END IF;
+
+    -- Recount items after insertion attempt
+    SELECT COUNT(*) INTO v_items_count FROM public.order_items WHERE order_id = p_order_id;
   END IF;
 
-  -- 5. Deduct inventory with row-level locks on products (Fail-closed audit)
+  -- If still 0 items, fail closed
+  IF v_items_count = 0 THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'already_processed', false,
+      'error', 'INVALID_ORDER_ITEMS: Pedido não possui itens registrados em order_items.'
+    );
+  END IF;
+
+  -- 5. Stock Pre-Check Loop (Fail-closed: Prevent overselling and zero clamping)
+  FOR v_item IN
+    SELECT product_id, product_name, quantity
+    FROM public.order_items
+    WHERE order_id = p_order_id
+    ORDER BY product_id ASC
+  LOOP
+    SELECT stock_count INTO v_cur_stock
+    FROM public.products
+    WHERE id = v_item.product_id
+    FOR UPDATE;
+
+    IF FOUND AND v_cur_stock < v_item.quantity THEN
+      RETURN jsonb_build_object(
+        'success', false,
+        'already_processed', false,
+        'error', format('INSUFFICIENT_STOCK: Estoque insuficiente para o produto %s (%s disponível, %s solicitado)', COALESCE(v_item.product_name, v_item.product_id), v_cur_stock, v_item.quantity)
+      );
+    END IF;
+  END LOOP;
+
+  -- 6. Deduct inventory with row-level locks on products
   FOR v_item IN
     SELECT product_id, quantity
     FROM public.order_items
@@ -998,9 +1038,6 @@ BEGIN
 
     IF FOUND THEN
       v_new_stock := v_cur_stock - v_item.quantity;
-      IF v_new_stock < 0 THEN
-        v_new_stock := 0;
-      END IF;
 
       UPDATE public.products
       SET stock_count = v_new_stock,
@@ -1015,7 +1052,7 @@ BEGIN
     END IF;
   END LOOP;
 
-  -- 6. Record Financial Ledger Effect (Single Source of Truth)
+  -- 7. Record Financial Ledger Effect (Single Source of Truth)
   INSERT INTO public.payment_effects (
     gateway, payment_id, order_id, amount, currency, payment_method, status, raw_payload
   ) VALUES (
@@ -1023,7 +1060,7 @@ BEGIN
   )
   ON CONFLICT (gateway, payment_id) DO NOTHING;
 
-  -- 7. Update Order Status
+  -- 8. Update Order Status
   UPDATE public.orders
   SET status = 'Em Separação',
       payment_status = 'Pago',
@@ -1034,7 +1071,7 @@ BEGIN
       updated_at = NOW()
   WHERE id = p_order_id;
 
-  -- 8. Add History Entry
+  -- 9. Add History Entry
   INSERT INTO public.order_status_history (
     order_id, status, previous_status, new_status, source, external_event_id, description
   ) VALUES (
@@ -1255,20 +1292,54 @@ DROP POLICY IF EXISTS "Profiles delete only for admin" ON public.profiles;
 CREATE POLICY "Profiles delete only for admin" ON public.profiles FOR DELETE USING (public.is_admin());
 
 -- Clean up any legacy or overly permissive policies that might exist
+DROP POLICY IF EXISTS "Orders insert allowed for checkout" ON public.orders;
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.orders;
 DROP POLICY IF EXISTS "orders_insert_policy" ON public.orders;
 DROP POLICY IF EXISTS "Allow anonymous insert orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow anonymous insert" ON public.orders;
+DROP POLICY IF EXISTS "Allow anonymous read" ON public.orders;
+DROP POLICY IF EXISTS "Allow authenticated insert" ON public.orders;
 DROP POLICY IF EXISTS "Allow all insert" ON public.orders;
+DROP POLICY IF EXISTS "Allow all" ON public.orders;
 DROP POLICY IF EXISTS "Public insert orders" ON public.orders;
 DROP POLICY IF EXISTS "Orders insert allowed for anyone" ON public.orders;
+DROP POLICY IF EXISTS "Orders can be created by authenticated users" ON public.orders;
+DROP POLICY IF EXISTS "Users can insert their own orders" ON public.orders;
 
+DROP POLICY IF EXISTS "Order items insert allowed for checkout" ON public.order_items;
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.order_items;
 DROP POLICY IF EXISTS "Allow anonymous insert order_items" ON public.order_items;
+DROP POLICY IF EXISTS "Allow anonymous insert" ON public.order_items;
+DROP POLICY IF EXISTS "Allow anonymous read" ON public.order_items;
+DROP POLICY IF EXISTS "Allow all insert" ON public.order_items;
+DROP POLICY IF EXISTS "Allow all" ON public.order_items;
 DROP POLICY IF EXISTS "Public insert order_items" ON public.order_items;
+DROP POLICY IF EXISTS "Order items can be created by authenticated users" ON public.order_items;
 
+DROP POLICY IF EXISTS "Returns insert allowed for customer" ON public.returns;
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.returns;
 DROP POLICY IF EXISTS "Allow anonymous insert returns" ON public.returns;
+DROP POLICY IF EXISTS "Allow anonymous insert" ON public.returns;
+DROP POLICY IF EXISTS "Allow anonymous read" ON public.returns;
+DROP POLICY IF EXISTS "Allow all insert" ON public.returns;
+DROP POLICY IF EXISTS "Allow all" ON public.returns;
 DROP POLICY IF EXISTS "Public insert returns" ON public.returns;
+
+DROP POLICY IF EXISTS "Profiles allow insert" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles allow read" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles insert during registration" ON public.profiles;
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Allow authenticated users to read profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Allow all" ON public.profiles;
+
+DROP POLICY IF EXISTS "Allow all" ON public.payment_effects;
+DROP POLICY IF EXISTS "Allow all" ON public.webhook_events;
+DROP POLICY IF EXISTS "Allow all" ON public.shipment_operations;
+DROP POLICY IF EXISTS "Allow all" ON public.shipping_quotes;
+DROP POLICY IF EXISTS "Allow all" ON public.inventory_movements;
 
 -- Orders RLS (Strictly authoritative backend/service_role only creation, buyer/admin read)
 DROP POLICY IF EXISTS "Orders select restricted to buyer and admin" ON public.orders;

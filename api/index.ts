@@ -10217,18 +10217,18 @@ function normalizeCarrierStatus(statusOrDescription: string): {
   // Fallback / Unknown
   return {
     internalState: 'unknown',
-    orderStatus: 'Em Transporte',
-    shippingStatus: 'Em trânsito',
+    orderStatus: 'UNMODIFIED',
+    shippingStatus: 'Desconhecido',
     label: 'Atualização de Rastreio',
     description: statusOrDescription || 'Evento de movimentação registrado.',
-    rank: 55,
+    rank: 0,
     isTerminal: false,
     isException: false,
   };
 }
 
 function canTransitionOrderStatus(currentStatus: string, newStatus: string): boolean {
-  if (currentStatus === newStatus) return false;
+  if (newStatus === 'UNMODIFIED' || currentStatus === newStatus) return false;
 
   const currentRank = ORDER_STATUS_RANKS[currentStatus] || 0;
   const newRank = ORDER_STATUS_RANKS[newStatus] || 0;
@@ -10485,12 +10485,12 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   }
 }
 
-// Protected Vercel Cron Endpoint for Serverless Logistics Sync
+// Protected Vercel Cron Endpoint for Serverless Logistics Sync (Fail-Closed)
 app.get(['/api/cron/tracking-sync', '/api/cron/sync-tracking'], async (req, res) => {
   try {
-    const cronSecret = process.env.CRON_SECRET || process.env.VERCEL_CRON_SECRET;
-    const authHeader = req.headers.authorization;
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    const cronSecret = (process.env.CRON_SECRET || process.env.VERCEL_CRON_SECRET || '').trim();
+    const authHeader = (req.headers.authorization || '').trim();
+    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return res.status(401).json({ error: 'Não autorizado para execução do cron de sincronização.' });
     }
 
