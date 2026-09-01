@@ -1,5 +1,58 @@
 [
   {
+    "id": "MM-811782-117",
+    "customerName": "Cliente Marmot",
+    "customerEmail": "",
+    "customerPhone": "",
+    "customerCpf": "",
+    "items": [
+      {
+        "id": "item-1788224811782-pfk7g",
+        "productId": "prod-acs-001",
+        "title": "Boné Trucker",
+        "price": 149.9,
+        "quantity": 1,
+        "size": "M",
+        "color": "black",
+        "colorName": "Preto",
+        "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80",
+        "weight": 0.3,
+        "height": 8,
+        "width": 18,
+        "length": 22
+      }
+    ],
+    "shippingAddress": {
+      "postalCode": "01001000",
+      "street": "Rua",
+      "number": "1",
+      "city": "SP",
+      "state": "SP"
+    },
+    "shippingOption": {
+      "id": "pac",
+      "name": "PAC - Correios",
+      "price": 0.01,
+      "deadline": "5 a 8 dias úteis"
+    },
+    "shippingFee": 0.01,
+    "paymentMethod": "Mercado Pago",
+    "subtotal": 149.9,
+    "discount": 0,
+    "total": 149.91,
+    "status": "Aguardando Pagamento",
+    "paymentStatus": "Pendente",
+    "createdAt": "2026-09-01T01:06:51.782Z",
+    "updatedAt": "2026-09-01T01:06:51.782Z",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "01/09/2026, 01:06:51",
+        "description": "Pedido gerado pelo checkout. Aguardando compensação do pagamento."
+      }
+    ]
+  },
+  {
     "id": "MM-570026-2320",
     "customerName": "Comprador Teste Marmot",
     "customerEmail": "comprador.marmot@gmail.com",

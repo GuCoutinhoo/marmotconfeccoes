@@ -467,7 +467,7 @@ export function buildProductSupabasePayload(product: Product) {
     tags: product.tags || [],
     rating: product.rating || 5.0,
     review_count: product.reviewCount || 0,
-    stock_count: product.stockCount !== undefined ? product.stockCount : 20,
+    stock_count: typeof product.stockCount === 'number' ? product.stockCount : 0,
     sku: product.sku || '',
     sizes: product.sizes || ['P', 'M', 'G', 'GG'],
     colors: product.colors || [],

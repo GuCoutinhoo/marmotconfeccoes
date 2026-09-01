@@ -821,7 +821,7 @@ CREATE POLICY "Profiles update restricted to owner and admin"
 DROP POLICY IF EXISTS "Profiles insert allowed for user or admin" ON public.profiles;
 CREATE POLICY "Profiles insert allowed for user or admin"
   ON public.profiles FOR INSERT
-  WITH CHECK (auth.uid()::text = id::text OR public.is_admin() OR auth.uid() IS NOT NULL);
+  WITH CHECK (auth.uid()::text = id::text OR public.is_admin());
 
 DROP POLICY IF EXISTS "Profiles delete only for admin" ON public.profiles;
 CREATE POLICY "Profiles delete only for admin"
@@ -867,29 +867,30 @@ CREATE POLICY "Coupons write restricted to admin"
   USING (public.is_admin())
   WITH CHECK (public.is_admin());
 
--- Orders RLS
+-- Orders RLS (Backend authoritative creation via service_role, read by buyer/admin)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Orders select restricted to buyer and admin" ON public.orders;
 CREATE POLICY "Orders select restricted to buyer and admin"
   ON public.orders FOR SELECT
   USING (
-    auth.uid()::text = user_id::text OR 
-    (auth.jwt() ->> 'email' IS NOT NULL AND auth.jwt() ->> 'email' = customer_email) OR 
+    (select auth.uid())::text = user_id::text OR 
+    ((select auth.jwt()) ->> 'email' IS NOT NULL AND (select auth.jwt()) ->> 'email' = customer_email) OR 
     public.is_admin()
   );
 
 DROP POLICY IF EXISTS "Orders insert allowed for checkout" ON public.orders;
-CREATE POLICY "Orders insert allowed for checkout"
+DROP POLICY IF EXISTS "Orders insert backend only" ON public.orders;
+CREATE POLICY "Orders insert backend only"
   ON public.orders FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (public.is_admin() OR (auth.role() = 'service_role') OR (auth.uid() IS NOT NULL AND auth.uid()::text = user_id::text));
 
 DROP POLICY IF EXISTS "Orders update restricted to admin" ON public.orders;
 CREATE POLICY "Orders update restricted to admin"
   ON public.orders FOR UPDATE
-  USING (public.is_admin())
-  WITH CHECK (public.is_admin());
+  USING (public.is_admin() OR (auth.role() = 'service_role'))
+  WITH CHECK (public.is_admin() OR (auth.role() = 'service_role'));
 
--- Order Items RLS
+-- Order Items RLS (Backend authoritative creation via service_role, read by buyer/admin)
 ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Order items readable by buyer or admin" ON public.order_items;
 CREATE POLICY "Order items readable by buyer or admin"
@@ -899,80 +900,94 @@ CREATE POLICY "Order items readable by buyer or admin"
       SELECT 1 FROM public.orders o
       WHERE o.id = order_items.order_id
       AND (
-        o.user_id::text = auth.uid()::text OR
-        (auth.jwt() ->> 'email' IS NOT NULL AND o.customer_email = auth.jwt() ->> 'email') OR
+        o.user_id::text = (select auth.uid())::text OR
+        ((select auth.jwt()) ->> 'email' IS NOT NULL AND o.customer_email = (select auth.jwt()) ->> 'email') OR
         public.is_admin()
       )
     )
   );
 
 DROP POLICY IF EXISTS "Order items insert allowed" ON public.order_items;
-CREATE POLICY "Order items insert allowed"
+DROP POLICY IF EXISTS "Order items insert backend only" ON public.order_items;
+CREATE POLICY "Order items insert backend only"
   ON public.order_items FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (
+    public.is_admin() OR 
+    (auth.role() = 'service_role') OR
+    EXISTS (
+      SELECT 1 FROM public.orders o
+      WHERE o.id = order_items.order_id
+      AND o.user_id::text = (select auth.uid())::text
+    )
+  );
 
 -- User Addresses RLS
 ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "User addresses owner read" ON public.user_addresses;
 CREATE POLICY "User addresses owner read"
   ON public.user_addresses FOR SELECT
-  USING (auth.uid()::text = user_id::text OR public.is_admin());
+  USING ((select auth.uid())::text = user_id::text OR public.is_admin());
 
 DROP POLICY IF EXISTS "User addresses owner manage" ON public.user_addresses;
 CREATE POLICY "User addresses owner manage"
   ON public.user_addresses FOR ALL
-  USING (auth.uid()::text = user_id::text OR public.is_admin())
-  WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin());
+  USING ((select auth.uid())::text = user_id::text OR public.is_admin())
+  WITH CHECK ((select auth.uid())::text = user_id::text OR public.is_admin());
 
 -- Cart Items RLS
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Cart items owner manage" ON public.cart_items;
 CREATE POLICY "Cart items owner manage"
   ON public.cart_items FOR ALL
-  USING (auth.uid()::text = user_id::text OR public.is_admin())
-  WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin());
+  USING ((select auth.uid())::text = user_id::text OR public.is_admin())
+  WITH CHECK ((select auth.uid())::text = user_id::text OR public.is_admin());
 
 -- Favorites RLS
 ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Favorites owner manage" ON public.favorites;
 CREATE POLICY "Favorites owner manage"
   ON public.favorites FOR ALL
-  USING (auth.uid()::text = user_id::text OR public.is_admin())
-  WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin());
+  USING ((select auth.uid())::text = user_id::text OR public.is_admin())
+  WITH CHECK ((select auth.uid())::text = user_id::text OR public.is_admin());
 
--- Returns RLS
+-- Returns RLS (Backend authoritative creation, read by owner/admin)
 ALTER TABLE public.returns ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Returns select allowed for owner or admin" ON public.returns;
 CREATE POLICY "Returns select allowed for owner or admin"
   ON public.returns FOR SELECT
   USING (
-    auth.uid()::text = user_id::text OR 
-    (auth.jwt() ->> 'email' IS NOT NULL AND auth.jwt() ->> 'email' = customer_email) OR 
+    (select auth.uid())::text = user_id::text OR 
+    ((select auth.jwt()) ->> 'email' IS NOT NULL AND (select auth.jwt()) ->> 'email' = customer_email) OR 
     public.is_admin()
   );
 
 DROP POLICY IF EXISTS "Returns insert allowed" ON public.returns;
-CREATE POLICY "Returns insert allowed"
+DROP POLICY IF EXISTS "Returns insert backend only" ON public.returns;
+CREATE POLICY "Returns insert backend only"
   ON public.returns FOR INSERT
-  WITH CHECK (true);
+  WITH CHECK (
+    public.is_admin() OR 
+    (auth.role() = 'service_role') OR
+    ((select auth.uid()) IS NOT NULL AND (select auth.uid())::text = user_id::text)
+  );
 
 DROP POLICY IF EXISTS "Returns write restricted to admin" ON public.returns;
 CREATE POLICY "Returns write restricted to admin"
   ON public.returns FOR UPDATE
-  USING (public.is_admin())
-  WITH CHECK (public.is_admin());
+  USING (public.is_admin() OR (auth.role() = 'service_role'))
+  WITH CHECK (public.is_admin() OR (auth.role() = 'service_role'));
 
 -- Product Reviews RLS
 ALTER TABLE public.product_reviews ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Reviews are publicly readable" ON public.product_reviews;
 CREATE POLICY "Reviews are publicly readable"
   ON public.product_reviews FOR SELECT
-  USING (status = 'approved' OR public.is_admin() OR auth.uid()::text = user_id::text);
+  USING (status = 'approved' OR public.is_admin() OR (select auth.uid())::text = user_id::text);
 
 DROP POLICY IF EXISTS "Reviews insert allowed" ON public.product_reviews;
 CREATE POLICY "Reviews insert allowed"
   ON public.product_reviews FOR INSERT
-  WITH CHECK (auth.uid() IS NOT NULL OR public.is_admin());
+  WITH CHECK ((select auth.uid()) IS NOT NULL OR public.is_admin());
 
 DROP POLICY IF EXISTS "Reviews admin manage" ON public.product_reviews;
 CREATE POLICY "Reviews admin manage"
@@ -1015,8 +1030,8 @@ CREATE POLICY "Order status history select allowed" ON public.order_status_histo
     SELECT 1 FROM public.orders o
     WHERE o.id = order_status_history.order_id
     AND (
-      o.user_id::text = auth.uid()::text OR
-      (auth.jwt() ->> 'email' IS NOT NULL AND o.customer_email = auth.jwt() ->> 'email') OR
+      o.user_id::text = (select auth.uid())::text OR
+      ((select auth.jwt()) ->> 'email' IS NOT NULL AND o.customer_email = (select auth.jwt()) ->> 'email') OR
       public.is_admin()
     )
   )
@@ -1040,8 +1055,8 @@ CREATE POLICY "Shipment events select allowed" ON public.shipment_events FOR SEL
     SELECT 1 FROM public.orders o
     WHERE o.id = shipment_events.order_id
     AND (
-      o.user_id::text = auth.uid()::text OR
-      (auth.jwt() ->> 'email' IS NOT NULL AND o.customer_email = auth.jwt() ->> 'email') OR
+      o.user_id::text = (select auth.uid())::text OR
+      ((select auth.jwt()) ->> 'email' IS NOT NULL AND o.customer_email = (select auth.jwt()) ->> 'email') OR
       public.is_admin()
     )
   )
@@ -1061,17 +1076,53 @@ ALTER TABLE public.admin_audit_logs ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Audit logs admin only" ON public.admin_audit_logs;
 CREATE POLICY "Audit logs admin only" ON public.admin_audit_logs FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- Permissions Grants
-REVOKE EXECUTE ON FUNCTION public.process_approved_order_atomic FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic TO authenticated, service_role;
+-- Storage Bucket Setup & Security
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'product-images',
+  'product-images',
+  true,
+  5242880, -- 5MB limit
+  ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
+)
+ON CONFLICT (id) DO UPDATE SET
+  public = true,
+  file_size_limit = 5242880,
+  allowed_mime_types = ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
 
-REVOKE EXECUTE ON FUNCTION public.deduct_inventory_atomic FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.deduct_inventory_atomic TO authenticated, service_role;
+-- Storage RLS Policies
+DROP POLICY IF EXISTS "Product images public read" ON storage.objects;
+CREATE POLICY "Product images public read"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'product-images');
 
-REVOKE EXECUTE ON FUNCTION public.claim_webhook_event FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.claim_webhook_event TO authenticated, service_role;
+DROP POLICY IF EXISTS "Product images admin upload" ON storage.objects;
+CREATE POLICY "Product images admin upload"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'product-images' AND (public.is_admin() OR auth.role() = 'service_role'));
 
-REVOKE EXECUTE ON FUNCTION public.complete_webhook_event FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.complete_webhook_event TO authenticated, service_role;
+DROP POLICY IF EXISTS "Product images admin update" ON storage.objects;
+CREATE POLICY "Product images admin update"
+  ON storage.objects FOR UPDATE
+  USING (bucket_id = 'product-images' AND (public.is_admin() OR auth.role() = 'service_role'))
+  WITH CHECK (bucket_id = 'product-images' AND (public.is_admin() OR auth.role() = 'service_role'));
+
+DROP POLICY IF EXISTS "Product images admin delete" ON storage.objects;
+CREATE POLICY "Product images admin delete"
+  ON storage.objects FOR DELETE
+  USING (bucket_id = 'product-images' AND (public.is_admin() OR auth.role() = 'service_role'));
+
+-- Permissions Grants: Financial and inventory RPCs are strictly restricted to service_role and admin
+REVOKE EXECUTE ON FUNCTION public.process_approved_order_atomic FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic TO service_role;
+
+REVOKE EXECUTE ON FUNCTION public.deduct_inventory_atomic FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.deduct_inventory_atomic TO service_role;
+
+REVOKE EXECUTE ON FUNCTION public.claim_webhook_event FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.claim_webhook_event TO service_role;
+
+REVOKE EXECUTE ON FUNCTION public.complete_webhook_event FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.complete_webhook_event TO service_role;
 
 GRANT EXECUTE ON FUNCTION public.is_admin TO PUBLIC, anon, authenticated, service_role;

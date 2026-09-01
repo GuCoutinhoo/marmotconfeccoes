@@ -6557,7 +6557,7 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
       }
 
       const requestedQty = Math.max(1, Math.min(50, Number(rawItem.quantity) || 1));
-      const availableStock = dbProd.stockCount !== undefined ? dbProd.stockCount : 20;
+      const availableStock = typeof dbProd.stockCount === 'number' ? dbProd.stockCount : 0;
       if (availableStock < requestedQty) {
         return res.status(400).json({
           error: `Estoque insuficiente para "${dbProd.title}". Disponível: ${availableStock} un.`,
