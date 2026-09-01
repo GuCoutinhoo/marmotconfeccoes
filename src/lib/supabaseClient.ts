@@ -94,7 +94,11 @@ export function mapSupabaseRowToProduct(row: any): Product {
     tags: Array.isArray(row.tags) ? row.tags : (Array.isArray(d.tags) ? d.tags : ['Lançamento']),
     rating: typeof row.rating === 'number' ? row.rating : parseFloat(row.rating || d.rating || 5.0),
     reviewCount: typeof row.review_count === 'number' ? row.review_count : parseInt(row.review_count || d.reviewCount || 0, 10),
-    stockCount: typeof row.stock_count === 'number' ? row.stock_count : parseInt(row.stock_count || d.stockCount || 20, 10),
+    stockCount: typeof row.stock_count === 'number'
+      ? row.stock_count
+      : (row.stock_count !== undefined && row.stock_count !== null
+          ? (parseInt(String(row.stock_count), 10) >= 0 ? parseInt(String(row.stock_count), 10) : 0)
+          : (typeof d?.stockCount === 'number' ? d.stockCount : 0)),
     sku: row.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
     sizes: Array.isArray(row.sizes) && row.sizes.length > 0 ? row.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
     colors: cleanColors,

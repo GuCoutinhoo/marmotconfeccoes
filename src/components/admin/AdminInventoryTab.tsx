@@ -69,7 +69,7 @@ export const AdminInventoryTab: React.FC = () => {
       p.id.toLowerCase().includes(term) ||
       (p.sku && p.sku.toLowerCase().includes(term));
 
-    const stock = p.stockCount ?? 20;
+    const stock = p.stockCount ?? 0;
     let matchesStock = true;
     if (stockStatusFilter === 'low') {
       matchesStock = stock > 0 && stock <= 5;
@@ -80,8 +80,8 @@ export const AdminInventoryTab: React.FC = () => {
     return matchesSearch && matchesStock;
   });
 
-  const lowStockCount = products.filter((p) => (p.stockCount ?? 20) <= 5 && (p.stockCount ?? 20) > 0).length;
-  const outOfStockCount = products.filter((p) => (p.stockCount ?? 20) <= 0).length;
+  const lowStockCount = products.filter((p) => (p.stockCount ?? 0) <= 5 && (p.stockCount ?? 0) > 0).length;
+  const outOfStockCount = products.filter((p) => (p.stockCount ?? 0) <= 0).length;
 
   const handleSaveAdjustment = async () => {
     if (!selectedProduct) return;
@@ -90,7 +90,7 @@ export const AdminInventoryTab: React.FC = () => {
       return;
     }
 
-    const currentStock = selectedProduct.stockCount ?? 20;
+    const currentStock = selectedProduct.stockCount ?? 0;
     const newStock = Math.max(0, currentStock + quantityChange);
 
     setIsSaving(true);
@@ -230,7 +230,7 @@ export const AdminInventoryTab: React.FC = () => {
                 </thead>
                 <tbody className="divide-y divide-[#E5E5E1]">
                   {filteredProducts.map((prod) => {
-                    const stock = prod.stockCount ?? 20;
+                    const stock = prod.stockCount ?? 0;
                     const isOut = stock <= 0;
                     const isLow = stock > 0 && stock <= 5;
 
@@ -398,7 +398,7 @@ export const AdminInventoryTab: React.FC = () => {
 
             <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl flex items-center justify-between font-mono text-xs">
               <span className="text-[#6B6B66]">Estoque Atual:</span>
-              <span className="font-black text-[#B45309] text-sm">{selectedProduct.stockCount ?? 20} un.</span>
+              <span className="font-black text-[#B45309] text-sm">{selectedProduct.stockCount ?? 0} un.</span>
             </div>
 
             <div className="space-y-3">
@@ -429,7 +429,7 @@ export const AdminInventoryTab: React.FC = () => {
                 <p className="text-[11px] text-[#6B6B66] font-mono mt-1 text-center">
                   Novo estoque resultante:{' '}
                   <strong className="text-[#171717]">
-                    {Math.max(0, (selectedProduct.stockCount ?? 20) + quantityChange)} un.
+                    {Math.max(0, (selectedProduct.stockCount ?? 0) + quantityChange)} un.
                   </strong>
                 </p>
               </div>

@@ -1055,7 +1055,11 @@ export class DatabaseManager {
       tags: Array.isArray(item.tags) ? item.tags : (Array.isArray(d.tags) ? d.tags : ['Lançamento']),
       rating: typeof item.rating === 'number' ? item.rating : parseFloat(item.rating || d.rating || 5.0),
       reviewCount: typeof item.review_count === 'number' ? item.review_count : parseInt(item.review_count || d.reviewCount || 0, 10),
-      stockCount: typeof item.stock_count === 'number' ? item.stock_count : parseInt(item.stock_count || d.stockCount || 20, 10),
+      stockCount: typeof item.stock_count === 'number'
+        ? item.stock_count
+        : (item.stock_count !== undefined && item.stock_count !== null
+            ? (parseInt(String(item.stock_count), 10) >= 0 ? parseInt(String(item.stock_count), 10) : 0)
+            : (typeof d?.stockCount === 'number' ? d.stockCount : 0)),
       sku: item.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
       sizes: Array.isArray(item.sizes) && item.sizes.length > 0 ? item.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
       colors: cleanColors,
@@ -1793,7 +1797,7 @@ export class DatabaseManager {
         if (updates.tags !== undefined) updatePayload.tags = cleanProduct.tags || [];
         if (updates.rating !== undefined) updatePayload.rating = cleanProduct.rating || 5.0;
         if (updates.reviewCount !== undefined) updatePayload.review_count = cleanProduct.reviewCount || 0;
-        if (updates.stockCount !== undefined) updatePayload.stock_count = cleanProduct.stockCount ?? 20;
+        if (updates.stockCount !== undefined) updatePayload.stock_count = typeof cleanProduct.stockCount === 'number' ? cleanProduct.stockCount : 0;
         if (updates.sku !== undefined) updatePayload.sku = cleanProduct.sku || '';
         if (updates.sizes !== undefined) updatePayload.sizes = cleanProduct.sizes || ['P', 'M', 'G', 'GG'];
         if (updates.colors !== undefined) updatePayload.colors = cleanProduct.colors || [];
@@ -4348,7 +4352,7 @@ export class DatabaseManager {
                 image: itm.productImage || matchedProd?.image || '',
                 salesCount: 0,
                 revenue: 0,
-                stock: matchedProd?.stockCount ?? 20,
+                stock: typeof matchedProd?.stockCount === 'number' ? matchedProd.stockCount : 0,
               });
             }
             const pEntry = productSalesMap.get(pId)!;
@@ -4372,7 +4376,7 @@ export class DatabaseManager {
       (r) => r.status !== 'Concluída' && r.status !== 'Recusada' && r.status !== 'Reembolso realizado'
     ).length;
 
-    const lowStockCount = this.products.filter((p) => (p.stockCount ?? 20) <= 5).length;
+    const lowStockCount = this.products.filter((p) => (typeof p.stockCount === 'number' ? p.stockCount : 0) <= 5).length;
     const averageTicket = totalValidOrders > 0 ? Number((totalValidRevenue / totalValidOrders).toFixed(2)) : 0;
     const newCustomersThisMonth = (await this.getCustomerProfiles()).filter((c) => {
       const d = new Date(c.createdAt);
@@ -7142,7 +7146,13 @@ function getMercadoPagoClient() {
 }
 
 function verifyMercadoPagoWebhookSignature(req: express.Request, secret?: string): boolean {
-  if (!secret || secret.trim().length === 0) return true; // Permissive if no secret configured
+  if (!secret || secret.trim().length === 0) {
+    if (process.env.NODE_ENV === 'production') {
+      console.warn('[Mercado Pago Webhook Warning]: MERCADOPAGO_WEBHOOK_SECRET ausente em produção. Rejeitando requisição por segurança.');
+      return false;
+    }
+    return true; // Permissive only in non-production local development
+  }
   const xSignature = (req.headers['x-signature'] as string) || '';
   const xRequestId = (req.headers['x-request-id'] as string) || '';
   if (!xSignature) {
@@ -7207,11 +7217,17 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       }
 
       const qty = Math.max(1, parseInt(String(item.quantity || 1), 10));
-      const currentStock = dbProduct.stockCount ?? 20;
+      const currentStock = typeof dbProduct.stockCount === 'number' ? dbProduct.stockCount : 0;
 
       if (currentStock <= 0) {
         return res.status(400).json({
           error: `O produto "${dbProduct.title}" está esgotado no momento.`,
+        });
+      }
+
+      if (qty > currentStock) {
+        return res.status(400).json({
+          error: `Estoque insuficiente para "${dbProduct.title}". Quantidade solicitada: ${qty}, disponível: ${currentStock}.`,
         });
       }
 
@@ -7854,8 +7870,8 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
 
     const isSignatureValid = verifyMercadoPagoWebhookSignature(req, webhookSecret);
 
-    if (hasWebhookSecret && !isSignatureValid) {
-      console.warn('[Mercado Pago Webhook Warning]: Invalid signature header.');
+    if (!isSignatureValid) {
+      console.warn('[Mercado Pago Webhook Warning]: Assinatura do webhook inválida ou rejeitada.');
       return res.status(401).json({ error: 'Assinatura do webhook inválida.' });
     }
 
@@ -8540,9 +8556,9 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
         quantity: Math.max(1, Number(item.quantity) || 1),
         unitary_value: Number(Number(item.price || 0).toFixed(2)),
         weight: Number(weight.toFixed(2)),
-        height: Math.round(height),
-        width: Math.round(width),
-        length: Math.round(length),
+        height: Math.ceil(height),
+        width: Math.ceil(width),
+        length: Math.ceil(length),
       });
     }
 
@@ -8571,8 +8587,10 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       fromPayload.state_register = senderConfig.stateRegister || 'ISENTO';
     }
 
+    const resolvedServiceId = Number(order.shippingServiceId) || (order.shippingCarrier?.toLowerCase().includes('jadlog') ? 3 : (order.shippingCarrier?.toLowerCase().includes('sedex') ? 2 : 1));
+
     const cartPayload = {
-      service: Number(order.shippingServiceId) || 1,
+      service: resolvedServiceId,
       from: fromPayload,
       to: {
         name: order.shippingAddress?.recipientName || order.customerName || 'Destinatário',

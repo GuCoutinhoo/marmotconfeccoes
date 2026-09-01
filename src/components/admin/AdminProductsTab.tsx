@@ -949,11 +949,11 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         <input
                           type="number"
                           min={0}
-                          defaultValue={p.stockCount ?? 20}
+                          defaultValue={p.stockCount ?? 0}
                           onBlur={(e) => handleQuickStockChange(p.id, parseInt(e.target.value) || 0)}
                           className="w-16 bg-[#F9F9F7] border border-[#E5E5E1] px-2 py-1 rounded text-center text-xs font-mono font-bold text-[#171717] focus:border-[#B45309] focus:outline-none"
                         />
-                        {(p.stockCount ?? 20) < 10 && (
+                        {(p.stockCount ?? 0) < 10 && (
                           <span className="text-[10px] text-amber-700 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
                             Baixo
                           </span>

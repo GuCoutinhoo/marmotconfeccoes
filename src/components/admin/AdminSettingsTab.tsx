@@ -23,8 +23,8 @@ export const AdminSettingsTab: React.FC = () => {
     phone: '(11) 99999-9999',
     whatsapp: '11999999999',
     instagram: '@marmotstreetwear',
-    freeShippingThreshold: 299.00,
-    announcementBarText: 'FRETE GRÁTIS PARA TODO O BRASIL EM COMPRAS ACIMA DE R$ 299',
+    freeShippingThreshold: 399.00,
+    announcementBarText: 'FRETE GRÁTIS PARA TODO O BRASIL EM COMPRAS ACIMA DE R$ 399',
     announcementBarActive: true,
     maintenanceMode: false,
     originPostalCode: '01001000',
@@ -179,7 +179,7 @@ export const AdminSettingsTab: React.FC = () => {
             <input
               type="number"
               step="0.01"
-              value={settings.freeShippingThreshold ?? 299}
+              value={settings.freeShippingThreshold ?? 399}
               onChange={(e) => setSettings({ ...settings, freeShippingThreshold: parseFloat(e.target.value) || 0 })}
               className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
             />
@@ -204,7 +204,7 @@ export const AdminSettingsTab: React.FC = () => {
               type="text"
               value={settings.announcementBarText || ''}
               onChange={(e) => setSettings({ ...settings, announcementBarText: e.target.value })}
-              placeholder="FRETE GRÁTIS ACIMA DE R$ 299 • PARCELAMENTO EM ATÉ 6X SEM JUROS"
+              placeholder="FRETE GRÁTIS ACIMA DE R$ 399 • PARCELAMENTO EM ATÉ 6X SEM JUROS"
               className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
             />
           </div>

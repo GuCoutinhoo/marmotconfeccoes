@@ -88,7 +88,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
     (o) => o.status === 'Aguardando Pagamento' || o.status === 'Pagamento Pendente' || o.status === 'Pagamento Aprovado'
   ).length;
 
-  const lowStockCount = products.filter((p) => (p.stockCount ?? 20) <= 5).length;
+  const lowStockCount = products.filter((p) => (p.stockCount ?? 0) <= 5).length;
 
   if (isLoading) {
     return (
