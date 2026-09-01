@@ -4,9 +4,9 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Profiles (Customers and Administrators)
+-- 1. Profiles (Customers and Administrators)
 CREATE TABLE IF NOT EXISTS public.profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
   name TEXT,
   role TEXT NOT NULL DEFAULT 'customer' CHECK (role IN ('customer', 'admin')),
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Products Catalog
+-- 2. Products Catalog
 CREATE TABLE IF NOT EXISTS public.products (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Categories
+-- 3. Categories
 CREATE TABLE IF NOT EXISTS public.categories (
   id TEXT PRIMARY KEY,
   slug TEXT UNIQUE NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Coupons
+-- 4. Coupons
 CREATE TABLE IF NOT EXISTS public.coupons (
   code TEXT PRIMARY KEY,
   discount_percentage NUMERIC(5, 2) DEFAULT 0 CHECK (discount_percentage >= 0 AND discount_percentage <= 100),
@@ -86,10 +86,10 @@ CREATE TABLE IF NOT EXISTS public.coupons (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Orders Table
+-- 5. Orders Table
 CREATE TABLE IF NOT EXISTS public.orders (
   id TEXT PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_id TEXT,
   order_number TEXT,
   customer_name TEXT,
   customer_email TEXT NOT NULL,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Relational Order Items
+-- 6. Relational Order Items
 CREATE TABLE IF NOT EXISTS public.order_items (
   id TEXT PRIMARY KEY,
   order_id TEXT NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS public.order_items (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Order Status History
+-- 7. Order Status History
 CREATE TABLE IF NOT EXISTS public.order_status_history (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id TEXT NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -166,10 +166,10 @@ CREATE TABLE IF NOT EXISTS public.order_status_history (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- User Addresses
+-- 8. User Addresses
 CREATE TABLE IF NOT EXISTS public.user_addresses (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
   recipient_name TEXT NOT NULL,
   cpf TEXT,
   phone TEXT,
@@ -186,10 +186,10 @@ CREATE TABLE IF NOT EXISTS public.user_addresses (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Cart Items
+-- 9. Cart Items
 CREATE TABLE IF NOT EXISTS public.cart_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
   product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   size TEXT NOT NULL DEFAULT 'M',
   color TEXT NOT NULL DEFAULT 'Padrão',
@@ -201,20 +201,20 @@ CREATE TABLE IF NOT EXISTS public.cart_items (
   UNIQUE(user_id, product_id, size, color)
 );
 
--- Favorites / Wishlist
+-- 10. Favorites / Wishlist
 CREATE TABLE IF NOT EXISTS public.favorites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL,
   product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(user_id, product_id)
 );
 
--- Returns
+-- 11. Returns
 CREATE TABLE IF NOT EXISTS public.returns (
   id TEXT PRIMARY KEY,
   order_id TEXT NOT NULL REFERENCES public.orders(id) ON DELETE RESTRICT,
-  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_id TEXT,
   customer_name TEXT,
   customer_email TEXT NOT NULL,
   customer_phone TEXT,
@@ -232,7 +232,7 @@ CREATE TABLE IF NOT EXISTS public.returns (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Inventory Movements Ledger
+-- 12. Inventory Movements Ledger
 CREATE TABLE IF NOT EXISTS public.inventory_movements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE RESTRICT,
@@ -249,11 +249,11 @@ CREATE TABLE IF NOT EXISTS public.inventory_movements (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Product Reviews
+-- 13. Product Reviews
 CREATE TABLE IF NOT EXISTS public.product_reviews (
   id TEXT PRIMARY KEY,
   product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
-  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  user_id TEXT,
   order_id TEXT REFERENCES public.orders(id) ON DELETE SET NULL,
   user_name TEXT NOT NULL,
   rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
@@ -266,7 +266,7 @@ CREATE TABLE IF NOT EXISTS public.product_reviews (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Store Settings
+-- 14. Store Settings
 CREATE TABLE IF NOT EXISTS public.store_settings (
   id TEXT PRIMARY KEY,
   store_name TEXT NOT NULL DEFAULT 'Marmot Confecções',
@@ -279,7 +279,7 @@ CREATE TABLE IF NOT EXISTS public.store_settings (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Store Banners
+-- 15. Store Banners
 CREATE TABLE IF NOT EXISTS public.store_banners (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
@@ -295,7 +295,7 @@ CREATE TABLE IF NOT EXISTS public.store_banners (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Newsletter Subscribers
+-- 16. Newsletter Subscribers
 CREATE TABLE IF NOT EXISTS public.newsletter_subscribers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT UNIQUE NOT NULL,
@@ -305,7 +305,7 @@ CREATE TABLE IF NOT EXISTS public.newsletter_subscribers (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Email Logs / Outbox
+-- 17. Email Logs / Outbox
 CREATE TABLE IF NOT EXISTS public.email_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   recipient_email TEXT NOT NULL,
@@ -319,7 +319,7 @@ CREATE TABLE IF NOT EXISTS public.email_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Shipment Operations (Distributed Locks & Idempotency for Mejor Envio)
+-- 18. Shipment Operations (Distributed Locks & Idempotency for Mejor Envio)
 CREATE TABLE IF NOT EXISTS public.shipment_operations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id TEXT UNIQUE NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -335,7 +335,7 @@ CREATE TABLE IF NOT EXISTS public.shipment_operations (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Shipment Events
+-- 19. Shipment Events
 CREATE TABLE IF NOT EXISTS public.shipment_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id TEXT NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -351,7 +351,7 @@ CREATE TABLE IF NOT EXISTS public.shipment_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Webhook Events (Idempotency and Claim Table)
+-- 20. Webhook Events (Idempotency and Claim Table)
 CREATE TABLE IF NOT EXISTS public.webhook_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   gateway TEXT NOT NULL,
@@ -368,7 +368,7 @@ CREATE TABLE IF NOT EXISTS public.webhook_events (
   UNIQUE(gateway, event_key)
 );
 
--- Payment Effects (Ledger of Approved / Processed Financial Transactions)
+-- 21. Payment Effects (Ledger of Approved / Processed Financial Transactions)
 CREATE TABLE IF NOT EXISTS public.payment_effects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   order_id TEXT NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
@@ -384,10 +384,10 @@ CREATE TABLE IF NOT EXISTS public.payment_effects (
   UNIQUE(gateway, payment_id)
 );
 
--- Admin Audit Logs
+-- 22. Admin Audit Logs
 CREATE TABLE IF NOT EXISTS public.admin_audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  admin_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  admin_id TEXT,
   admin_email TEXT NOT NULL,
   action TEXT NOT NULL,
   resource_type TEXT NOT NULL,
@@ -398,29 +398,40 @@ CREATE TABLE IF NOT EXISTS public.admin_audit_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Helper function to check if caller is an administrator
+-- =========================================================================
+-- FUNCTIONS & TRIGGERS
+-- =========================================================================
+
+-- Helper function to check if caller is an administrator (Resiliente a UUID e TEXT)
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  )
-  OR (
-    SELECT COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', '') = 'admin'
+BEGIN
+  RETURN (
+    COALESCE(auth.jwt() ->> 'role', '') = 'admin' OR
+    COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', '') = 'admin' OR
+    COALESCE(auth.jwt() ->> 'email', '') IN ('admin@marmot.com', 'admin@marmot.com.br', 'gustavohcsantos.mm2020@gmail.com') OR
+    EXISTS (
+      SELECT 1 FROM public.profiles
+      WHERE id::text = auth.uid()::text AND role = 'admin'
+    )
   );
+END;
 $$;
+
+REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, service_role, anon;
 
 -- Secure trigger for new user creation
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
 DECLARE
   assigned_role TEXT := 'customer';
@@ -431,7 +442,7 @@ BEGIN
 
   INSERT INTO public.profiles (id, email, name, role, created_at, updated_at)
   VALUES (
-    NEW.id,
+    NEW.id::text,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'name', NEW.raw_user_meta_data->>'full_name', SPLIT_PART(NEW.email, '@', 1)),
     assigned_role,
@@ -441,8 +452,11 @@ BEGIN
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
     name = COALESCE(EXCLUDED.name, profiles.name),
+    role = CASE WHEN profiles.role = 'admin' THEN 'admin' ELSE EXCLUDED.role END,
     updated_at = NOW();
 
+  RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
   RETURN NEW;
 END;
 $$;
@@ -458,7 +472,7 @@ CREATE OR REPLACE FUNCTION public.protect_profile_role()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
 BEGIN
   IF OLD.role IS DISTINCT FROM NEW.role THEN
@@ -490,7 +504,7 @@ CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
 DECLARE
   v_already_processed BOOLEAN;
@@ -671,7 +685,7 @@ CREATE OR REPLACE FUNCTION public.claim_webhook_event(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
 DECLARE
   v_row public.webhook_events%ROWTYPE;
@@ -717,7 +731,7 @@ CREATE OR REPLACE FUNCTION public.complete_webhook_event(
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
 BEGIN
   UPDATE public.webhook_events
@@ -741,7 +755,7 @@ CREATE OR REPLACE FUNCTION public.deduct_inventory_atomic(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
 DECLARE
   v_current_stock INTEGER;
@@ -787,6 +801,267 @@ BEGIN
 END;
 $$;
 
+-- =========================================================================
+-- ROW LEVEL SECURITY (RLS) POLICIES
+-- =========================================================================
+
+-- Profiles RLS
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Profiles read restricted to owner and admin" ON public.profiles;
+CREATE POLICY "Profiles read restricted to owner and admin"
+  ON public.profiles FOR SELECT
+  USING (auth.uid()::text = id::text OR public.is_admin());
+
+DROP POLICY IF EXISTS "Profiles update restricted to owner and admin" ON public.profiles;
+CREATE POLICY "Profiles update restricted to owner and admin"
+  ON public.profiles FOR UPDATE
+  USING (auth.uid()::text = id::text OR public.is_admin())
+  WITH CHECK (auth.uid()::text = id::text OR public.is_admin());
+
+DROP POLICY IF EXISTS "Profiles insert allowed for user or admin" ON public.profiles;
+CREATE POLICY "Profiles insert allowed for user or admin"
+  ON public.profiles FOR INSERT
+  WITH CHECK (auth.uid()::text = id::text OR public.is_admin() OR auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS "Profiles delete only for admin" ON public.profiles;
+CREATE POLICY "Profiles delete only for admin"
+  ON public.profiles FOR DELETE
+  USING (public.is_admin());
+
+-- Products RLS
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Products are publicly readable" ON public.products;
+CREATE POLICY "Products are publicly readable"
+  ON public.products FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Products write restricted to admin" ON public.products;
+CREATE POLICY "Products write restricted to admin"
+  ON public.products FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Categories RLS
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Categories are publicly readable" ON public.categories;
+CREATE POLICY "Categories are publicly readable"
+  ON public.categories FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Categories write restricted to admin" ON public.categories;
+CREATE POLICY "Categories write restricted to admin"
+  ON public.categories FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Coupons RLS
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Coupons are viewable by everyone" ON public.coupons;
+CREATE POLICY "Coupons are viewable by everyone"
+  ON public.coupons FOR SELECT
+  USING (active = true OR public.is_admin());
+
+DROP POLICY IF EXISTS "Coupons write restricted to admin" ON public.coupons;
+CREATE POLICY "Coupons write restricted to admin"
+  ON public.coupons FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Orders RLS
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Orders select restricted to buyer and admin" ON public.orders;
+CREATE POLICY "Orders select restricted to buyer and admin"
+  ON public.orders FOR SELECT
+  USING (
+    auth.uid()::text = user_id::text OR 
+    (auth.jwt() ->> 'email' IS NOT NULL AND auth.jwt() ->> 'email' = customer_email) OR 
+    public.is_admin()
+  );
+
+DROP POLICY IF EXISTS "Orders insert allowed for checkout" ON public.orders;
+CREATE POLICY "Orders insert allowed for checkout"
+  ON public.orders FOR INSERT
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Orders update restricted to admin" ON public.orders;
+CREATE POLICY "Orders update restricted to admin"
+  ON public.orders FOR UPDATE
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Order Items RLS
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Order items readable by buyer or admin" ON public.order_items;
+CREATE POLICY "Order items readable by buyer or admin"
+  ON public.order_items FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.orders o
+      WHERE o.id = order_items.order_id
+      AND (
+        o.user_id::text = auth.uid()::text OR
+        (auth.jwt() ->> 'email' IS NOT NULL AND o.customer_email = auth.jwt() ->> 'email') OR
+        public.is_admin()
+      )
+    )
+  );
+
+DROP POLICY IF EXISTS "Order items insert allowed" ON public.order_items;
+CREATE POLICY "Order items insert allowed"
+  ON public.order_items FOR INSERT
+  WITH CHECK (true);
+
+-- User Addresses RLS
+ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User addresses owner read" ON public.user_addresses;
+CREATE POLICY "User addresses owner read"
+  ON public.user_addresses FOR SELECT
+  USING (auth.uid()::text = user_id::text OR public.is_admin());
+
+DROP POLICY IF EXISTS "User addresses owner manage" ON public.user_addresses;
+CREATE POLICY "User addresses owner manage"
+  ON public.user_addresses FOR ALL
+  USING (auth.uid()::text = user_id::text OR public.is_admin())
+  WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin());
+
+-- Cart Items RLS
+ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Cart items owner manage" ON public.cart_items;
+CREATE POLICY "Cart items owner manage"
+  ON public.cart_items FOR ALL
+  USING (auth.uid()::text = user_id::text OR public.is_admin())
+  WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin());
+
+-- Favorites RLS
+ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Favorites owner manage" ON public.favorites;
+CREATE POLICY "Favorites owner manage"
+  ON public.favorites FOR ALL
+  USING (auth.uid()::text = user_id::text OR public.is_admin())
+  WITH CHECK (auth.uid()::text = user_id::text OR public.is_admin());
+
+-- Returns RLS
+ALTER TABLE public.returns ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Returns select allowed for owner or admin" ON public.returns;
+CREATE POLICY "Returns select allowed for owner or admin"
+  ON public.returns FOR SELECT
+  USING (
+    auth.uid()::text = user_id::text OR 
+    (auth.jwt() ->> 'email' IS NOT NULL AND auth.jwt() ->> 'email' = customer_email) OR 
+    public.is_admin()
+  );
+
+DROP POLICY IF EXISTS "Returns insert allowed" ON public.returns;
+CREATE POLICY "Returns insert allowed"
+  ON public.returns FOR INSERT
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Returns write restricted to admin" ON public.returns;
+CREATE POLICY "Returns write restricted to admin"
+  ON public.returns FOR UPDATE
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Product Reviews RLS
+ALTER TABLE public.product_reviews ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Reviews are publicly readable" ON public.product_reviews;
+CREATE POLICY "Reviews are publicly readable"
+  ON public.product_reviews FOR SELECT
+  USING (status = 'approved' OR public.is_admin() OR auth.uid()::text = user_id::text);
+
+DROP POLICY IF EXISTS "Reviews insert allowed" ON public.product_reviews;
+CREATE POLICY "Reviews insert allowed"
+  ON public.product_reviews FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL OR public.is_admin());
+
+DROP POLICY IF EXISTS "Reviews admin manage" ON public.product_reviews;
+CREATE POLICY "Reviews admin manage"
+  ON public.product_reviews FOR UPDATE
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Store Settings & Banners RLS
+ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Settings public read" ON public.store_settings;
+CREATE POLICY "Settings public read" ON public.store_settings FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Settings admin write" ON public.store_settings;
+CREATE POLICY "Settings admin write" ON public.store_settings FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+ALTER TABLE public.store_banners ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Banners public read" ON public.store_banners;
+CREATE POLICY "Banners public read" ON public.store_banners FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Banners admin write" ON public.store_banners;
+CREATE POLICY "Banners admin write" ON public.store_banners FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- Newsletter Subscribers RLS
+ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Newsletter insert allowed" ON public.newsletter_subscribers;
+CREATE POLICY "Newsletter insert allowed" ON public.newsletter_subscribers FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Newsletter admin manage" ON public.newsletter_subscribers;
+CREATE POLICY "Newsletter admin manage" ON public.newsletter_subscribers FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- Inventory Movements RLS
+ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Inventory movements admin read" ON public.inventory_movements;
+CREATE POLICY "Inventory movements admin read" ON public.inventory_movements FOR SELECT USING (public.is_admin());
+DROP POLICY IF EXISTS "Inventory movements admin write" ON public.inventory_movements;
+CREATE POLICY "Inventory movements admin write" ON public.inventory_movements FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- Order Status History RLS
+ALTER TABLE public.order_status_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Order status history select allowed" ON public.order_status_history;
+CREATE POLICY "Order status history select allowed" ON public.order_status_history FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM public.orders o
+    WHERE o.id = order_status_history.order_id
+    AND (
+      o.user_id::text = auth.uid()::text OR
+      (auth.jwt() ->> 'email' IS NOT NULL AND o.customer_email = auth.jwt() ->> 'email') OR
+      public.is_admin()
+    )
+  )
+);
+DROP POLICY IF EXISTS "Order status history admin write" ON public.order_status_history;
+CREATE POLICY "Order status history admin write" ON public.order_status_history FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- Backend & Service Tables RLS (Admin / Service Role only)
+ALTER TABLE public.email_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Email logs admin only" ON public.email_logs;
+CREATE POLICY "Email logs admin only" ON public.email_logs FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+ALTER TABLE public.shipment_operations ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Shipment operations admin only" ON public.shipment_operations;
+CREATE POLICY "Shipment operations admin only" ON public.shipment_operations FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+ALTER TABLE public.shipment_events ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Shipment events select allowed" ON public.shipment_events;
+CREATE POLICY "Shipment events select allowed" ON public.shipment_events FOR SELECT USING (
+  EXISTS (
+    SELECT 1 FROM public.orders o
+    WHERE o.id = shipment_events.order_id
+    AND (
+      o.user_id::text = auth.uid()::text OR
+      (auth.jwt() ->> 'email' IS NOT NULL AND o.customer_email = auth.jwt() ->> 'email') OR
+      public.is_admin()
+    )
+  )
+);
+DROP POLICY IF EXISTS "Shipment events admin write" ON public.shipment_events;
+CREATE POLICY "Shipment events admin write" ON public.shipment_events FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+ALTER TABLE public.webhook_events ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Webhook events admin only" ON public.webhook_events;
+CREATE POLICY "Webhook events admin only" ON public.webhook_events FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+ALTER TABLE public.payment_effects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Payment effects admin only" ON public.payment_effects;
+CREATE POLICY "Payment effects admin only" ON public.payment_effects FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+ALTER TABLE public.admin_audit_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Audit logs admin only" ON public.admin_audit_logs;
+CREATE POLICY "Audit logs admin only" ON public.admin_audit_logs FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- Permissions Grants
 REVOKE EXECUTE ON FUNCTION public.process_approved_order_atomic FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic TO authenticated, service_role;
 
