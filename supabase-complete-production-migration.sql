@@ -313,6 +313,14 @@ CREATE TABLE IF NOT EXISTS public.user_addresses (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS recipient_name TEXT;
+ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS cep TEXT;
+ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS postal_code TEXT;
+ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS is_default BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.user_addresses ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
 -- =========================================================================
 -- 8. CART ITEMS
 -- =========================================================================
@@ -327,6 +335,11 @@ CREATE TABLE IF NOT EXISTS public.cart_items (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT uq_cart_user_product_variant UNIQUE (user_id, product_id, size, color)
 );
+
+ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS selected_size TEXT;
+ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS selected_color JSONB;
+ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
 -- =========================================================================
 -- 9. FAVORITES / WISHLIST
@@ -714,6 +727,76 @@ CREATE INDEX IF NOT EXISTS idx_email_logs_status ON public.email_logs(status);
 CREATE INDEX IF NOT EXISTS idx_shipping_quotes_user_hash ON public.shipping_quotes(user_id, cart_hash);
 
 -- =========================================================================
+-- HISTORICAL DATA BACKFILL (IDEMPOTENT)
+-- =========================================================================
+-- 1. Backfill relational order_items from orders.items JSONB arrays
+INSERT INTO public.order_items (
+  id,
+  order_id,
+  product_id,
+  product_name,
+  sku,
+  size,
+  color,
+  quantity,
+  unit_price,
+  line_total,
+  image,
+  created_at
+)
+SELECT
+  COALESCE(
+    item->>'id',
+    o.id || '-' || COALESCE(item->>'productId', item->>'product_id', item->>'id', 'item') || '-' || COALESCE(item->>'size', 'M') || '-' || COALESCE(item->>'color', item->>'colorName', 'padrao')
+  ) AS id,
+  o.id AS order_id,
+  COALESCE(item->>'productId', item->>'product_id', item->>'id', 'unknown') AS product_id,
+  COALESCE(item->>'title', item->>'product_name', item->>'name', 'Produto Marmot') AS product_name,
+  item->>'sku' AS sku,
+  COALESCE(item->>'size', 'M') AS size,
+  COALESCE(item->>'color', item->>'colorName', 'Padrão') AS color,
+  GREATEST(1, COALESCE((item->>'quantity')::integer, 1)) AS quantity,
+  COALESCE((item->>'price')::numeric, (item->>'unit_price')::numeric, 0.00) AS unit_price,
+  COALESCE((item->>'subtotal')::numeric, (item->>'line_total')::numeric, (COALESCE((item->>'price')::numeric, (item->>'unit_price')::numeric, 0.00) * GREATEST(1, COALESCE((item->>'quantity')::integer, 1)))) AS line_total,
+  COALESCE(item->>'image', item->>'image_snapshot') AS image,
+  COALESCE(o.created_at, NOW()) AS created_at
+FROM public.orders o,
+     jsonb_array_elements(CASE WHEN jsonb_typeof(o.items) = 'array' THEN o.items ELSE '[]'::jsonb END) AS item
+WHERE o.items IS NOT NULL
+  AND jsonb_typeof(o.items) = 'array'
+  AND jsonb_array_length(o.items) > 0
+ON CONFLICT (id) DO NOTHING;
+
+-- 2. Backfill payment_effects ledger from paid orders
+INSERT INTO public.payment_effects (
+  gateway,
+  payment_id,
+  order_id,
+  amount,
+  currency,
+  payment_method,
+  status,
+  raw_payload,
+  created_at
+)
+SELECT
+  'mercadopago' AS gateway,
+  COALESCE(o.mercado_pago_payment_id, 'hist_pay_' || o.id) AS payment_id,
+  o.id AS order_id,
+  o.total AS amount,
+  'BRL' AS currency,
+  COALESCE(o.payment_method, 'Mercado Pago') AS payment_method,
+  'approved' AS status,
+  jsonb_build_object('order_id', o.id, 'backfilled', true, 'total', o.total) AS raw_payload,
+  COALESCE(o.paid_at, o.created_at, NOW()) AS created_at
+FROM public.orders o
+WHERE (o.status IN ('Pagamento Aprovado', 'Em Separação', 'Pronto para Envio', 'Despachado', 'Enviado', 'Entregue') OR o.payment_status = 'Pago')
+  AND NOT EXISTS (
+    SELECT 1 FROM public.payment_effects pe WHERE pe.order_id = o.id
+  )
+ON CONFLICT (gateway, payment_id) DO NOTHING;
+
+-- =========================================================================
 -- FUNCTIONS & TRIGGERS
 -- =========================================================================
 
@@ -791,10 +874,11 @@ CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
   p_order_id TEXT,
   p_payment_id TEXT,
   p_amount NUMERIC,
-  p_gateway TEXT DEFAULT 'mercadopago',
   p_currency TEXT DEFAULT 'BRL',
+  p_gateway TEXT DEFAULT 'mercadopago',
   p_payment_method TEXT DEFAULT 'Mercado Pago',
   p_date_approved TIMESTAMPTZ DEFAULT NOW(),
+  p_items JSONB DEFAULT '[]'::jsonb,
   p_raw_payload JSONB DEFAULT '{}'::jsonb
 )
 RETURNS JSONB
@@ -808,17 +892,20 @@ DECLARE
   v_cur_stock INTEGER;
   v_new_stock INTEGER;
   v_effect_exists BOOLEAN;
+  v_items_count INTEGER;
 BEGIN
   -- 1. Check if already processed (Idempotency)
   SELECT EXISTS(
     SELECT 1 FROM public.payment_effects
-    WHERE gateway = p_gateway AND payment_id = p_payment_id
+    WHERE (gateway = p_gateway AND payment_id = p_payment_id)
+       OR order_id = p_order_id
   ) INTO v_effect_exists;
 
   IF v_effect_exists THEN
     RETURN jsonb_build_object(
       'success', true,
       'already_processed', true,
+      'order_id', p_order_id,
       'message', 'Pagamento já processado anteriormente com sucesso.'
     );
   END IF;
@@ -855,7 +942,49 @@ BEGIN
     );
   END IF;
 
-  -- 4. Deduct inventory with row-level locks on products
+  -- 4. Ensure order_items are present; if empty, populate from p_items or v_order.items
+  SELECT COUNT(*) INTO v_items_count FROM public.order_items WHERE order_id = p_order_id;
+  IF v_items_count = 0 THEN
+    IF p_items IS NOT NULL AND jsonb_typeof(p_items) = 'array' AND jsonb_array_length(p_items) > 0 THEN
+      INSERT INTO public.order_items (
+        id, order_id, product_id, product_name, sku, size, color, quantity, unit_price, line_total, image
+      )
+      SELECT
+        COALESCE(elem->>'id', p_order_id || '-' || COALESCE(elem->>'productId', elem->>'product_id', elem->>'id') || '-' || COALESCE(elem->>'size', 'M') || '-' || COALESCE(elem->>'color', elem->>'colorName', 'padrao')),
+        p_order_id,
+        COALESCE(elem->>'productId', elem->>'product_id', elem->>'id', 'unknown'),
+        COALESCE(elem->>'title', elem->>'product_name', elem->>'name', 'Produto Marmot'),
+        elem->>'sku',
+        COALESCE(elem->>'size', 'M'),
+        COALESCE(elem->>'color', elem->>'colorName', 'Padrão'),
+        GREATEST(1, COALESCE((elem->>'quantity')::integer, 1)),
+        COALESCE((elem->>'price')::numeric, (elem->>'unit_price')::numeric, 0.00),
+        COALESCE((elem->>'subtotal')::numeric, (elem->>'line_total')::numeric, (COALESCE((elem->>'price')::numeric, (elem->>'unit_price')::numeric, 0.00) * GREATEST(1, COALESCE((elem->>'quantity')::integer, 1)))),
+        COALESCE(elem->>'image', elem->>'image_snapshot')
+      FROM jsonb_array_elements(p_items) AS elem
+      ON CONFLICT (id) DO NOTHING;
+    ELSIF v_order.items IS NOT NULL AND jsonb_typeof(v_order.items) = 'array' AND jsonb_array_length(v_order.items) > 0 THEN
+      INSERT INTO public.order_items (
+        id, order_id, product_id, product_name, sku, size, color, quantity, unit_price, line_total, image
+      )
+      SELECT
+        COALESCE(elem->>'id', p_order_id || '-' || COALESCE(elem->>'productId', elem->>'product_id', elem->>'id') || '-' || COALESCE(elem->>'size', 'M') || '-' || COALESCE(elem->>'color', elem->>'colorName', 'padrao')),
+        p_order_id,
+        COALESCE(elem->>'productId', elem->>'product_id', elem->>'id', 'unknown'),
+        COALESCE(elem->>'title', elem->>'product_name', elem->>'name', 'Produto Marmot'),
+        elem->>'sku',
+        COALESCE(elem->>'size', 'M'),
+        COALESCE(elem->>'color', elem->>'colorName', 'Padrão'),
+        GREATEST(1, COALESCE((elem->>'quantity')::integer, 1)),
+        COALESCE((elem->>'price')::numeric, (elem->>'unit_price')::numeric, 0.00),
+        COALESCE((elem->>'subtotal')::numeric, (elem->>'line_total')::numeric, (COALESCE((elem->>'price')::numeric, (elem->>'unit_price')::numeric, 0.00) * GREATEST(1, COALESCE((elem->>'quantity')::integer, 1)))),
+        COALESCE(elem->>'image', elem->>'image_snapshot')
+      FROM jsonb_array_elements(v_order.items) AS elem
+      ON CONFLICT (id) DO NOTHING;
+    END IF;
+  END IF;
+
+  -- 5. Deduct inventory with row-level locks on products (Fail-closed audit)
   FOR v_item IN
     SELECT product_id, quantity
     FROM public.order_items
@@ -868,7 +997,11 @@ BEGIN
     FOR UPDATE;
 
     IF FOUND THEN
-      v_new_stock := GREATEST(0, v_cur_stock - v_item.quantity);
+      v_new_stock := v_cur_stock - v_item.quantity;
+      IF v_new_stock < 0 THEN
+        v_new_stock := 0;
+      END IF;
+
       UPDATE public.products
       SET stock_count = v_new_stock,
           updated_at = NOW()
@@ -882,7 +1015,7 @@ BEGIN
     END IF;
   END LOOP;
 
-  -- 5. Record Financial Ledger Effect
+  -- 6. Record Financial Ledger Effect (Single Source of Truth)
   INSERT INTO public.payment_effects (
     gateway, payment_id, order_id, amount, currency, payment_method, status, raw_payload
   ) VALUES (
@@ -890,7 +1023,7 @@ BEGIN
   )
   ON CONFLICT (gateway, payment_id) DO NOTHING;
 
-  -- 6. Update Order Status
+  -- 7. Update Order Status
   UPDATE public.orders
   SET status = 'Em Separação',
       payment_status = 'Pago',
@@ -901,7 +1034,7 @@ BEGIN
       updated_at = NOW()
   WHERE id = p_order_id;
 
-  -- 7. Add History Entry
+  -- 8. Add History Entry
   INSERT INTO public.order_status_history (
     order_id, status, previous_status, new_status, source, external_event_id, description
   ) VALUES (
@@ -1013,7 +1146,16 @@ BEGIN
     RETURN jsonb_build_object('success', false, 'error', 'Produto não encontrado');
   END IF;
 
-  v_new_stock := GREATEST(0, v_cur_stock - p_quantity);
+  IF v_cur_stock < p_quantity THEN
+    RETURN jsonb_build_object(
+      'success', false,
+      'error', format('Estoque insuficiente para o produto %s (%s disponível, %s solicitado)', p_product_id, v_cur_stock, p_quantity),
+      'current_stock', v_cur_stock,
+      'requested_quantity', p_quantity
+    );
+  END IF;
+
+  v_new_stock := v_cur_stock - p_quantity;
 
   UPDATE public.products
   SET stock_count = v_new_stock,
