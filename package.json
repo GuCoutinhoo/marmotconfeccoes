@@ -10,7 +10,8 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
-    "test": "node -e 'console.log(\"All security assertions verified.\")'"
+    "test": "node --test test/*.test.mjs",
+    "test:integration": "node --test test/*.test.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

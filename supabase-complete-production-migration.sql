@@ -724,7 +724,6 @@ SET search_path = public, auth
 AS $$
   SELECT (
     coalesce((auth.jwt() -> 'app_metadata' ->> 'role'), '') = 'admin'
-    OR coalesce((auth.jwt() -> 'user_metadata' ->> 'role'), '') = 'admin'
     OR EXISTS (
       SELECT 1 FROM public.profiles
       WHERE id::text = auth.uid()::text AND role = 'admin'
