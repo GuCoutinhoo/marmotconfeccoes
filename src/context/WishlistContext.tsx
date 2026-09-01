@@ -56,7 +56,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         if ((!loadedWishlist || loadedWishlist.length === 0) && isSupabaseConfigured()) {
           try {
             const { data: sbWish, error: sbWishErr } = await supabase
-              .from('wishlist_items')
+              .from('favorites')
               .select('*')
               .eq('user_id', user.id);
 
@@ -171,7 +171,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (isSupabaseConfigured()) {
         if (exists) {
           supabase
-            .from('wishlist_items')
+            .from('favorites')
             .delete()
             .eq('user_id', user.id)
             .eq('product_id', product.id)
@@ -179,9 +179,9 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               if (error) console.warn('[Wishlist] Supabase delete notice:', error.message);
             });
         } else {
-          const wishId = `wish-${user.id}-${product.id}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+          const wishId = `fav-${user.id}-${product.id}`.replace(/[^a-zA-Z0-9_-]/g, '_');
           supabase
-            .from('wishlist_items')
+            .from('favorites')
             .upsert({
               id: wishId,
               user_id: user.id,

@@ -1214,9 +1214,14 @@ export class DatabaseManager {
       } catch {}
 
       try {
-        const { data: wishData } = await this.supabase.from('wishlist_items').select('*');
+        const { data: wishData } = await this.supabase.from('favorites').select('*');
         if (wishData && wishData.length > 0) {
-          this.wishlistItems = wishData.map((item: any) => item.data || item);
+          this.wishlistItems = wishData.map((item: any) => item.data || {
+            id: item.id,
+            userId: item.user_id,
+            productId: item.product_id,
+            createdAt: item.created_at,
+          });
           this.writeJsonFile(WISHLIST_ITEMS_FILE, this.wishlistItems);
         }
       } catch {}
@@ -3206,7 +3211,7 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase.from('wishlist_items').select('*').eq('user_id', userId);
+        const { data, error } = await this.supabase.from('favorites').select('*').eq('user_id', userId);
         if (!error && data) {
           const nonUserItems = this.wishlistItems.filter((w) => w.userId !== userId);
           const sbItems = data.map((item: any) => item.data || {
@@ -3244,13 +3249,13 @@ export class DatabaseManager {
       this.wishlistItems.splice(idx, 1);
       if (this.mode === 'supabase' && this.supabase) {
         try {
-          await this.supabase.from('wishlist_items').delete().eq('id', item.id);
+          await this.supabase.from('favorites').delete().eq('id', item.id);
         } catch {}
       }
       isInWishlist = false;
     } else {
       const newItem: DbWishlistItem = {
-        id: `wish-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        id: `fav-${userId}-${productId}`.replace(/[^a-zA-Z0-9_-]/g, '_'),
         userId,
         productId,
         createdAt: new Date().toISOString(),
@@ -3258,7 +3263,7 @@ export class DatabaseManager {
       this.wishlistItems.push(newItem);
       if (this.mode === 'supabase' && this.supabase) {
         try {
-          await this.supabase.from('wishlist_items').upsert({
+          await this.supabase.from('favorites').upsert({
             id: newItem.id,
             user_id: newItem.userId,
             product_id: newItem.productId,
@@ -3284,7 +3289,7 @@ export class DatabaseManager {
       this.writeJsonFile(WISHLIST_ITEMS_FILE, this.wishlistItems);
       if (this.mode === 'supabase' && this.supabase) {
         try {
-          await this.supabase.from('wishlist_items').delete().eq('id', item.id);
+          await this.supabase.from('favorites').delete().eq('id', item.id);
         } catch {}
       }
     }
@@ -3297,7 +3302,7 @@ export class DatabaseManager {
     this.writeJsonFile(WISHLIST_ITEMS_FILE, this.wishlistItems);
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        await this.supabase.from('wishlist_items').delete().eq('user_id', userId);
+        await this.supabase.from('favorites').delete().eq('user_id', userId);
       } catch {}
     }
   }
@@ -3967,35 +3972,38 @@ export class DatabaseManager {
       return { success: false, error: 'O valor do reembolso deve ser maior que zero.' };
     }
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const { data, error } = await this.supabase.rpc('process_refund_atomic', {
-          p_order_id: orderId,
-          p_amount: amount,
-          p_reason: reason,
-          p_admin_name: adminUser?.name || 'Administrador',
-          p_admin_email: adminUser?.email || 'admin@marmot.com',
-        });
+        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (client) {
+          const { data, error } = await client.rpc('process_refund_atomic', {
+            p_order_id: orderId,
+            p_amount: amount,
+            p_reason: reason,
+            p_admin_name: adminUser?.name || 'Administrador',
+            p_admin_email: adminUser?.email || 'admin@marmot.com',
+          });
 
-        if (error) {
-          console.warn('[DB] Supabase process_refund_atomic RPC error, using transaction check:', error);
-        } else if (data) {
-          if (!data.success) {
-            return { success: false, error: data.error || 'Erro ao processar reembolso atômico.' };
-          }
-          // Fetch updated order from DB
-          const updatedOrder = await this.getOrderById(orderId);
-          if (updatedOrder) {
-            await this.logAdminAction(
-              adminUser?.email || 'admin@marmot.com',
-              adminUser?.name || 'Admin',
-              'refund',
-              'refund',
-              orderId,
-              `Reembolso de R$ ${amount.toFixed(2)} emitido (${reason})`,
-              { amount, reason, isFullRefund: data.is_full_refund }
-            );
-            return { success: true, order: updatedOrder };
+          if (error) {
+            console.warn('[DB] Supabase process_refund_atomic RPC error, using transaction check:', error);
+          } else if (data) {
+            if (!data.success) {
+              return { success: false, error: data.error || 'Erro ao processar reembolso atômico.' };
+            }
+            // Fetch updated order from DB
+            const updatedOrder = await this.getOrderById(orderId);
+            if (updatedOrder) {
+              await this.logAdminAction(
+                adminUser?.email || 'admin@marmot.com',
+                adminUser?.name || 'Admin',
+                'refund',
+                'refund',
+                orderId,
+                `Reembolso de R$ ${amount.toFixed(2)} emitido (${reason})`,
+                { amount, reason, isFullRefund: data.is_full_refund }
+              );
+              return { success: true, order: updatedOrder };
+            }
           }
         }
       } catch (err: any) {
@@ -4064,20 +4072,23 @@ export class DatabaseManager {
     payload: any = {}
   ): Promise<{ shouldProcess: boolean; status: string }> {
     await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const { data, error } = await this.supabase.rpc('claim_webhook_event', {
-          p_gateway: provider,
-          p_event_key: eventId,
-          p_topic: eventType,
-          p_payload: payload || {},
-        });
-        if (!error && data) {
-          return { shouldProcess: Boolean(data.should_process), status: String(data.status) };
-        }
-        if (error) {
-          console.warn('[DB] Supabase claim_webhook_event error:', error.message);
-          return { shouldProcess: false, status: 'claim_error' };
+        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (client) {
+          const { data, error } = await client.rpc('claim_webhook_event', {
+            p_gateway: provider,
+            p_event_key: eventId,
+            p_topic: eventType,
+            p_payload: payload || {},
+          });
+          if (!error && data) {
+            return { shouldProcess: Boolean(data.should_process), status: String(data.status) };
+          }
+          if (error) {
+            console.warn('[DB] Supabase claim_webhook_event error:', error.message);
+            return { shouldProcess: false, status: 'claim_error' };
+          }
         }
       } catch (err: any) {
         console.warn('[DB] Supabase claim_webhook_event exception:', err?.message || err);
@@ -4097,15 +4108,18 @@ export class DatabaseManager {
     errorMsg?: string
   ): Promise<void> {
     await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.rpc('complete_webhook_event', {
-          p_gateway: provider,
-          p_event_key: eventId,
-          p_status: errorMsg ? 'failed' : 'completed',
-          p_order_id: orderId || null,
-          p_error: errorMsg || null,
-        });
+        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (client) {
+          await client.rpc('complete_webhook_event', {
+            p_gateway: provider,
+            p_event_key: eventId,
+            p_status: errorMsg ? 'failed' : 'completed',
+            p_order_id: orderId || null,
+            p_error: errorMsg || null,
+          });
+        }
       } catch (err: any) {
         console.warn('[DB] Supabase complete_webhook_event error:', err?.message || err);
       }
@@ -4119,21 +4133,24 @@ export class DatabaseManager {
     reason: string = 'Venda Confirmada'
   ): Promise<{ success: boolean; previousStock: number; newStock: number; error?: string }> {
     await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const { data, error } = await this.supabase.rpc('deduct_inventory_atomic', {
-          p_product_id: productId,
-          p_quantity: quantity,
-          p_order_id: orderId || null,
-          p_reason: reason,
-        });
-        if (!error && data) {
-          return {
-            success: Boolean(data.success),
-            previousStock: Number(data.previous_stock || 0),
-            newStock: Number(data.new_stock || 0),
-            error: data.error,
-          };
+        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (client) {
+          const { data, error } = await client.rpc('deduct_inventory_atomic', {
+            p_product_id: productId,
+            p_quantity: quantity,
+            p_order_id: orderId || null,
+            p_reason: reason,
+          });
+          if (!error && data) {
+            return {
+              success: Boolean(data.success),
+              previousStock: Number(data.previous_stock || 0),
+              newStock: Number(data.new_stock || 0),
+              error: data.error,
+            };
+          }
         }
       } catch (err) {
         console.warn('[DB] Supabase deduct_inventory_atomic fallback:', err);
@@ -4170,22 +4187,25 @@ export class DatabaseManager {
     subtotal: number
   ): Promise<{ valid: boolean; discount: number; couponCode?: string; error?: string }> {
     await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const { data, error } = await this.supabase.rpc('redeem_coupon_atomic', {
-          p_coupon_code: couponCode,
-          p_order_id: orderId,
-          p_user_id: userId,
-          p_customer_email: customerEmail,
-          p_subtotal: subtotal,
-        });
-        if (!error && data) {
-          return {
-            valid: Boolean(data.valid),
-            discount: Number(data.discount || 0),
-            couponCode: data.coupon_code,
-            error: data.error,
-          };
+        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (client) {
+          const { data, error } = await client.rpc('redeem_coupon_atomic', {
+            p_coupon_code: couponCode,
+            p_order_id: orderId,
+            p_user_id: userId,
+            p_customer_email: customerEmail,
+            p_subtotal: subtotal,
+          });
+          if (!error && data) {
+            return {
+              valid: Boolean(data.valid),
+              discount: Number(data.discount || 0),
+              couponCode: data.coupon_code,
+              error: data.error,
+            };
+          }
         }
       } catch (err) {
         console.warn('[DB] Supabase redeem_coupon_atomic fallback:', err);
@@ -4221,42 +4241,45 @@ export class DatabaseManager {
     items: any[] = []
   ): Promise<{ success: boolean; alreadyProcessed: boolean; orderId?: string; error?: string }> {
     await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const { data, error } = await this.supabase.rpc('process_approved_order_atomic', {
-          p_order_id: orderId,
-          p_payment_id: paymentId,
-          p_amount: transactionAmount,
-          p_currency: currency,
-          p_gateway: gateway,
-          p_payment_method: paymentMethod,
-          p_date_approved: dateApproved || new Date().toISOString(),
-          p_items: items && items.length > 0 ? items : [],
-        });
-        if (!error && data) {
-          return {
-            success: Boolean(data.success),
-            alreadyProcessed: Boolean(data.alreadyProcessed || data.already_processed),
-            orderId: data.orderId || data.order_id,
-            error: data.error,
-          };
-        }
-        if (error) {
-          const { data: fallbackData, error: fallbackError } = await this.supabase.rpc('apply_approved_payment_atomic', {
+        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        if (client) {
+          const { data, error } = await client.rpc('process_approved_order_atomic', {
             p_order_id: orderId,
             p_payment_id: paymentId,
-            p_transaction_amount: transactionAmount,
+            p_amount: transactionAmount,
             p_currency: currency,
+            p_gateway: gateway,
             p_payment_method: paymentMethod,
             p_date_approved: dateApproved || new Date().toISOString(),
+            p_items: items && items.length > 0 ? items : [],
           });
-          if (!fallbackError && fallbackData) {
+          if (!error && data) {
             return {
-              success: Boolean(fallbackData.success),
-              alreadyProcessed: Boolean(fallbackData.already_processed),
-              orderId: fallbackData.order_id,
-              error: fallbackData.error,
+              success: Boolean(data.success),
+              alreadyProcessed: Boolean(data.alreadyProcessed || data.already_processed),
+              orderId: data.orderId || data.order_id,
+              error: data.error,
             };
+          }
+          if (error) {
+            const { data: fallbackData, error: fallbackError } = await client.rpc('apply_approved_payment_atomic', {
+              p_order_id: orderId,
+              p_payment_id: paymentId,
+              p_transaction_amount: transactionAmount,
+              p_currency: currency,
+              p_payment_method: paymentMethod,
+              p_date_approved: dateApproved || new Date().toISOString(),
+            });
+            if (!fallbackError && fallbackData) {
+              return {
+                success: Boolean(fallbackData.success),
+                alreadyProcessed: Boolean(fallbackData.already_processed),
+                orderId: fallbackData.order_id,
+                error: fallbackData.error,
+              };
+            }
           }
         }
       } catch (err: any) {
@@ -5766,15 +5789,20 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
     const criticalTables = [
       'products',
       'orders',
+      'order_items',
       'profiles',
       'shipment_operations',
+      'shipping_quotes',
+      'return_inventory_effects',
+      'inventory_movements',
       'app_settings',
       'webhook_events',
       'payment_effects',
       'user_addresses',
       'cart_items',
-      'wishlist_items',
+      'favorites',
       'product_reviews',
+      'returns',
       'coupons',
     ];
 
