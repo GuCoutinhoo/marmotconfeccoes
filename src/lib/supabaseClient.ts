@@ -1319,6 +1319,8 @@ export async function saveCartItemToSupabase(userId: string, item: CartItem): Pr
       id: cartItemId,
       user_id: userId,
       product_id: item.product.id,
+      size: cleanSize,
+      color: colorName,
       selected_size: cleanSize,
       selected_color: item.selectedColor,
       quantity: Math.max(1, item.quantity || 1),

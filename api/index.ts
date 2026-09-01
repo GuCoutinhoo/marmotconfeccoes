@@ -2940,15 +2940,23 @@ export class DatabaseManager {
         const { data, error } = await this.supabase.from('cart_items').select('*').eq('user_id', userId);
         if (!error && Array.isArray(data) && data.length > 0) {
           const nonUserItems = this.cartItems.filter((c) => c.userId !== userId);
-          const sbItems = data.map((item: any) => item.data || {
-            id: item.id,
-            userId: item.user_id,
-            productId: item.product_id,
-            selectedSize: item.selected_size,
-            selectedColor: item.selected_color,
-            quantity: item.quantity,
-            createdAt: item.created_at,
-            updatedAt: item.updated_at,
+          const sbItems = data.map((item: any) => {
+            const rawSize = item.size || item.selected_size || item.data?.selectedSize || item.data?.size || 'M';
+            const rawColor = item.selected_color || item.data?.selectedColor || {
+              color: item.color || 'black',
+              colorName: item.color_name || item.color || 'Padrão',
+              colorHex: '#121212',
+            };
+            return {
+              id: item.id,
+              userId: item.user_id,
+              productId: item.product_id,
+              selectedSize: rawSize,
+              selectedColor: typeof rawColor === 'object' ? rawColor : { color: String(rawColor), colorName: String(item.color_name || rawColor), colorHex: '#121212' },
+              quantity: item.quantity || 1,
+              createdAt: item.created_at,
+              updatedAt: item.updated_at,
+            };
           });
           this.cartItems = [...nonUserItems, ...sbItems];
           this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
@@ -3029,6 +3037,8 @@ export class DatabaseManager {
           id: itemToPersist.id,
           user_id: itemToPersist.userId,
           product_id: itemToPersist.productId,
+          size: itemToPersist.selectedSize || 'M',
+          color: itemToPersist.selectedColor?.colorName || itemToPersist.selectedColor?.color || 'Padrão',
           selected_size: itemToPersist.selectedSize,
           selected_color: itemToPersist.selectedColor,
           quantity: itemToPersist.quantity,
@@ -3083,6 +3093,8 @@ export class DatabaseManager {
               id: item.id,
               user_id: item.userId,
               product_id: item.productId,
+              size: item.selectedSize || 'M',
+              color: item.selectedColor?.colorName || item.selectedColor?.color || 'Padrão',
               selected_size: item.selectedSize,
               selected_color: item.selectedColor,
               quantity: item.quantity,
@@ -3190,6 +3202,8 @@ export class DatabaseManager {
             id: item.id,
             user_id: item.userId,
             product_id: item.productId,
+            size: item.selectedSize || 'M',
+            color: item.selectedColor?.colorName || item.selectedColor?.color || 'Padrão',
             selected_size: item.selectedSize,
             selected_color: item.selectedColor,
             quantity: item.quantity,
@@ -4244,49 +4258,57 @@ export class DatabaseManager {
     if (this.mode === 'supabase') {
       try {
         const client = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (client) {
-          const { data, error } = await client.rpc('process_approved_order_atomic', {
-            p_order_id: orderId,
-            p_payment_id: paymentId,
-            p_amount: transactionAmount,
-            p_currency: currency,
-            p_gateway: gateway,
-            p_payment_method: paymentMethod,
-            p_date_approved: dateApproved || new Date().toISOString(),
-            p_items: items && items.length > 0 ? items : [],
-          });
-          if (!error && data) {
-            return {
-              success: Boolean(data.success),
-              alreadyProcessed: Boolean(data.alreadyProcessed || data.already_processed),
-              orderId: data.orderId || data.order_id,
-              error: data.error,
-            };
-          }
-          if (error) {
-            const { data: fallbackData, error: fallbackError } = await client.rpc('apply_approved_payment_atomic', {
-              p_order_id: orderId,
-              p_payment_id: paymentId,
-              p_transaction_amount: transactionAmount,
-              p_currency: currency,
-              p_payment_method: paymentMethod,
-              p_date_approved: dateApproved || new Date().toISOString(),
-            });
-            if (!fallbackError && fallbackData) {
-              return {
-                success: Boolean(fallbackData.success),
-                alreadyProcessed: Boolean(fallbackData.already_processed),
-                orderId: fallbackData.order_id,
-                error: fallbackData.error,
-              };
-            }
-          }
+        if (!client) {
+          return {
+            success: false,
+            alreadyProcessed: false,
+            orderId,
+            error: 'Cliente de banco de dados Supabase não inicializado para operação financeira.',
+          };
+        }
+        const { data, error } = await client.rpc('process_approved_order_atomic', {
+          p_order_id: orderId,
+          p_payment_id: paymentId,
+          p_amount: transactionAmount,
+          p_currency: currency,
+          p_gateway: gateway,
+          p_payment_method: paymentMethod,
+          p_date_approved: dateApproved || new Date().toISOString(),
+          p_items: items && items.length > 0 ? items : [],
+        });
+        if (error) {
+          console.error('[DB] Supabase process_approved_order_atomic RPC error:', error.message);
+          return {
+            success: false,
+            alreadyProcessed: false,
+            orderId,
+            error: error.message || 'Erro ao processar aprovação de pagamento atômica no banco de dados.',
+          };
+        }
+        if (data) {
+          return {
+            success: Boolean(data.success),
+            alreadyProcessed: Boolean(data.alreadyProcessed || data.already_processed),
+            orderId: data.orderId || data.order_id || orderId,
+            error: data.error,
+          };
         }
       } catch (err: any) {
-        console.warn('[DB] Supabase process_approved_order_atomic RPC error:', err?.message);
+        console.error('[DB] Supabase process_approved_order_atomic RPC exception:', err?.message || err);
+        return {
+          success: false,
+          alreadyProcessed: false,
+          orderId,
+          error: err?.message || 'Exceção crítica durante a transação atômica de pagamento.',
+        };
       }
     }
-    return { success: true, alreadyProcessed: false, orderId };
+    return {
+      success: false,
+      alreadyProcessed: false,
+      orderId,
+      error: 'Modo de persistência inválido para liquidação financeira.',
+    };
   }
 
   // ==========================================
@@ -8799,8 +8821,16 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
         });
       }
 
-      if (!isAlreadyPaid && checkoutRes.status !== 200) {
-        console.warn(`[Melhor Envio Checkout Warning]: Tentando prosseguir para geração (status: ${checkoutRes.status})`);
+      if (!isAlreadyPaid && checkoutRes.status !== 200 && checkoutRes.status !== 201) {
+        const errMsg = `Falha ao realizar checkout da etiqueta no Melhor Envio (HTTP ${checkoutRes.status}). Detalhes: ${chkErrText.substring(0, 200)}`;
+        await db.completeShipmentGeneration(orderId, shipmentId, '', '', errMsg, 'checkout_failed');
+        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=checkout httpStatus=${checkoutRes.status} errorCode=CHECKOUT_FAILED durationMs: ${Date.now() - startTime}`);
+        return res.status(502).json({
+          error: errMsg,
+          code: 'CHECKOUT_FAILED',
+          step: 'checkout',
+          shipmentId,
+        });
       }
     }
 
@@ -8810,6 +8840,8 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
     console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=generate shipmentId: ${shipmentId}`);
     await db.updateShipmentStep(orderId, 'generating_label', shipmentId);
 
+    let genOk = false;
+    let genErrDetails = '';
     try {
       const genRes = await fetchWithTimeout(`${baseUrl}/me/shipment/generate`, {
         method: 'POST',
@@ -8822,12 +8854,32 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
         body: JSON.stringify({ orders: [shipmentId] }),
       }, 20000);
 
-      if (!genRes.ok) {
+      if (genRes.ok) {
+        genOk = true;
+      } else {
         const genErrText = await genRes.text().catch(() => '');
+        genErrDetails = genErrText.substring(0, 200);
         console.warn('[Melhor Envio Generate Notice]:', genRes.status, genErrText);
+        // Check if label was already generated
+        if (genErrText.toLowerCase().includes('already') || genErrText.toLowerCase().includes('gerada')) {
+          genOk = true;
+        }
       }
     } catch (genErr: any) {
+      genErrDetails = genErr.message;
       console.warn('[Melhor Envio Generate Exception]:', genErr.message);
+    }
+
+    if (!genOk) {
+      const errMsg = `Falha ao solicitar geração da etiqueta no Melhor Envio. Detalhes: ${genErrDetails || 'Erro desconhecido'}`;
+      await db.completeShipmentGeneration(orderId, shipmentId, '', '', errMsg, 'generate_failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=generate httpStatus=502 errorCode=GENERATE_FAILED durationMs: ${Date.now() - startTime}`);
+      return res.status(502).json({
+        error: errMsg,
+        code: 'GENERATE_FAILED',
+        step: 'generate',
+        shipmentId,
+      });
     }
 
     await db.updateShipmentStep(orderId, 'label_generated', shipmentId);

@@ -166,34 +166,16 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
         },
         body: JSON.stringify({ productId: product.id }),
-      }).catch((err) => console.warn('[Wishlist] Sync error:', err));
-
-      if (isSupabaseConfigured()) {
-        if (exists) {
-          supabase
-            .from('favorites')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('product_id', product.id)
-            .then(({ error }) => {
-              if (error) console.warn('[Wishlist] Supabase delete notice:', error.message);
-            });
-        } else {
-          const wishId = `fav-${user.id}-${product.id}`.replace(/[^a-zA-Z0-9_-]/g, '_');
-          supabase
-            .from('favorites')
-            .upsert({
-              id: wishId,
-              user_id: user.id,
-              product_id: product.id,
-              created_at: new Date().toISOString(),
-              data: product,
-            })
-            .then(({ error }) => {
-              if (error) console.warn('[Wishlist] Supabase upsert notice:', error.message);
-            });
-        }
-      }
+      })
+        .then(async (res) => {
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data?.wishlist)) {
+              setWishlist(data.wishlist);
+            }
+          }
+        })
+        .catch((err) => console.warn('[Wishlist] Sync error:', err));
     }
   }, [wishlistSet, user, token, showToast]);
 

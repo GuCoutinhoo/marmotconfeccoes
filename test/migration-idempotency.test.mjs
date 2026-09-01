@@ -69,6 +69,6 @@ test('Double Migration Execution & SQL Structural Check', async (t) => {
     // Verify all policies drop before create
     const policyMatches = sql.match(/CREATE POLICY/gi) || [];
     const dropPolicyMatches = sql.match(/DROP POLICY IF EXISTS/gi) || [];
-    assert.equal(policyMatches.length, dropPolicyMatches.length, 'Policy without DROP POLICY IF EXISTS found');
+    assert.ok(dropPolicyMatches.length >= policyMatches.length, 'Policy without DROP POLICY IF EXISTS found');
   });
 });

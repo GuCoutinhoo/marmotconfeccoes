@@ -696,6 +696,8 @@ CREATE INDEX IF NOT EXISTS idx_order_items_product ON public.order_items(product
 CREATE INDEX IF NOT EXISTS idx_cart_items_user ON public.cart_items(user_id);
 CREATE INDEX IF NOT EXISTS idx_cart_items_product ON public.cart_items(product_id);
 CREATE INDEX IF NOT EXISTS idx_favorites_user ON public.favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_product ON public.favorites(product_id);
+CREATE INDEX IF NOT EXISTS idx_user_addresses_user ON public.user_addresses(user_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_product ON public.inventory_movements(product_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_order ON public.inventory_movements(order_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_return ON public.inventory_movements(return_id);
@@ -707,6 +709,7 @@ CREATE INDEX IF NOT EXISTS idx_returns_user ON public.returns(user_id);
 CREATE INDEX IF NOT EXISTS idx_shipment_events_order ON public.shipment_events(order_id);
 CREATE INDEX IF NOT EXISTS idx_shipment_ops_order ON public.shipment_operations(order_id);
 CREATE INDEX IF NOT EXISTS idx_payment_effects_order ON public.payment_effects(order_id);
+CREATE INDEX IF NOT EXISTS idx_return_effects_return ON public.return_inventory_effects(return_id);
 CREATE INDEX IF NOT EXISTS idx_email_logs_status ON public.email_logs(status);
 CREATE INDEX IF NOT EXISTS idx_shipping_quotes_user_hash ON public.shipping_quotes(user_id, cart_hash);
 
@@ -830,8 +833,8 @@ BEGIN
     RAISE EXCEPTION 'Pedido % não encontrado.', p_order_id;
   END IF;
 
-  -- 3. Validate financial amount (Anti-tampering)
-  IF p_amount < (v_order.total - 0.05) THEN
+  -- 3. Validate financial amount (Anti-tampering: exact bidirectional balance within R$ 0.05 tolerance)
+  IF (p_amount < (v_order.total - 0.05) OR p_amount > (v_order.total + 0.05)) THEN
     -- Flag divergent payment
     UPDATE public.orders
     SET payment_status = 'Pagamento Divergente',
@@ -1109,7 +1112,23 @@ CREATE POLICY "Profiles insert allowed for user or admin" ON public.profiles FOR
 DROP POLICY IF EXISTS "Profiles delete only for admin" ON public.profiles;
 CREATE POLICY "Profiles delete only for admin" ON public.profiles FOR DELETE USING (public.is_admin());
 
--- Orders RLS (Authoritative backend creation, owner or admin read)
+-- Clean up any legacy or overly permissive policies that might exist
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.orders;
+DROP POLICY IF EXISTS "orders_insert_policy" ON public.orders;
+DROP POLICY IF EXISTS "Allow anonymous insert orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow all insert" ON public.orders;
+DROP POLICY IF EXISTS "Public insert orders" ON public.orders;
+DROP POLICY IF EXISTS "Orders insert allowed for anyone" ON public.orders;
+
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.order_items;
+DROP POLICY IF EXISTS "Allow anonymous insert order_items" ON public.order_items;
+DROP POLICY IF EXISTS "Public insert order_items" ON public.order_items;
+
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.returns;
+DROP POLICY IF EXISTS "Allow anonymous insert returns" ON public.returns;
+DROP POLICY IF EXISTS "Public insert returns" ON public.returns;
+
+-- Orders RLS (Strictly authoritative backend/service_role only creation, buyer/admin read)
 DROP POLICY IF EXISTS "Orders select restricted to buyer and admin" ON public.orders;
 CREATE POLICY "Orders select restricted to buyer and admin" ON public.orders FOR SELECT USING (
   (select auth.uid())::text = user_id::text OR 
@@ -1119,15 +1138,14 @@ CREATE POLICY "Orders select restricted to buyer and admin" ON public.orders FOR
 DROP POLICY IF EXISTS "Orders insert backend only" ON public.orders;
 CREATE POLICY "Orders insert backend only" ON public.orders FOR INSERT WITH CHECK (
   public.is_admin() OR 
-  (auth.role() = 'service_role') OR 
-  ((select auth.uid()) IS NOT NULL AND (select auth.uid())::text = user_id::text)
+  (auth.role() = 'service_role')
 );
 DROP POLICY IF EXISTS "Orders update restricted to admin" ON public.orders;
 CREATE POLICY "Orders update restricted to admin" ON public.orders FOR UPDATE USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Orders delete restricted to admin" ON public.orders;
 CREATE POLICY "Orders delete restricted to admin" ON public.orders FOR DELETE USING (public.is_admin());
 
--- Order Items RLS
+-- Order Items RLS (Strictly authoritative backend/service_role creation)
 DROP POLICY IF EXISTS "Order items readable by buyer or admin" ON public.order_items;
 CREATE POLICY "Order items readable by buyer or admin" ON public.order_items FOR SELECT USING (
   EXISTS (
@@ -1143,12 +1161,7 @@ CREATE POLICY "Order items readable by buyer or admin" ON public.order_items FOR
 DROP POLICY IF EXISTS "Order items insert backend only" ON public.order_items;
 CREATE POLICY "Order items insert backend only" ON public.order_items FOR INSERT WITH CHECK (
   public.is_admin() OR 
-  (auth.role() = 'service_role') OR
-  EXISTS (
-    SELECT 1 FROM public.orders o
-    WHERE o.id = order_items.order_id
-    AND o.user_id::text = (select auth.uid())::text
-  )
+  (auth.role() = 'service_role')
 );
 DROP POLICY IF EXISTS "Order items admin manage" ON public.order_items;
 CREATE POLICY "Order items admin manage" ON public.order_items FOR ALL USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
@@ -1177,8 +1190,7 @@ CREATE POLICY "Returns select allowed for owner or admin" ON public.returns FOR 
 DROP POLICY IF EXISTS "Returns insert backend only" ON public.returns;
 CREATE POLICY "Returns insert backend only" ON public.returns FOR INSERT WITH CHECK (
   public.is_admin() OR 
-  (auth.role() = 'service_role') OR
-  ((select auth.uid()) IS NOT NULL AND (select auth.uid())::text = user_id::text)
+  (auth.role() = 'service_role')
 );
 DROP POLICY IF EXISTS "Returns write restricted to admin" ON public.returns;
 CREATE POLICY "Returns write restricted to admin" ON public.returns FOR UPDATE USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
@@ -1307,4 +1319,10 @@ GRANT EXECUTE ON FUNCTION public.claim_webhook_event TO service_role;
 REVOKE EXECUTE ON FUNCTION public.complete_webhook_event FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.complete_webhook_event TO service_role;
 
-GRANT EXECUTE ON FUNCTION public.is_admin TO PUBLIC, anon, authenticated, service_role;
+-- Revoke execution of trigger and internal functions from anon/authenticated
+REVOKE EXECUTE ON FUNCTION public.handle_new_user FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.protect_profile_role FROM PUBLIC, anon, authenticated;
+
+-- Restrict is_admin to authenticated and service_role
+REVOKE EXECUTE ON FUNCTION public.is_admin FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_admin TO authenticated, service_role;
