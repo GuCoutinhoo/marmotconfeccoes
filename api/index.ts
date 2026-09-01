@@ -4194,27 +4194,60 @@ export class DatabaseManager {
     paymentMethod: string = 'Mercado Pago',
     dateApproved?: string
   ): Promise<{ success: boolean; alreadyProcessed: boolean; orderId?: string; error?: string }> {
+    return this.processApprovedOrderAtomic(orderId, paymentId, transactionAmount, currency, 'mercadopago', paymentMethod, dateApproved, []);
+  }
+
+  public async processApprovedOrderAtomic(
+    orderId: string,
+    paymentId: string,
+    transactionAmount: number,
+    currency: string = 'BRL',
+    gateway: string = 'mercadopago',
+    paymentMethod: string = 'Mercado Pago',
+    dateApproved?: string,
+    items: any[] = []
+  ): Promise<{ success: boolean; alreadyProcessed: boolean; orderId?: string; error?: string }> {
     await this.initialize();
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase.rpc('apply_approved_payment_atomic', {
+        const { data, error } = await this.supabase.rpc('process_approved_order_atomic', {
           p_order_id: orderId,
           p_payment_id: paymentId,
-          p_transaction_amount: transactionAmount,
+          p_amount: transactionAmount,
           p_currency: currency,
+          p_gateway: gateway,
           p_payment_method: paymentMethod,
           p_date_approved: dateApproved || new Date().toISOString(),
+          p_items: items && items.length > 0 ? items : [],
         });
         if (!error && data) {
           return {
             success: Boolean(data.success),
-            alreadyProcessed: Boolean(data.already_processed),
-            orderId: data.order_id,
+            alreadyProcessed: Boolean(data.alreadyProcessed || data.already_processed),
+            orderId: data.orderId || data.order_id,
             error: data.error,
           };
         }
-      } catch (err) {
-        console.warn('[DB] Supabase apply_approved_payment_atomic RPC error:', err);
+        if (error) {
+          const { data: fallbackData, error: fallbackError } = await this.supabase.rpc('apply_approved_payment_atomic', {
+            p_order_id: orderId,
+            p_payment_id: paymentId,
+            p_transaction_amount: transactionAmount,
+            p_currency: currency,
+            p_payment_method: paymentMethod,
+            p_date_approved: dateApproved || new Date().toISOString(),
+          });
+          if (!fallbackError && fallbackData) {
+            return {
+              success: Boolean(fallbackData.success),
+              alreadyProcessed: Boolean(fallbackData.already_processed),
+              orderId: fallbackData.order_id,
+              error: fallbackData.error,
+            };
+          }
+        }
+      } catch (err: any) {
+        console.warn('[DB] Supabase process_approved_order_atomic RPC error:', err?.message);
       }
     }
     return { success: true, alreadyProcessed: false, orderId };
@@ -6031,7 +6064,6 @@ app.post('/api/auth/register', async (req, res) => {
       message: 'Conta criada com sucesso!',
       user: sanitizeUser(newUser),
       token,
-      verificationCode,
     });
   } catch {
     res.status(500).json({ error: 'Erro interno ao realizar cadastro.' });
@@ -7241,13 +7273,15 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     const total = Math.max(0, Number((subtotal - discount + validatedShippingFee).toFixed(2)));
 
     // 6. Generate or reuse existing pending order in Database BEFORE payment (status: pending_payment)
-    let orderUserId = (req as any).user?.id || req.body?.userId || payer?.id;
+    let orderUserId: string | null = null;
     const token = extractToken(req);
-    if (!orderUserId && token) {
+    if (token) {
       const verified = await verifyAuthToken(token);
-      if (verified) {
+      if (verified && verified.userId) {
         orderUserId = verified.userId;
       }
+    } else if ((req as any).user?.id) {
+      orderUserId = (req as any).user.id;
     }
 
     const requestedOrderId = String(req.body?.orderId || req.body?.order_id || '').trim();
@@ -7611,14 +7645,16 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
     order.separationStartedAt = order.separationStartedAt || nowIso;
     order.paymentDetails.paidAt = paymentData.date_approved || nowIso;
 
-    // Call PostgreSQL atomic payment effect registrar
-    const effectResult = await db.applyApprovedPaymentAtomic(
+    // Call PostgreSQL atomic payment effect & stock deduction registrar
+    const effectResult = await db.processApprovedOrderAtomic(
       order.id,
       String(paymentData.id),
       transactionAmount,
       currencyId,
+      'mercadopago',
       paymentData.payment_method_id || order.paymentMethod || 'Mercado Pago',
-      paymentData.date_approved
+      paymentData.date_approved,
+      order.items || []
     );
 
     if (!wasAlreadyApproved && !effectResult.alreadyProcessed) {
@@ -7905,6 +7941,17 @@ app.all([
   try {
     const { orderId } = req.params;
     const paymentId = (req.query.payment_id || req.query.collection_id || req.body?.payment_id || req.body?.collection_id) as string;
+
+    const existingOrder = await db.getOrderById(orderId);
+    if (existingOrder && existingOrder.userId) {
+      const token = extractToken(req);
+      if (token) {
+        const verified = await verifyAuthToken(token);
+        if (verified && verified.userId !== existingOrder.userId && verified.role !== 'admin') {
+          return res.status(403).json({ error: 'Acesso negado. Você não é o titular deste pedido.' });
+        }
+      }
+    }
 
     const result = await fetchAndVerifyMercadoPagoPayment(orderId, paymentId);
     return res.json({
@@ -8994,6 +9041,26 @@ app.post('/api/returns', async (req: any, res) => {
       const verified = await verifyAuthToken(token);
       if (verified) {
         userId = verified.userId;
+        if (order.userId && verified.userId !== order.userId && verified.role !== 'admin') {
+          return res.status(403).json({ error: 'Acesso negado. Você não possui permissão para este pedido.' });
+        }
+      }
+    }
+
+    const returnItemsList = Array.isArray(items) ? items : [items];
+    if (Array.isArray(order.items) && order.items.length > 0) {
+      for (const retItem of returnItemsList) {
+        const prodId = retItem.productId || retItem.id;
+        const origItem = order.items.find((oi: any) => oi.productId === prodId || oi.id === prodId);
+        if (!origItem) {
+          return res.status(400).json({ error: `O produto "${prodId}" não pertence ao pedido original.` });
+        }
+        const retQty = Math.max(1, parseInt(String(retItem.quantity || 1), 10));
+        if (retQty > (origItem.quantity || 1)) {
+          return res.status(400).json({
+            error: `Quantidade de devolução (${retQty}) para "${origItem.title || prodId}" excede a quantidade comprada (${origItem.quantity}).`
+          });
+        }
       }
     }
 
@@ -9005,7 +9072,7 @@ app.post('/api/returns', async (req: any, res) => {
       customerName: customerName || order.customerName,
       customerEmail: customerEmail || order.customerEmail,
       customerPhone: customerPhone || order.customerPhone,
-      items: Array.isArray(items) ? items : [items],
+      items: returnItemsList,
       reason,
       description: description || '',
       photos: photos || [],
@@ -10252,10 +10319,36 @@ async function syncActiveOrdersTrackingServer(): Promise<{ totalActive: number; 
   };
 }
 
-// Background recurring sync every 5 minutes
-setInterval(() => {
-  syncActiveOrdersTrackingServer().catch((e) => console.warn('[Background Tracking Sync Notice]:', e.message));
-}, 5 * 60 * 1000);
+// Background recurring sync (only in persistent node process, avoided in serverless/tests)
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
+  const syncInterval = setInterval(() => {
+    syncActiveOrdersTrackingServer().catch((e) => console.warn('[Background Tracking Sync Notice]:', e.message));
+  }, 5 * 60 * 1000);
+  if (syncInterval && typeof syncInterval.unref === 'function') {
+    syncInterval.unref();
+  }
+}
+
+// Protected Vercel Cron Endpoint for Serverless Logistics Sync
+app.get(['/api/cron/tracking-sync', '/api/cron/sync-tracking'], async (req, res) => {
+  try {
+    const cronSecret = process.env.CRON_SECRET || process.env.VERCEL_CRON_SECRET;
+    const authHeader = req.headers.authorization;
+    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+      return res.status(401).json({ error: 'Não autorizado para execução do cron de sincronização.' });
+    }
+
+    const stats = await syncActiveOrdersTrackingServer();
+    res.json({
+      success: true,
+      timestamp: new Date().toISOString(),
+      stats,
+    });
+  } catch (err: any) {
+    console.error('[Cron Tracking Sync Error]:', err);
+    res.status(500).json({ error: 'Erro na execução da sincronização de rastreios.', message: err.message });
+  }
+});
 
 // --- MELHOR ENVIO & CARRIER WEBHOOKS ---
 app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhooks/melhorenvio', '/api/webhooks/tracking'], async (req, res) => {

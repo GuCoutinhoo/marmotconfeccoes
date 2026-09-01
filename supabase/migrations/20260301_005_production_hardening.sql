@@ -1,8 +1,18 @@
 -- =========================================================================
--- COMPLETE PRODUCTION MIGRATION FOR MARMOT CONFECÇÕES
+-- MIGRATION: 20260301_005_production_hardening.sql
+-- DESCRIPTION: End-to-End Production Hardening for Marmot Confecções
+-- 1. Role escalation protection (P0 Fix)
+-- 2. Fully atomic payment + inventory deduction transaction RPC (Phase 11)
+-- 3. Distributed webhook claiming and idempotency (Phase 10)
+-- 4. Complete canonical schema with relational tables & check constraints
+-- 5. Hardened RLS policies and role-based access control
 -- =========================================================================
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- =========================================================================
+-- 1. CORE CANONICAL TABLES
+-- =========================================================================
 
 -- Profiles (Customers and Administrators)
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -398,6 +408,10 @@ CREATE TABLE IF NOT EXISTS public.admin_audit_logs (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- =========================================================================
+-- 2. SECURITY DEFINER FUNCTIONS & TRIGGERS (PRIVILEGE ESCALATION FIX P0)
+-- =========================================================================
+
 -- Helper function to check if caller is an administrator
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
@@ -415,7 +429,7 @@ AS $$
   );
 $$;
 
--- Secure trigger for new user creation
+-- Secure trigger for new user creation (Strictly customer, ignores raw_user_meta_data.role)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -425,6 +439,7 @@ AS $$
 DECLARE
   assigned_role TEXT := 'customer';
 BEGIN
+  -- Strict whitelist for default administrator accounts
   IF LOWER(NEW.email) IN ('admin@marmot.com', 'admin@marmot.com.br', 'gustavohcsantos.mm2020@gmail.com') THEN
     assigned_role := 'admin';
   END IF;
@@ -453,7 +468,7 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW
   EXECUTE FUNCTION public.handle_new_user();
 
--- Trigger to protect profiles.role
+-- Trigger to protect profiles.role against unauthorized elevation
 CREATE OR REPLACE FUNCTION public.protect_profile_role()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -461,7 +476,9 @@ SECURITY DEFINER
 SET search_path = public, auth
 AS $$
 BEGIN
+  -- If role is being changed
   IF OLD.role IS DISTINCT FROM NEW.role THEN
+    -- Only allow change if caller is admin or service_role
     IF NOT (public.is_admin() OR auth.role() = 'service_role' OR current_user = 'postgres') THEN
       NEW.role := OLD.role;
     END IF;
@@ -476,7 +493,11 @@ CREATE TRIGGER trg_protect_profile_role
   FOR EACH ROW
   EXECUTE FUNCTION public.protect_profile_role();
 
--- Complete Atomic Payment Approval & Stock Deduction Transaction
+-- =========================================================================
+-- 3. ATOMIC TRANSACTIONS & RPCS
+-- =========================================================================
+
+-- Complete Atomic Payment Approval & Stock Deduction Transaction (Phase 11)
 CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
   p_order_id TEXT,
   p_payment_id TEXT,
@@ -518,7 +539,7 @@ BEGIN
     );
   END IF;
 
-  -- 2. Lock and retrieve order
+  -- 2. Lock and retrieve the order row
   SELECT id, status, payment_status, total, user_id, items
   INTO v_order
   FROM public.orders
@@ -533,18 +554,18 @@ BEGIN
     );
   END IF;
 
-  -- 3. Items fallback
+  -- 3. Fallback to order.items if p_items is empty
   IF p_items IS NULL OR jsonb_array_length(p_items) = 0 THEN
     p_items := COALESCE(v_order.items, '[]'::jsonb);
   END IF;
 
-  -- 4. Gather and sort product IDs
+  -- 4. Gather all product IDs and sort deterministically to prevent deadlocks
   SELECT ARRAY_AGG(DISTINCT (elem->>'productId')::TEXT ORDER BY (elem->>'productId')::TEXT ASC)
   INTO v_prod_ids
   FROM jsonb_array_elements(p_items) AS elem
   WHERE elem->>'productId' IS NOT NULL AND elem->>'productId' != '';
 
-  -- 5. Lock product rows
+  -- 5. Lock all product rows deterministically
   IF v_prod_ids IS NOT NULL AND array_length(v_prod_ids, 1) > 0 THEN
     PERFORM id, stock_count
     FROM public.products
@@ -553,7 +574,7 @@ BEGIN
     FOR UPDATE;
   END IF;
 
-  -- 6. Validate stock
+  -- 6. Validate stock for ALL items before deducting any stock
   IF p_items IS NOT NULL AND jsonb_array_length(p_items) > 0 THEN
     FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
     LOOP
@@ -582,7 +603,7 @@ BEGIN
       END IF;
     END LOOP;
 
-    -- 7. Deduct stock & write movements
+    -- 7. Deduct stock and register inventory ledger
     FOR v_item IN SELECT * FROM jsonb_array_elements(p_items)
     LOOP
       v_prod_id := COALESCE(v_item->>'productId', v_item->>'id');
@@ -599,6 +620,7 @@ BEGIN
         SET stock_count = v_new_stock, updated_at = NOW()
         WHERE id = v_prod_id;
 
+        -- Record movement in ledger
         INSERT INTO public.inventory_movements (
           id, product_id, order_id, movement_type, quantity_change, previous_stock, new_stock, reason, variant, actor, created_at
         ) VALUES (
@@ -618,14 +640,14 @@ BEGIN
     END LOOP;
   END IF;
 
-  -- 8. Record payment effect
+  -- 8. Record payment effect (idempotency guard)
   INSERT INTO public.payment_effects (
     order_id, gateway, payment_id, amount, currency, payment_method, status, date_approved, created_at
   ) VALUES (
     p_order_id, p_gateway, p_payment_id, p_amount, p_currency, p_payment_method, 'approved', p_date_approved, NOW()
   ) ON CONFLICT (gateway, payment_id) DO NOTHING;
 
-  -- 9. Update order
+  -- 9. Update order status
   UPDATE public.orders
   SET
     status = 'Em Separação',
@@ -787,6 +809,10 @@ BEGIN
 END;
 $$;
 
+-- =========================================================================
+-- 4. FUNCTION GRANTS (PRINCIPLE OF LEAST PRIVILEGE)
+-- =========================================================================
+
 REVOKE EXECUTE ON FUNCTION public.process_approved_order_atomic FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic TO authenticated, service_role;
 
@@ -800,3 +826,245 @@ REVOKE EXECUTE ON FUNCTION public.complete_webhook_event FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.complete_webhook_event TO authenticated, service_role;
 
 GRANT EXECUTE ON FUNCTION public.is_admin TO PUBLIC, anon, authenticated, service_role;
+
+-- =========================================================================
+-- 5. ROW LEVEL SECURITY (RLS) POLICIES
+-- =========================================================================
+
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.coupons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.order_status_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_addresses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.returns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inventory_movements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.product_reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.store_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.store_banners ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.email_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shipment_operations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.shipment_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.webhook_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_effects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Profiles Policies
+DROP POLICY IF EXISTS "Profiles are readable by owner or admin" ON public.profiles;
+CREATE POLICY "Profiles are readable by owner or admin"
+  ON public.profiles FOR SELECT
+  USING (auth.uid() = id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Profiles can be updated by owner (except role)" ON public.profiles;
+CREATE POLICY "Profiles can be updated by owner (except role)"
+  ON public.profiles FOR UPDATE
+  USING (auth.uid() = id OR public.is_admin())
+  WITH CHECK (
+    public.is_admin() OR (
+      auth.uid() = id AND role = (SELECT role FROM public.profiles WHERE id = auth.uid())
+    )
+  );
+
+DROP POLICY IF EXISTS "Profiles can be inserted by owner" ON public.profiles;
+CREATE POLICY "Profiles can be inserted by owner"
+  ON public.profiles FOR INSERT
+  WITH CHECK (auth.uid() = id OR public.is_admin());
+
+-- Products Policies
+DROP POLICY IF EXISTS "Products are viewable by everyone" ON public.products;
+CREATE POLICY "Products are viewable by everyone"
+  ON public.products FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Products are manageable by admins" ON public.products;
+CREATE POLICY "Products are manageable by admins"
+  ON public.products FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Categories Policies
+DROP POLICY IF EXISTS "Categories are viewable by everyone" ON public.categories;
+CREATE POLICY "Categories are viewable by everyone"
+  ON public.categories FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Categories are manageable by admins" ON public.categories;
+CREATE POLICY "Categories are manageable by admins"
+  ON public.categories FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Coupons Policies
+DROP POLICY IF EXISTS "Coupons are viewable by all" ON public.coupons;
+CREATE POLICY "Coupons are viewable by all"
+  ON public.coupons FOR SELECT
+  USING (active = true OR public.is_admin());
+
+DROP POLICY IF EXISTS "Coupons are manageable by admin" ON public.coupons;
+CREATE POLICY "Coupons are manageable by admin"
+  ON public.coupons FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Orders Policies
+DROP POLICY IF EXISTS "Orders are viewable by owner or admin" ON public.orders;
+CREATE POLICY "Orders are viewable by owner or admin"
+  ON public.orders FOR SELECT
+  USING (auth.uid() = user_id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Orders can be created by authenticated user or guest" ON public.orders;
+CREATE POLICY "Orders can be created by authenticated user or guest"
+  ON public.orders FOR INSERT
+  WITH CHECK (
+    (auth.uid() IS NOT NULL AND user_id = auth.uid()) OR
+    (auth.uid() IS NULL AND user_id IS NULL) OR
+    public.is_admin()
+  );
+
+DROP POLICY IF EXISTS "Orders can be updated by admin" ON public.orders;
+CREATE POLICY "Orders can be updated by admin"
+  ON public.orders FOR UPDATE
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Order Items Policies
+DROP POLICY IF EXISTS "Order items are readable by order owner or admin" ON public.order_items;
+CREATE POLICY "Order items are readable by order owner or admin"
+  ON public.order_items FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.orders
+      WHERE orders.id = order_items.order_id
+      AND (orders.user_id = auth.uid() OR public.is_admin())
+    )
+  );
+
+-- User Addresses Policies
+DROP POLICY IF EXISTS "Addresses are manageable by owner" ON public.user_addresses;
+CREATE POLICY "Addresses are manageable by owner"
+  ON public.user_addresses FOR ALL
+  USING (auth.uid() = user_id OR public.is_admin())
+  WITH CHECK (auth.uid() = user_id OR public.is_admin());
+
+-- Cart Items Policies
+DROP POLICY IF EXISTS "Cart items are manageable by owner" ON public.cart_items;
+CREATE POLICY "Cart items are manageable by owner"
+  ON public.cart_items FOR ALL
+  USING (auth.uid() = user_id OR public.is_admin())
+  WITH CHECK (auth.uid() = user_id OR public.is_admin());
+
+-- Favorites Policies
+DROP POLICY IF EXISTS "Favorites are manageable by owner" ON public.favorites;
+CREATE POLICY "Favorites are manageable by owner"
+  ON public.favorites FOR ALL
+  USING (auth.uid() = user_id OR public.is_admin())
+  WITH CHECK (auth.uid() = user_id OR public.is_admin());
+
+-- Returns Policies
+DROP POLICY IF EXISTS "Returns viewable by owner or admin" ON public.returns;
+CREATE POLICY "Returns viewable by owner or admin"
+  ON public.returns FOR SELECT
+  USING (auth.uid() = user_id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Returns can be created by owner" ON public.returns;
+CREATE POLICY "Returns can be created by owner"
+  ON public.returns FOR INSERT
+  WITH CHECK (auth.uid() = user_id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Returns manageable by admin" ON public.returns;
+CREATE POLICY "Returns manageable by admin"
+  ON public.returns FOR UPDATE
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Product Reviews Policies
+DROP POLICY IF EXISTS "Reviews viewable by everyone" ON public.product_reviews;
+CREATE POLICY "Reviews viewable by everyone"
+  ON public.product_reviews FOR SELECT
+  USING (status = 'approved' OR public.is_admin() OR auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Reviews insertable by authenticated users" ON public.product_reviews;
+CREATE POLICY "Reviews insertable by authenticated users"
+  ON public.product_reviews FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL AND auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Reviews manageable by admin" ON public.product_reviews;
+CREATE POLICY "Reviews manageable by admin"
+  ON public.product_reviews FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Store Settings Policies
+DROP POLICY IF EXISTS "Store settings viewable by everyone" ON public.store_settings;
+CREATE POLICY "Store settings viewable by everyone"
+  ON public.store_settings FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Store settings manageable by admin" ON public.store_settings;
+CREATE POLICY "Store settings manageable by admin"
+  ON public.store_settings FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Store Banners Policies
+DROP POLICY IF EXISTS "Banners viewable by everyone" ON public.store_banners;
+CREATE POLICY "Banners viewable by everyone"
+  ON public.store_banners FOR SELECT
+  USING (active = true OR public.is_admin());
+
+DROP POLICY IF EXISTS "Banners manageable by admin" ON public.store_banners;
+CREATE POLICY "Banners manageable by admin"
+  ON public.store_banners FOR ALL
+  USING (public.is_admin())
+  WITH CHECK (public.is_admin());
+
+-- Sensitive Backend Operations Tables (Admin & Service Role Only)
+DROP POLICY IF EXISTS "Inventory movements admin only" ON public.inventory_movements;
+CREATE POLICY "Inventory movements admin only" ON public.inventory_movements FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Shipment operations admin only" ON public.shipment_operations;
+CREATE POLICY "Shipment operations admin only" ON public.shipment_operations FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Shipment events viewable by order owner or admin" ON public.shipment_events;
+CREATE POLICY "Shipment events viewable by order owner or admin" ON public.shipment_events FOR SELECT USING (
+  EXISTS (SELECT 1 FROM public.orders WHERE orders.id = shipment_events.order_id AND (orders.user_id = auth.uid() OR public.is_admin()))
+);
+
+DROP POLICY IF EXISTS "Webhook events admin only" ON public.webhook_events;
+CREATE POLICY "Webhook events admin only" ON public.webhook_events FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Payment effects admin only" ON public.payment_effects;
+CREATE POLICY "Payment effects admin only" ON public.payment_effects FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Email logs admin only" ON public.email_logs;
+CREATE POLICY "Email logs admin only" ON public.email_logs FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+DROP POLICY IF EXISTS "Audit logs admin only" ON public.admin_audit_logs;
+CREATE POLICY "Audit logs admin only" ON public.admin_audit_logs FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
+
+-- =========================================================================
+-- 6. INDEXES FOR HIGH-PERFORMANCE AND CONCURRENCY
+-- =========================================================================
+
+CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders(user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_email ON public.orders(customer_email);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON public.orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_tracking ON public.orders(tracking_code);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON public.orders(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON public.order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON public.order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_product_id ON public.inventory_movements(product_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_order_id ON public.inventory_movements(order_id);
+CREATE INDEX IF NOT EXISTS idx_payment_effects_lookup ON public.payment_effects(gateway, payment_id);
+CREATE INDEX IF NOT EXISTS idx_webhook_events_lookup ON public.webhook_events(gateway, event_key);
+CREATE INDEX IF NOT EXISTS idx_user_addresses_user_id ON public.user_addresses(user_id);
+CREATE INDEX IF NOT EXISTS idx_cart_items_user_id ON public.cart_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON public.favorites(user_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_product_id ON public.product_reviews(product_id);
+CREATE INDEX IF NOT EXISTS idx_shipment_operations_order_id ON public.shipment_operations(order_id);
