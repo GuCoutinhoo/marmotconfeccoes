@@ -8402,9 +8402,10 @@ app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
     const saved = await db.getShippingSettings();
 
     const clientId = saved.clientId || process.env.MELHOR_ENVIO_CLIENT_ID;
+    const appUrl = process.env.APP_URL ? process.env.APP_URL.replace(/\/$/, '') : '';
     const host = req.get('host') || 'localhost:3000';
     const protocol = req.protocol === 'https' || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http';
-    const redirectUri = `${protocol}://${host}/admin?tab=shipping&oauth=melhor-envio`;
+    const redirectUri = appUrl ? `${appUrl}/admin?tab=shipping&oauth=melhor-envio` : `${protocol}://${host}/admin?tab=shipping&oauth=melhor-envio`;
 
     if (!clientId) {
       return res.status(400).json({
@@ -8412,9 +8413,10 @@ app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
       });
     }
 
+    const randomState = crypto.randomBytes(16).toString('hex');
     const authBase = config.environment === 'sandbox' ? 'https://sandbox.melhorenvio.com.br/oauth/authorize' : 'https://melhorenvio.com.br/oauth/authorize';
     const scopes = 'cart-read cart-write orders-read shipping-calculate shipping-cancel shipping-checkout shipping-companies shipping-generate shipping-preview shipping-print shipping-tracking ecommerce-shipping';
-    const authUrl = `${authBase}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=marmot_admin_oauth`;
+    const authUrl = `${authBase}?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scopes)}&state=${randomState}`;
 
     res.json({ url: authUrl, redirectUri });
   } catch (err: any) {
