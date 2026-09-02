@@ -2785,6 +2785,23 @@ export class DatabaseManager {
               }
             }
           }
+
+          // Persist status history entry if admin client is present
+          if (adminClient) {
+            try {
+              await adminClient.from('order_status_history').insert({
+                order_id: order.id,
+                status: order.status || 'Aguardando Pagamento',
+                previous_status: null,
+                new_status: order.status || 'Aguardando Pagamento',
+                source: 'system',
+                description: `Pedido sincronizado com status "${order.status || 'Aguardando Pagamento'}"`,
+                occurred_at: new Date().toISOString(),
+              });
+            } catch (histErr: any) {
+              // Silently ignore if already logged or duplicate
+            }
+          }
         } catch (dbErr: any) {
           console.warn('[DB] Supabase saveOrder notice:', dbErr.message);
         }
@@ -3894,6 +3911,24 @@ export class DatabaseManager {
     });
 
     await this.saveOrder(order);
+
+    if (this.mode === 'supabase') {
+      try {
+        const adminClient = await this.getSupabaseAdminClient();
+        if (adminClient) {
+          await adminClient.from('order_status_history').insert({
+            order_id: order.id,
+            status: newStatus,
+            previous_status: previousStatus,
+            new_status: newStatus,
+            source: 'admin',
+            description: `Status alterado de "${previousStatus}" para "${newStatus}" por ${adminUser?.name || 'Admin'}${note ? ` | Obs: ${note}` : ''}`,
+            occurred_at: new Date().toISOString(),
+          });
+        }
+      } catch {}
+    }
+
     await this.logAdminAction(
       adminUser?.email || 'admin@marmot.com',
       adminUser?.name || 'Admin',
@@ -7175,6 +7210,31 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
 
     // Ordenação simples por menor preço
     rawApiQuotes.sort((a, b) => a.price - b.price);
+
+    // Persist shipping quotes in database for server-authoritative checkout verification
+    if (rawApiQuotes.length > 0) {
+      try {
+        const adminClient = await db.getSupabaseAdminClient();
+        if (adminClient) {
+          const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+          const cartHash = cleanCep + '_' + (shippingProducts || []).map((i: any) => `${i.id}:${i.quantity || 1}`).sort().join('_');
+          const quoteInserts = rawApiQuotes.map((q) => ({
+            user_id: (req as any).user?.id || null,
+            destination_postal_code: cleanCep,
+            service_id: q.serviceId && !isNaN(parseInt(String(q.serviceId), 10)) ? parseInt(String(q.serviceId), 10) : 1,
+            carrier: q.carrier,
+            service_name: q.name,
+            price: q.price,
+            delivery_time: q.deliveryTime || 1,
+            cart_hash: cartHash,
+            expires_at: expiresAt,
+          }));
+          await adminClient.from('shipping_quotes').insert(quoteInserts);
+        }
+      } catch (sqErr: any) {
+        // Safe notice
+      }
+    }
 
     console.log('[SHIPPING_REQUEST_END]', {
       requestId,

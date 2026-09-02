@@ -423,6 +423,15 @@ CREATE TABLE IF NOT EXISTS public.order_status_history (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS status TEXT;
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS previous_status TEXT;
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS new_status TEXT;
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'system';
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS external_event_id TEXT;
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS occurred_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.order_status_history ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
 -- =========================================================================
 -- 13. PRODUCT REVIEWS
 -- =========================================================================
@@ -674,9 +683,27 @@ CREATE TABLE IF NOT EXISTS public.payment_effects (
   CONSTRAINT uq_payment_effects_gateway_payment UNIQUE (gateway, payment_id)
 );
 
+ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS gateway TEXT DEFAULT 'mercadopago';
+ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS payment_id TEXT;
+ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS order_id TEXT;
+ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS amount NUMERIC(10, 2) NOT NULL DEFAULT 0.00;
 ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS currency TEXT DEFAULT 'BRL';
 ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS payment_method TEXT;
+ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'approved';
 ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS raw_payload JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+-- Safely clean duplicate payment_effects per order_id before adding unique index
+DELETE FROM public.payment_effects a
+WHERE a.ctid <> (
+  SELECT min(b.ctid)
+  FROM public.payment_effects b
+  WHERE a.order_id = b.order_id
+);
+
+-- Ensure UNIQUE(order_id) and UNIQUE(gateway, payment_id) indexes exist
+CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_effects_order_id ON public.payment_effects(order_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_effects_gateway_payment ON public.payment_effects(gateway, payment_id);
 
 -- =========================================================================
 -- 22. ADMIN AUDIT LOGS
