@@ -924,7 +924,7 @@ RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
   SELECT (
     coalesce((auth.jwt() -> 'app_metadata' ->> 'role'), '') = 'admin'
@@ -935,12 +935,25 @@ AS $$
   );
 $$;
 
+CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = user_id::text AND role = 'admin'
+  );
+$$;
+
 -- 2. Trigger on new auth.users signup to create profile (Strictly 'customer' role)
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, auth, pg_temp
 AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, name, role, avatar_url, created_at, updated_at)
@@ -970,7 +983,7 @@ CREATE OR REPLACE FUNCTION public.protect_profile_role()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, pg_temp
 AS $$
 BEGIN
   IF NEW.role <> OLD.role THEN
@@ -1008,7 +1021,7 @@ CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_order public.orders%ROWTYPE;
@@ -1214,7 +1227,7 @@ CREATE OR REPLACE FUNCTION public.claim_webhook_event(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_existing public.webhook_events%ROWTYPE;
@@ -1257,7 +1270,7 @@ CREATE OR REPLACE FUNCTION public.complete_webhook_event(
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, pg_temp
 AS $$
 BEGIN
   UPDATE public.webhook_events
@@ -1279,7 +1292,7 @@ CREATE OR REPLACE FUNCTION public.deduct_inventory_atomic(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = public
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_cur_stock INTEGER;
@@ -1656,5 +1669,8 @@ REVOKE EXECUTE ON FUNCTION public.handle_new_user FROM PUBLIC, anon, authenticat
 REVOKE EXECUTE ON FUNCTION public.protect_profile_role FROM PUBLIC, anon, authenticated;
 
 -- Restrict is_admin to authenticated and service_role
-REVOKE EXECUTE ON FUNCTION public.is_admin FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.is_admin TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.is_admin() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION public.is_admin(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO authenticated, service_role;

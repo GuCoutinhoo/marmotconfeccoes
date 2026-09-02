@@ -3,7 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -2508,6 +2507,43 @@ export class DatabaseManager {
   }
 
   // ==========================================
+  // SHIPPING QUOTES (Server-authoritative)
+  // ==========================================
+  private shippingQuotes: any[] = [];
+
+  public async saveShippingQuotes(quotes: any[]): Promise<void> {
+    if (!Array.isArray(quotes) || quotes.length === 0) return;
+    for (const q of quotes) {
+      const idx = this.shippingQuotes.findIndex((existing) => existing.id === q.id);
+      if (idx >= 0) {
+        this.shippingQuotes[idx] = q;
+      } else {
+        this.shippingQuotes.push(q);
+      }
+    }
+  }
+
+  public async getShippingQuote(quoteId: string): Promise<any | null> {
+    if (!quoteId) return null;
+    const adminClient = await this.getSupabaseAdminClient();
+    if (adminClient) {
+      try {
+        const { data, error } = await adminClient
+          .from('shipping_quotes')
+          .select('*')
+          .eq('id', quoteId)
+          .maybeSingle();
+        if (!error && data) {
+          return data;
+        }
+      } catch (err: any) {
+        console.warn('[DB] Supabase query shipping_quotes failed:', err.message);
+      }
+    }
+    return this.shippingQuotes.find((q) => q.id === quoteId) || null;
+  }
+
+  // ==========================================
   // ORDERS
   // ==========================================
   public async getOrders(userId?: string, userEmail?: string): Promise<Order[]> {
@@ -2662,16 +2698,14 @@ export class DatabaseManager {
 
   public async saveOrder(order: Order): Promise<Order> {
     await this.initialize();
-    const idx = this.orders.findIndex((o) => o.id === order.id);
-    if (idx >= 0) {
-      this.orders[idx] = order;
-    } else {
-      this.orders.unshift(order);
-    }
-    this.writeJsonFile(ORDERS_FILE, this.orders);
 
     if (this.mode === 'supabase') {
       const adminClient = await this.getSupabaseAdminClient();
+      const clientToUse = adminClient || this.supabase;
+
+      if (!clientToUse) {
+        throw new Error(`[DB_PERSISTENCE_ERROR] Supabase client não disponível para persistir pedido #${order.id}.`);
+      }
 
       const orderPayload: any = {
         id: order.id,
@@ -2718,95 +2752,99 @@ export class DatabaseManager {
         updated_at: new Date().toISOString(),
       };
 
-      const clientToUse = adminClient || this.supabase;
+      try {
+        const { error: saveErr } = await clientToUse.from('orders').upsert(orderPayload, { onConflict: 'id' });
 
-      if (clientToUse) {
-        try {
-          const { error: saveErr } = await clientToUse.from('orders').upsert(orderPayload, { onConflict: 'id' });
-
-          if (saveErr) {
-            console.warn('[DB] Tentativa de upsert completo falhou, testando payload base:', saveErr.message);
-            // Fallback to base columns that always exist in core orders table
-            const basePayload = {
-              id: order.id,
-              user_id: order.userId || null,
-              customer_name: order.customerName || (order as any).customer?.name || null,
-              customer_email: order.customerEmail || (order as any).customer?.email || 'cliente@marmot.com',
-              customer_phone: order.customerPhone || null,
-              customer_cpf: order.customerCpf || null,
-              items: order.items || [],
-              subtotal: Number(order.subtotal || 0),
-              shipping_fee: Number(order.shippingFee || 0),
-              discount: Number(order.discount || 0),
-              total: Number(order.total || 0),
-              status: order.status || 'Aguardando Pagamento',
-              payment_method: order.paymentMethod || null,
-              payment_status: order.paymentStatus || 'Pendente',
-              shipping_address: order.shippingAddress || {},
-              tracking_code: order.trackingCode || null,
-              data: order,
-              updated_at: new Date().toISOString(),
-            };
-            const { error: fallbackErr } = await clientToUse.from('orders').upsert(basePayload, { onConflict: 'id' });
-            if (fallbackErr) {
-              if (adminClient) {
-                console.error('[DB] Supabase order upsert fallback error:', fallbackErr.message);
-              } else {
-                console.info('[DB] Supabase RLS ativo para inserção anônima direta. Pedido mantido no cache seguro.');
-              }
-            } else {
-              console.log(`[DB] Pedido #${order.id} salvo via payload canônico no Supabase.`);
-            }
+        if (saveErr) {
+          console.warn('[DB] Tentativa de upsert completo falhou, testando payload base:', saveErr.message);
+          // Fallback to base columns that always exist in core orders table
+          const basePayload = {
+            id: order.id,
+            user_id: order.userId || null,
+            customer_name: order.customerName || (order as any).customer?.name || null,
+            customer_email: order.customerEmail || (order as any).customer?.email || 'cliente@marmot.com',
+            customer_phone: order.customerPhone || null,
+            customer_cpf: order.customerCpf || null,
+            items: order.items || [],
+            subtotal: Number(order.subtotal || 0),
+            shipping_fee: Number(order.shippingFee || 0),
+            discount: Number(order.discount || 0),
+            total: Number(order.total || 0),
+            status: order.status || 'Aguardando Pagamento',
+            payment_method: order.paymentMethod || null,
+            payment_status: order.paymentStatus || 'Pendente',
+            shipping_address: order.shippingAddress || {},
+            tracking_code: order.trackingCode || null,
+            data: order,
+            updated_at: new Date().toISOString(),
+          };
+          const { error: fallbackErr } = await clientToUse.from('orders').upsert(basePayload, { onConflict: 'id' });
+          if (fallbackErr) {
+            console.error('[DB] Supabase order upsert fallback error:', fallbackErr.message);
+            throw new Error(`[DB_PERSISTENCE_ERROR] Falha crítica ao persistir pedido #${order.id} no Supabase: ${fallbackErr.message}`);
           } else {
-            console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase.`);
+            console.log(`[DB] Pedido #${order.id} salvo via payload canônico no Supabase.`);
           }
-
-          // Persist normalized order_items if admin client is present
-          if (adminClient && Array.isArray(order.items) && order.items.length > 0) {
-            for (const item of order.items) {
-              try {
-                await adminClient.from('order_items').upsert({
-                  id: item.id || `${order.id}-${item.productId}`,
-                  order_id: order.id,
-                  product_id: item.productId,
-                  product_name: item.title || (item as any).productTitle || (item as any).name || 'Produto',
-                  sku: item.sku || null,
-                  size: item.size || 'M',
-                  color: item.color || (item as any).colorName || 'Padrão',
-                  color_name: (item as any).colorName || item.color || null,
-                  quantity: item.quantity || 1,
-                  unit_price: item.price || 0,
-                  discount: 0,
-                  line_total: item.subtotal || ((item.price || 0) * (item.quantity || 1)),
-                  image: item.image || (item as any).productImage || null,
-                }, { onConflict: 'id' });
-              } catch (itemErr: any) {
-                console.warn('[DB] Supabase order_item notice:', itemErr.message);
-              }
-            }
-          }
-
-          // Persist status history entry if admin client is present
-          if (adminClient) {
-            try {
-              await adminClient.from('order_status_history').insert({
-                order_id: order.id,
-                status: order.status || 'Aguardando Pagamento',
-                previous_status: null,
-                new_status: order.status || 'Aguardando Pagamento',
-                source: 'system',
-                description: `Pedido sincronizado com status "${order.status || 'Aguardando Pagamento'}"`,
-                occurred_at: new Date().toISOString(),
-              });
-            } catch (histErr: any) {
-              // Silently ignore if already logged or duplicate
-            }
-          }
-        } catch (dbErr: any) {
-          console.warn('[DB] Supabase saveOrder notice:', dbErr.message);
+        } else {
+          console.log(`[DB] Pedido #${order.id} salvo com sucesso no Supabase.`);
         }
+
+        // Persist normalized order_items if admin client is present
+        if (adminClient && Array.isArray(order.items) && order.items.length > 0) {
+          for (const item of order.items) {
+            try {
+              await adminClient.from('order_items').upsert({
+                id: item.id || `${order.id}-${item.productId}`,
+                order_id: order.id,
+                product_id: item.productId,
+                product_name: item.title || (item as any).productTitle || (item as any).name || 'Produto',
+                sku: item.sku || null,
+                size: item.size || 'M',
+                color: item.color || (item as any).colorName || 'Padrão',
+                color_name: (item as any).colorName || item.color || null,
+                quantity: item.quantity || 1,
+                unit_price: item.price || 0,
+                discount: 0,
+                line_total: item.subtotal || ((item.price || 0) * (item.quantity || 1)),
+                image: item.image || (item as any).productImage || null,
+              }, { onConflict: 'id' });
+            } catch (itemErr: any) {
+              console.warn('[DB] Supabase order_item notice:', itemErr.message);
+            }
+          }
+        }
+
+        // Persist status history entry if admin client is present
+        if (adminClient) {
+          try {
+            await adminClient.from('order_status_history').insert({
+              order_id: order.id,
+              status: order.status || 'Aguardando Pagamento',
+              previous_status: null,
+              new_status: order.status || 'Aguardando Pagamento',
+              source: 'system',
+              description: `Pedido sincronizado com status "${order.status || 'Aguardando Pagamento'}"`,
+              occurred_at: new Date().toISOString(),
+            });
+          } catch (histErr: any) {
+            // Silently ignore if already logged or duplicate
+          }
+        }
+      } catch (dbErr: any) {
+        console.error('[DB] Erro crítico ao persistir pedido no Supabase:', dbErr.message);
+        throw dbErr;
       }
     }
+
+    // Only update local cache and memory once backend persistence succeeds
+    const idx = this.orders.findIndex((o) => o.id === order.id);
+    if (idx >= 0) {
+      this.orders[idx] = order;
+    } else {
+      this.orders.unshift(order);
+    }
+    this.writeJsonFile(ORDERS_FILE, this.orders);
+
     return order;
   }
 
@@ -4732,23 +4770,50 @@ export class DatabaseManager {
       return { canReview: false, reason: 'Identificação do usuário ou e-mail necessária.' };
     }
 
-    // Match delivered order containing this product
+    if (this.mode === 'supabase') {
+      const adminClient = await this.getSupabaseAdminClient();
+      const client = adminClient || this.supabase;
+      if (client) {
+        try {
+          const { data: userOrders } = await client
+            .from('orders')
+            .select('id, user_id, customer_email, status, shipping_status, payment_status, items')
+            .or(`user_id.eq.${userEmailOrId},customer_email.ilike.${cleanIdentifier}`);
+
+          if (Array.isArray(userOrders)) {
+            for (const o of userOrders) {
+              const isEligible = o.status === 'Entregue' || o.shipping_status === 'Entregue' || o.payment_status === 'Pago' || o.status === 'Pago';
+              if (isEligible && Array.isArray(o.items)) {
+                const hasProd = o.items.some((it: any) => it.productId === productId || it.product_id === productId || it.id === productId);
+                if (hasProd) {
+                  return { canReview: true, orderId: o.id };
+                }
+              }
+            }
+          }
+        } catch (e: any) {
+          console.warn('[DB] canUserReviewProduct query notice:', e.message);
+        }
+      }
+    }
+
+    // Match delivered or paid order containing this product from cached orders
     const matchingOrder = this.orders.find((o) => {
       const isUserMatch =
         (o.userId && o.userId.toLowerCase() === cleanIdentifier) ||
-        (o.customerEmail && o.customerEmail.toLowerCase() === cleanIdentifier) ||
-        (o.shippingAddress?.recipientName && o.shippingAddress.recipientName.toLowerCase() === cleanIdentifier);
+        (o.customerEmail && o.customerEmail.toLowerCase() === cleanIdentifier);
 
       if (!isUserMatch) return false;
 
-      const isDelivered =
+      const isEligible =
         o.status === 'Entregue' ||
         o.shippingStatus === 'Entregue' ||
+        o.paymentStatus === 'Pago' ||
         o.orderStatus === 'delivered';
 
-      if (!isDelivered) return false;
+      if (!isEligible) return false;
 
-      return Array.isArray(o.items) && o.items.some((it) => it.productId === productId);
+      return Array.isArray(o.items) && o.items.some((it) => it.productId === productId || (it as any).id === productId);
     });
 
     if (matchingOrder) {
@@ -4757,7 +4822,7 @@ export class DatabaseManager {
 
     return {
       canReview: false,
-      reason: 'Apenas clientes com compras entregues podem avaliar esta peça.',
+      reason: 'Apenas clientes com compras confirmadas podem obter selo de avaliação verificada.',
     };
   }
 
@@ -4774,12 +4839,12 @@ export class DatabaseManager {
   }): Promise<ProductReview> {
     await this.initialize();
 
-    // Verify purchase
-    let verified = Boolean(data.verifiedPurchase);
+    // Strict verified purchase verification: Never trust client-provided flag blindly
+    let verified = false;
     let orderId = data.orderId;
 
-    if (!verified && (data.userEmail || data.userId)) {
-      const check = await this.canUserReviewProduct(data.userEmail || data.userId || '', data.productId);
+    if (data.userId || data.userEmail) {
+      const check = await this.canUserReviewProduct(data.userId || data.userEmail || '', data.productId);
       if (check.canReview) {
         verified = true;
         if (!orderId && check.orderId) {
@@ -5421,24 +5486,61 @@ export async function fetchWithTimeout(url: string, options: RequestInit = {}, t
   }
 }
 
+/**
+ * Server-authoritative Canonical Cart Hash
+ * Binds destination postal code, items, quantities, and physical specifications.
+ */
+export function generateCanonicalCartHash(
+  destinationCep: string,
+  items: Array<{
+    productId?: string;
+    id?: string;
+    size?: string;
+    color?: string;
+    colorName?: string;
+    quantity?: number;
+    weight?: number;
+    height?: number;
+    width?: number;
+    length?: number;
+  }>
+): string {
+  const cleanCep = String(destinationCep || '').replace(/\D/g, '');
+  const sortedItems = [...(items || [])].sort((a, b) => {
+    const idA = String(a.productId || a.id || '');
+    const idB = String(b.productId || b.id || '');
+    if (idA !== idB) return idA.localeCompare(idB);
+    const sizeA = String(a.size || '');
+    const sizeB = String(b.size || '');
+    if (sizeA !== sizeB) return sizeA.localeCompare(sizeB);
+    return String(a.color || a.colorName || '').localeCompare(String(b.color || b.colorName || ''));
+  });
+
+  const parts = sortedItems.map((item) => {
+    const pId = String(item.productId || item.id || '');
+    const qty = Math.max(1, Number(item.quantity || 1));
+    const w = Number(item.weight || 0).toFixed(3);
+    const h = Number(item.height || 0).toFixed(1);
+    const wd = Number(item.width || 0).toFixed(1);
+    const l = Number(item.length || 0).toFixed(1);
+    const size = String(item.size || 'M');
+    const color = String(item.color || item.colorName || 'Padrao');
+    return `${pId}:${size}:${color}:${qty}:w${w}:h${h}:wd${wd}:l${l}`;
+  });
+
+  const rawString = `${cleanCep}|${parts.join('|')}`;
+  return crypto.createHash('sha256').update(rawString).digest('hex');
+}
+
 // =========================================================================
 // 5. EXPRESS APPLICATION SETUP, RATE LIMITING & AUTH SECURITY
 // =========================================================================
 
 export const app = express();
 
-const JWT_SECRET = process.env.JWT_SECRET || (() => {
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
-    console.warn('[SECURITY WARNING] JWT_SECRET não configurado no ambiente de produção. Usando segredo temporário em memória.');
-  }
-  return crypto.randomBytes(32).toString('hex');
-})();
-
 const SESSION_SECRET = process.env.SESSION_SECRET || (() => {
   return crypto.randomBytes(32).toString('hex');
 })();
-
-const BCRYPT_SALT_ROUNDS = 12;
 
 // High-Performance In-Memory Sliding Window Rate Limiter
 class RateLimiter {
@@ -5632,35 +5734,37 @@ function getAdminEmailList(): string[] {
   return parsed;
 }
 
-// Cryptographic token validation with HMAC and Supabase Auth (Strict signature enforcement)
+// Cryptographic token validation strictly with Supabase Auth (Strict signature enforcement)
 async function verifyAuthToken(token: string): Promise<{ userId: string; email: string | null; role: string; name: string } | null> {
   if (!token || typeof token !== 'string') return null;
 
   const adminEmails = getAdminEmailList();
 
-  // 1. Try local HMAC signature verification
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    if (decoded && (decoded.userId || decoded.sub)) {
-      const email = decoded.email ? String(decoded.email).toLowerCase().trim() : null;
-      const isOfficialAdmin = Boolean(
-        (email && adminEmails.length > 0 && adminEmails.includes(email)) ||
-        decoded.app_metadata?.role === 'admin' ||
-        decoded.role === 'admin'
-      );
+  // 1. If official Supabase JWT secret is configured, verify signature directly
+  const supabaseJwtSecret = process.env.SUPABASE_JWT_SECRET;
+  if (supabaseJwtSecret) {
+    try {
+      const decoded = jwt.verify(token, supabaseJwtSecret) as any;
+      if (decoded && (decoded.sub || decoded.userId)) {
+        const email = decoded.email ? String(decoded.email).toLowerCase().trim() : null;
+        const isOfficialAdmin = Boolean(
+          (email && adminEmails.length > 0 && adminEmails.includes(email)) ||
+          decoded.app_metadata?.role === 'admin'
+        );
 
-      return {
-        userId: String(decoded.userId || decoded.sub),
-        email,
-        role: isOfficialAdmin ? 'admin' : (decoded.role === 'admin' ? 'admin' : 'customer'),
-        name: decoded.name || email?.split('@')[0] || 'Cliente Marmot',
-      };
+        return {
+          userId: String(decoded.sub || decoded.userId),
+          email,
+          role: isOfficialAdmin ? 'admin' : 'customer',
+          name: decoded.user_metadata?.name || decoded.user_metadata?.full_name || email?.split('@')[0] || 'Cliente Marmot',
+        };
+      }
+    } catch {
+      // Signature did not match Supabase JWT secret - proceed to Supabase Auth Server check
     }
-  } catch {
-    // Signature did not match local secret - proceed to Supabase Auth cryptographic verification
   }
 
-  // 2. Validate with Supabase Auth Server (Cryptographic asymmetric signature checked by Supabase Auth)
+  // 2. Validate with Supabase Auth Server (Official Supabase Auth Service)
   const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
   if (supabase) {
     try {
@@ -6135,80 +6239,74 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres.' });
     }
 
-    const existing = await db.getUserByEmail(safeEmail);
-    if (existing) {
-      return res.status(409).json({ error: 'Já existe uma conta cadastrada com este e-mail.' });
+    const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+    if (!supabase) {
+      return res.status(503).json({ error: 'Serviço de autenticação Supabase indisponível no momento.' });
     }
 
-    const passwordHash = bcrypt.hashSync(password, BCRYPT_SALT_ROUNDS);
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    const newUser: DbUser = {
-      id: `usr-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`,
-      name: safeName,
+    const { data: authData, error: authErr } = await supabase.auth.signUp({
       email: safeEmail,
-      passwordHash,
-      role: 'customer',
-      isVerified: false,
-      phone: safePhone || '',
-      cpf: safeCpf || '',
-      addresses: [],
-      verificationCode,
-      verificationCodeExpires: Date.now() + 24 * 60 * 60 * 1000,
-      createdAt: new Date().toISOString(),
-      lastLogin: new Date().toISOString(),
-    };
-
-    await db.saveUser(newUser);
-
-    const token = jwt.sign(
-      { userId: newUser.id, email: newUser.email, role: newUser.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.cookie('session_token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
+      password: String(password),
+      options: {
+        data: {
+          name: safeName,
+          full_name: safeName,
+          phone: safePhone || '',
+          cpf: safeCpf || '',
+        },
+      },
     });
+
+    if (authErr) {
+      return res.status(400).json({ error: authErr.message });
+    }
+
+    const token = authData?.session?.access_token || null;
+    if (token) {
+      res.cookie('session_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        path: '/',
+      });
+    }
 
     res.status(201).json({
       success: true,
-      message: 'Conta criada com sucesso!',
-      user: sanitizeUser(newUser),
+      message: 'Conta criada com sucesso via Supabase Auth!',
+      user: authData.user,
       token,
     });
-  } catch {
-    res.status(500).json({ error: 'Erro interno ao realizar cadastro.' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Erro interno ao realizar cadastro.' });
   }
 });
 
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
     const safeEmail = sanitizeInput(email).toLowerCase();
 
     if (!safeEmail || !password) {
       return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
     }
 
-    const user = await db.getUserByEmail(safeEmail);
-    if (!user || !bcrypt.compareSync(password, user.passwordHash)) {
-      return res.status(401).json({ error: 'Credenciais inválidas. Verifique seu e-mail e senha.' });
+    const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+    if (!supabase) {
+      return res.status(503).json({ error: 'Serviço de autenticação Supabase indisponível no momento.' });
     }
 
-    user.lastLogin = new Date().toISOString();
-    await db.saveUser(user);
+    const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+      email: safeEmail,
+      password: String(password),
+    });
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    if (authErr || !authData?.session) {
+      return res.status(401).json({ error: authErr?.message || 'Credenciais inválidas no Supabase Auth.' });
+    }
 
+    const token = authData.session.access_token;
     res.cookie('session_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -6219,11 +6317,11 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({
       success: true,
-      user: sanitizeUser(user),
+      user: authData.user,
       token,
     });
-  } catch {
-    res.status(500).json({ error: 'Erro interno durante autenticação.' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Erro interno durante autenticação.' });
   }
 });
 
@@ -6727,25 +6825,38 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
         return res.status(400).json({ error: 'Cotação de frete obrigatória para pedidos com subtotal inferior a R$ 399,00. Por favor, calcule o frete para prosseguir.' });
       }
 
-      const adminClient = await db.getSupabaseAdminClient();
-      if (!adminClient) {
-        return res.status(503).json({ error: 'Serviço de validação de frete indisponível temporariamente.' });
+      const quoteData = await db.getShippingQuote(requestedQuoteId);
+      if (!quoteData || typeof quoteData.price !== 'number') {
+        return res.status(400).json({ error: 'Cotação de frete inválida ou não encontrada. Por favor, recalcule o frete para continuar.' });
       }
 
-      const { data: quoteData, error: qErr } = await adminClient
-        .from('shipping_quotes')
-        .select('*')
-        .eq('id', requestedQuoteId)
-        .gte('expires_at', new Date().toISOString())
-        .maybeSingle();
+      if (quoteData.expires_at && new Date(quoteData.expires_at).getTime() < Date.now()) {
+        return res.status(400).json({ error: 'Cotação de frete expirada. Por favor, recalcule o frete para continuar.' });
+      }
 
-      if (qErr || !quoteData || typeof quoteData.price !== 'number') {
-        return res.status(400).json({ error: 'Cotação de frete inválida ou expirada. Por favor, recalcule o frete para continuar.' });
+      // Security: Shipping quote must belong to the authenticated user
+      if (quoteData.user_id && quoteData.user_id !== authUser.id) {
+        return res.status(403).json({
+          error: 'A cotação de frete informada pertence a outro usuário.',
+          code: 'SHIPPING_QUOTE_FORBIDDEN',
+        });
       }
 
       const cleanDestCep = String(body.shippingAddress?.postalCode || body.shippingAddress?.cep || '').replace(/\D/g, '');
       if (quoteData.destination_postal_code && cleanDestCep && quoteData.destination_postal_code !== cleanDestCep) {
-        return res.status(400).json({ error: 'A cotação de frete não corresponde ao CEP de entrega informado.' });
+        return res.status(409).json({
+          error: 'A cotação de frete não corresponde ao CEP de entrega informado.',
+          code: 'SHIPPING_QUOTE_INVALID',
+        });
+      }
+
+      // Security: Server-calculated canonical cart hash must match quote's cart_hash
+      const serverCartHash = generateCanonicalCartHash(cleanDestCep, validatedItems);
+      if (quoteData.cart_hash && quoteData.cart_hash !== serverCartHash) {
+        return res.status(409).json({
+          error: 'SHIPPING_QUOTE_INVALID: Os itens do carrinho foram alterados após o cálculo do frete.',
+          code: 'SHIPPING_QUOTE_INVALID',
+        });
       }
 
       validatedShippingFee = Number(quoteData.price.toFixed(2));
@@ -6753,8 +6864,29 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
 
     const calculatedTotal = Math.max(0, Number((authoritativeSubtotal - authoritativeDiscount + validatedShippingFee).toFixed(2)));
 
+    // Strict order ID generation: Reject arbitrary client-provided orderId, only allow valid reuse of pending order
+    const requestedOrderId = String(body.existingOrderId || body.orderId || body.order_id || '').trim();
+    let existingOrder: Order | null = null;
+    let orderId: string;
+
+    if (requestedOrderId) {
+      const found = await db.getOrderById(requestedOrderId);
+      if (!found) {
+        return res.status(404).json({ error: 'Pedido informado não encontrado.' });
+      }
+      if (found.userId && found.userId !== authUser.id) {
+        return res.status(403).json({ error: 'Acesso negado: este pedido pertence a outro usuário.' });
+      }
+      if (found.status !== 'Aguardando Pagamento' && found.paymentStatus !== 'Pendente') {
+        return res.status(409).json({ error: 'Este pedido já foi processado ou não está em estado reutilizável.' });
+      }
+      existingOrder = found;
+      orderId = found.id;
+    } else {
+      orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
+
     const now = new Date();
-    const orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
 
     const newOrder: Order = {
       id: orderId,
@@ -7265,25 +7397,43 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
     // Persist shipping quotes in database for server-authoritative checkout verification
     if (rawApiQuotes.length > 0) {
       try {
-        const adminClient = await db.getSupabaseAdminClient();
-        if (adminClient) {
-          const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-          const cartHash = cleanCep + '_' + (shippingProducts || []).map((i: any) => `${i.id}:${i.quantity || 1}`).sort().join('_');
-          const quoteInserts = rawApiQuotes
-            .filter((q) => q.serviceId !== undefined && q.serviceId !== null)
-            .map((q) => ({
-              id: (q as any).quoteId,
-              user_id: (req as any).user?.id || null,
-              destination_postal_code: cleanCep,
-              service_id: typeof q.serviceId === 'number' ? q.serviceId : parseInt(String(q.serviceId), 10) || 0,
-              carrier: q.carrier,
-              service_name: q.name,
-              price: q.price,
-              delivery_time: q.deliveryTime || 1,
-              cart_hash: cartHash,
-              expires_at: expiresAt,
-            }));
-          if (quoteInserts.length > 0) {
+        let quoteUserId: string | null = null;
+        const reqToken = extractToken(req);
+        if (reqToken) {
+          try {
+            const verified = await verifyAuthToken(reqToken);
+            if (verified && verified.userId) {
+              quoteUserId = verified.userId;
+            }
+          } catch {
+            // Ignore unauthenticated shipping quote calculation
+          }
+        } else if ((req as any).user?.id) {
+          quoteUserId = (req as any).user.id;
+        }
+
+        const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+        const cartHash = generateCanonicalCartHash(cleanCep, shippingProducts);
+        const quoteInserts = rawApiQuotes
+          .filter((q) => q.serviceId !== undefined && q.serviceId !== null)
+          .map((q) => ({
+            id: (q as any).quoteId,
+            user_id: quoteUserId,
+            destination_postal_code: cleanCep,
+            service_id: typeof q.serviceId === 'number' ? q.serviceId : parseInt(String(q.serviceId), 10) || 0,
+            carrier: q.carrier,
+            service_name: q.name,
+            price: q.price,
+            delivery_time: q.deliveryTime || 1,
+            cart_hash: cartHash,
+            expires_at: expiresAt,
+          }));
+
+        if (quoteInserts.length > 0) {
+          await db.saveShippingQuotes(quoteInserts);
+
+          const adminClient = await db.getSupabaseAdminClient();
+          if (adminClient) {
             const { error: sqInsertErr } = await adminClient.from('shipping_quotes').insert(quoteInserts);
             if (sqInsertErr) {
               console.warn('[SHIPPING_QUOTES_INSERT_WARN]', sqInsertErr.message);
@@ -7478,7 +7628,29 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       }
     }
 
-    // 4. Validate shipping fee (Server-authoritative via shipping_quotes table - Fail-Closed)
+    // 4. Authenticate user before shipping validation and order operations
+    let orderUserId: string | null = null;
+    let authUserEmail: string | null = null;
+    let authUserName: string | null = null;
+    const token = extractToken(req);
+    if (token) {
+      const verified = await verifyAuthToken(token);
+      if (verified && verified.userId) {
+        orderUserId = verified.userId;
+        authUserEmail = verified.email;
+        authUserName = verified.name;
+      }
+    } else if ((req as any).user?.id) {
+      orderUserId = (req as any).user.id;
+      authUserEmail = (req as any).user?.email || null;
+      authUserName = (req as any).user?.name || null;
+    }
+
+    if (!orderUserId) {
+      return res.status(401).json({ error: 'É necessário estar autenticado para gerar a cobrança no Mercado Pago.' });
+    }
+
+    // 5. Validate shipping fee (Server-authoritative via shipping_quotes table - Fail-Closed)
     let validatedShippingFee = 0;
     const requestedQuoteId = req.body?.shippingQuoteId || req.body?.shippingOption?.quoteId || req.body?.shippingOption?.id;
     const isFreeShipping = subtotal >= 399.00;
@@ -7490,71 +7662,69 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         return res.status(400).json({ error: 'Cotação de frete obrigatória para compras abaixo de R$ 399,00. Por favor, calcule o frete para prosseguir.' });
       }
 
-      const adminClient = await db.getSupabaseAdminClient();
-      if (!adminClient) {
-        return res.status(503).json({ error: 'Serviço de validação de frete indisponível temporariamente.' });
+      const quoteData = await db.getShippingQuote(requestedQuoteId);
+      if (!quoteData || typeof quoteData.price !== 'number') {
+        return res.status(400).json({ error: 'Cotação de frete inválida ou não encontrada. Por favor, recalcule o frete para continuar.' });
       }
 
-      const { data: quoteData, error: qErr } = await adminClient
-        .from('shipping_quotes')
-        .select('*')
-        .eq('id', requestedQuoteId)
-        .gte('expires_at', new Date().toISOString())
-        .maybeSingle();
+      if (quoteData.expires_at && new Date(quoteData.expires_at).getTime() < Date.now()) {
+        return res.status(400).json({ error: 'Cotação de frete expirada. Por favor, recalcule o frete para continuar.' });
+      }
 
-      if (qErr || !quoteData || typeof quoteData.price !== 'number') {
-        return res.status(400).json({ error: 'Cotação de frete inválida ou expirada. Por favor, recalcule o frete para continuar.' });
+      // Security: Shipping quote must belong to the authenticated user
+      if (quoteData.user_id && quoteData.user_id !== orderUserId) {
+        return res.status(403).json({
+          error: 'A cotação de frete informada pertence a outro usuário.',
+          code: 'SHIPPING_QUOTE_FORBIDDEN',
+        });
       }
 
       const cleanDestCep = String(shippingAddress?.postalCode || shippingAddress?.cep || '').replace(/\D/g, '');
       if (quoteData.destination_postal_code && cleanDestCep && quoteData.destination_postal_code !== cleanDestCep) {
-        return res.status(400).json({ error: 'A cotação de frete não corresponde ao CEP de entrega informado.' });
+        return res.status(409).json({
+          error: 'A cotação de frete não corresponde ao CEP de entrega informado.',
+          code: 'SHIPPING_QUOTE_INVALID',
+        });
+      }
+
+      // Security: Server-calculated canonical cart hash must match quote's cart_hash
+      const serverCartHash = generateCanonicalCartHash(cleanDestCep, validatedItems);
+      if (quoteData.cart_hash && quoteData.cart_hash !== serverCartHash) {
+        return res.status(409).json({
+          error: 'SHIPPING_QUOTE_INVALID: Os itens ou quantidades do carrinho foram alterados após o cálculo do frete.',
+          code: 'SHIPPING_QUOTE_INVALID',
+        });
       }
 
       validatedShippingFee = Number(quoteData.price.toFixed(2));
     }
 
-    // 5. Calculate official total
+    // 6. Calculate official total
     const total = Math.max(0, Number((subtotal - discount + validatedShippingFee).toFixed(2)));
 
-    // 6. Generate or reuse existing pending order in Database BEFORE payment (status: pending_payment)
-    let orderUserId: string | null = null;
-    const token = extractToken(req);
-    if (token) {
-      const verified = await verifyAuthToken(token);
-      if (verified && verified.userId) {
-        orderUserId = verified.userId;
-      }
-    } else if ((req as any).user?.id) {
-      orderUserId = (req as any).user.id;
-    }
-
-    if (!orderUserId) {
-      return res.status(401).json({ error: 'É necessário estar autenticado para gerar a cobrança no Mercado Pago.' });
-    }
-
-    const requestedOrderId = String(req.body?.orderId || req.body?.order_id || '').trim();
+    // 7. Strict order ID generation: Reject arbitrary client-provided orderId, only allow valid reuse of pending order
+    const requestedOrderId = String(req.body?.existingOrderId || req.body?.orderId || req.body?.order_id || '').trim();
     let existingOrder: Order | null = null;
-    if (requestedOrderId) {
-      try {
-        const found = await db.getOrderById(requestedOrderId);
-        if (found) {
-          // Strict ownership validation: Cannot reuse/modify another user's order
-          if (found.userId && orderUserId && found.userId !== orderUserId) {
-            console.warn('[CHECKOUT_ORDER_MISMATCH] Order ID belongs to another user:', { requestedOrderId, orderUserId, foundUserId: found.userId });
-            existingOrder = null;
-          } else {
-            existingOrder = found;
-          }
-        }
-      } catch {
-        existingOrder = null;
-      }
-    }
+    let orderId: string;
 
-    const orderId = (existingOrder && (existingOrder.status === 'Aguardando Pagamento' || existingOrder.paymentStatus === 'Pendente'))
-      ? existingOrder.id
-      : (requestedOrderId && requestedOrderId.startsWith('MM-') ? requestedOrderId : `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`);
+    if (requestedOrderId) {
+      const found = await db.getOrderById(requestedOrderId);
+      if (!found) {
+        return res.status(404).json({ error: 'Pedido informado não encontrado.' });
+      }
+      if (found.userId && found.userId !== orderUserId) {
+        console.warn('[CHECKOUT_ORDER_MISMATCH] Order ID belongs to another user:', { requestedOrderId, orderUserId, foundUserId: found.userId });
+        return res.status(403).json({ error: 'Acesso negado: este pedido pertence a outro usuário.' });
+      }
+      if (found.status !== 'Aguardando Pagamento' && found.paymentStatus !== 'Pendente') {
+        return res.status(409).json({ error: 'Este pedido já foi finalizado ou não está em estado reutilizável.' });
+      }
+      existingOrder = found;
+      orderId = found.id;
+    } else {
+      // Backend ALWAYS generates orderId for new orders
+      orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    }
 
     console.log('[CHECKOUT_START]', JSON.stringify({
       requestId,
@@ -10063,29 +10233,27 @@ app.post(['/api/products/:productId/reviews', '/api/reviews'], async (req, res) 
     }
 
     const token = extractToken(req);
-    let resolvedUserId = req.body?.userId;
-    let resolvedUserEmail = req.body?.userEmail;
-    let resolvedUserName = req.body?.userName || 'Cliente Marmot';
-    let isVerified = false;
+    let resolvedUserId: string | undefined = undefined;
+    let resolvedUserEmail: string | undefined = undefined;
+    let resolvedUserName = sanitizeInput(req.body?.userName) || 'Cliente Marmot';
 
     if (token) {
       const authUser = await verifyAuthToken(token);
       if (authUser) {
         resolvedUserId = authUser.userId;
         resolvedUserEmail = authUser.email;
-        resolvedUserName = authUser.name || req.body?.userName || 'Cliente Marmot';
+        resolvedUserName = authUser.name || resolvedUserName;
       }
     }
 
-    if (orderId) {
-      const order = await db.getOrderById(orderId);
-      if (order) {
-        const matchesBuyer = (resolvedUserId && order.userId === resolvedUserId) ||
-                             (resolvedUserEmail && order.customerEmail?.toLowerCase() === resolvedUserEmail.toLowerCase());
-        const hasProduct = Array.isArray(order.items) && order.items.some((i: any) => (i.productId === productId || i.id === productId));
-        if (matchesBuyer && hasProduct) {
-          isVerified = true;
-        }
+    let isVerified = false;
+    let verifiedOrderId: string | undefined = undefined;
+
+    if (resolvedUserId || resolvedUserEmail) {
+      const check = await db.canUserReviewProduct(resolvedUserId || resolvedUserEmail || '', productId);
+      if (check.canReview) {
+        isVerified = true;
+        verifiedOrderId = check.orderId || orderId;
       }
     }
 
@@ -10097,7 +10265,7 @@ app.post(['/api/products/:productId/reviews', '/api/reviews'], async (req, res) 
       rating: Number(rating),
       title: title || 'Avaliação da Peça',
       comment,
-      orderId,
+      orderId: verifiedOrderId,
       verifiedPurchase: isVerified,
     });
 
@@ -10707,13 +10875,16 @@ app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhoo
 
     const isSecretValid = Boolean(webhookSecret && incomingToken === webhookSecret);
 
-    let statusToApply = providerStatus;
+    let statusToApply: string | null = null;
     let descriptionToApply = eventDescription;
     let occurredAtToApply = payload.created_at || payload.occurred_at || new Date().toISOString();
     let externalEventIdToApply = payload.id ? String(payload.id) : undefined;
 
-    // If webhook signature is not verified, query the canonical Melhor Envio API directly to eliminate spoofing
-    if (!isSecretValid) {
+    if (isSecretValid) {
+      statusToApply = providerStatus;
+    } else {
+      // Secret is invalid or missing: Consult carrier API directly (Fail-Closed)
+      console.warn('[TRACKING_WEBHOOK_UNVERIFIED] Webhook secret ausente ou inválido. Consultando API oficial da transportadora.');
       const token = getMelhorEnvioTokenServer();
       if (token && token.length >= 10) {
         const baseUrl = 'https://melhorenvio.com.br/api/v2';
@@ -10737,8 +10908,8 @@ app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhoo
             const trackData: any = await trackRes.json();
             const verifiedInfo = trackData[trackingCode];
             if (verifiedInfo && verifiedInfo.status) {
-              statusToApply = verifiedInfo.status;
-              descriptionToApply = verifiedInfo.description || verifiedInfo.message || descriptionToApply;
+              statusToApply = String(verifiedInfo.status).toLowerCase();
+              descriptionToApply = verifiedInfo.description || verifiedInfo.message || `Status oficial verificado: ${statusToApply}`;
               occurredAtToApply = verifiedInfo.posted_at || verifiedInfo.delivered_at || occurredAtToApply;
               externalEventIdToApply = verifiedInfo.id ? String(verifiedInfo.id) : externalEventIdToApply;
             }
@@ -10746,6 +10917,15 @@ app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhoo
         } catch (verErr: any) {
           console.warn('[Webhook Re-Verification Warning]:', verErr.message);
         }
+      }
+
+      // Fail-closed: If status could not be verified by carrier API, reject unverified update
+      if (!statusToApply) {
+        console.warn(`[TRACKING_WEBHOOK_REJECTED] Atualização descartada para rastreio ${trackingCode}: assinatura inválida e transportadora não confirmou.`);
+        return res.status(401).json({
+          success: false,
+          error: 'Assinatura do webhook inválida e status não confirmado pela transportadora oficial.',
+        });
       }
     }
 
