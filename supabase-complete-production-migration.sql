@@ -390,6 +390,12 @@ CREATE TABLE IF NOT EXISTS public.return_inventory_effects (
   CONSTRAINT uq_return_restock UNIQUE (return_id, product_id)
 );
 
+ALTER TABLE public.return_inventory_effects ADD COLUMN IF NOT EXISTS return_id TEXT;
+ALTER TABLE public.return_inventory_effects ADD COLUMN IF NOT EXISTS order_id TEXT;
+ALTER TABLE public.return_inventory_effects ADD COLUMN IF NOT EXISTS product_id TEXT;
+ALTER TABLE public.return_inventory_effects ADD COLUMN IF NOT EXISTS quantity INTEGER DEFAULT 1;
+ALTER TABLE public.return_inventory_effects ADD COLUMN IF NOT EXISTS restocked_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
 -- =========================================================================
 -- 11. INVENTORY MOVEMENTS (AUDIT TRAIL)
 -- =========================================================================
@@ -406,6 +412,17 @@ CREATE TABLE IF NOT EXISTS public.inventory_movements (
   metadata JSONB DEFAULT '{}'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS product_id TEXT;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS quantity_change INTEGER;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS previous_stock INTEGER;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS new_stock INTEGER;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS reason TEXT;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS order_id TEXT;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS return_id TEXT;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.inventory_movements ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
 -- =========================================================================
 -- 12. ORDER STATUS HISTORY
@@ -452,6 +469,20 @@ CREATE TABLE IF NOT EXISTS public.product_reviews (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS product_id TEXT;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS user_name TEXT;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS user_email TEXT;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS rating INTEGER DEFAULT 5;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS title TEXT;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS comment TEXT;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS verified_purchase BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS order_id TEXT;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'approved';
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+ALTER TABLE public.product_reviews ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
 -- =========================================================================
 -- 14. STORE SETTINGS & APP SETTINGS
 -- =========================================================================
@@ -471,6 +502,19 @@ CREATE TABLE IF NOT EXISTS public.store_settings (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS store_name TEXT NOT NULL DEFAULT 'MARMOT CONFECÇÕES';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS contact_email TEXT NOT NULL DEFAULT 'contato@marmotconfeccoes.com.br';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS support_phone TEXT DEFAULT '(11) 99999-9999';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS whatsapp TEXT DEFAULT '(11) 99999-9999';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS instagram TEXT DEFAULT '@marmotconfeccoes';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS free_shipping_threshold NUMERIC(10, 2) NOT NULL DEFAULT 299.00;
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS announcement_bar_text TEXT DEFAULT 'FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 299 | PARCELAMENTO EM ATÉ 12X';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS announcement_bar_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS maintenance_mode BOOLEAN DEFAULT FALSE;
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS default_postal_code TEXT DEFAULT '01001-000';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS data JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
 INSERT INTO public.store_settings (id, store_name, contact_email, free_shipping_threshold, announcement_bar_text)
 VALUES (
   'default',
@@ -488,11 +532,15 @@ CREATE TABLE IF NOT EXISTS public.app_settings (
   updated_by TEXT
 );
 
+ALTER TABLE public.app_settings ADD COLUMN IF NOT EXISTS value JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.app_settings ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+ALTER TABLE public.app_settings ADD COLUMN IF NOT EXISTS updated_by TEXT;
+
 -- =========================================================================
 -- 15. SHIPPING QUOTES (SERVER-AUTHORITATIVE LOCK)
 -- =========================================================================
 CREATE TABLE IF NOT EXISTS public.shipping_quotes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id TEXT PRIMARY KEY,
   user_id TEXT,
   destination_postal_code TEXT NOT NULL,
   service_id INTEGER NOT NULL,
@@ -504,6 +552,17 @@ CREATE TABLE IF NOT EXISTS public.shipping_quotes (
   expires_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS destination_postal_code TEXT;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS service_id INTEGER;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS carrier TEXT;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS service_name TEXT;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS price NUMERIC(10, 2) NOT NULL DEFAULT 0.00;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS delivery_time INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS cart_hash TEXT;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+ALTER TABLE public.shipping_quotes ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
 -- =========================================================================
 -- 16. STORE BANNERS & CAMPAIGNS
@@ -642,6 +701,18 @@ CREATE TABLE IF NOT EXISTS public.shipment_events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS tracking_code TEXT;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS carrier TEXT;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS service TEXT;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS provider_event_id TEXT;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS event_status TEXT;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS event_description TEXT;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS event_location TEXT;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS event_timestamp TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'melhor_envio';
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS raw_payload JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.shipment_events ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
 -- =========================================================================
 -- 20. WEBHOOK EVENTS (IDEMPOTENCY LEDGER)
 -- =========================================================================
@@ -711,6 +782,15 @@ CREATE TABLE IF NOT EXISTS public.admin_audit_logs (
   ip_address TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS user_id TEXT;
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS user_email TEXT;
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS action TEXT;
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS entity_type TEXT;
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS entity_id TEXT;
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS details JSONB DEFAULT '{}'::jsonb;
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS ip_address TEXT;
+ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
 -- =========================================================================
 -- INDEXES FOR HIGH-TRAFFIC RELATIONAL QUERIES
