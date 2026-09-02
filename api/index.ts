@@ -6647,14 +6647,18 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
       return res.status(400).json({ error: 'O pedido deve conter pelo menos um item válido.' });
     }
 
-    // 1. Authenticate user if token exists
+    // 1. Authenticate user strictly from verified session (Never trust body.userId)
     const token = extractToken(req);
     let authUser: any = null;
     if (token) {
       const verified = await verifyAuthToken(token);
-      if (verified) {
+      if (verified && verified.userId) {
         authUser = await db.getUserById(verified.userId);
       }
+    }
+
+    if (!authUser) {
+      return res.status(401).json({ error: 'É necessário estar autenticado com uma sessão válida para realizar pedidos.' });
     }
 
     // 2. Validate all items against database products
@@ -6711,15 +6715,47 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
       }
     }
 
-    const validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
-    const calculatedTotal = Math.max(0, authoritativeSubtotal - authoritativeDiscount + validatedShippingFee);
+    // 4. Validate shipping fee against server-authoritative shipping_quotes table
+    let validatedShippingFee = 0;
+    const requestedQuoteId = body.shippingQuoteId || body.shippingOption?.quoteId || body.shippingOption?.id;
+    const isFreeShipping = authoritativeSubtotal >= 299.90;
+
+    if (isFreeShipping) {
+      validatedShippingFee = 0;
+    } else if (requestedQuoteId) {
+      try {
+        const adminClient = await db.getSupabaseAdminClient();
+        if (adminClient) {
+          const { data: quoteData } = await adminClient
+            .from('shipping_quotes')
+            .select('*')
+            .eq('id', requestedQuoteId)
+            .gte('expires_at', new Date().toISOString())
+            .maybeSingle();
+
+          if (quoteData && typeof quoteData.price === 'number') {
+            validatedShippingFee = Number(quoteData.price.toFixed(2));
+          } else {
+            validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
+          }
+        } else {
+          validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
+        }
+      } catch {
+        validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
+      }
+    } else {
+      validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
+    }
+
+    const calculatedTotal = Math.max(0, Number((authoritativeSubtotal - authoritativeDiscount + validatedShippingFee).toFixed(2)));
 
     const now = new Date();
     const orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
 
     const newOrder: Order = {
       id: orderId,
-      userId: authUser?.id || body.userId || undefined,
+      userId: authUser.id,
       customerName: sanitizeInput(body.customerName) || authUser?.name || 'Cliente Marmot',
       customerEmail: sanitizeInput(body.customerEmail || authUser?.email || '').toLowerCase(),
       customerPhone: sanitizeInput(body.customerPhone || (authUser as any)?.phone || ''),
@@ -7191,8 +7227,10 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
         const days = parseInt(item.custom_delivery_time || item.delivery_time || 0, 10);
         const deliveryDaysText = days === 1 ? '1 dia útil' : days > 1 ? `${days} dias úteis` : 'A consultar';
 
+        const quoteId = `sq_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
         return {
           id: String(item.id || item.name).toLowerCase().replace(/\s+/g, '-'),
+          quoteId,
           serviceId: item.id,
           companyId: item.company?.id ? Number(item.company.id) : undefined,
           name: serviceName,
@@ -7218,21 +7256,29 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
         if (adminClient) {
           const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
           const cartHash = cleanCep + '_' + (shippingProducts || []).map((i: any) => `${i.id}:${i.quantity || 1}`).sort().join('_');
-          const quoteInserts = rawApiQuotes.map((q) => ({
-            user_id: (req as any).user?.id || null,
-            destination_postal_code: cleanCep,
-            service_id: q.serviceId && !isNaN(parseInt(String(q.serviceId), 10)) ? parseInt(String(q.serviceId), 10) : 1,
-            carrier: q.carrier,
-            service_name: q.name,
-            price: q.price,
-            delivery_time: q.deliveryTime || 1,
-            cart_hash: cartHash,
-            expires_at: expiresAt,
-          }));
-          await adminClient.from('shipping_quotes').insert(quoteInserts);
+          const quoteInserts = rawApiQuotes
+            .filter((q) => q.serviceId !== undefined && q.serviceId !== null)
+            .map((q) => ({
+              id: (q as any).quoteId,
+              user_id: (req as any).user?.id || null,
+              destination_postal_code: cleanCep,
+              service_id: typeof q.serviceId === 'number' ? q.serviceId : parseInt(String(q.serviceId), 10) || 0,
+              carrier: q.carrier,
+              service_name: q.name,
+              price: q.price,
+              delivery_time: q.deliveryTime || 1,
+              cart_hash: cartHash,
+              expires_at: expiresAt,
+            }));
+          if (quoteInserts.length > 0) {
+            const { error: sqInsertErr } = await adminClient.from('shipping_quotes').insert(quoteInserts);
+            if (sqInsertErr) {
+              console.warn('[SHIPPING_QUOTES_INSERT_WARN]', sqInsertErr.message);
+            }
+          }
         }
       } catch (sqErr: any) {
-        // Safe notice
+        console.warn('[SHIPPING_QUOTES_PERSIST_ERROR]', sqErr.message);
       }
     }
 
@@ -7419,9 +7465,42 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       }
     }
 
-    // 4. Validate shipping fee
-    const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
-    const validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
+    // 4. Validate shipping fee (Server-authoritative via shipping_quotes table)
+    let validatedShippingFee = 0;
+    const requestedQuoteId = req.body?.shippingQuoteId || req.body?.shippingOption?.quoteId || req.body?.shippingOption?.id;
+    const isFreeShipping = subtotal >= 299.90;
+
+    if (isFreeShipping) {
+      validatedShippingFee = 0;
+    } else if (requestedQuoteId) {
+      try {
+        const adminClient = await db.getSupabaseAdminClient();
+        if (adminClient) {
+          const { data: quoteData } = await adminClient
+            .from('shipping_quotes')
+            .select('*')
+            .eq('id', requestedQuoteId)
+            .gte('expires_at', new Date().toISOString())
+            .maybeSingle();
+
+          if (quoteData && typeof quoteData.price === 'number') {
+            validatedShippingFee = Number(quoteData.price.toFixed(2));
+          } else {
+            const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
+            validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
+          }
+        } else {
+          const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
+          validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
+        }
+      } catch {
+        const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
+        validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
+      }
+    } else {
+      const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
+      validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
+    }
 
     // 5. Calculate official total
     const total = Math.max(0, Number((subtotal - discount + validatedShippingFee).toFixed(2)));

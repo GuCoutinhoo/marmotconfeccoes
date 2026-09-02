@@ -693,15 +693,7 @@ ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS status TEXT NOT NULL
 ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS raw_payload JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
--- Safely clean duplicate payment_effects per order_id before adding unique index
-DELETE FROM public.payment_effects a
-WHERE a.ctid <> (
-  SELECT min(b.ctid)
-  FROM public.payment_effects b
-  WHERE a.order_id = b.order_id
-);
-
--- Ensure UNIQUE(order_id) and UNIQUE(gateway, payment_id) indexes exist
+-- Ensure UNIQUE(order_id) and UNIQUE(gateway, payment_id) indexes exist without destructive deletions
 CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_effects_order_id ON public.payment_effects(order_id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_effects_gateway_payment ON public.payment_effects(gateway, payment_id);
 
