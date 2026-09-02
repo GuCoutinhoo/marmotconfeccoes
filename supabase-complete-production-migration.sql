@@ -1534,27 +1534,68 @@ CREATE POLICY "Returns insert backend only" ON public.returns FOR INSERT WITH CH
 DROP POLICY IF EXISTS "Returns write restricted to admin" ON public.returns;
 CREATE POLICY "Returns write restricted to admin" ON public.returns FOR UPDATE USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 
--- Product Reviews RLS
+-- Product Reviews RLS (Fail-Closed, Service-Role Insert Only)
 DROP POLICY IF EXISTS "Reviews are publicly readable" ON public.product_reviews;
-CREATE POLICY "Reviews are publicly readable" ON public.product_reviews FOR SELECT USING (status = 'approved' OR public.is_admin() OR (select auth.uid())::text = user_id::text);
+DROP POLICY IF EXISTS "Reviews viewable by everyone" ON public.product_reviews;
+DROP POLICY IF EXISTS "Published reviews readable by everyone" ON public.product_reviews;
+DROP POLICY IF EXISTS "reviews_select_public" ON public.product_reviews;
+DROP POLICY IF EXISTS "reviews_select_policy" ON public.product_reviews;
+CREATE POLICY "reviews_select_policy" ON public.product_reviews FOR SELECT USING (
+  status IN ('approved', 'published') 
+  OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin' 
+  OR auth.role() = 'service_role' 
+  OR (auth.uid() IS NOT NULL AND user_id::text = auth.uid()::text)
+);
+
 DROP POLICY IF EXISTS "Reviews insert allowed for authenticated" ON public.product_reviews;
-CREATE POLICY "Reviews insert allowed for authenticated" ON public.product_reviews FOR INSERT WITH CHECK ((select auth.uid()) IS NOT NULL OR public.is_admin() OR auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Users can insert reviews" ON public.product_reviews;
+DROP POLICY IF EXISTS "reviews_insert_authenticated" ON public.product_reviews;
+DROP POLICY IF EXISTS "Reviews insertable by authenticated users" ON public.product_reviews;
+DROP POLICY IF EXISTS "Reviews insert allowed" ON public.product_reviews;
+DROP POLICY IF EXISTS "reviews_insert_service_role_only" ON public.product_reviews;
+CREATE POLICY "reviews_insert_service_role_only" ON public.product_reviews FOR INSERT WITH CHECK (
+  auth.role() = 'service_role' 
+  OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+);
+
 DROP POLICY IF EXISTS "Reviews admin manage" ON public.product_reviews;
-CREATE POLICY "Reviews admin manage" ON public.product_reviews FOR ALL USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+DROP POLICY IF EXISTS "Reviews moderation restricted to admin" ON public.product_reviews;
+DROP POLICY IF EXISTS "Reviews manageable by admin" ON public.product_reviews;
+DROP POLICY IF EXISTS "reviews_manage_admin_service_only" ON public.product_reviews;
+CREATE POLICY "reviews_manage_admin_service_only" ON public.product_reviews FOR ALL USING (
+  auth.role() = 'service_role' 
+  OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+) WITH CHECK (
+  auth.role() = 'service_role' 
+  OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+);
 
 -- Newsletter Subscribers RLS
 DROP POLICY IF EXISTS "Newsletter insert allowed for public" ON public.newsletter_subscribers;
 CREATE POLICY "Newsletter insert allowed for public" ON public.newsletter_subscribers FOR INSERT WITH CHECK (true);
 DROP POLICY IF EXISTS "Newsletter admin read" ON public.newsletter_subscribers;
-CREATE POLICY "Newsletter admin read" ON public.newsletter_subscribers FOR SELECT USING (public.is_admin() OR auth.role() = 'service_role');
+CREATE POLICY "Newsletter admin read" ON public.newsletter_subscribers FOR SELECT USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin' OR auth.role() = 'service_role');
 DROP POLICY IF EXISTS "Newsletter admin manage" ON public.newsletter_subscribers;
-CREATE POLICY "Newsletter admin manage" ON public.newsletter_subscribers FOR ALL USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+CREATE POLICY "Newsletter admin manage" ON public.newsletter_subscribers FOR ALL USING ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin' OR auth.role() = 'service_role') WITH CHECK ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin' OR auth.role() = 'service_role');
 
--- Shipping Quotes RLS
+-- Shipping Quotes RLS (Fail-Closed, Backend Authoritative Writes)
 DROP POLICY IF EXISTS "Shipping quotes read" ON public.shipping_quotes;
-CREATE POLICY "Shipping quotes read" ON public.shipping_quotes FOR SELECT USING (user_id::text = (select auth.uid())::text OR public.is_admin() OR auth.role() = 'service_role');
+DROP POLICY IF EXISTS "shipping_quotes_select_policy" ON public.shipping_quotes;
+CREATE POLICY "shipping_quotes_select_policy" ON public.shipping_quotes FOR SELECT USING (
+  auth.role() = 'service_role' 
+  OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin' 
+  OR (auth.uid() IS NOT NULL AND user_id::text = auth.uid()::text)
+);
+
 DROP POLICY IF EXISTS "Shipping quotes write" ON public.shipping_quotes;
-CREATE POLICY "Shipping quotes write" ON public.shipping_quotes FOR ALL USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+DROP POLICY IF EXISTS "shipping_quotes_write_policy" ON public.shipping_quotes;
+CREATE POLICY "shipping_quotes_write_policy" ON public.shipping_quotes FOR ALL USING (
+  auth.role() = 'service_role' 
+  OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+) WITH CHECK (
+  auth.role() = 'service_role' 
+  OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+);
 
 -- Ledger and Audit Tables RLS (Backend Service & Admin Only)
 DROP POLICY IF EXISTS "Payment effects admin only" ON public.payment_effects;

@@ -476,9 +476,15 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           items: payloadItems,
         };
 
+        const activeAuthToken = token || localStorage.getItem('@marmot_auth_token') || localStorage.getItem('supabase.auth.token');
+        const reqHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (activeAuthToken) {
+          reqHeaders['Authorization'] = `Bearer ${activeAuthToken}`;
+        }
+
         const response = await fetch('/api/shipping/calculate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: reqHeaders,
           body: JSON.stringify(requestBody),
           signal: currentController.signal,
         });
@@ -489,6 +495,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setSelectedShippingState(null);
           setShippingOptions([]);
           setShippingStatus('error');
+          if (response.status === 401) {
+            const errorMsg = 'Faça login na sua conta para calcular o frete e emitir a cotação oficial.';
+            setShippingError(errorMsg);
+            throw new Error(errorMsg);
+          }
           const errorMsg = data.message || data.error || `Não foi possível calcular o frete (Erro ${response.status}).`;
           throw new Error(errorMsg);
         }

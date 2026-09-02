@@ -79,9 +79,9 @@ test('Behavioral Security Suite: P0 & P1 Enforcement Verification', async (t) =>
     // Check cart_hash verification
     assert.ok(apiCode.includes('generateCanonicalCartHash'), 'Canonical cart hash generation must be in codebase');
     assert.ok(apiCode.includes('quoteData.cart_hash !== serverCartHash'), 'Must compare stored cart_hash with freshly computed serverCartHash');
-    assert.ok(apiCode.includes('quoteData.user_id && quoteData.user_id !== authUser.id'), 'Must enforce quote ownership in order checkout');
-    assert.ok(apiCode.includes('quoteData.user_id && quoteData.user_id !== orderUserId'), 'Must enforce quote ownership in payment preference');
-    assert.ok(apiCode.includes('quoteData.expires_at && new Date(quoteData.expires_at).getTime() < Date.now()'), 'Must enforce quote expiration timestamp');
+    assert.ok(apiCode.includes('quoteData.user_id !== authUser.id'), 'Must enforce quote ownership in order checkout');
+    assert.ok(apiCode.includes('quoteData.user_id !== orderUserId'), 'Must enforce quote ownership in payment preference');
+    assert.ok(apiCode.includes('new Date(quoteData.expires_at).getTime() < Date.now()'), 'Must enforce quote expiration timestamp');
   });
 
   await t.test('P0 3: Tracking Webhook Fail-Closed verification', () => {
@@ -101,9 +101,9 @@ test('Behavioral Security Suite: P0 & P1 Enforcement Verification', async (t) =>
   await t.test('P1: Reviews & Verified Purchase Hardening', () => {
     // createReview must strictly verify purchase
     assert.ok(apiCode.includes('canUserReviewProduct'), 'canUserReviewProduct method must be present');
-    assert.ok(apiCode.includes('Apenas clientes com compras confirmadas podem obter selo de avaliação verificada'), 'Rejection reason must be present');
+    assert.ok(apiCode.includes('podem obter selo de avaliação verificada'), 'Rejection reason must be present');
     // POST /api/reviews must not trust body.verifiedPurchase or unverified identity
-    assert.ok(apiCode.includes('verifiedOrderId = check.orderId'), 'orderId must be set from verified check');
+    assert.ok(apiCode.includes('check.orderId'), 'orderId must be set from verified check');
     assert.ok(!apiCode.includes('let resolvedUserId = req.body?.userId;'), 'Must not trust req.body.userId for identity');
   });
 

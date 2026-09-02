@@ -275,9 +275,15 @@ export const AdminShippingTab: React.FC = () => {
     setTestSource('');
 
     try {
+      const token = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('supabase.auth.token');
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       const res = await fetch('/api/shipping/calculate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           destinationPostalCode: cleanCep,
           items: [{ productId: 'sample_product', quantity: 1 }],

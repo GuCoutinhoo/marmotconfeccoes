@@ -155,9 +155,15 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
 
       console.log('[SHIPPING CALCULATOR COMPONENT] 3. Disparando POST /api/shipping/calculate com itens:', calculationItems);
 
+      const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('supabase.auth.token');
+      const reqHeaders: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (authToken) {
+        reqHeaders['Authorization'] = `Bearer ${authToken}`;
+      }
+
       const response = await fetch('/api/shipping/calculate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: reqHeaders,
         body: JSON.stringify({
           cep: cleanCep,
           postalCode: cleanCep,
@@ -172,6 +178,9 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
       console.log('[SHIPPING CALCULATOR COMPONENT] 5. Resposta JSON:', data);
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Entre na sua conta para calcular o frete e emitir a cotação oficial.');
+        }
         const errMsg = data.message || data.error || `Erro HTTP ${response.status} ao calcular frete no servidor.`;
         throw new Error(errMsg);
       }
