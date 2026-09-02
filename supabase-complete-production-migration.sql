@@ -796,6 +796,19 @@ ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS ip_address TEXT;
 ALTER TABLE public.admin_audit_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
 -- =========================================================================
+-- 23. SCHEMA MIGRATIONS VERSIONING
+-- =========================================================================
+CREATE TABLE IF NOT EXISTS public.schema_migrations (
+  version TEXT PRIMARY KEY,
+  applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  description TEXT
+);
+
+INSERT INTO public.schema_migrations (version, description)
+VALUES ('20260901_p0_production_hardening_v4', 'Marmot Confecções P0/P1 Production Hardening, Fail-Closed Shipping, RLS & Financial Ledger Serialization')
+ON CONFLICT (version) DO UPDATE SET applied_at = NOW();
+
+-- =========================================================================
 -- INDEXES FOR HIGH-TRAFFIC RELATIONAL QUERIES
 -- =========================================================================
 CREATE INDEX IF NOT EXISTS idx_products_category ON public.products(category);
@@ -825,6 +838,9 @@ CREATE INDEX IF NOT EXISTS idx_shipment_events_order ON public.shipment_events(o
 CREATE INDEX IF NOT EXISTS idx_shipment_ops_order ON public.shipment_operations(order_id);
 CREATE INDEX IF NOT EXISTS idx_payment_effects_order ON public.payment_effects(order_id);
 CREATE INDEX IF NOT EXISTS idx_return_effects_return ON public.return_inventory_effects(return_id);
+CREATE INDEX IF NOT EXISTS idx_return_effects_order ON public.return_inventory_effects(order_id);
+CREATE INDEX IF NOT EXISTS idx_return_effects_product ON public.return_inventory_effects(product_id);
+CREATE INDEX IF NOT EXISTS idx_campaigns_status ON public.campaign_records(status);
 CREATE INDEX IF NOT EXISTS idx_email_logs_status ON public.email_logs(status);
 CREATE INDEX IF NOT EXISTS idx_shipping_quotes_user_hash ON public.shipping_quotes(user_id, cart_hash);
 
@@ -1052,28 +1068,10 @@ BEGIN
     );
   END IF;
 
-  -- 4. Ensure order_items are present; if empty, populate from p_items or v_order.items
+  -- 4. Ensure order_items are present in database (Canonical Source of Truth)
   SELECT COUNT(*) INTO v_items_count FROM public.order_items WHERE order_id = p_order_id;
   IF v_items_count = 0 THEN
-    IF p_items IS NOT NULL AND jsonb_typeof(p_items) = 'array' AND jsonb_array_length(p_items) > 0 THEN
-      INSERT INTO public.order_items (
-        id, order_id, product_id, product_name, sku, size, color, quantity, unit_price, line_total, image
-      )
-      SELECT
-        COALESCE(elem->>'id', p_order_id || '-' || COALESCE(elem->>'productId', elem->>'product_id', elem->>'id') || '-' || COALESCE(elem->>'size', 'M') || '-' || COALESCE(elem->>'color', elem->>'colorName', 'padrao')),
-        p_order_id,
-        COALESCE(elem->>'productId', elem->>'product_id', elem->>'id', 'unknown'),
-        COALESCE(elem->>'title', elem->>'product_name', elem->>'name', 'Produto Marmot'),
-        elem->>'sku',
-        COALESCE(elem->>'size', 'M'),
-        COALESCE(elem->>'color', elem->>'colorName', 'Padrão'),
-        GREATEST(1, COALESCE((elem->>'quantity')::integer, 1)),
-        COALESCE((elem->>'price')::numeric, (elem->>'unit_price')::numeric, 0.00),
-        COALESCE((elem->>'subtotal')::numeric, (elem->>'line_total')::numeric, (COALESCE((elem->>'price')::numeric, (elem->>'unit_price')::numeric, 0.00) * GREATEST(1, COALESCE((elem->>'quantity')::integer, 1)))),
-        COALESCE(elem->>'image', elem->>'image_snapshot')
-      FROM jsonb_array_elements(p_items) AS elem
-      ON CONFLICT (id) DO NOTHING;
-    ELSIF v_order.items IS NOT NULL AND jsonb_typeof(v_order.items) = 'array' AND jsonb_array_length(v_order.items) > 0 THEN
+    IF v_order.items IS NOT NULL AND jsonb_typeof(v_order.items) = 'array' AND jsonb_array_length(v_order.items) > 0 THEN
       INSERT INTO public.order_items (
         id, order_id, product_id, product_name, sku, size, color, quantity, unit_price, line_total, image
       )
@@ -1097,12 +1095,12 @@ BEGIN
     SELECT COUNT(*) INTO v_items_count FROM public.order_items WHERE order_id = p_order_id;
   END IF;
 
-  -- If still 0 items, fail closed
+  -- If still 0 items, fail closed (never trust unverified external lists)
   IF v_items_count = 0 THEN
     RETURN jsonb_build_object(
       'success', false,
       'already_processed', false,
-      'error', 'INVALID_ORDER_ITEMS: Pedido não possui itens registrados em order_items.'
+      'error', 'INVALID_ORDER_ITEMS: Pedido não possui itens canônicos registrados no banco de dados.'
     );
   END IF;
 
@@ -1593,6 +1591,12 @@ CREATE POLICY "Email logs admin only" ON public.email_logs FOR ALL USING (public
 
 DROP POLICY IF EXISTS "Admin audit logs admin only" ON public.admin_audit_logs;
 CREATE POLICY "Admin audit logs admin only" ON public.admin_audit_logs FOR ALL USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Return inventory effects admin only" ON public.return_inventory_effects;
+CREATE POLICY "Return inventory effects admin only" ON public.return_inventory_effects FOR ALL USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
+
+DROP POLICY IF EXISTS "Campaign records admin only" ON public.campaign_records;
+CREATE POLICY "Campaign records admin only" ON public.campaign_records FOR ALL USING (public.is_admin() OR auth.role() = 'service_role') WITH CHECK (public.is_admin() OR auth.role() = 'service_role');
 
 -- =========================================================================
 -- STORAGE BUCKET SETUP & SECURITY POLICIES
