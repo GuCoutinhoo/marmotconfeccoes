@@ -493,8 +493,8 @@ CREATE TABLE IF NOT EXISTS public.store_settings (
   support_phone TEXT DEFAULT '(11) 99999-9999',
   whatsapp TEXT DEFAULT '(11) 99999-9999',
   instagram TEXT DEFAULT '@marmotconfeccoes',
-  free_shipping_threshold NUMERIC(10, 2) NOT NULL DEFAULT 299.00 CHECK (free_shipping_threshold >= 0),
-  announcement_bar_text TEXT DEFAULT 'FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 299 | PARCELAMENTO EM ATÉ 12X',
+  free_shipping_threshold NUMERIC(10, 2) NOT NULL DEFAULT 399.00 CHECK (free_shipping_threshold >= 0),
+  announcement_bar_text TEXT DEFAULT 'FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 399 | PARCELAMENTO EM ATÉ 12X',
   announcement_bar_active BOOLEAN DEFAULT TRUE,
   maintenance_mode BOOLEAN DEFAULT FALSE,
   default_postal_code TEXT DEFAULT '01001-000',
@@ -507,8 +507,8 @@ ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS contact_email TEXT NO
 ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS support_phone TEXT DEFAULT '(11) 99999-9999';
 ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS whatsapp TEXT DEFAULT '(11) 99999-9999';
 ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS instagram TEXT DEFAULT '@marmotconfeccoes';
-ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS free_shipping_threshold NUMERIC(10, 2) NOT NULL DEFAULT 299.00;
-ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS announcement_bar_text TEXT DEFAULT 'FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 299 | PARCELAMENTO EM ATÉ 12X';
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS free_shipping_threshold NUMERIC(10, 2) NOT NULL DEFAULT 399.00;
+ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS announcement_bar_text TEXT DEFAULT 'FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 399 | PARCELAMENTO EM ATÉ 12X';
 ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS announcement_bar_active BOOLEAN DEFAULT TRUE;
 ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS maintenance_mode BOOLEAN DEFAULT FALSE;
 ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS default_postal_code TEXT DEFAULT '01001-000';
@@ -520,10 +520,13 @@ VALUES (
   'default',
   'MARMOT CONFECÇÕES',
   'contato@marmotconfeccoes.com.br',
-  299.00,
-  'FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 299 | PARCELAMENTO EM ATÉ 12X'
+  399.00,
+  'FRETE GRÁTIS EM COMPRAS ACIMA DE R$ 399 | PARCELAMENTO EM ATÉ 12X'
 )
-ON CONFLICT (id) DO UPDATE SET updated_at = NOW();
+ON CONFLICT (id) DO UPDATE SET 
+  free_shipping_threshold = EXCLUDED.free_shipping_threshold,
+  announcement_bar_text = EXCLUDED.announcement_bar_text,
+  updated_at = NOW();
 
 CREATE TABLE IF NOT EXISTS public.app_settings (
   key TEXT PRIMARY KEY,
@@ -999,23 +1002,7 @@ DECLARE
   v_effect_exists BOOLEAN;
   v_items_count INTEGER;
 BEGIN
-  -- 1. Check if already processed (Idempotency)
-  SELECT EXISTS(
-    SELECT 1 FROM public.payment_effects
-    WHERE (gateway = p_gateway AND payment_id = p_payment_id)
-       OR order_id = p_order_id
-  ) INTO v_effect_exists;
-
-  IF v_effect_exists THEN
-    RETURN jsonb_build_object(
-      'success', true,
-      'already_processed', true,
-      'order_id', p_order_id,
-      'message', 'Pagamento já processado anteriormente com sucesso.'
-    );
-  END IF;
-
-  -- 2. Lock Order row
+  -- 1. Lock Order row first (Serializes all concurrent webhooks for this order)
   SELECT * INTO v_order
   FROM public.orders
   WHERE id = p_order_id
@@ -1023,6 +1010,23 @@ BEGIN
 
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Pedido % não encontrado.', p_order_id;
+  END IF;
+
+  -- 2. Check if already processed (Idempotency inside serialized order lock)
+  SELECT EXISTS(
+    SELECT 1 FROM public.payment_effects
+    WHERE (gateway = p_gateway AND payment_id = p_payment_id)
+       OR order_id = p_order_id
+  ) INTO v_effect_exists;
+
+  IF v_effect_exists OR v_order.payment_status = 'Pago' THEN
+    RETURN jsonb_build_object(
+      'success', true,
+      'already_processed', true,
+      'order_id', p_order_id,
+      'status', v_order.status,
+      'message', 'Pagamento já processado anteriormente com sucesso.'
+    );
   END IF;
 
   -- 3. Validate financial amount (Anti-tampering: exact bidirectional balance within R$ 0.05 tolerance)
@@ -1102,7 +1106,7 @@ BEGIN
     );
   END IF;
 
-  -- 5. Stock Pre-Check Loop (Fail-closed: Prevent overselling and zero clamping)
+  -- 5. Stock Pre-Check Loop (Fail-closed: Prevent overselling, zero clamping, and missing products)
   FOR v_item IN
     SELECT product_id, product_name, quantity
     FROM public.order_items
@@ -1114,7 +1118,15 @@ BEGIN
     WHERE id = v_item.product_id
     FOR UPDATE;
 
-    IF FOUND AND v_cur_stock < v_item.quantity THEN
+    IF NOT FOUND THEN
+      RETURN jsonb_build_object(
+        'success', false,
+        'already_processed', false,
+        'error', format('INVALID_ORDER_ITEM: Produto %s não encontrado no catálogo.', COALESCE(v_item.product_name, v_item.product_id))
+      );
+    END IF;
+
+    IF v_cur_stock < v_item.quantity THEN
       RETURN jsonb_build_object(
         'success', false,
         'already_processed', false,
@@ -1135,20 +1147,22 @@ BEGIN
     WHERE id = v_item.product_id
     FOR UPDATE;
 
-    IF FOUND THEN
-      v_new_stock := v_cur_stock - v_item.quantity;
-
-      UPDATE public.products
-      SET stock_count = v_new_stock,
-          updated_at = NOW()
-      WHERE id = v_item.product_id;
-
-      INSERT INTO public.inventory_movements (
-        product_id, quantity_change, previous_stock, new_stock, reason, order_id
-      ) VALUES (
-        v_item.product_id, -v_item.quantity, v_cur_stock, v_new_stock, 'Venda Aprovada', p_order_id
-      );
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Produto % não encontrado durante dedução de estoque.', v_item.product_id;
     END IF;
+
+    v_new_stock := v_cur_stock - v_item.quantity;
+
+    UPDATE public.products
+    SET stock_count = v_new_stock,
+        updated_at = NOW()
+    WHERE id = v_item.product_id;
+
+    INSERT INTO public.inventory_movements (
+      product_id, quantity_change, previous_stock, new_stock, reason, order_id
+    ) VALUES (
+      v_item.product_id, -v_item.quantity, v_cur_stock, v_new_stock, 'Venda Aprovada', p_order_id
+    );
   END LOOP;
 
   -- 7. Record Financial Ledger Effect (Single Source of Truth)
@@ -1405,6 +1419,7 @@ DROP POLICY IF EXISTS "Orders insert allowed for anyone" ON public.orders;
 DROP POLICY IF EXISTS "Orders can be created by authenticated users" ON public.orders;
 DROP POLICY IF EXISTS "Users can insert their own orders" ON public.orders;
 
+DROP POLICY IF EXISTS "Order items insert allowed" ON public.order_items;
 DROP POLICY IF EXISTS "Order items insert allowed for checkout" ON public.order_items;
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.order_items;
 DROP POLICY IF EXISTS "Allow anonymous insert order_items" ON public.order_items;
@@ -1415,6 +1430,7 @@ DROP POLICY IF EXISTS "Allow all" ON public.order_items;
 DROP POLICY IF EXISTS "Public insert order_items" ON public.order_items;
 DROP POLICY IF EXISTS "Order items can be created by authenticated users" ON public.order_items;
 
+DROP POLICY IF EXISTS "Returns insert allowed" ON public.returns;
 DROP POLICY IF EXISTS "Returns insert allowed for customer" ON public.returns;
 DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.returns;
 DROP POLICY IF EXISTS "Allow anonymous insert returns" ON public.returns;

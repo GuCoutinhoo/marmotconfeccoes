@@ -6715,37 +6715,40 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
       }
     }
 
-    // 4. Validate shipping fee against server-authoritative shipping_quotes table
+    // 4. Validate shipping fee against server-authoritative shipping_quotes table (Fail-Closed)
     let validatedShippingFee = 0;
     const requestedQuoteId = body.shippingQuoteId || body.shippingOption?.quoteId || body.shippingOption?.id;
-    const isFreeShipping = authoritativeSubtotal >= 299.90;
+    const isFreeShipping = authoritativeSubtotal >= 399.00;
 
     if (isFreeShipping) {
       validatedShippingFee = 0;
-    } else if (requestedQuoteId) {
-      try {
-        const adminClient = await db.getSupabaseAdminClient();
-        if (adminClient) {
-          const { data: quoteData } = await adminClient
-            .from('shipping_quotes')
-            .select('*')
-            .eq('id', requestedQuoteId)
-            .gte('expires_at', new Date().toISOString())
-            .maybeSingle();
-
-          if (quoteData && typeof quoteData.price === 'number') {
-            validatedShippingFee = Number(quoteData.price.toFixed(2));
-          } else {
-            validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
-          }
-        } else {
-          validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
-        }
-      } catch {
-        validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
-      }
     } else {
-      validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0);
+      if (!requestedQuoteId) {
+        return res.status(400).json({ error: 'Cotação de frete obrigatória para pedidos com subtotal inferior a R$ 399,00. Por favor, calcule o frete para prosseguir.' });
+      }
+
+      const adminClient = await db.getSupabaseAdminClient();
+      if (!adminClient) {
+        return res.status(503).json({ error: 'Serviço de validação de frete indisponível temporariamente.' });
+      }
+
+      const { data: quoteData, error: qErr } = await adminClient
+        .from('shipping_quotes')
+        .select('*')
+        .eq('id', requestedQuoteId)
+        .gte('expires_at', new Date().toISOString())
+        .maybeSingle();
+
+      if (qErr || !quoteData || typeof quoteData.price !== 'number') {
+        return res.status(400).json({ error: 'Cotação de frete inválida ou expirada. Por favor, recalcule o frete para continuar.' });
+      }
+
+      const cleanDestCep = String(body.shippingAddress?.postalCode || body.shippingAddress?.cep || '').replace(/\D/g, '');
+      if (quoteData.destination_postal_code && cleanDestCep && quoteData.destination_postal_code !== cleanDestCep) {
+        return res.status(400).json({ error: 'A cotação de frete não corresponde ao CEP de entrega informado.' });
+      }
+
+      validatedShippingFee = Number(quoteData.price.toFixed(2));
     }
 
     const calculatedTotal = Math.max(0, Number((authoritativeSubtotal - authoritativeDiscount + validatedShippingFee).toFixed(2)));
@@ -6987,27 +6990,37 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
     }> = [];
 
     for (const item of rawItemsList) {
-      const prodId = String(item.productId || item.id || '');
-      const dbProduct = prodId ? await db.getProductById(prodId) : null;
+      const prodId = String(item.productId || item.id || '').trim();
+      if (!prodId) {
+        return res.status(400).json({
+          success: false,
+          error: 'INVALID_PRODUCT_ID',
+          message: 'Identificador do produto ausente para cálculo de frete.',
+          quotes: [],
+          options: [],
+        });
+      }
 
-      const rawWeight = item.weight !== undefined && item.weight !== null && String(item.weight).trim() !== '' 
-        ? parseFloat(String(item.weight).replace(',', '.'))
-        : (dbProduct?.weight !== undefined ? Number(dbProduct.weight) : NaN);
+      const dbProduct = await db.getProductById(prodId);
+      if (!dbProduct) {
+        return res.status(400).json({
+          success: false,
+          error: 'PRODUCT_NOT_FOUND',
+          message: `Produto "${prodId}" não foi encontrado no catálogo oficial.`,
+          quotes: [],
+          options: [],
+        });
+      }
 
-      const rawHeight = item.height !== undefined && item.height !== null && String(item.height).trim() !== '' 
-        ? parseFloat(String(item.height).replace(',', '.'))
-        : (dbProduct?.height !== undefined ? Number(dbProduct.height) : NaN);
-
-      const rawWidth = item.width !== undefined && item.width !== null && String(item.width).trim() !== '' 
-        ? parseFloat(String(item.width).replace(',', '.'))
-        : (dbProduct?.width !== undefined ? Number(dbProduct.width) : NaN);
-
-      const rawLength = item.length !== undefined && item.length !== null && String(item.length).trim() !== '' 
-        ? parseFloat(String(item.length).replace(',', '.'))
-        : (dbProduct?.length !== undefined ? Number(dbProduct.length) : NaN);
+      // Server-authoritative dimensions and weights from official database catalog
+      const rawWeight = Number(dbProduct.weight);
+      const rawHeight = Number(dbProduct.height);
+      const rawWidth = Number(dbProduct.width);
+      const rawLength = Number(dbProduct.length);
 
       const qty = Math.max(1, parseInt(String(item.quantity || 1), 10));
-      const price = Number(item.insurance_value || item.price || dbProduct?.promoPrice || dbProduct?.price || 0);
+      const unitPrice = Number(dbProduct.promoPrice || dbProduct.price || 0);
+      const insuranceValue = Number((unitPrice * qty).toFixed(2));
 
       if (
         !Number.isFinite(rawWeight) || rawWeight <= 0 ||
@@ -7015,9 +7028,9 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
         !Number.isFinite(rawWidth) || rawWidth <= 0 ||
         !Number.isFinite(rawLength) || rawLength <= 0
       ) {
-        console.error('[SHIPPING ERROR] Produto sem peso ou dimensões cadastradas:', {
-          id: prodId || 'desconhecido',
-          title: dbProduct?.title,
+        console.error('[SHIPPING ERROR] Produto sem peso ou dimensões cadastradas no catálogo:', {
+          id: prodId,
+          title: dbProduct.title,
           weight: rawWeight,
           height: rawHeight,
           width: rawWidth,
@@ -7026,20 +7039,20 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], async (req, res) =>
         return res.status(400).json({
           success: false,
           error: 'INVALID_PRODUCT_SPECS',
-          message: `Produto "${dbProduct?.title || prodId || 'Item'}" sem peso ou dimensões cadastradas.`,
+          message: `Produto "${dbProduct.title || prodId}" sem especificações de peso ou dimensões no catálogo.`,
           quotes: [],
           options: [],
         });
       }
 
       const productData = {
-        id: prodId || `prod-${shippingProducts.length + 1}`,
+        id: prodId,
         weight: Number(rawWeight),
         height: Number(rawHeight),
         width: Number(rawWidth),
         length: Number(rawLength),
         quantity: qty,
-        insurance_value: price > 0 ? price : 150,
+        insurance_value: insuranceValue > 0 ? insuranceValue : 150,
       };
 
       console.log('[SHIPPING PRODUCT DATA]', {
@@ -7465,41 +7478,40 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       }
     }
 
-    // 4. Validate shipping fee (Server-authoritative via shipping_quotes table)
+    // 4. Validate shipping fee (Server-authoritative via shipping_quotes table - Fail-Closed)
     let validatedShippingFee = 0;
     const requestedQuoteId = req.body?.shippingQuoteId || req.body?.shippingOption?.quoteId || req.body?.shippingOption?.id;
-    const isFreeShipping = subtotal >= 299.90;
+    const isFreeShipping = subtotal >= 399.00;
 
     if (isFreeShipping) {
       validatedShippingFee = 0;
-    } else if (requestedQuoteId) {
-      try {
-        const adminClient = await db.getSupabaseAdminClient();
-        if (adminClient) {
-          const { data: quoteData } = await adminClient
-            .from('shipping_quotes')
-            .select('*')
-            .eq('id', requestedQuoteId)
-            .gte('expires_at', new Date().toISOString())
-            .maybeSingle();
-
-          if (quoteData && typeof quoteData.price === 'number') {
-            validatedShippingFee = Number(quoteData.price.toFixed(2));
-          } else {
-            const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
-            validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
-          }
-        } else {
-          const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
-          validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
-        }
-      } catch {
-        const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
-        validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
-      }
     } else {
-      const shippingFeeNum = parseFloat(String(reqShippingFee || 0));
-      validatedShippingFee = Number.isFinite(shippingFeeNum) && shippingFeeNum > 0 ? Number(shippingFeeNum.toFixed(2)) : 0;
+      if (!requestedQuoteId) {
+        return res.status(400).json({ error: 'Cotação de frete obrigatória para compras abaixo de R$ 399,00. Por favor, calcule o frete para prosseguir.' });
+      }
+
+      const adminClient = await db.getSupabaseAdminClient();
+      if (!adminClient) {
+        return res.status(503).json({ error: 'Serviço de validação de frete indisponível temporariamente.' });
+      }
+
+      const { data: quoteData, error: qErr } = await adminClient
+        .from('shipping_quotes')
+        .select('*')
+        .eq('id', requestedQuoteId)
+        .gte('expires_at', new Date().toISOString())
+        .maybeSingle();
+
+      if (qErr || !quoteData || typeof quoteData.price !== 'number') {
+        return res.status(400).json({ error: 'Cotação de frete inválida ou expirada. Por favor, recalcule o frete para continuar.' });
+      }
+
+      const cleanDestCep = String(shippingAddress?.postalCode || shippingAddress?.cep || '').replace(/\D/g, '');
+      if (quoteData.destination_postal_code && cleanDestCep && quoteData.destination_postal_code !== cleanDestCep) {
+        return res.status(400).json({ error: 'A cotação de frete não corresponde ao CEP de entrega informado.' });
+      }
+
+      validatedShippingFee = Number(quoteData.price.toFixed(2));
     }
 
     // 5. Calculate official total
@@ -7515,6 +7527,10 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       }
     } else if ((req as any).user?.id) {
       orderUserId = (req as any).user.id;
+    }
+
+    if (!orderUserId) {
+      return res.status(401).json({ error: 'É necessário estar autenticado para gerar a cobrança no Mercado Pago.' });
     }
 
     const requestedOrderId = String(req.body?.orderId || req.body?.order_id || '').trim();
@@ -8781,32 +8797,49 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       });
     }
 
-    const senderDoc = senderDocValidation.digits;
-    const senderPhone = (senderConfig.phone || '11988421092').replace(/\D/g, '');
+    if (!order.shippingAddress?.street || !order.shippingAddress?.city || !order.shippingAddress?.state) {
+      const errMsg = 'Endereço de entrega incompleto no pedido (rua, cidade e UF são obrigatórios).';
+      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+      return res.status(400).json({ error: errMsg, code: 'INCOMPLETE_DEST_ADDRESS', step: 'validation' });
+    }
+
+    if (!senderConfig.street || !senderConfig.city || !senderConfig.state || !senderDocValidation?.valid || !senderDocValidation.digits) {
+      const errMsg = 'Endereço ou documento do remetente incompleto nas configurações de frete.';
+      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+      return res.status(400).json({ error: errMsg, code: 'INCOMPLETE_SENDER_DATA', step: 'validation' });
+    }
+
+    const resolvedServiceId = Number(order.shippingServiceId);
+    if (!resolvedServiceId || isNaN(resolvedServiceId) || resolvedServiceId <= 0) {
+      const errMsg = 'Identificador de serviço de frete (shippingServiceId) ausente no pedido. Não é permitido inferir serviço sem contrato explícito.';
+      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
+      return res.status(400).json({ error: errMsg, code: 'MISSING_SERVICE_ID', step: 'validation' });
+    }
+
+    const senderDocClean = senderDocValidation.digits;
+    const senderPhone = (senderConfig.phone || '').replace(/\D/g, '');
 
     // Construção do payload do remetente sem misturar document e company_document
     const fromPayload: any = {
       name: senderConfig.name || 'Marmot Confecções',
-      phone: senderPhone,
+      phone: senderPhone || '11988421092',
       email: senderConfig.email || appEmail,
-      address: senderConfig.street || 'Avenida Celso Garcia',
-      number: senderConfig.number || '1200',
+      address: senderConfig.street,
+      number: senderConfig.number || 'S/N',
       complement: senderConfig.complement || '',
-      district: senderConfig.neighborhood || 'Brás',
-      city: senderConfig.city || 'São Paulo',
-      state_abbr: (senderConfig.state || 'SP').toUpperCase(),
+      district: senderConfig.neighborhood || 'Centro',
+      city: senderConfig.city,
+      state_abbr: senderConfig.state.toUpperCase(),
       country_id: 'BR',
       postal_code: cleanOrigin,
     };
 
     if (senderDocValidation.type === 'cpf') {
-      fromPayload.document = senderDoc;
+      fromPayload.document = senderDocClean;
     } else {
-      fromPayload.company_document = senderDoc;
+      fromPayload.company_document = senderDocClean;
       fromPayload.state_register = senderConfig.stateRegister || 'ISENTO';
     }
-
-    const resolvedServiceId = Number(order.shippingServiceId) || (order.shippingCarrier?.toLowerCase().includes('jadlog') ? 3 : (order.shippingCarrier?.toLowerCase().includes('sedex') ? 2 : 1));
 
     const cartPayload = {
       service: resolvedServiceId,
@@ -8816,12 +8849,12 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
         phone: (order.customerPhone || (order.shippingAddress as any)?.phone || '11988421092').replace(/\D/g, ''),
         email: order.customerEmail || 'contato@marmot.com.br',
         document: customerCpf,
-        address: order.shippingAddress?.street,
-        number: order.shippingAddress?.number || 'S/N',
-        complement: order.shippingAddress?.complement || '',
-        district: order.shippingAddress?.neighborhood || '',
-        city: order.shippingAddress?.city,
-        state_abbr: (order.shippingAddress?.state || 'SP').toUpperCase(),
+        address: order.shippingAddress.street,
+        number: order.shippingAddress.number || 'S/N',
+        complement: order.shippingAddress.complement || '',
+        district: order.shippingAddress.neighborhood || '',
+        city: order.shippingAddress.city,
+        state_abbr: order.shippingAddress.state.toUpperCase(),
         country_id: 'BR',
         postal_code: cleanDest,
       },
@@ -9068,14 +9101,25 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
       }
     } catch {}
 
+    if (!printUrl) {
+      const errMsg = 'A remessa foi gerada e paga no Melhor Envio, mas a URL de impressão da etiqueta não foi retornada pela transportadora. Tente imprimir novamente pelo painel administrativo.';
+      await db.completeShipmentGeneration(orderId, shipmentId, realTracking || undefined, '', errMsg, 'print_failed');
+      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=print httpStatus=502 errorCode=PRINT_URL_FAILED durationMs: ${Date.now() - startTime}`);
+      return res.status(502).json({
+        error: errMsg,
+        code: 'PRINT_URL_FAILED',
+        step: 'print',
+        shipmentId,
+        trackingCode: realTracking || undefined,
+      });
+    }
+
     // STEP 7: COMPLETE (Finalização com sucesso e persistência)
     order.melhorEnvioShipmentId = shipmentId;
     if (realTracking) {
       order.trackingCode = realTracking;
     }
-    if (printUrl) {
-      order.shippingLabelUrl = printUrl;
-    }
+    order.shippingLabelUrl = printUrl;
     order.shippingStatus = 'Pronto para envio';
     order.status = 'Pronto para Envio';
 
@@ -9286,11 +9330,11 @@ app.get('/api/user/returns', requireAuth, async (req: any, res) => {
   }
 });
 
-app.post('/api/returns', async (req: any, res) => {
+app.post('/api/returns', requireAuth, async (req: any, res) => {
   try {
     const { orderId, customerEmail, customerName, customerPhone, items, reason, description, photos } = req.body;
-    if (!orderId || !customerEmail || !items || !reason) {
-      return res.status(400).json({ error: 'Preencha os campos obrigatórios para solicitar a troca/devolução.' });
+    if (!orderId || !items || !reason) {
+      return res.status(400).json({ error: 'Preencha os campos obrigatórios (orderId, items, reason) para solicitar a troca/devolução.' });
     }
 
     const order = await db.getOrderById(orderId);
@@ -9298,21 +9342,21 @@ app.post('/api/returns', async (req: any, res) => {
       return res.status(404).json({ error: 'Pedido associado não foi encontrado.' });
     }
 
-    if (order.customerEmail?.toLowerCase() !== customerEmail.toLowerCase().trim()) {
-      return res.status(403).json({ error: 'O e-mail informado não corresponde ao e-mail registrado neste pedido.' });
+    const authUser = req.user;
+    if (!authUser || !authUser.id) {
+      return res.status(401).json({ error: 'Autenticação necessária para solicitar troca/devolução.' });
     }
 
-    const token = extractToken(req);
-    let userId: string | undefined;
-    if (token) {
-      const verified = await verifyAuthToken(token);
-      if (verified) {
-        userId = verified.userId;
-        if (order.userId && verified.userId !== order.userId && verified.role !== 'admin') {
-          return res.status(403).json({ error: 'Acesso negado. Você não possui permissão para este pedido.' });
-        }
-      }
+    // Strict ownership validation: must be the order's owner or an admin
+    if (order.userId && order.userId !== authUser.id && authUser.role !== 'admin') {
+      return res.status(403).json({ error: 'Acesso negado. Você não possui permissão para este pedido.' });
     }
+
+    if (order.customerEmail && authUser.email && order.customerEmail.toLowerCase() !== authUser.email.toLowerCase() && authUser.role !== 'admin') {
+      return res.status(403).json({ error: 'O e-mail do usuário autenticado não corresponde ao e-mail registrado neste pedido.' });
+    }
+
+    const userId = authUser.id;
 
     const returnItemsList = Array.isArray(items) ? items : [items];
     if (Array.isArray(order.items) && order.items.length > 0) {
@@ -10645,7 +10689,7 @@ app.get(['/api/cron/tracking-sync', '/api/cron/sync-tracking'], async (req, res)
   }
 });
 
-// --- MELHOR ENVIO & CARRIER WEBHOOKS ---
+// --- MELHOR ENVIO & CARRIER WEBHOOKS (Protected & Verified) ---
 app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhooks/melhorenvio', '/api/webhooks/tracking'], async (req, res) => {
   try {
     const payload = req.body || {};
@@ -10654,22 +10698,67 @@ app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhoo
     const eventDescription = payload.description || payload.message || payload.title || `Status: ${providerStatus}`;
     const location = payload.location ? `${payload.location.city || ''} ${payload.location.state ? `- ${payload.location.state}` : ''}`.trim() : undefined;
 
-    console.log(`[Melhor Envio Webhook]: Tracking/Shipment=${trackingCode}, Status=${providerStatus}`);
-
-    if (trackingCode) {
-      const result = await applyShippingEventToOrder(trackingCode, {
-        rawStatus: providerStatus,
-        description: eventDescription,
-        location,
-        occurredAt: payload.created_at || payload.occurred_at || new Date().toISOString(),
-        source: 'melhor_envio',
-        externalEventId: payload.id ? String(payload.id) : undefined,
-      });
-
-      return res.status(200).json({ success: true, message: result.message, transitionApplied: result.transitionApplied });
+    if (!trackingCode) {
+      return res.status(200).json({ success: true, message: 'Webhook recebido sem identificador de rastreio.' });
     }
 
-    res.status(200).json({ success: true, message: 'Webhook recebido sem identificador de rastreio.' });
+    const webhookSecret = (process.env.MELHOR_ENVIO_WEBHOOK_SECRET || '').trim();
+    const incomingToken = String(req.headers['x-melhor-envio-token'] || req.headers['authorization'] || req.query.token || '').replace(/^Bearer\s+/i, '').trim();
+
+    const isSecretValid = Boolean(webhookSecret && incomingToken === webhookSecret);
+
+    let statusToApply = providerStatus;
+    let descriptionToApply = eventDescription;
+    let occurredAtToApply = payload.created_at || payload.occurred_at || new Date().toISOString();
+    let externalEventIdToApply = payload.id ? String(payload.id) : undefined;
+
+    // If webhook signature is not verified, query the canonical Melhor Envio API directly to eliminate spoofing
+    if (!isSecretValid) {
+      const token = getMelhorEnvioTokenServer();
+      if (token && token.length >= 10) {
+        const baseUrl = 'https://melhorenvio.com.br/api/v2';
+        const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confeccoes';
+        const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
+        const userAgent = `${appName} (${appEmail})`;
+
+        try {
+          const trackRes = await fetch(`${baseUrl}/me/shipment/tracking`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              'User-Agent': userAgent,
+            },
+            body: JSON.stringify({ orders: [trackingCode] }),
+          });
+
+          if (trackRes.ok) {
+            const trackData: any = await trackRes.json();
+            const verifiedInfo = trackData[trackingCode];
+            if (verifiedInfo && verifiedInfo.status) {
+              statusToApply = verifiedInfo.status;
+              descriptionToApply = verifiedInfo.description || verifiedInfo.message || descriptionToApply;
+              occurredAtToApply = verifiedInfo.posted_at || verifiedInfo.delivered_at || occurredAtToApply;
+              externalEventIdToApply = verifiedInfo.id ? String(verifiedInfo.id) : externalEventIdToApply;
+            }
+          }
+        } catch (verErr: any) {
+          console.warn('[Webhook Re-Verification Warning]:', verErr.message);
+        }
+      }
+    }
+
+    const result = await applyShippingEventToOrder(trackingCode, {
+      rawStatus: statusToApply,
+      description: descriptionToApply,
+      location,
+      occurredAt: occurredAtToApply,
+      source: 'melhor_envio',
+      externalEventId: externalEventIdToApply,
+    });
+
+    return res.status(200).json({ success: true, message: result.message, transitionApplied: result.transitionApplied });
   } catch (err: any) {
     console.error('[Melhor Envio Webhook Error]:', err);
     res.status(200).json({ success: false, error: err.message });
