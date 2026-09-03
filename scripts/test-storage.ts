@@ -9,7 +9,7 @@ async function testStorage() {
   console.log('[STORAGE TEST] Logging in as admin...');
   const authRes = await supabase.auth.signInWithPassword({
     email: 'admin@marmot.com',
-    password: 'marmot'
+    password: process.env.ADMIN_PASSWORD || ''
   });
   console.log('[AUTH] Admin login session:', !!authRes.data?.session);
 

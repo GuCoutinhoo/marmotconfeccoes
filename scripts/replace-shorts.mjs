@@ -539,7 +539,7 @@ const SHORTS_DATA = [
 async function run() {
   console.log('=== 1. CONECTANDO AO SUPABASE COMO ADMIN ===');
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
-  const authRes = await sb.auth.signInWithPassword({ email: 'admin@marmot.com', password: 'marmot' });
+  const authRes = await sb.auth.signInWithPassword({ email: 'admin@marmot.com', password: process.env.ADMIN_PASSWORD || '' });
   if (authRes.error || !authRes.data.session) {
     console.error('Falha de autenticação Admin:', authRes.error);
     process.exit(1);

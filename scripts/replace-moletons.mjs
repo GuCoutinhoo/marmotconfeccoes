@@ -281,7 +281,7 @@ async function execute() {
   console.log('=== 1. AUTENTICANDO COMO ADMIN NO SUPABASE ===');
   const { data: authData, error: authErr } = await baseSb.auth.signInWithPassword({
     email: 'admin@marmot.com',
-    password: 'marmot',
+    password: process.env.ADMIN_PASSWORD || '',
   });
 
   if (authErr || !authData.session?.access_token) {

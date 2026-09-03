@@ -1,5 +1,15 @@
 [
   {
+    "id": "log-1788461462685-23nae",
+    "timestamp": "2026-09-03T18:51:02.685Z",
+    "eventType": "ADMIN_UNAUTHORIZED_ACCESS",
+    "email": "cliente@marmot.com",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "ip": "127.0.0.1",
+    "status": "failure",
+    "details": "Tentativa de acesso não autorizada a endpoint administrativo."
+  },
+  {
     "id": "log-1788395740382-bq0ja",
     "timestamp": "2026-09-03T00:35:40.382Z",
     "eventType": "ADMIN_UNAUTHORIZED_ACCESS",

@@ -28,9 +28,9 @@ async function getAuthenticatedClient() {
 
   // Tentar login de admin comum
   const credentialsList = [
-    { email: 'admin@marmot.com', password: 'marmot' },
-    { email: 'admin@marmot.com.br', password: 'marmot' },
-    { email: 'contato@marmotstreetwear.com.br', password: 'marmot' }
+    { email: 'admin@marmot.com', password: process.env.ADMIN_PASSWORD || '' },
+    { email: 'admin@marmot.com.br', password: process.env.ADMIN_PASSWORD || '' },
+    { email: 'contato@marmotstreetwear.com.br', password: process.env.ADMIN_PASSWORD || '' }
   ];
 
   for (const cred of credentialsList) {
