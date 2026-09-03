@@ -65,5 +65,16 @@
     "addresses": [],
     "createdAt": "2026-09-02T23:19:54.800Z",
     "lastLogin": "2026-09-02T23:19:54.800Z"
+  },
+  {
+    "id": "user-hacker-001",
+    "name": "Fake Authenticated User",
+    "email": "hacker@evil.com",
+    "passwordHash": "",
+    "role": "admin",
+    "isVerified": true,
+    "addresses": [],
+    "createdAt": "2026-09-03T00:07:21.427Z",
+    "lastLogin": "2026-09-03T00:07:21.427Z"
   }
 ]

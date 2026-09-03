@@ -1,5 +1,19 @@
 [
   {
+    "id": "rev-1788394042472-k1z6",
+    "productId": "prod-mol-016",
+    "userId": "user-hacker-001",
+    "userName": "Fake Authenticated User",
+    "userEmail": "hacker@evil.com",
+    "rating": 5,
+    "title": "Fake Review",
+    "comment": "Attempting to post review with forged token.",
+    "verifiedPurchase": false,
+    "likes": 0,
+    "status": "published",
+    "createdAt": "2026-09-03T00:07:22.472Z"
+  },
+  {
     "id": "rev-1788391385894-b7ab",
     "productId": "prod-mol-016",
     "userId": "user-alpha-001",

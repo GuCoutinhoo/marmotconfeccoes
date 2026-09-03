@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: Install Dependencies
@@ -30,8 +30,24 @@ jobs:
       - name: Run Test Suite
         run: npm test
 
+      - name: Build Application
+        run: npm run build
+
+      - name: Start Backend Server & Healthcheck
+        run: |
+          nohup node dist/server.cjs > server.log 2>&1 &
+          echo "Waiting for backend server to become healthy on http://localhost:3000/api/health..."
+          for i in $(seq 1 30); do
+            if curl -s -f http://localhost:3000/api/health > /dev/null; then
+              echo "Backend server is healthy!"
+              exit 0
+            fi
+            echo "Waiting for backend... attempt $i"
+            sleep 1
+          done
+          echo "Backend failed to become healthy within 30 seconds. Logs:"
+          cat server.log
+          exit 1
+
       - name: Run Integration Tests
         run: npm run test:integration
-
-      - name: Build Production Assets
-        run: npm run build

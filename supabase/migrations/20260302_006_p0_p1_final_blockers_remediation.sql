@@ -47,6 +47,34 @@ REVOKE ALL ON FUNCTION public.is_admin() FROM anon;
 REVOKE ALL ON FUNCTION public.is_admin() FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.is_admin() TO service_role;
 
+CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
+RETURNS boolean
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF auth.role() = 'service_role' THEN
+    RETURN TRUE;
+  END IF;
+
+  IF user_id IS NULL THEN
+    RETURN FALSE;
+  END IF;
+
+  RETURN EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = user_id AND role = 'admin'
+  );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM PUBLIC;
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM anon;
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO service_role;
+
 -- ------------------------------------------------------------------------------
 -- 2. PRODUCT REVIEWS RLS HARDENING (FAIL-CLOSED, SERVICE_ROLE INSERT ONLY)
 -- ------------------------------------------------------------------------------

@@ -3,7 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
-import jwt from 'jsonwebtoken';
 import { Pool } from 'pg';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
@@ -5759,107 +5758,61 @@ function getAdminEmailList(): string[] {
   return parsed;
 }
 
-// Cryptographic token validation strictly with Supabase Auth (Strict signature enforcement)
+// Cryptographic token validation strictly with Supabase Auth (Strict authority enforcement)
 async function verifyAuthToken(token: string): Promise<{ userId: string; email: string | null; role: string; name: string } | null> {
   if (!token || typeof token !== 'string') return null;
 
-  const adminEmails = getAdminEmailList();
-
-  // 1. If official Supabase JWT secret or local JWT secret is configured, verify signature directly
-  const supabaseJwtSecret = process.env.SUPABASE_JWT_SECRET || process.env.JWT_SECRET || 'marmot-streetwear-super-secret-jwt-key-2026';
-  if (supabaseJwtSecret) {
-    try {
-      const decoded = jwt.verify(token, supabaseJwtSecret) as any;
-      if (decoded && (decoded.sub || decoded.userId)) {
-        const email = decoded.email ? String(decoded.email).toLowerCase().trim() : null;
-        const isOfficialAdmin = Boolean(
-          (email && adminEmails.length > 0 && adminEmails.includes(email)) ||
-          decoded.app_metadata?.role === 'admin'
-        );
-
-        return {
-          userId: String(decoded.sub || decoded.userId),
-          email,
-          role: isOfficialAdmin ? 'admin' : 'customer',
-          name: decoded.name || decoded.user_metadata?.name || decoded.user_metadata?.full_name || email?.split('@')[0] || 'Cliente Marmot',
-        };
-      }
-    } catch {
-      // Signature did not match Supabase JWT secret - proceed to Supabase Auth Server check
-    }
-  }
-
-  // 2. Validate with Supabase Auth Server (Official Supabase Auth Service)
+  // Supabase Auth Server is the sole authoritative authentication provider
   const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.auth.getUser(token);
-      if (!error && data?.user) {
-        const email = data.user.email ? data.user.email.toLowerCase().trim() : null;
-        const appRole = data.user.app_metadata?.role;
-        
-        // Strict role validation: Check profiles table or app_metadata
-        let isDbAdmin = false;
-        let profileRole: string | undefined = undefined;
-
-        try {
-          const { data: profile, error: profErr } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', data.user.id)
-            .maybeSingle();
-
-          if (profile) {
-            profileRole = profile.role;
-            isDbAdmin = profile.role === 'admin';
-          } else if (email) {
-            const { data: emailProfile } = await supabase
-              .from('profiles')
-              .select('role')
-              .eq('email', email)
-              .maybeSingle();
-
-            if (emailProfile) {
-              profileRole = emailProfile.role;
-              isDbAdmin = emailProfile.role === 'admin';
-            }
-          }
-
-          if (profErr) {
-            console.warn('[AUTH] Profile query notice:', profErr.message);
-          }
-        } catch (dbErr) {
-          console.warn('[AUTH] Database check exception:', dbErr);
-        }
-
-        const isOfficialAdmin = Boolean(
-          (email && adminEmails.length > 0 && adminEmails.includes(email)) ||
-          appRole === 'admin' ||
-          isDbAdmin
-        );
-
-        console.log('[AUTH ROLE BACKEND]', {
-          userId: data.user.id,
-          email,
-          appMetadataRole: appRole,
-          profileRole,
-          isOfficialAdmin,
-        });
-
-        return {
-          userId: data.user.id,
-          email,
-          role: isOfficialAdmin ? 'admin' : 'customer',
-          name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email?.split('@')[0] || 'Cliente Marmot',
-        };
-      }
-    } catch {
-      // Supabase verification failed
-    }
+  if (!supabase) {
+    console.error('[AUTH CRITICAL] Supabase client unavailable for token verification.');
+    return null;
   }
 
-  // Tokens without valid cryptographic signatures are strictly rejected (No insecure fallback)
-  return null;
+  try {
+    const { data, error } = await supabase.auth.getUser(token);
+    if (error || !data?.user) {
+      return null;
+    }
+
+    const email = data.user.email ? data.user.email.toLowerCase().trim() : null;
+    const appRole = data.user.app_metadata?.role;
+    
+    // Strict role validation: Check app_metadata or profiles table
+    let isDbAdmin = false;
+    let profileRole: string | undefined = undefined;
+
+    try {
+      const { data: profile, error: profErr } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .maybeSingle();
+
+      if (profile) {
+        profileRole = profile.role;
+        isDbAdmin = profile.role === 'admin';
+      }
+
+      if (profErr) {
+        console.warn('[AUTH] Profile query notice:', profErr.message);
+      }
+    } catch (dbErr) {
+      console.warn('[AUTH] Database check exception:', dbErr);
+    }
+
+    const isOfficialAdmin = Boolean(appRole === 'admin' || isDbAdmin);
+
+    return {
+      userId: data.user.id,
+      email,
+      role: isOfficialAdmin ? 'admin' : 'customer',
+      name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email?.split('@')[0] || 'Cliente Marmot',
+    };
+  } catch (err) {
+    console.error('[AUTH ERROR] Exception verifying token with Supabase Auth:', err);
+    return null;
+  }
 }
 
 async function requireAuth(req: any, res: express.Response, next: express.NextFunction) {
@@ -6856,6 +6809,7 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
 
     // 4. Validate shipping fee against server-authoritative shipping_quotes table (Fail-Closed)
     let validatedShippingFee = 0;
+    let validatedQuoteData: any = null;
     const requestedQuoteId = body.shippingQuoteId || body.shippingOption?.quoteId || body.shippingOption?.id;
     const isFreeShipping = authoritativeSubtotal >= 399.00;
 
@@ -6914,6 +6868,7 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
         }
       }
 
+      validatedQuoteData = quoteData;
       validatedShippingFee = isFreeShipping ? 0 : Number(quoteData.price.toFixed(2));
     } else if (isFreeShipping) {
       validatedShippingFee = 0;
@@ -6966,7 +6921,9 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
       },
       shippingOption: body.shippingOption || { id: 'pac', name: 'PAC - Correios', price: validatedShippingFee, deadline: '5 a 8 dias úteis' },
       shippingFee: validatedShippingFee,
-      shippingServiceId: body.shippingServiceId,
+      shippingServiceId: (validatedQuoteData && validatedQuoteData.service_id !== undefined && validatedQuoteData.service_id !== null)
+        ? String(validatedQuoteData.service_id)
+        : (body.shippingServiceId !== undefined ? String(body.shippingServiceId) : undefined),
       paymentMethod: body.paymentMethod || 'Mercado Pago',
       subtotal: authoritativeSubtotal,
       discount: authoritativeDiscount,
@@ -7754,6 +7711,7 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
 
     // 5. Validate shipping fee (Server-authoritative via shipping_quotes table - Fail-Closed)
     let validatedShippingFee = 0;
+    let preferenceQuoteData: any = null;
     const requestedQuoteId = req.body?.shippingQuoteId || req.body?.shippingOption?.quoteId || req.body?.shippingOption?.id;
     const isFreeShipping = subtotal >= 399.00;
 
@@ -7812,6 +7770,7 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         }
       }
 
+      preferenceQuoteData = quoteData;
       validatedShippingFee = isFreeShipping ? 0 : Number(quoteData.price.toFixed(2));
     } else if (isFreeShipping) {
       validatedShippingFee = 0;
@@ -7885,7 +7844,9 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       },
       shippingCarrier: shippingCarrier || existingOrder?.shippingCarrier || 'Melhor Envio',
       shippingService: shippingService || existingOrder?.shippingService || 'Transportadora Padrão',
-      shippingServiceId: shippingServiceId ? String(shippingServiceId) : existingOrder?.shippingServiceId,
+      shippingServiceId: (preferenceQuoteData && preferenceQuoteData.service_id !== undefined && preferenceQuoteData.service_id !== null)
+        ? String(preferenceQuoteData.service_id)
+        : (shippingServiceId ? String(shippingServiceId) : existingOrder?.shippingServiceId),
       shippingDeliveryTime: shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5,
       estimatedDelivery: `${shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5} a ${(shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5) + 2} dias úteis`,
       trackingCode: existingOrder?.trackingCode || undefined,
