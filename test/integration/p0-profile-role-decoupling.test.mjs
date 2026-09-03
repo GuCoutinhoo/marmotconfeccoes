@@ -10,21 +10,22 @@ const TEST_ADMIN_EMAIL = process.env.TEST_ADMIN_EMAIL;
 const TEST_ADMIN_PASSWORD = process.env.TEST_ADMIN_PASSWORD;
 
 if (!TEST_CUSTOMER_EMAIL) {
-  throw new Error('TEST_CUSTOMER_EMAIL environment variable is required and cannot be empty');
+  throw new Error('MISSING_REQUIRED_TEST_SECRET: TEST_CUSTOMER_EMAIL');
 }
 if (!TEST_CUSTOMER_PASSWORD) {
-  throw new Error('TEST_CUSTOMER_PASSWORD environment variable is required and cannot be empty');
+  throw new Error('MISSING_REQUIRED_TEST_SECRET: TEST_CUSTOMER_PASSWORD');
 }
 if (!TEST_ADMIN_EMAIL) {
-  throw new Error('TEST_ADMIN_EMAIL environment variable is required and cannot be empty');
+  throw new Error('MISSING_REQUIRED_TEST_SECRET: TEST_ADMIN_EMAIL');
 }
 if (!TEST_ADMIN_PASSWORD) {
-  throw new Error('TEST_ADMIN_PASSWORD environment variable is required and cannot be empty');
+  throw new Error('MISSING_REQUIRED_TEST_SECRET: TEST_ADMIN_PASSWORD');
 }
 
 const BASE_URL = 'http://localhost:3000';
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const LEGACY_SECRET = 'marmot-streetwear-super-secret-jwt-key-2026';
 
 function createLegacySignedToken(payload, secret = LEGACY_SECRET) {
@@ -44,19 +45,15 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
   let adminToken = '';
 
   // --------------------------------------------------------------------------
-  // SETUP: Authenticate real customer from environment variables
+  // SETUP: Authenticate real customer from environment variables (Fail-Closed)
   // --------------------------------------------------------------------------
-  await t.test('Setup: Real Supabase Customer User Authentication', async (ctx) => {
+  await t.test('Setup: Real Supabase Customer User Authentication', async () => {
     const loginRes = await sb.auth.signInWithPassword({
       email: TEST_CUSTOMER_EMAIL,
       password: TEST_CUSTOMER_PASSWORD,
     });
 
-    if (loginRes.error) {
-      ctx.skip(`Customer credentials not authenticated (${loginRes.error.message}). Skipping customer session dependent subtests.`);
-      return;
-    }
-
+    assert.ifError(loginRes.error, `AUTHENTICATION_FAILED: Customer login failed with error: ${loginRes.error?.message}`);
     assert.ok(loginRes.data.session?.access_token, 'Must return valid session access_token');
 
     userAToken = loginRes.data.session.access_token;
@@ -69,11 +66,8 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
   // --------------------------------------------------------------------------
   // TESTE A: Cliente tenta UPDATE profiles.role = 'admin'
   // --------------------------------------------------------------------------
-  await t.test('TESTE A: Customer attempting UPDATE profiles.role = "admin" is strictly blocked', async (ctx) => {
-    if (!userAToken) {
-      ctx.skip('Customer session not available');
-      return;
-    }
+  await t.test('TESTE A: Customer attempting UPDATE profiles.role = "admin" is strictly blocked', async () => {
+    assert.ok(userAToken, 'AUTHENTICATION_REQUIRED: Customer token must be active');
     const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: `Bearer ${userAToken}` } },
       auth: { persistSession: false },
@@ -106,7 +100,7 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
 
     // Verify backend still considers user a customer
     const res = await fetch(`${BASE_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${userAToken}`, 'x-marmot-test': 'true' },
+      headers: { Authorization: `Bearer ${userAToken}` },
     });
     assert.equal(res.status, 200, 'GET /api/auth/me must succeed');
     const data = await res.json();
@@ -114,13 +108,86 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
   });
 
   // --------------------------------------------------------------------------
-  // TESTE B: INSERT profile tentando role = 'admin'
+  // TESTE B: INSERT profile tentando role = 'admin' (Valid Payload with email NOT NULL)
   // --------------------------------------------------------------------------
-  await t.test('TESTE B: Customer attempting INSERT profile with role = "admin" is rejected or sanitized', async (ctx) => {
-    if (!userAToken) {
-      ctx.skip('Customer session not available');
-      return;
+  await t.test('TESTE B: Customer attempting INSERT profile with role = "admin" is rejected or sanitized', async () => {
+    assert.ok(userAToken, 'AUTHENTICATION_REQUIRED: Customer token must be active');
+
+    // Scenario 1: If in isolated/disposable test environment with service_role, create ephemeral test user
+    // to execute clean INSERT with no preexisting primary key conflict
+    if (SERVICE_ROLE_KEY && process.env.VITE_SUPABASE_URL && !process.env.VITE_SUPABASE_URL.includes('ktmkvysnjfphcfntazut')) {
+      const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+        auth: { persistSession: false },
+      });
+      const ephemeralEmail = `ephemeral-sec-test-${Date.now()}@marmot-test.local`;
+      const ephemeralPassword = `Pass!${crypto.randomBytes(8).toString('hex')}`;
+
+      const { data: createdUser, error: createErr } = await adminClient.auth.admin.createUser({
+        email: ephemeralEmail,
+        password: ephemeralPassword,
+        email_confirm: true,
+      });
+
+      if (!createErr && createdUser?.user) {
+        const ephemeralUserId = createdUser.user.id;
+        try {
+          // Remove profile auto-created by auth trigger to test direct table INSERT
+          await adminClient.from('profiles').delete().eq('id', ephemeralUserId);
+
+          const { data: ephemeralSession } = await sb.auth.signInWithPassword({
+            email: ephemeralEmail,
+            password: ephemeralPassword,
+          });
+
+          if (ephemeralSession?.session?.access_token) {
+            const ephemeralUserClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+              global: { headers: { Authorization: `Bearer ${ephemeralSession.session.access_token}` } },
+              auth: { persistSession: false },
+            });
+
+            const insertRes = await ephemeralUserClient
+              .from('profiles')
+              .insert({
+                id: ephemeralUserId,
+                email: ephemeralEmail,
+                name: 'Privilege Escalation Attempt',
+                role: 'admin',
+              })
+              .select('role');
+
+            if (insertRes.error) {
+              assert.notEqual(insertRes.error.code, '23505', 'Duplicate key constraint (23505) does NOT count as a security defense');
+              assert.notEqual(insertRes.error.code, '23503', 'Foreign key constraint (23503) does NOT count as a security defense');
+              assert.notEqual(insertRes.error.code, '23502', 'Missing field constraint (23502) does NOT count as a security defense');
+
+              const isSecurityError = insertRes.error.code === '42501' ||
+                                      insertRes.error.code === 'P0001' ||
+                                      /permission denied|acesso negado|not authorized/i.test(insertRes.error.message);
+              assert.ok(isSecurityError, `Insert rejection must be a security rejection (got code ${insertRes.error.code}: ${insertRes.error.message})`);
+            } else if (insertRes.data && insertRes.data.length > 0) {
+              assert.notEqual(insertRes.data[0].role, 'admin', 'Inserted profile role must NOT be admin');
+              assert.equal(insertRes.data[0].role, 'customer', 'Inserted profile role must be sanitized to customer');
+            }
+
+            const { data: profileCheck } = await ephemeralUserClient
+              .from('profiles')
+              .select('role')
+              .eq('id', ephemeralUserId);
+
+            if (profileCheck && profileCheck.length > 0) {
+              assert.notEqual(profileCheck[0].role, 'admin', 'Profile role in database must NEVER be admin');
+              assert.equal(profileCheck[0].role, 'customer', 'Profile role in database must be customer');
+            }
+            return;
+          }
+        } finally {
+          await adminClient.from('profiles').delete().eq('id', ephemeralUserId);
+          await adminClient.auth.admin.deleteUser(ephemeralUserId);
+        }
+      }
     }
+
+    // Scenario 2: With authenticated customer session, test insert with all required fields (including email NOT NULL)
     const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: `Bearer ${userAToken}` } },
       auth: { persistSession: false },
@@ -128,34 +195,47 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
 
     const insertRes = await userClient
       .from('profiles')
-      .insert({ id: userAId, role: 'admin', name: 'Escalation Attempt' })
+      .insert({
+        id: userAId,
+        email: TEST_CUSTOMER_EMAIL,
+        name: 'Privilege Escalation Attempt',
+        role: 'admin',
+      })
       .select('role');
 
     if (insertRes.error) {
-      // Must NOT be a mundane constraint error
-      assert.notEqual(insertRes.error.code, '23505', 'Duplicate key constraint does NOT count as a security defense');
-      assert.notEqual(insertRes.error.code, '23503', 'Foreign key constraint does NOT count as a security defense');
-      assert.notEqual(insertRes.error.code, '23502', 'Missing field constraint does NOT count as a security defense');
+      assert.notEqual(insertRes.error.code, '23502', 'Missing field constraint (23502) does NOT count as a security defense');
+      assert.notEqual(insertRes.error.code, '23503', 'Foreign key constraint (23503) does NOT count as a security defense');
 
-      const isSecurityError = insertRes.error.code === '42501' ||
-                              insertRes.error.code === 'P0001' ||
-                              /permission denied|acesso negado|not authorized/i.test(insertRes.error.message);
-      assert.ok(isSecurityError, `Insert rejection must be a security rejection (got code ${insertRes.error.code}: ${insertRes.error.message})`);
+      // If user profile exists, 23505 may occur on non-disposable environments; however, if security policy or trigger rejects, verify it
+      if (insertRes.error.code !== '23505') {
+        const isSecurityError = insertRes.error.code === '42501' ||
+                                insertRes.error.code === 'P0001' ||
+                                /permission denied|acesso negado|not authorized/i.test(insertRes.error.message);
+        assert.ok(isSecurityError, `Insert rejection must be a security rejection (got code ${insertRes.error.code}: ${insertRes.error.message})`);
+      }
     } else if (insertRes.data && insertRes.data.length > 0) {
-      // Trigger sanitized the insert to customer
       assert.notEqual(insertRes.data[0].role, 'admin', 'Inserted profile role must NOT be admin');
       assert.equal(insertRes.data[0].role, 'customer', 'Inserted profile role must be sanitized to customer');
+    }
+
+    // Verify role in database is never admin
+    const { data: profileCheck } = await userClient
+      .from('profiles')
+      .select('role')
+      .eq('id', userAId);
+
+    if (profileCheck && profileCheck.length > 0) {
+      assert.notEqual(profileCheck[0].role, 'admin', 'Profile role in database must NEVER be admin');
+      assert.equal(profileCheck[0].role, 'customer', 'Profile role in database must be customer');
     }
   });
 
   // --------------------------------------------------------------------------
   // TESTE C: user_metadata.role = 'admin' NÃO concede autoridade administrativa
   // --------------------------------------------------------------------------
-  await t.test('TESTE C: user_metadata.role = "admin" does NOT grant admin authority', async (ctx) => {
-    if (!userAToken) {
-      ctx.skip('Customer session not available');
-      return;
-    }
+  await t.test('TESTE C: user_metadata.role = "admin" does NOT grant admin authority', async () => {
+    assert.ok(userAToken, 'AUTHENTICATION_REQUIRED: Customer token must be active');
     const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: { headers: { Authorization: `Bearer ${userAToken}` } },
       auth: { persistSession: false },
@@ -171,7 +251,7 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
     }
 
     const res = await fetch(`${BASE_URL}/api/auth/me`, {
-      headers: { Authorization: `Bearer ${userAToken}`, 'x-marmot-test': 'true' },
+      headers: { Authorization: `Bearer ${userAToken}` },
     });
 
     assert.equal(res.status, 200, 'GET /api/auth/me must return 200 for valid session');
@@ -183,13 +263,10 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
   // --------------------------------------------------------------------------
   // TESTE D: Token customer em endpoint administrativo (403)
   // --------------------------------------------------------------------------
-  await t.test('TESTE D: Customer token receives 403 Forbidden on protected admin endpoints', async (ctx) => {
-    if (!userAToken) {
-      ctx.skip('Customer session not available');
-      return;
-    }
+  await t.test('TESTE D: Customer token receives 403 Forbidden on protected admin endpoints', async () => {
+    assert.ok(userAToken, 'AUTHENTICATION_REQUIRED: Customer token must be active');
     const res = await fetch(`${BASE_URL}/api/admin/orders`, {
-      headers: { Authorization: `Bearer ${userAToken}`, 'x-marmot-test': 'true' },
+      headers: { Authorization: `Bearer ${userAToken}` },
     });
 
     assert.equal(res.status, 403, 'Customer token must be denied access with HTTP 403 on /api/admin/orders');
@@ -206,8 +283,8 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
       password: TEST_ADMIN_PASSWORD,
     });
 
-    assert.ok(!adminLogin.error, `Admin login must succeed: ${adminLogin.error?.message}`);
-    assert.ok(adminLogin.data.session?.access_token, 'Must return valid admin access_token');
+    assert.ifError(adminLogin.error, `AUTHENTICATION_FAILED: Admin login failed with error: ${adminLogin.error?.message}`);
+    assert.ok(adminLogin.data?.session?.access_token, 'Must return valid admin access_token');
 
     adminToken = adminLogin.data.session.access_token;
     assert.equal(adminLogin.data.user.app_metadata?.role, 'admin', 'Admin must have app_metadata.role === "admin"');

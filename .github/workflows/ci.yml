@@ -11,6 +11,21 @@ jobs:
     name: Typecheck, Test & Build
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgrespassword
+          POSTGRES_DB: marmot_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -49,10 +64,16 @@ jobs:
           cat /tmp/server.log
           exit 1
 
+      - name: Bootstrap Disposable Test Database
+        env:
+          DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
+        run: node scripts/setup-test-db.mjs
+
       - name: Run Integration Tests
         env:
           CI: true
           MARMOT_TEST_MODE: true
+          DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
           TEST_CUSTOMER_EMAIL: ${{ secrets.TEST_CUSTOMER_EMAIL }}
           TEST_CUSTOMER_PASSWORD: ${{ secrets.TEST_CUSTOMER_PASSWORD }}
           TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}

@@ -10,6 +10,20 @@ import crypto from 'crypto';
 import sharp from 'sharp';
 import { MercadoPagoConfig, Preference, Payment, WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
 
+/**
+ * Authoritative process test mode flag.
+ * Evaluated strictly once at process startup from environment variables.
+ * Immutable at runtime. Production MUST execute with test mode = false.
+ */
+export const IS_TEST_MODE: boolean = Object.freeze({
+  enabled: Boolean(
+    (process.env.NODE_ENV === 'test' ||
+     process.env.CI === 'true' ||
+     process.env.MARMOT_TEST_MODE === 'true') &&
+    process.env.NODE_ENV !== 'production'
+  )
+}).enabled;
+
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
   try {
@@ -1385,12 +1399,7 @@ export class DatabaseManager {
 
   private writeJsonFile<T>(filePath: string, data: T): void {
     try {
-      const isTestEnv = process.env.NODE_ENV === 'test' ||
-                        process.env.CI === 'true' ||
-                        process.env.IS_TEST_ENV === 'true' ||
-                        process.env.MARMOT_TEST_MODE === 'true';
-
-      const effectivePath = (isTestEnv && filePath.includes(DATA_DIR))
+      const effectivePath = (IS_TEST_MODE && filePath.includes(DATA_DIR))
         ? path.join(os.tmpdir(), 'marmot-test-data', path.basename(filePath))
         : filePath;
 
@@ -1407,12 +1416,7 @@ export class DatabaseManager {
       fs.renameSync(tempPath, effectivePath);
     } catch {
       try {
-        const isTestEnv = process.env.NODE_ENV === 'test' ||
-                          process.env.CI === 'true' ||
-                          process.env.IS_TEST_ENV === 'true' ||
-                          process.env.MARMOT_TEST_MODE === 'true';
-
-        const effectivePath = (isTestEnv && filePath.includes(DATA_DIR))
+        const effectivePath = (IS_TEST_MODE && filePath.includes(DATA_DIR))
           ? path.join(os.tmpdir(), 'marmot-test-data', path.basename(filePath))
           : filePath;
         fs.writeFileSync(effectivePath, JSON.stringify(data, null, 2), 'utf-8');
@@ -5585,8 +5589,14 @@ const SESSION_SECRET = process.env.SESSION_SECRET || (() => {
 // High-Performance In-Memory Sliding Window Rate Limiter
 class RateLimiter {
   private requests: Map<string, { count: number; resetTime: number }> = new Map();
+  private windowMs: number;
+  private maxRequests: number;
+  private name: string;
 
-  constructor(private windowMs: number, private maxRequests: number, private name: string) {
+  constructor(windowMs: number, maxRequests: number, name: string) {
+    this.windowMs = windowMs;
+    this.maxRequests = maxRequests;
+    this.name = name;
     setInterval(() => {
       const now = Date.now();
       for (const [key, val] of this.requests.entries()) {
@@ -5640,13 +5650,6 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  if (
-    req.headers['x-marmot-test'] === 'true' ||
-    req.headers['x-test-mode'] === 'true' ||
-    Boolean(req.headers['user-agent']?.includes('node'))
-  ) {
-    process.env.MARMOT_TEST_MODE = 'true';
-  }
   next();
 });
 
