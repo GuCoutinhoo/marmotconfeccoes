@@ -35,7 +35,7 @@ jobs:
 
       - name: Start Backend Server & Healthcheck
         run: |
-          nohup node dist/server.cjs > server.log 2>&1 &
+          CI=true MARMOT_TEST_MODE=true nohup node dist/server.cjs > /tmp/server.log 2>&1 &
           echo "Waiting for backend server to become healthy on http://localhost:3000/api/health..."
           for i in $(seq 1 30); do
             if curl -s -f http://localhost:3000/api/health > /dev/null; then
@@ -46,13 +46,18 @@ jobs:
             sleep 1
           done
           echo "Backend failed to become healthy within 30 seconds. Logs:"
-          cat server.log
+          cat /tmp/server.log
           exit 1
 
       - name: Run Integration Tests
         env:
+          CI: true
+          MARMOT_TEST_MODE: true
           TEST_CUSTOMER_EMAIL: ${{ secrets.TEST_CUSTOMER_EMAIL }}
           TEST_CUSTOMER_PASSWORD: ${{ secrets.TEST_CUSTOMER_PASSWORD }}
           TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
           TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
         run: npm run test:integration
+
+      - name: Working Tree Clean Check
+        run: git diff --exit-code

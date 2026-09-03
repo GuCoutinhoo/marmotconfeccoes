@@ -1707,11 +1707,30 @@ GRANT EXECUTE ON FUNCTION public.complete_webhook_event TO service_role;
 
 -- Revoke execution of trigger and internal functions from anon/authenticated
 REVOKE EXECUTE ON FUNCTION public.handle_new_user FROM PUBLIC, anon, authenticated;
-REVOKE EXECUTE ON FUNCTION public.protect_profile_role FROM PUBLIC, anon, authenticated;
+DROP TRIGGER IF EXISTS trg_protect_profile_role ON public.profiles;
+DROP FUNCTION IF EXISTS public.protect_profile_role();
 
--- Restrict is_admin to authenticated and service_role
-REVOKE EXECUTE ON FUNCTION public.is_admin() FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.is_admin() TO authenticated, service_role;
+-- Restrict is_admin strictly to service_role (authenticated and anon DENIED)
+REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO service_role;
 
-REVOKE EXECUTE ON FUNCTION public.is_admin(uuid) FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO authenticated, service_role;
+REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO service_role;
+
+-- Revoke execute on internal trigger functions from anon and authenticated
+REVOKE ALL ON FUNCTION public.enforce_profile_insert_role() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.prevent_profile_role_escalation() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.enforce_profile_insert_role() TO service_role;
+GRANT EXECUTE ON FUNCTION public.prevent_profile_role_escalation() TO service_role;
+
+-- Duplicate Index Cleanup
+DROP INDEX IF EXISTS public.idx_favorites_user;
+DROP INDEX IF EXISTS public.idx_orders_email;
+
+-- Track All Production Migrations
+INSERT INTO public.schema_migrations (version, description)
+VALUES 
+  ('20260902_remove_profile_role_admin_authority', 'Decouple profiles.role from admin authorization, revoke UPDATE role from authenticated, lock is_admin RPC to service_role'),
+  ('20260903_lock_profile_trigger_functions', 'Revoke execute on trigger functions from anon/authenticated, remove legacy trigger, clean duplicate indexes, and optimize InitPlan RLS')
+ON CONFLICT (version) DO UPDATE SET applied_at = NOW();
+

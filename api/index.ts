@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import os from 'os';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { Pool } from 'pg';
@@ -1384,7 +1385,16 @@ export class DatabaseManager {
 
   private writeJsonFile<T>(filePath: string, data: T): void {
     try {
-      const dir = path.dirname(filePath);
+      const isTestEnv = process.env.NODE_ENV === 'test' ||
+                        process.env.CI === 'true' ||
+                        process.env.IS_TEST_ENV === 'true' ||
+                        process.env.MARMOT_TEST_MODE === 'true';
+
+      const effectivePath = (isTestEnv && filePath.includes(DATA_DIR))
+        ? path.join(os.tmpdir(), 'marmot-test-data', path.basename(filePath))
+        : filePath;
+
+      const dir = path.dirname(effectivePath);
       if (!fs.existsSync(dir)) {
         try {
           fs.mkdirSync(dir, { recursive: true });
@@ -1392,12 +1402,20 @@ export class DatabaseManager {
           // Read-only serverless filesystem
         }
       }
-      const tempPath = `${filePath}.tmp.${Date.now()}`;
+      const tempPath = `${effectivePath}.tmp.${Date.now()}`;
       fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf-8');
-      fs.renameSync(tempPath, filePath);
+      fs.renameSync(tempPath, effectivePath);
     } catch {
       try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8');
+        const isTestEnv = process.env.NODE_ENV === 'test' ||
+                          process.env.CI === 'true' ||
+                          process.env.IS_TEST_ENV === 'true' ||
+                          process.env.MARMOT_TEST_MODE === 'true';
+
+        const effectivePath = (isTestEnv && filePath.includes(DATA_DIR))
+          ? path.join(os.tmpdir(), 'marmot-test-data', path.basename(filePath))
+          : filePath;
+        fs.writeFileSync(effectivePath, JSON.stringify(data, null, 2), 'utf-8');
       } catch {
         // Safe failover
       }
@@ -5325,9 +5343,7 @@ export class DatabaseManager {
     if (!fs.existsSync(dir)) {
       try { fs.mkdirSync(dir, { recursive: true }); } catch {}
     }
-    try {
-      fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2), 'utf-8');
-    } catch {}
+    this.writeJsonFile(settingsPath, settings);
   }
 }
 
@@ -11072,7 +11088,7 @@ app.all(['/api/admin/simulate-concurrency-tests', '/api/test/concurrency-simulat
   }
 
   const adminSecret = req.headers['x-admin-test-token'] || req.query.token;
-  const isAuthorized = req.user?.role === 'admin' || (adminSecret && adminSecret === (process.env.ADMIN_AUDIT_TOKEN || 'marmot-audit-2026'));
+  const isAuthorized = req.user?.role === 'admin' || (Boolean(adminSecret) && Boolean(process.env.ADMIN_AUDIT_TOKEN) && adminSecret === process.env.ADMIN_AUDIT_TOKEN);
 
   if (!isAuthorized) {
     return res.status(403).json({ error: 'Acesso restrito ao módulo de testes em ambiente de desenvolvimento.' });

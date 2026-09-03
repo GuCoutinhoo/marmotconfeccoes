@@ -64,7 +64,7 @@ test('Double Migration Execution & SQL Structural Check', async (t) => {
     // Verify all triggers drop before create
     const triggerMatches = sql.match(/CREATE TRIGGER/gi) || [];
     const dropTriggerMatches = sql.match(/DROP TRIGGER IF EXISTS/gi) || [];
-    assert.equal(triggerMatches.length, dropTriggerMatches.length, 'Trigger without DROP TRIGGER IF EXISTS found');
+    assert.ok(dropTriggerMatches.length >= triggerMatches.length, 'Trigger without DROP TRIGGER IF EXISTS found');
 
     // Verify all policies drop before create
     const policyMatches = sql.match(/CREATE POLICY/gi) || [];
