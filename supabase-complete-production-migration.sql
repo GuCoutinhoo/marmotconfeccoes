@@ -919,34 +919,37 @@ ON CONFLICT (gateway, payment_id) DO NOTHING;
 -- FUNCTIONS & TRIGGERS
 -- =========================================================================
 
--- 1. Helper function to check if the current requester is an administrator
+-- 1. Helper function to check if the current requester is an administrator (Strictly service_role / JWT app_metadata only)
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public, auth, pg_temp
-AS $$
-  SELECT (
-    coalesce((auth.jwt() -> 'app_metadata' ->> 'role'), '') = 'admin'
-    OR EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id::text = auth.uid()::text AND role = 'admin'
-    )
-  );
-$$;
-
-CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
-RETURNS BOOLEAN
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = user_id::text AND role = 'admin'
-  );
+BEGIN
+  IF (select auth.role()) = 'service_role' THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN COALESCE((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin', FALSE);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF (select auth.role()) = 'service_role' THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN FALSE;
+END;
 $$;
 
 -- 2. Trigger on new auth.users signup to create profile (Strictly 'customer' role)
@@ -979,7 +982,7 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 3. Trigger to prevent unauthorized role escalation on public profiles update
+-- 3. Triggers and column-level privileges to prevent unauthorized role escalation
 CREATE OR REPLACE FUNCTION public.protect_profile_role()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -987,9 +990,9 @@ SECURITY DEFINER
 SET search_path = public, pg_temp
 AS $$
 BEGIN
-  IF NEW.role <> OLD.role THEN
-    IF NOT public.is_admin() THEN
-      RAISE EXCEPTION 'Apenas administradores autorizados podem alterar o nível de permissão de usuário.';
+  IF NEW.role IS DISTINCT FROM OLD.role THEN
+    IF (select auth.role()) != 'service_role' THEN
+      RAISE EXCEPTION 'Acesso negado: a coluna role de profiles só pode ser alterada via service_role administrativo.';
     END IF;
   END IF;
   RETURN NEW;
@@ -1000,6 +1003,50 @@ DROP TRIGGER IF EXISTS trg_protect_profile_role ON public.profiles;
 CREATE TRIGGER trg_protect_profile_role
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.protect_profile_role();
+
+CREATE OR REPLACE FUNCTION public.prevent_profile_role_escalation()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF NEW.role IS DISTINCT FROM OLD.role THEN
+    IF (select auth.role()) != 'service_role' THEN
+      RAISE EXCEPTION 'Acesso negado: a coluna role de profiles só pode ser alterada via service_role administrativo.';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_prevent_profile_role_escalation ON public.profiles;
+CREATE TRIGGER trg_prevent_profile_role_escalation
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.prevent_profile_role_escalation();
+
+CREATE OR REPLACE FUNCTION public.enforce_profile_insert_role()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF (select auth.role()) != 'service_role' THEN
+    NEW.role := 'customer';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_enforce_profile_insert_role ON public.profiles;
+CREATE TRIGGER trg_enforce_profile_insert_role
+  BEFORE INSERT ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.enforce_profile_insert_role();
+
+-- Lock column-level UPDATE on profiles.role
+REVOKE UPDATE ON public.profiles FROM PUBLIC, anon, authenticated;
+GRANT UPDATE (name, phone, cpf, avatar_url, addresses, updated_at, data) ON public.profiles TO authenticated;
 
 -- 4. Server-Authoritative Atomic Payment Processing & Inventory Deduction RPC
 DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB, JSONB);

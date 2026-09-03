@@ -1,4 +1,18 @@
 import 'dotenv/config';
+import fs from 'node:fs';
+
+if (fs.existsSync('/tmp/supabase-disposable.env')) {
+  try {
+    const envLines = fs.readFileSync('/tmp/supabase-disposable.env', 'utf8').split('\n');
+    for (const line of envLines) {
+      const match = line.match(/^export\s+([A-Z0-9_]+)="?(.*?)"?$/);
+      if (match && !process.env[match[1]]) {
+        process.env[match[1]] = match[2];
+      }
+    }
+  } catch {}
+}
+
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -23,9 +37,9 @@ if (!TEST_ADMIN_PASSWORD) {
 }
 
 const BASE_URL = 'http://localhost:3000';
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const SUPABASE_URL = process.env.SUPABASE_DISPOSABLE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_DISPOSABLE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
+const SERVICE_ROLE_KEY = process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 const LEGACY_SECRET = 'marmot-streetwear-super-secret-jwt-key-2026';
 
 function createLegacySignedToken(payload, secret = LEGACY_SECRET) {

@@ -13,6 +13,18 @@ import { IS_TEST_MODE } from '../src/server/runtime-flags';
 
 export { IS_TEST_MODE };
 
+if ((process.env.MARMOT_TEST_MODE === 'true' || process.env.CI === 'true') && fs.existsSync('/tmp/supabase-disposable.env')) {
+  try {
+    const envLines = fs.readFileSync('/tmp/supabase-disposable.env', 'utf8').split('\n');
+    for (const line of envLines) {
+      const match = line.match(/^export\s+([A-Z0-9_]+)="?(.*?)"?$/);
+      if (match) {
+        process.env[match[1]] = match[2];
+      }
+    }
+  } catch {}
+}
+
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {
   try {
@@ -839,9 +851,9 @@ export class DatabaseManager {
   }
 
   private detectAndInitMode() {
-    const dbUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRESQL_URL;
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
+    const dbUrl = process.env.DISPOSABLE_DATABASE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRESQL_URL;
+    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
+    const supabaseKey = (process.env.SUPABASE_DISPOSABLE_URL ? (process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || process.env.SUPABASE_DISPOSABLE_ANON_KEY) : null) || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
 
     if (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder')) {
       try {
@@ -1424,8 +1436,8 @@ export class DatabaseManager {
    * Fail-Closed Security Policy: Never falls back to anon client for admin operations.
    */
   public async getSupabaseAdminClient(): Promise<SupabaseClient | null> {
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
+    const serviceKey = (process.env.SUPABASE_DISPOSABLE_URL ? process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY : null) || process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
 
     if (serviceKey && serviceKey.trim() !== '') {
       const cleanKey = serviceKey.trim();

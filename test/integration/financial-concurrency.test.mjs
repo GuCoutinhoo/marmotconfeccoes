@@ -1,4 +1,18 @@
 import 'dotenv/config';
+import fs from 'node:fs';
+
+if (fs.existsSync('/tmp/supabase-disposable.env')) {
+  try {
+    const envLines = fs.readFileSync('/tmp/supabase-disposable.env', 'utf8').split('\n');
+    for (const line of envLines) {
+      const match = line.match(/^export\s+([A-Z0-9_]+)="?(.*?)"?$/);
+      if (match && !process.env[match[1]]) {
+        process.env[match[1]] = match[2];
+      }
+    }
+  } catch {}
+}
+
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';

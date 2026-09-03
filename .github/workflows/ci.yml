@@ -51,8 +51,18 @@ jobs:
       - name: Build Application
         run: npm run build
 
+      - name: Bootstrap Disposable Test Environment & Database
+        env:
+          DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
+        run: |
+          node scripts/setup-test-db.mjs
+          node scripts/bootstrap-disposable-supabase.mjs
+
       - name: Start Backend Server
         run: |
+          if [ -f /tmp/supabase-disposable.env ]; then
+            source /tmp/supabase-disposable.env
+          fi
           CI=true MARMOT_TEST_MODE=true nohup node dist/server.cjs > /tmp/server.log 2>&1 &
           echo $! > /tmp/server.pid
 
@@ -71,28 +81,27 @@ jobs:
           cat /tmp/server.log
           exit 1
 
-      - name: Bootstrap Disposable Test Database
-        env:
-          DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
-        run: node scripts/setup-test-db.mjs
-
       - name: Run Integration Tests
         env:
           CI: true
           MARMOT_TEST_MODE: true
           DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
-          TEST_CUSTOMER_EMAIL: ${{ secrets.TEST_CUSTOMER_EMAIL }}
-          TEST_CUSTOMER_PASSWORD: ${{ secrets.TEST_CUSTOMER_PASSWORD }}
-          TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
-          TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
-        run: npm run test:integration
+        run: |
+          if [ -f /tmp/supabase-disposable.env ]; then
+            source /tmp/supabase-disposable.env
+          fi
+          npm run test:integration
 
       - name: Run Concurrency Tests
         env:
           CI: true
           MARMOT_TEST_MODE: true
           DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
-        run: npm run test:concurrency
+        run: |
+          if [ -f /tmp/supabase-disposable.env ]; then
+            source /tmp/supabase-disposable.env
+          fi
+          npm run test:concurrency
 
       - name: Working Tree Clean Check
         run: git diff --exit-code

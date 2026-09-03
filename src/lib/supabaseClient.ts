@@ -16,8 +16,32 @@ const getEnvVar = (viteKey: string, processKey: string, fallback: string): strin
   return fallback;
 };
 
-const supabaseUrl = getEnvVar('VITE_SUPABASE_URL', 'SUPABASE_URL', SUPABASE_PROJECT_URL);
-const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', SUPABASE_DEFAULT_ANON_KEY);
+let resolvedUrl = getEnvVar('VITE_SUPABASE_URL', 'SUPABASE_URL', SUPABASE_PROJECT_URL);
+let resolvedAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', SUPABASE_DEFAULT_ANON_KEY);
+
+// Security & Connectivity Guard:
+// If running in browser and the URL is an internal loopback/emulator address (127.0.0.1, localhost, or port 54321)
+// while the browser origin is not that same local port, fallback immediately to the real live Supabase project.
+if (typeof window !== 'undefined') {
+  const isLoopbackOrEmulator =
+    resolvedUrl.includes(':54321') ||
+    ((resolvedUrl.includes('127.0.0.1') || resolvedUrl.includes('localhost')) &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1');
+
+  if (isLoopbackOrEmulator) {
+    resolvedUrl = SUPABASE_PROJECT_URL;
+    resolvedAnonKey = SUPABASE_DEFAULT_ANON_KEY;
+  }
+}
+
+// Ensure live project always pairs with the live publishable key (never an emulator JWT)
+if (resolvedUrl.includes('ktmkvysnjfphcfntazut') && resolvedAnonKey.startsWith('eyJ')) {
+  resolvedAnonKey = SUPABASE_DEFAULT_ANON_KEY;
+}
+
+const supabaseUrl = resolvedUrl;
+const supabaseAnonKey = resolvedAnonKey;
 
 export const isSupabaseConfigured = (): boolean => {
   const url = supabaseUrl;
@@ -712,7 +736,7 @@ export async function deleteProductInSupabase(id: string): Promise<{ success: bo
 }
 
 /**
- * Direct query to Supabase for categories with fallback handling.
+ * Direct query to Supabase for categories with resilient backend fallback handling.
  */
 export async function fetchCategoriesFromSupabaseDirect(): Promise<{ categories: Category[]; error?: any }> {
   try {
@@ -721,21 +745,32 @@ export async function fetchCategoriesFromSupabaseDirect(): Promise<{ categories:
       .select('*')
       .order('order', { ascending: true });
 
+    if (!error && data && data.length > 0) {
+      const mapped = data.map(mapSupabaseRowToCategory);
+      return { categories: mapped };
+    }
+
     if (error) {
-      console.error('[Supabase Client Direct] Erro ao carregar categorias:', error.message || error);
-      return { categories: [], error };
+      console.warn('[Supabase Client Direct] Supabase direto reportou aviso:', error.message || error);
     }
-
-    if (!data || data.length === 0) {
-      return { categories: [] };
-    }
-
-    const mapped = data.map(mapSupabaseRowToCategory);
-    return { categories: mapped };
   } catch (err: any) {
-    console.error('[Supabase Client Direct] Exceção ao buscar categorias:', err);
-    return { categories: [], error: err };
+    console.warn('[Supabase Client Direct] Supabase direto indisponível, acionando fallback:', err?.message || err);
   }
+
+  // Graceful fallback: try fetching from backend /api/categories if direct Supabase connection fails
+  try {
+    const res = await fetch('/api/categories', { cache: 'no-store' });
+    if (res.ok) {
+      const apiCategories = await res.json();
+      if (Array.isArray(apiCategories) && apiCategories.length > 0) {
+        return { categories: apiCategories };
+      }
+    }
+  } catch (apiErr) {
+    console.warn('[Supabase Client Direct] Fallback via /api/categories falhou:', apiErr);
+  }
+
+  return { categories: [] };
 }
 
 /**

@@ -86,6 +86,43 @@ DROP FUNCTION IF EXISTS public.protect_profile_role();
 -- =========================================================================
 -- 4. LOCK TRIGGER FUNCTIONS & INTERNAL RPCS
 -- =========================================================================
+-- Redefine public.is_admin() to strictly rely on service_role and JWT app_metadata
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS boolean
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF (select auth.role()) = 'service_role' THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN COALESCE(((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin', FALSE);
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
+RETURNS boolean
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF (select auth.role()) = 'service_role' THEN
+    RETURN TRUE;
+  END IF;
+
+  RETURN FALSE;
+END;
+$$;
+
+-- Lock column-level privileges on public.profiles
+REVOKE UPDATE ON public.profiles FROM PUBLIC, anon, authenticated;
+GRANT UPDATE (name, phone, cpf, avatar_url, addresses, updated_at, data) ON public.profiles TO authenticated;
+
 REVOKE ALL ON FUNCTION public.enforce_profile_insert_role() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION public.prevent_profile_role_escalation() FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.enforce_profile_insert_role() TO service_role;
