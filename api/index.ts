@@ -9,20 +9,9 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import sharp from 'sharp';
 import { MercadoPagoConfig, Preference, Payment, WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
+import { IS_TEST_MODE } from '../src/server/runtime-flags';
 
-/**
- * Authoritative process test mode flag.
- * Evaluated strictly once at process startup from environment variables.
- * Immutable at runtime. Production MUST execute with test mode = false.
- */
-export const IS_TEST_MODE: boolean = Object.freeze({
-  enabled: Boolean(
-    (process.env.NODE_ENV === 'test' ||
-     process.env.CI === 'true' ||
-     process.env.MARMOT_TEST_MODE === 'true') &&
-    process.env.NODE_ENV !== 'production'
-  )
-}).enabled;
+export { IS_TEST_MODE };
 
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
 if (!fs.existsSync(UPLOADS_DIR)) {

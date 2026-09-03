@@ -113,121 +113,89 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
   await t.test('TESTE B: Customer attempting INSERT profile with role = "admin" is rejected or sanitized', async () => {
     assert.ok(userAToken, 'AUTHENTICATION_REQUIRED: Customer token must be active');
 
-    // Scenario 1: If in isolated/disposable test environment with service_role, create ephemeral test user
-    // to execute clean INSERT with no preexisting primary key conflict
-    if (SERVICE_ROLE_KEY && process.env.VITE_SUPABASE_URL && !process.env.VITE_SUPABASE_URL.includes('ktmkvysnjfphcfntazut')) {
-      const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-        auth: { persistSession: false },
-      });
-      const ephemeralEmail = `ephemeral-sec-test-${Date.now()}@marmot-test.local`;
-      const ephemeralPassword = `Pass!${crypto.randomBytes(8).toString('hex')}`;
+    const targetUrl = process.env.SUPABASE_DISPOSABLE_URL || (process.env.VITE_SUPABASE_URL && !process.env.VITE_SUPABASE_URL.includes('ktmkvysnjfphcfntazut') ? process.env.VITE_SUPABASE_URL : null);
+    const serviceKey = process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || SERVICE_ROLE_KEY;
 
-      const { data: createdUser, error: createErr } = await adminClient.auth.admin.createUser({
-        email: ephemeralEmail,
-        password: ephemeralPassword,
-        email_confirm: true,
-      });
-
-      if (!createErr && createdUser?.user) {
-        const ephemeralUserId = createdUser.user.id;
-        try {
-          // Remove profile auto-created by auth trigger to test direct table INSERT
-          await adminClient.from('profiles').delete().eq('id', ephemeralUserId);
-
-          const { data: ephemeralSession } = await sb.auth.signInWithPassword({
-            email: ephemeralEmail,
-            password: ephemeralPassword,
-          });
-
-          if (ephemeralSession?.session?.access_token) {
-            const ephemeralUserClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-              global: { headers: { Authorization: `Bearer ${ephemeralSession.session.access_token}` } },
-              auth: { persistSession: false },
-            });
-
-            const insertRes = await ephemeralUserClient
-              .from('profiles')
-              .insert({
-                id: ephemeralUserId,
-                email: ephemeralEmail,
-                name: 'Privilege Escalation Attempt',
-                role: 'admin',
-              })
-              .select('role');
-
-            if (insertRes.error) {
-              assert.notEqual(insertRes.error.code, '23505', 'Duplicate key constraint (23505) does NOT count as a security defense');
-              assert.notEqual(insertRes.error.code, '23503', 'Foreign key constraint (23503) does NOT count as a security defense');
-              assert.notEqual(insertRes.error.code, '23502', 'Missing field constraint (23502) does NOT count as a security defense');
-
-              const isSecurityError = insertRes.error.code === '42501' ||
-                                      insertRes.error.code === 'P0001' ||
-                                      /permission denied|acesso negado|not authorized/i.test(insertRes.error.message);
-              assert.ok(isSecurityError, `Insert rejection must be a security rejection (got code ${insertRes.error.code}: ${insertRes.error.message})`);
-            } else if (insertRes.data && insertRes.data.length > 0) {
-              assert.notEqual(insertRes.data[0].role, 'admin', 'Inserted profile role must NOT be admin');
-              assert.equal(insertRes.data[0].role, 'customer', 'Inserted profile role must be sanitized to customer');
-            }
-
-            const { data: profileCheck } = await ephemeralUserClient
-              .from('profiles')
-              .select('role')
-              .eq('id', ephemeralUserId);
-
-            if (profileCheck && profileCheck.length > 0) {
-              assert.notEqual(profileCheck[0].role, 'admin', 'Profile role in database must NEVER be admin');
-              assert.equal(profileCheck[0].role, 'customer', 'Profile role in database must be customer');
-            }
-            return;
-          }
-        } finally {
-          await adminClient.from('profiles').delete().eq('id', ephemeralUserId);
-          await adminClient.auth.admin.deleteUser(ephemeralUserId);
-        }
-      }
+    if (!targetUrl || !serviceKey) {
+      assert.fail(
+        'DISPOSABLE_TEST_ENVIRONMENT_REQUIRED: Testing profile INSERT privilege escalation requires an isolated disposable Supabase environment with service_role key (SUPABASE_DISPOSABLE_URL & SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY). Fallback to 23505 duplicate key on existing users is strictly forbidden by audit policy.'
+      );
     }
 
-    // Scenario 2: With authenticated customer session, test insert with all required fields (including email NOT NULL)
-    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: `Bearer ${userAToken}` } },
+    const adminClient = createClient(targetUrl, serviceKey, {
       auth: { persistSession: false },
     });
+    const ephemeralEmail = `ephemeral-sec-test-${Date.now()}@marmot-test.local`;
+    const ephemeralPassword = `Pass!${crypto.randomBytes(8).toString('hex')}`;
 
-    const insertRes = await userClient
-      .from('profiles')
-      .insert({
-        id: userAId,
-        email: TEST_CUSTOMER_EMAIL,
-        name: 'Privilege Escalation Attempt',
-        role: 'admin',
-      })
-      .select('role');
+    const { data: createdUser, error: createErr } = await adminClient.auth.admin.createUser({
+      email: ephemeralEmail,
+      password: ephemeralPassword,
+      email_confirm: true,
+    });
 
-    if (insertRes.error) {
-      assert.notEqual(insertRes.error.code, '23502', 'Missing field constraint (23502) does NOT count as a security defense');
-      assert.notEqual(insertRes.error.code, '23503', 'Foreign key constraint (23503) does NOT count as a security defense');
+    assert.ifError(createErr, `Failed to create ephemeral user: ${createErr?.message}`);
+    assert.ok(createdUser?.user, 'Ephemeral user must be created');
 
-      // If user profile exists, 23505 may occur on non-disposable environments; however, if security policy or trigger rejects, verify it
-      if (insertRes.error.code !== '23505') {
+    const ephemeralUserId = createdUser.user.id;
+    try {
+      // Remove profile auto-created by auth trigger to test direct table INSERT
+      await adminClient.from('profiles').delete().eq('id', ephemeralUserId);
+
+      const targetAnonKey = process.env.SUPABASE_DISPOSABLE_ANON_KEY || SUPABASE_ANON_KEY;
+      const ephemeralSb = createClient(targetUrl, targetAnonKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+
+      const { data: ephemeralSession, error: loginErr } = await ephemeralSb.auth.signInWithPassword({
+        email: ephemeralEmail,
+        password: ephemeralPassword,
+      });
+
+      assert.ifError(loginErr, `Ephemeral user login failed: ${loginErr?.message}`);
+      assert.ok(ephemeralSession?.session?.access_token, 'Must return valid session access_token');
+
+      const ephemeralUserClient = createClient(targetUrl, targetAnonKey, {
+        global: { headers: { Authorization: `Bearer ${ephemeralSession.session.access_token}` } },
+        auth: { persistSession: false },
+      });
+
+      const insertRes = await ephemeralUserClient
+        .from('profiles')
+        .insert({
+          id: ephemeralUserId,
+          email: ephemeralEmail,
+          name: 'Privilege Escalation Attempt',
+          role: 'admin',
+        })
+        .select('role');
+
+      if (insertRes.error) {
+        assert.notEqual(insertRes.error.code, '23505', 'Duplicate key constraint (23505) does NOT count as a security defense');
+        assert.notEqual(insertRes.error.code, '23503', 'Foreign key constraint (23503) does NOT count as a security defense');
+        assert.notEqual(insertRes.error.code, '23502', 'Missing field constraint (23502) does NOT count as a security defense');
+
         const isSecurityError = insertRes.error.code === '42501' ||
                                 insertRes.error.code === 'P0001' ||
                                 /permission denied|acesso negado|not authorized/i.test(insertRes.error.message);
         assert.ok(isSecurityError, `Insert rejection must be a security rejection (got code ${insertRes.error.code}: ${insertRes.error.message})`);
+      } else if (insertRes.data && insertRes.data.length > 0) {
+        assert.notEqual(insertRes.data[0].role, 'admin', 'Inserted profile role must NOT be admin');
+        assert.equal(insertRes.data[0].role, 'customer', 'Inserted profile role must be sanitized to customer');
       }
-    } else if (insertRes.data && insertRes.data.length > 0) {
-      assert.notEqual(insertRes.data[0].role, 'admin', 'Inserted profile role must NOT be admin');
-      assert.equal(insertRes.data[0].role, 'customer', 'Inserted profile role must be sanitized to customer');
-    }
 
-    // Verify role in database is never admin
-    const { data: profileCheck } = await userClient
-      .from('profiles')
-      .select('role')
-      .eq('id', userAId);
+      const { data: profileCheck } = await ephemeralUserClient
+        .from('profiles')
+        .select('role')
+        .eq('id', ephemeralUserId);
 
-    if (profileCheck && profileCheck.length > 0) {
-      assert.notEqual(profileCheck[0].role, 'admin', 'Profile role in database must NEVER be admin');
-      assert.equal(profileCheck[0].role, 'customer', 'Profile role in database must be customer');
+      if (profileCheck && profileCheck.length > 0) {
+        assert.notEqual(profileCheck[0].role, 'admin', 'Profile role in database must NEVER be admin');
+        assert.equal(profileCheck[0].role, 'customer', 'Profile role in database must be customer');
+      }
+    } finally {
+      await adminClient.from('profiles').delete().eq('id', ephemeralUserId);
+      await adminClient.auth.admin.deleteUser(ephemeralUserId);
     }
   });
 

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { IS_TEST_MODE } from '../api/index.ts';
+import { IS_TEST_MODE } from '../../src/server/runtime-flags.ts';
 
 const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
 

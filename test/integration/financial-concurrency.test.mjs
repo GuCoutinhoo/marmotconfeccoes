@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import pg from 'pg';
 
@@ -139,18 +140,26 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
     }
   }
 
+  const RUN_ID = crypto.randomUUID();
+  const RUN_PREFIX = `TEST-${RUN_ID}`;
+
   async function cleanupTestData() {
     try {
       if (pool) {
-        await pool.query(`DELETE FROM public.payment_effects WHERE order_id LIKE 'TEST-%';`);
-        await pool.query(`DELETE FROM public.order_items WHERE order_id LIKE 'TEST-%';`);
-        await pool.query(`DELETE FROM public.orders WHERE id LIKE 'TEST-%';`);
-        await pool.query(`DELETE FROM public.products WHERE id LIKE 'TEST-%';`);
+        // FK-safe deletion order: payment_effects -> order_status_history -> inventory_movements -> order_items -> orders -> products
+        await pool.query(`DELETE FROM public.payment_effects WHERE order_id LIKE $1;`, [`${RUN_PREFIX}%`]);
+        await pool.query(`DELETE FROM public.order_status_history WHERE order_id LIKE $1;`, [`${RUN_PREFIX}%`]);
+        await pool.query(`DELETE FROM public.inventory_movements WHERE order_id LIKE $1 OR product_id LIKE $1;`, [`${RUN_PREFIX}%`]);
+        await pool.query(`DELETE FROM public.order_items WHERE order_id LIKE $1;`, [`${RUN_PREFIX}%`]);
+        await pool.query(`DELETE FROM public.orders WHERE id LIKE $1;`, [`${RUN_PREFIX}%`]);
+        await pool.query(`DELETE FROM public.products WHERE id LIKE $1;`, [`${RUN_PREFIX}%`]);
       } else if (supabaseAdmin) {
-        await supabaseAdmin.from('payment_effects').delete().like('order_id', 'TEST-%');
-        await supabaseAdmin.from('order_items').delete().like('order_id', 'TEST-%');
-        await supabaseAdmin.from('orders').delete().like('id', 'TEST-%');
-        await supabaseAdmin.from('products').delete().like('id', 'TEST-%');
+        await supabaseAdmin.from('payment_effects').delete().like('order_id', `${RUN_PREFIX}%`);
+        await supabaseAdmin.from('order_status_history').delete().like('order_id', `${RUN_PREFIX}%`);
+        await supabaseAdmin.from('inventory_movements').delete().like('order_id', `${RUN_PREFIX}%`);
+        await supabaseAdmin.from('order_items').delete().like('order_id', `${RUN_PREFIX}%`);
+        await supabaseAdmin.from('orders').delete().like('id', `${RUN_PREFIX}%`);
+        await supabaseAdmin.from('products').delete().like('id', `${RUN_PREFIX}%`);
       }
     } catch (e) {
       console.warn('Cleanup warning:', e?.message || e);
@@ -163,15 +172,15 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
     if (pool) await pool.end();
   });
 
-  const TEST_PROD_A = `TEST-PRODUCT-A-${Date.now()}`;
-  const TEST_ORDER_A = `TEST-CONCURRENCY-A-${Date.now()}`;
-  const TEST_PAY_A = `PAY-CONCURRENCY-A-${Date.now()}`;
+  const TEST_PROD_A = `${RUN_PREFIX}-PROD-A`;
+  const TEST_ORDER_A = `${RUN_PREFIX}-ORDER-A`;
+  const TEST_PAY_A = `${RUN_PREFIX}-PAY-A`;
 
-  const TEST_PROD_B = `TEST-PRODUCT-B-${Date.now()}`;
-  const TEST_ORDER_B1 = `TEST-ORDER-B1-${Date.now()}`;
-  const TEST_ORDER_B2 = `TEST-ORDER-B2-${Date.now()}`;
-  const TEST_PAY_B1 = `PAY-CONCURRENCY-B1-${Date.now()}`;
-  const TEST_PAY_B2 = `PAY-CONCURRENCY-B2-${Date.now()}`;
+  const TEST_PROD_B = `${RUN_PREFIX}-PROD-B`;
+  const TEST_ORDER_B1 = `${RUN_PREFIX}-ORDER-B1`;
+  const TEST_ORDER_B2 = `${RUN_PREFIX}-ORDER-B2`;
+  const TEST_PAY_B1 = `${RUN_PREFIX}-PAY-B1`;
+  const TEST_PAY_B2 = `${RUN_PREFIX}-PAY-B2`;
 
   // =========================================================================
   // CENÁRIO A — DUPLICATE PAYMENT
