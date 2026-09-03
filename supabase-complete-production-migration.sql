@@ -767,9 +767,10 @@ ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS status TEXT NOT NULL
 ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS raw_payload JSONB DEFAULT '{}'::jsonb;
 ALTER TABLE public.payment_effects ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
--- Ensure UNIQUE(order_id) and UNIQUE(gateway, payment_id) indexes exist without destructive deletions
+-- Ensure UNIQUE(order_id) index exists without destructive deletions
 CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_effects_order_id ON public.payment_effects(order_id);
-CREATE UNIQUE INDEX IF NOT EXISTS uq_payment_effects_gateway_payment ON public.payment_effects(gateway, payment_id);
+-- Ensure duplicate standalone index uq_payment_effects_gateway_payment is dropped, retaining the unique table constraint
+DROP INDEX IF EXISTS public.uq_payment_effects_gateway_payment;
 
 -- =========================================================================
 -- 22. ADMIN AUDIT LOGS
@@ -1405,15 +1406,55 @@ CREATE POLICY "Public read active coupons" ON public.coupons FOR SELECT USING (a
 DROP POLICY IF EXISTS "Admin manage coupons" ON public.coupons;
 CREATE POLICY "Admin manage coupons" ON public.coupons FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
--- Profiles RLS
+-- Profiles RLS - Canonical Generation (Decoupled from profiles.role, optimized with InitPlan)
+DROP POLICY IF EXISTS "Profiles read restricted to owner and admin" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles update restricted to owner and admin" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles insert restricted to owner and admin" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles delete restricted to owner and admin" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles select allowed for user or admin" ON public.profiles;
-CREATE POLICY "Profiles select allowed for user or admin" ON public.profiles FOR SELECT USING ((select auth.uid())::text = id::text OR public.is_admin());
 DROP POLICY IF EXISTS "Profiles update allowed for user or admin" ON public.profiles;
-CREATE POLICY "Profiles update allowed for user or admin" ON public.profiles FOR UPDATE USING ((select auth.uid())::text = id::text OR public.is_admin()) WITH CHECK ((select auth.uid())::text = id::text OR public.is_admin());
 DROP POLICY IF EXISTS "Profiles insert allowed for user or admin" ON public.profiles;
-CREATE POLICY "Profiles insert allowed for user or admin" ON public.profiles FOR INSERT WITH CHECK ((select auth.uid())::text = id::text OR public.is_admin());
 DROP POLICY IF EXISTS "Profiles delete only for admin" ON public.profiles;
-CREATE POLICY "Profiles delete only for admin" ON public.profiles FOR DELETE USING (public.is_admin());
+DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;
+DROP POLICY IF EXISTS "profiles_delete_policy" ON public.profiles;
+
+CREATE POLICY "profiles_select_policy" ON public.profiles
+  FOR SELECT
+  USING (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND ((select auth.uid()))::text = id::text)
+  );
+
+CREATE POLICY "profiles_update_policy" ON public.profiles
+  FOR UPDATE
+  USING (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND ((select auth.uid()))::text = id::text)
+  )
+  WITH CHECK (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND ((select auth.uid()))::text = id::text)
+  );
+
+CREATE POLICY "profiles_insert_policy" ON public.profiles
+  FOR INSERT
+  WITH CHECK (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND ((select auth.uid()))::text = id::text)
+  );
+
+CREATE POLICY "profiles_delete_policy" ON public.profiles
+  FOR DELETE
+  USING (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+  );
 
 -- Clean up any legacy or overly permissive policies that might exist
 DROP POLICY IF EXISTS "Orders insert allowed for checkout" ON public.orders;
@@ -1726,11 +1767,13 @@ GRANT EXECUTE ON FUNCTION public.prevent_profile_role_escalation() TO service_ro
 -- Duplicate Index Cleanup
 DROP INDEX IF EXISTS public.idx_favorites_user;
 DROP INDEX IF EXISTS public.idx_orders_email;
+DROP INDEX IF EXISTS public.uq_payment_effects_gateway_payment;
 
 -- Track All Production Migrations
 INSERT INTO public.schema_migrations (version, description)
 VALUES 
   ('20260902_remove_profile_role_admin_authority', 'Decouple profiles.role from admin authorization, revoke UPDATE role from authenticated, lock is_admin RPC to service_role'),
-  ('20260903_lock_profile_trigger_functions', 'Revoke execute on trigger functions from anon/authenticated, remove legacy trigger, clean duplicate indexes, and optimize InitPlan RLS')
+  ('20260903_lock_profile_trigger_functions', 'Revoke execute on trigger functions from anon/authenticated, remove legacy trigger, clean duplicate indexes, and optimize InitPlan RLS'),
+  ('20260903_cleanup_profile_rls_policies', 'Consolidate public.profiles RLS policies, remove duplicate payment_effects index, drop legacy triggers, lock trigger functions')
 ON CONFLICT (version) DO UPDATE SET applied_at = NOW();
 
