@@ -33,48 +33,5 @@
     "addresses": [],
     "createdAt": "2026-08-17T20:25:05.384Z",
     "lastLogin": "2026-08-17T20:25:05.384Z"
-  },
-  {
-    "id": "user-a-123",
-    "name": "usera",
-    "email": "usera@marmot.com",
-    "passwordHash": "",
-    "role": "customer",
-    "isVerified": true,
-    "addresses": [],
-    "createdAt": "2026-09-02T23:13:58.132Z",
-    "lastLogin": "2026-09-02T23:13:58.132Z"
-  },
-  {
-    "id": "user-alpha-001",
-    "name": "User Alpha",
-    "email": "alpha@marmot.com",
-    "passwordHash": "",
-    "role": "customer",
-    "isVerified": true,
-    "addresses": [],
-    "createdAt": "2026-09-02T23:14:23.169Z",
-    "lastLogin": "2026-09-02T23:14:23.169Z"
-  },
-  {
-    "id": "user-beta-002",
-    "name": "User Beta",
-    "email": "beta@marmot.com",
-    "role": "customer",
-    "isVerified": true,
-    "addresses": [],
-    "createdAt": "2026-09-02T23:19:54.800Z",
-    "lastLogin": "2026-09-02T23:19:54.800Z"
-  },
-  {
-    "id": "user-hacker-001",
-    "name": "Fake Authenticated User",
-    "email": "hacker@evil.com",
-    "passwordHash": "",
-    "role": "admin",
-    "isVerified": true,
-    "addresses": [],
-    "createdAt": "2026-09-03T00:07:21.427Z",
-    "lastLogin": "2026-09-03T00:07:21.427Z"
   }
 ]

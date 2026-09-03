@@ -5776,37 +5776,15 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
     }
 
     const email = data.user.email ? data.user.email.toLowerCase().trim() : null;
-    const appRole = data.user.app_metadata?.role;
     
-    // Strict role validation: Check app_metadata or profiles table
-    let isDbAdmin = false;
-    let profileRole: string | undefined = undefined;
-
-    try {
-      const { data: profile, error: profErr } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.user.id)
-        .maybeSingle();
-
-      if (profile) {
-        profileRole = profile.role;
-        isDbAdmin = profile.role === 'admin';
-      }
-
-      if (profErr) {
-        console.warn('[AUTH] Profile query notice:', profErr.message);
-      }
-    } catch (dbErr) {
-      console.warn('[AUTH] Database check exception:', dbErr);
-    }
-
-    const isOfficialAdmin = Boolean(appRole === 'admin' || isDbAdmin);
+    // Strict role validation: Authoritative admin privilege derives SOLELY from app_metadata.role
+    // Never trust profiles.role, user_metadata.role, request bodies, or client parameters
+    const isAdmin = Boolean(data.user.app_metadata && data.user.app_metadata.role === 'admin');
 
     return {
       userId: data.user.id,
       email,
-      role: isOfficialAdmin ? 'admin' : 'customer',
+      role: isAdmin ? 'admin' : 'customer',
       name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || email?.split('@')[0] || 'Cliente Marmot',
     };
   } catch (err) {
@@ -5835,7 +5813,7 @@ async function requireAuth(req: any, res: express.Response, next: express.NextFu
     }
 
     if (user) {
-      user.role = userRole === 'admin' ? 'admin' : (user.role || 'customer');
+      user.role = userRole === 'admin' ? 'admin' : 'customer';
       if (userName && (!user.name || user.name === user.email?.split('@')[0])) {
         user.name = userName;
       }
@@ -5862,7 +5840,7 @@ async function requireAuth(req: any, res: express.Response, next: express.NextFu
     }
 
     req.user = sanitizeUser(user);
-    req.user.role = userRole === 'admin' ? 'admin' : (user.role || 'customer');
+    req.user.role = userRole === 'admin' ? 'admin' : 'customer';
     req.fullUser = user;
     next();
   } catch {
@@ -6738,13 +6716,15 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
             id: verified.userId,
             name: verified.name || verified.email?.split('@')[0] || 'Cliente Marmot',
             email: verified.email || `user-${verified.userId}@marmot.com`,
-            role: verified.role || 'customer',
+            role: verified.role === 'admin' ? 'admin' : 'customer',
             isVerified: true,
             addresses: [],
             createdAt: new Date().toISOString(),
             lastLogin: new Date().toISOString(),
           };
           await db.saveUser(authUser);
+        } else {
+          authUser.role = verified.role === 'admin' ? 'admin' : 'customer';
         }
       }
     }
