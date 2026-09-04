@@ -1,194 +1,185 @@
-#!/usr/bin/env node
-/**
- * MARMOT CONFECÇÕES - BOOTSTRAP DISPOSABLE SUPABASE ENVIRONMENT
- * FASE 3 REMEDIATION: Ephemeral, isolated, reproducible test environment.
- * 
- * 1. Checks or starts disposable Supabase service (Docker Supabase CLI or high-fidelity emulator).
- * 2. Prepares ephemeral test identities:
- *    - Customer: TEST_CUSTOMER_EMAIL / TEST_CUSTOMER_PASSWORD / TEST_CUSTOMER_TOKEN
- *    - Admin: TEST_ADMIN_EMAIL / TEST_ADMIN_PASSWORD / TEST_ADMIN_TOKEN (app_metadata.role = 'admin')
- *    - Attacker: TEST_ATTACKER_EMAIL / TEST_ATTACKER_PASSWORD / TEST_ATTACKER_TOKEN
- * 3. Injects configuration into /tmp/supabase-disposable.env, process.env, and GITHUB_ENV.
- */
-
-import http from 'node:http';
 import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 import crypto from 'node:crypto';
-import { spawn, execSync } from 'node:child_process';
-import path from 'node:path';
+import { createClient } from '@supabase/supabase-js';
 
-const JWT_SECRET = process.env.DISPOSABLE_JWT_SECRET || 'super-secret-jwt-token-with-at-least-32-characters-long';
-const PORT = 54321;
-const DISPOSABLE_URL = `http://127.0.0.1:${PORT}`;
+const PROD_PROJECT_REF = 'ktmkvysnjfphcfntazut';
 
-function signJwt(payload, secret = JWT_SECRET) {
-  const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
-  const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const signature = crypto.createHmac('sha256', secret).update(`${header}.${body}`).digest('base64url');
-  return `${header}.${body}.${signature}`;
-}
-
-const ANON_KEY = signJwt({
-  role: 'anon',
-  iss: 'supabase',
-  iat: Math.floor(Date.now() / 1000),
-  exp: Math.floor(Date.now() / 1000) + 3600 * 24 * 365,
-});
-
-const SERVICE_ROLE_KEY = signJwt({
-  role: 'service_role',
-  iss: 'supabase',
-  iat: Math.floor(Date.now() / 1000),
-  exp: Math.floor(Date.now() / 1000) + 3600 * 24 * 365,
-});
-
-async function isEndpointHealthy(url) {
-  return new Promise((resolve) => {
-    const req = http.get(`${url}/auth/v1/health`, (res) => {
-      resolve(res.statusCode === 200);
-    });
-    req.on('error', () => resolve(false));
-    req.setTimeout(500, () => {
-      req.destroy();
-      resolve(false);
-    });
-  });
-}
-
-async function waitForEndpoint(url, timeoutSeconds = 15) {
-  const start = Date.now();
-  while (Date.now() - start < timeoutSeconds * 1000) {
-    if (await isEndpointHealthy(url)) {
-      return true;
-    }
-    await new Promise(r => setTimeout(r, 300));
-  }
-  return false;
-}
-
-async function main() {
-  console.log('======================================================================');
-  console.log('MARMOT CONFECÇÕES — BOOTSTRAPPING DISPOSABLE TEST ENVIRONMENT');
-  console.log('======================================================================');
-
-  let activeUrl = DISPOSABLE_URL;
-  let activeAnonKey = ANON_KEY;
-  let activeServiceKey = SERVICE_ROLE_KEY;
-
-  const healthy = await isEndpointHealthy(activeUrl);
-
-  if (!healthy) {
-    let dockerAvailable = false;
+async function bootstrap() {
+  // Load status from /tmp/supabase-status.env if exists
+  if (fs.existsSync('/tmp/supabase-status.env')) {
     try {
-      execSync('docker info', { stdio: 'ignore' });
-      dockerAvailable = true;
+      const lines = fs.readFileSync('/tmp/supabase-status.env', 'utf8').split('\n');
+      for (const line of lines) {
+        const match = line.match(/^([A-Z0-9_]+)=(.*)$/);
+        if (match) {
+          const key = match[1];
+          const val = match[2].replace(/^["']|["']$/g, '');
+          if (!process.env[key]) process.env[key] = val;
+        }
+      }
     } catch {}
-
-    if (dockerAvailable) {
-      console.log('[BOOTSTRAP] Docker detected. Starting Supabase CLI disposable instance...');
-      try {
-        execSync('npx --yes supabase start -x studio,inbucket,storage,realtime,analytics,edge_runtime', { stdio: 'inherit' });
-      } catch (e) {
-        console.warn('[BOOTSTRAP] Supabase CLI start encountered error, falling back to background emulator daemon:', e.message);
-      }
-    }
-
-    const checkAgain = await isEndpointHealthy(activeUrl);
-    if (!checkAgain) {
-      console.log('[BOOTSTRAP] Starting high-fidelity disposable Supabase daemon on port 54321...');
-      const daemonScript = path.resolve('scripts/disposable-supabase-server.mjs');
-      const child = spawn(process.execPath, [daemonScript], {
-        detached: true,
-        stdio: 'ignore',
-      });
-      child.unref();
-
-      const becameHealthy = await waitForEndpoint(activeUrl, 10);
-      if (!becameHealthy) {
-        throw new Error(`[BOOTSTRAP CRITICAL] Disposable Supabase failed to respond on ${activeUrl} within 10s.`);
-      }
-    }
   }
 
-  console.log(`[BOOTSTRAP] Verified healthy Supabase endpoint at: ${activeUrl}`);
+  let supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.API_URL || process.env.SUPABASE_URL;
+  let anonKey = process.env.SUPABASE_DISPOSABLE_ANON_KEY || process.env.ANON_KEY || process.env.SUPABASE_ANON_KEY;
+  let serviceRoleKey = process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || process.env.SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  // Test identities
-  const customerEmail = 'test-customer-e2e@marmot-disposable.test';
-  const customerPassword = 'CustomerPass123!Safe';
-  const customerToken = signJwt({
-    sub: 'usr-customer-e2e-001',
+  // If missing, attempt npx supabase status -o json
+  if (!supabaseUrl || !anonKey || !serviceRoleKey) {
+    try {
+      const output = execSync('npx supabase status -o json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const status = JSON.parse(output);
+      supabaseUrl = supabaseUrl || status.API_URL || status.api_url;
+      anonKey = anonKey || status.ANON_KEY || status.anon_key;
+      serviceRoleKey = serviceRoleKey || status.SERVICE_ROLE_KEY || status.service_role_key;
+    } catch {}
+  }
+
+  if (!supabaseUrl) {
+    supabaseUrl = 'http://127.0.0.1:54321';
+  }
+
+  // Safety Gate: Explicit rejection of production instance
+  if (supabaseUrl.includes(PROD_PROJECT_REF)) {
+    console.error(`[CRITICAL SECURITY REJECTION] REFUSING_TO_RUN_DESTRUCTIVE_TESTS_AGAINST_PRODUCTION: Target URL points to production Supabase instance (${PROD_PROJECT_REF})!`);
+    process.exit(1);
+  }
+
+  if (!serviceRoleKey || !anonKey) {
+    console.error('[BOOTSTRAP ERROR] Real Supabase local credentials not found. Supabase local must be running.');
+    process.exit(1);
+  }
+
+  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  const nonce = crypto.randomBytes(4).toString('hex');
+  const timestamp = Date.now();
+
+  const customerEmail = `ephemeral-customer-${timestamp}-${nonce}@marmot-disposable.test`;
+  const customerPassword = `Cust!${crypto.randomBytes(12).toString('base64url')}9#`;
+
+  const adminEmail = `ephemeral-admin-${timestamp}-${nonce}@marmot-disposable.test`;
+  const adminPassword = `Admin!${crypto.randomBytes(12).toString('base64url')}9#`;
+
+  const attackerEmail = `ephemeral-attacker-${timestamp}-${nonce}@marmot-disposable.test`;
+  const attackerPassword = `Atk!${crypto.randomBytes(12).toString('base64url')}9#`;
+
+  // 1. Create ephemeral Customer
+  const { data: custData, error: custErr } = await adminClient.auth.admin.createUser({
     email: customerEmail,
-    role: 'authenticated',
-    app_metadata: { provider: 'email', providers: ['email'], role: 'customer' },
+    password: customerPassword,
+    email_confirm: true,
     user_metadata: { name: 'Cliente E2E Teste', full_name: 'Cliente E2E Teste' },
-    aud: 'authenticated',
-    exp: Math.floor(Date.now() / 1000) + 3600 * 24,
   });
+  if (custErr) {
+    console.error('[BOOTSTRAP ERROR] Failed to create ephemeral customer:', custErr.message);
+    process.exit(1);
+  }
+  console.log('Customer created: yes');
 
-  const adminEmail = 'test-admin-e2e@marmot-disposable.test';
-  const adminPassword = 'AdminPass123!Safe';
-  const adminToken = signJwt({
-    sub: 'usr-admin-e2e-001',
+  // 2. Create ephemeral Admin (strictly app_metadata.role = 'admin')
+  const { data: admData, error: admErr } = await adminClient.auth.admin.createUser({
     email: adminEmail,
-    role: 'authenticated',
-    app_metadata: { provider: 'email', providers: ['email'], role: 'admin' },
+    password: adminPassword,
+    email_confirm: true,
     user_metadata: { name: 'Administrador E2E Teste', full_name: 'Administrador E2E Teste' },
-    aud: 'authenticated',
-    exp: Math.floor(Date.now() / 1000) + 3600 * 24,
+    app_metadata: { role: 'admin' },
   });
+  if (admErr) {
+    console.error('[BOOTSTRAP ERROR] Failed to create ephemeral admin:', admErr.message);
+    process.exit(1);
+  }
+  console.log('Admin created: yes');
 
-  const attackerEmail = 'test-attacker-e2e@marmot-disposable.test';
-  const attackerPassword = 'AttackerPass123!Safe';
-  const attackerToken = signJwt({
-    sub: 'usr-attacker-e2e-001',
+  // 3. Create ephemeral Attacker (strictly unprivileged)
+  const { data: atkData, error: atkErr } = await adminClient.auth.admin.createUser({
     email: attackerEmail,
-    role: 'authenticated',
-    app_metadata: { provider: 'email', providers: ['email'], role: 'customer' },
-    user_metadata: { name: 'Attacker Teste', full_name: 'Attacker Teste' },
-    aud: 'authenticated',
-    exp: Math.floor(Date.now() / 1000) + 3600 * 24,
+    password: attackerPassword,
+    email_confirm: true,
+    user_metadata: { name: 'Attacker E2E Teste', full_name: 'Attacker E2E Teste' },
+  });
+  if (atkErr) {
+    console.error('[BOOTSTRAP ERROR] Failed to create ephemeral attacker:', atkErr.message);
+    process.exit(1);
+  }
+  console.log('Attacker created: yes');
+
+  // Authenticate all identities with real GoTrue signInWithPassword
+  const publicClient = createClient(supabaseUrl, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const envMap = {
-    SUPABASE_DISPOSABLE_URL: activeUrl,
-    SUPABASE_DISPOSABLE_ANON_KEY: activeAnonKey,
-    SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY: activeServiceKey,
-    SUPABASE_SERVICE_ROLE_KEY: activeServiceKey,
+  const { data: custLogin, error: custLoginErr } = await publicClient.auth.signInWithPassword({
+    email: customerEmail,
+    password: customerPassword,
+  });
+  if (custLoginErr || !custLogin?.session?.access_token) {
+    console.error('[BOOTSTRAP ERROR] Real GoTrue customer authentication failed:', custLoginErr?.message);
+    process.exit(1);
+  }
+  const customerToken = custLogin.session.access_token;
+
+  const { data: admLogin, error: admLoginErr } = await publicClient.auth.signInWithPassword({
+    email: adminEmail,
+    password: adminPassword,
+  });
+  if (admLoginErr || !admLogin?.session?.access_token) {
+    console.error('[BOOTSTRAP ERROR] Real GoTrue admin authentication failed:', admLoginErr?.message);
+    process.exit(1);
+  }
+  const adminToken = admLogin.session.access_token;
+
+  const { data: atkLogin, error: atkLoginErr } = await publicClient.auth.signInWithPassword({
+    email: attackerEmail,
+    password: attackerPassword,
+  });
+  if (atkLoginErr || !atkLogin?.session?.access_token) {
+    console.error('[BOOTSTRAP ERROR] Real GoTrue attacker authentication failed:', atkLoginErr?.message);
+    process.exit(1);
+  }
+  const attackerToken = atkLogin.session.access_token;
+
+  // Export environment variables
+  const envExports = {
+    SUPABASE_DISPOSABLE_URL: supabaseUrl,
+    SUPABASE_DISPOSABLE_ANON_KEY: anonKey,
+    SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY: serviceRoleKey,
+    SUPABASE_URL: supabaseUrl,
+    VITE_SUPABASE_URL: supabaseUrl,
+    SUPABASE_ANON_KEY: anonKey,
+    VITE_SUPABASE_ANON_KEY: anonKey,
+    SUPABASE_SERVICE_ROLE_KEY: serviceRoleKey,
     TEST_CUSTOMER_EMAIL: customerEmail,
     TEST_CUSTOMER_PASSWORD: customerPassword,
     TEST_CUSTOMER_TOKEN: customerToken,
+    TEST_CUSTOMER_ID: custData.user.id,
     TEST_ADMIN_EMAIL: adminEmail,
     TEST_ADMIN_PASSWORD: adminPassword,
     TEST_ADMIN_TOKEN: adminToken,
+    TEST_ADMIN_ID: admData.user.id,
     TEST_ATTACKER_EMAIL: attackerEmail,
     TEST_ATTACKER_PASSWORD: attackerPassword,
     TEST_ATTACKER_TOKEN: attackerToken,
+    TEST_ATTACKER_ID: atkData.user.id,
   };
 
-  for (const [k, v] of Object.entries(envMap)) {
-    process.env[k] = v;
-  }
+  const envLines = Object.entries(envExports)
+    .map(([k, v]) => `export ${k}="${v}"`)
+    .join('\n');
+  fs.writeFileSync('/tmp/supabase-disposable.env', envLines + '\n', { mode: 0o600 });
 
-  // Export to /tmp/supabase-disposable.env
-  const envContent = Object.entries(envMap).map(([k, v]) => `export ${k}="${v}"`).join('\n') + '\n';
-  fs.writeFileSync('/tmp/supabase-disposable.env', envContent, 'utf8');
-
-  // Export to GITHUB_ENV if in CI
   if (process.env.GITHUB_ENV) {
-    const ghContent = Object.entries(envMap).map(([k, v]) => `${k}=${v}`).join('\n') + '\n';
-    fs.appendFileSync(process.env.GITHUB_ENV, ghContent, 'utf8');
+    const ghEnvLines = Object.entries(envExports)
+      .map(([k, v]) => `${k}=${v}`)
+      .join('\n');
+    fs.appendFileSync(process.env.GITHUB_ENV, ghEnvLines + '\n');
   }
-
-  console.log('----------------------------------------------------------------------');
-  console.log('✅ DISPOSABLE TEST ENVIRONMENT READY');
-  console.log(`Endpoint: ${activeUrl}`);
-  console.log(`Customer: ${customerEmail}`);
-  console.log(`Admin:    ${adminEmail} (app_metadata.role = 'admin')`);
-  console.log(`Attacker: ${attackerEmail}`);
-  console.log('======================================================================');
 }
 
-main().catch((err) => {
-  console.error('[BOOTSTRAP CRITICAL] Error:', err);
+bootstrap().catch((err) => {
+  console.error('[BOOTSTRAP FATAL ERROR]:', err?.message || err);
   process.exit(1);
 });

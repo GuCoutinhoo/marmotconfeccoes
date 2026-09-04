@@ -11,7 +11,7 @@
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "test": "node --test test/*.test.mjs",
-    "test:integration": "node --test test/integration/test-mode-security.test.mjs test/integration/p0-profile-role-decoupling.test.mjs",
+    "test:integration": "node --test test/integration/test-mode-security.test.mjs test/integration/behavioral-remediation.test.mjs test/integration/p0-profile-role-decoupling.test.mjs",
     "test:concurrency": "node --test test/integration/financial-concurrency.test.mjs",
     "test:all": "node --test test/*.test.mjs test/integration/*.test.mjs"
   },
@@ -43,6 +43,7 @@
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
+    "supabase": "^2.116.0",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

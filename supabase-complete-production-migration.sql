@@ -807,7 +807,7 @@ CREATE TABLE IF NOT EXISTS public.schema_migrations (
 
 INSERT INTO public.schema_migrations (version, description)
 VALUES ('20260901_p0_production_hardening_v4', 'Marmot Confecções P0/P1 Production Hardening, Fail-Closed Shipping, RLS & Financial Ledger Serialization')
-ON CONFLICT (version) DO UPDATE SET applied_at = NOW();
+ON CONFLICT (version) DO NOTHING;
 
 -- =========================================================================
 -- INDEXES FOR HIGH-TRAFFIC RELATIONAL QUERIES
@@ -1822,5 +1822,5 @@ VALUES
   ('20260902_remove_profile_role_admin_authority', 'Decouple profiles.role from admin authorization, revoke UPDATE role from authenticated, lock is_admin RPC to service_role'),
   ('20260903_lock_profile_trigger_functions', 'Revoke execute on trigger functions from anon/authenticated, remove legacy trigger, clean duplicate indexes, and optimize InitPlan RLS'),
   ('20260903_cleanup_profile_rls_policies', 'Consolidate public.profiles RLS policies, remove duplicate payment_effects index, drop legacy triggers, lock trigger functions')
-ON CONFLICT (version) DO UPDATE SET applied_at = NOW();
+ON CONFLICT (version) DO NOTHING;
 

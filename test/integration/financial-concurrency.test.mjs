@@ -20,19 +20,17 @@ import { createClient } from '@supabase/supabase-js';
 import pg from 'pg';
 
 const { Pool } = pg;
-
 const PROD_PROJECT_REF = 'ktmkvysnjfphcfntazut';
+
 const rawSupabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.VITE_SUPABASE_URL || '';
 const disposableDbUrl = process.env.DISPOSABLE_DATABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // --------------------------------------------------------------------------
-// FAIL-CLOSED SAFETY GATE: Reject Production & Require Disposable Database
+// FAIL-CLOSED SAFETY GATE: Reject Production
 // --------------------------------------------------------------------------
-if (rawSupabaseUrl.includes(PROD_PROJECT_REF) && !disposableDbUrl) {
-  throw new Error(
-    'TEST ENVIRONMENT MISCONFIGURED: Refusing to run destructive financial concurrency tests against production Supabase instance (ktmkvysnjfphcfntazut). A disposable branch or isolated database must be configured via SUPABASE_DISPOSABLE_URL or DISPOSABLE_DATABASE_URL.'
-  );
+if (rawSupabaseUrl.includes(PROD_PROJECT_REF) || (disposableDbUrl && disposableDbUrl.includes(PROD_PROJECT_REF))) {
+  throw new Error('REFUSING_TO_RUN_DESTRUCTIVE_TESTS_AGAINST_PRODUCTION');
 }
 
 const hasDisposableConfig = Boolean(
@@ -58,69 +56,89 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
     });
   }
 
-  // Unified executor for RPC calls across both pg pool and Supabase client
   async function callProcessApprovedOrderAtomic(params) {
     if (pool) {
-      const client = await pool.connect();
+      const sql = `
+        SELECT public.process_approved_order_atomic(
+          $1::text,
+          $2::text,
+          $3::numeric,
+          $4::text,
+          $5::text,
+          $6::text,
+          $7::timestamptz,
+          $8::jsonb,
+          $9::jsonb
+        ) AS result;
+      `;
+      const values = [
+        params.p_order_id,
+        params.p_payment_id,
+        params.p_amount || 100,
+        params.p_currency || 'BRL',
+        params.p_gateway || 'mercadopago',
+        params.p_payment_method || 'credit_card',
+        params.p_date_approved || new Date().toISOString(),
+        JSON.stringify(params.p_items || []),
+        JSON.stringify(params.p_raw_payload || {}),
+      ];
       try {
-        const query = `
-          SELECT public.process_approved_order_atomic(
-            $1::text,
-            $2::text,
-            $3::numeric,
-            $4::text,
-            $5::text,
-            $6::text,
-            $7::timestamptz,
-            $8::jsonb,
-            $9::jsonb
-          ) AS result;
-        `;
-        const res = await client.query(query, [
-          params.p_order_id,
-          params.p_payment_id,
-          params.p_amount,
-          params.p_currency || 'BRL',
-          params.p_gateway || 'mercadopago',
-          params.p_payment_method || 'Mercado Pago',
-          params.p_date_approved || new Date().toISOString(),
-          JSON.stringify(params.p_items || []),
-          JSON.stringify(params.p_raw_payload || {}),
-        ]);
-        return { data: res.rows[0]?.result, error: null };
+        const res = await pool.query(sql, values);
+        return { data: res.rows[0].result, error: null };
       } catch (err) {
         return { data: null, error: err };
-      } finally {
-        client.release();
       }
     } else {
       return await supabaseAdmin.rpc('process_approved_order_atomic', params);
     }
   }
 
-  async function insertProduct(prod) {
+  async function insertProduct(product) {
     if (pool) {
       await pool.query(
         `INSERT INTO public.products (id, title, price, stock_count, category, status, images, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          ON CONFLICT (id) DO UPDATE SET stock_count = EXCLUDED.stock_count;`,
-        [prod.id, prod.title, prod.price, prod.stock_count, prod.category, prod.status, JSON.stringify(prod.images), prod.created_at]
+        [
+          product.id,
+          product.title,
+          product.price,
+          product.stock_count,
+          product.category,
+          product.status,
+          product.images,
+          product.created_at || new Date().toISOString(),
+        ]
       );
     } else {
-      await supabaseAdmin.from('products').insert(prod);
+      const { error } = await supabaseAdmin.from('products').upsert(product);
+      if (error) throw error;
     }
   }
 
   async function insertOrder(order) {
     if (pool) {
       await pool.query(
-        `INSERT INTO public.orders (id, customer_name, customer_email, total, status, payment_status, payment_method, shipping_address, items, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9::jsonb, $10)
-         ON CONFLICT (id) DO NOTHING;`,
-        [order.id, order.customer_name, order.customer_email, order.total, order.status, order.payment_status, order.payment_method, JSON.stringify(order.shipping_address), JSON.stringify(order.items), order.created_at]
+        `INSERT INTO public.orders (
+          id, customer_name, customer_email, total, status, payment_status, payment_method, shipping_address, items, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        ON CONFLICT (id) DO UPDATE SET payment_status = EXCLUDED.payment_status;`,
+        [
+          order.id,
+          order.customer_name,
+          order.customer_email,
+          order.total,
+          order.status,
+          order.payment_status,
+          order.payment_method,
+          JSON.stringify(order.shipping_address),
+          JSON.stringify(order.items),
+          order.created_at || new Date().toISOString(),
+        ]
       );
     } else {
-      await supabaseAdmin.from('orders').insert(order);
+      const { error } = await supabaseAdmin.from('orders').upsert(order);
+      if (error) throw error;
     }
   }
 
@@ -154,26 +172,47 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
     }
   }
 
-  const RUN_ID = crypto.randomUUID();
-  const RUN_PREFIX = `TEST-${RUN_ID}`;
+  async function getInventoryMovementsCount(orderId) {
+    if (pool) {
+      const res = await pool.query(`SELECT count(*)::integer AS total FROM public.inventory_movements WHERE order_id = $1;`, [orderId]);
+      return res.rows[0]?.total;
+    } else {
+      const { count } = await supabaseAdmin.from('inventory_movements').select('*', { count: 'exact', head: true }).eq('order_id', orderId);
+      return count;
+    }
+  }
 
+  const RUN_ID = crypto.randomUUID();
+  const TEST_PROD_A = `P-A-${RUN_ID}`;
+  const TEST_ORDER_A = `ORD-A-${RUN_ID}`;
+  const TEST_PAY_A = `PAY-A-${RUN_ID}`;
+
+  const TEST_PROD_B = `P-B-${RUN_ID}`;
+  const TEST_ORDER_B1 = `ORD-B1-${RUN_ID}`;
+  const TEST_ORDER_B2 = `ORD-B2-${RUN_ID}`;
+  const TEST_PAY_B1 = `PAY-B1-${RUN_ID}`;
+  const TEST_PAY_B2 = `PAY-B2-${RUN_ID}`;
+
+  const allOrderIds = [TEST_ORDER_A, TEST_ORDER_B1, TEST_ORDER_B2];
+  const allProductIds = [TEST_PROD_A, TEST_PROD_B];
+
+  // Precise cleanup targeting ONLY the exact IDs generated for this specific run (BLOCKER 13)
   async function cleanupTestData() {
     try {
       if (pool) {
-        // FK-safe deletion order: payment_effects -> order_status_history -> inventory_movements -> order_items -> orders -> products
-        await pool.query(`DELETE FROM public.payment_effects WHERE order_id LIKE $1;`, [`${RUN_PREFIX}%`]);
-        await pool.query(`DELETE FROM public.order_status_history WHERE order_id LIKE $1;`, [`${RUN_PREFIX}%`]);
-        await pool.query(`DELETE FROM public.inventory_movements WHERE order_id LIKE $1 OR product_id LIKE $1;`, [`${RUN_PREFIX}%`]);
-        await pool.query(`DELETE FROM public.order_items WHERE order_id LIKE $1;`, [`${RUN_PREFIX}%`]);
-        await pool.query(`DELETE FROM public.orders WHERE id LIKE $1;`, [`${RUN_PREFIX}%`]);
-        await pool.query(`DELETE FROM public.products WHERE id LIKE $1;`, [`${RUN_PREFIX}%`]);
+        await pool.query(`DELETE FROM public.payment_effects WHERE order_id = ANY($1::text[]);`, [allOrderIds]);
+        await pool.query(`DELETE FROM public.order_status_history WHERE order_id = ANY($1::text[]);`, [allOrderIds]);
+        await pool.query(`DELETE FROM public.inventory_movements WHERE order_id = ANY($1::text[]) OR product_id = ANY($2::text[]);`, [allOrderIds, allProductIds]);
+        await pool.query(`DELETE FROM public.order_items WHERE order_id = ANY($1::text[]);`, [allOrderIds]);
+        await pool.query(`DELETE FROM public.orders WHERE id = ANY($1::text[]);`, [allOrderIds]);
+        await pool.query(`DELETE FROM public.products WHERE id = ANY($1::text[]);`, [allProductIds]);
       } else if (supabaseAdmin) {
-        await supabaseAdmin.from('payment_effects').delete().like('order_id', `${RUN_PREFIX}%`);
-        await supabaseAdmin.from('order_status_history').delete().like('order_id', `${RUN_PREFIX}%`);
-        await supabaseAdmin.from('inventory_movements').delete().like('order_id', `${RUN_PREFIX}%`);
-        await supabaseAdmin.from('order_items').delete().like('order_id', `${RUN_PREFIX}%`);
-        await supabaseAdmin.from('orders').delete().like('id', `${RUN_PREFIX}%`);
-        await supabaseAdmin.from('products').delete().like('id', `${RUN_PREFIX}%`);
+        await supabaseAdmin.from('payment_effects').delete().in('order_id', allOrderIds);
+        await supabaseAdmin.from('order_status_history').delete().in('order_id', allOrderIds);
+        await supabaseAdmin.from('inventory_movements').delete().in('order_id', allOrderIds);
+        await supabaseAdmin.from('order_items').delete().in('order_id', allOrderIds);
+        await supabaseAdmin.from('orders').delete().in('id', allOrderIds);
+        await supabaseAdmin.from('products').delete().in('id', allProductIds);
       }
     } catch (e) {
       console.warn('Cleanup warning:', e?.message || e);
@@ -181,23 +220,14 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
   }
 
   await cleanupTestData();
+
   t.after(async () => {
     await cleanupTestData();
     if (pool) await pool.end();
   });
 
-  const TEST_PROD_A = `${RUN_PREFIX}-PROD-A`;
-  const TEST_ORDER_A = `${RUN_PREFIX}-ORDER-A`;
-  const TEST_PAY_A = `${RUN_PREFIX}-PAY-A`;
-
-  const TEST_PROD_B = `${RUN_PREFIX}-PROD-B`;
-  const TEST_ORDER_B1 = `${RUN_PREFIX}-ORDER-B1`;
-  const TEST_ORDER_B2 = `${RUN_PREFIX}-ORDER-B2`;
-  const TEST_PAY_B1 = `${RUN_PREFIX}-PAY-B1`;
-  const TEST_PAY_B2 = `${RUN_PREFIX}-PAY-B2`;
-
   // =========================================================================
-  // CENÁRIO A — DUPLICATE PAYMENT
+  // CENÁRIO A — DUPLICATE PAYMENT (BLOCKER 12)
   // =========================================================================
   await t.test('CENÁRIO A — Duplicate Payment: 10 concurrent requests for same order & payment', async () => {
     await insertProduct({
@@ -254,10 +284,13 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
 
     const effectCount = await getPaymentEffectsCount(TEST_ORDER_A);
     assert.equal(effectCount, 1, 'payment_effects must contain exactly 1 financial record');
+
+    const movementCount = await getInventoryMovementsCount(TEST_ORDER_A);
+    assert.equal(movementCount, 1, 'inventory_movements must contain exactly 1 sale entry');
   });
 
   // =========================================================================
-  // CENÁRIO B — STOCK RACE
+  // CENÁRIO B — STOCK RACE (BLOCKER 12)
   // =========================================================================
   await t.test('CENÁRIO B — Stock Race: 2 simultaneous orders for stock = 1', async () => {
     await insertProduct({
@@ -327,5 +360,21 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
 
     const stock = await getProductStock(TEST_PROD_B);
     assert.equal(stock, 0, 'Final stock must be exactly 0, never negative (-1)');
+    assert.ok(stock >= 0, 'Negative stock must be strictly false');
+
+    const countB1 = await getPaymentEffectsCount(TEST_ORDER_B1);
+    const countB2 = await getPaymentEffectsCount(TEST_ORDER_B2);
+    assert.equal((countB1 || 0) + (countB2 || 0), 1, 'Sum of payment_effects across both orders must equal exactly 1');
+
+    const failedOrderId = successes[0] === res1 ? TEST_ORDER_B2 : TEST_ORDER_B1;
+    const failedEffects = failedOrderId === TEST_ORDER_B1 ? countB1 : countB2;
+    assert.equal(failedEffects || 0, 0, 'Rejected order must have 0 payment_effects approved');
+
+    const failedMovements = await getInventoryMovementsCount(failedOrderId);
+    assert.equal(failedMovements || 0, 0, 'Rejected order must have 0 inventory deductions');
+
+    const failedOrder = await getOrderStatus(failedOrderId);
+    assert.notEqual(failedOrder?.payment_status, 'Pago', 'Rejected order payment_status must NOT be Pago');
+    assert.notEqual(failedOrder?.status, 'Em Separação', 'Rejected order status must NOT be Em Separação');
   });
 });

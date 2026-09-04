@@ -8,9 +8,8 @@ on:
 
 jobs:
   validate:
-    name: Typecheck, Test & Build
+    name: Release Gate Validation
     runs-on: ubuntu-latest
-
     services:
       postgres:
         image: postgres:16-alpine
@@ -25,7 +24,6 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -45,23 +43,32 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Run Unit Test Suite
+      - name: Unit Tests
         run: npm test
 
-      - name: Build Application
+      - name: Build
         run: npm run build
 
-      - name: Bootstrap Disposable Test Environment & Database
+      - name: Financial Test DB Bootstrap
         env:
           DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
-        run: |
-          node scripts/setup-test-db.mjs
-          node scripts/bootstrap-disposable-supabase.mjs
+        run: node scripts/setup-test-db.mjs
 
-      - name: Start Backend Server
+      - name: Real Supabase Local Bootstrap
+        run: |
+          npx supabase start -x studio,inbucket,storage,realtime,analytics,edge_runtime
+          npx supabase status -o env > /tmp/supabase-status.env
+          npx supabase migration up --local
+
+      - name: Auth Fixture Bootstrap
+        run: node scripts/bootstrap-disposable-supabase.mjs
+
+      - name: Backend Start
         run: |
           if [ -f /tmp/supabase-disposable.env ]; then
+            set -a
             source /tmp/supabase-disposable.env
+            set +a
           fi
           CI=true MARMOT_TEST_MODE=true nohup node dist/server.cjs > /tmp/server.log 2>&1 &
           echo $! > /tmp/server.pid
@@ -81,27 +88,40 @@ jobs:
           cat /tmp/server.log
           exit 1
 
-      - name: Run Integration Tests
+      - name: Integration Tests
         env:
           CI: true
           MARMOT_TEST_MODE: true
-          DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
         run: |
           if [ -f /tmp/supabase-disposable.env ]; then
+            set -a
             source /tmp/supabase-disposable.env
+            set +a
           fi
           npm run test:integration
 
-      - name: Run Concurrency Tests
+      - name: Concurrency Tests
         env:
           CI: true
           MARMOT_TEST_MODE: true
           DISPOSABLE_DATABASE_URL: postgres://postgres:postgrespassword@localhost:5432/marmot_test
         run: |
           if [ -f /tmp/supabase-disposable.env ]; then
+            set -a
             source /tmp/supabase-disposable.env
+            set +a
           fi
           npm run test:concurrency
 
       - name: Working Tree Clean Check
-        run: git diff --exit-code
+        run: |
+          git diff --exit-code
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "ERROR: tests changed repository files"
+            git status --porcelain
+            exit 1
+          fi
+
+      - name: Shutdown Supabase Local
+        if: always()
+        run: npx supabase stop || true
