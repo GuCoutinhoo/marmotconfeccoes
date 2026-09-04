@@ -28,7 +28,8 @@ async function bootstrap() {
   // If missing, attempt npx supabase status -o json
   if (!supabaseUrl || !anonKey || !serviceRoleKey) {
     try {
-      const output = execSync('npx supabase status -o json', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const workdirFlag = fs.existsSync('/tmp/supabase-workspace') ? ' --workdir /tmp/supabase-workspace' : '';
+      const output = execSync(`npx supabase status -o json${workdirFlag}`, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
       const status = JSON.parse(output);
       supabaseUrl = supabaseUrl || status.API_URL || status.api_url;
       anonKey = anonKey || status.ANON_KEY || status.anon_key;

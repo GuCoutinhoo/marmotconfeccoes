@@ -56,9 +56,10 @@ jobs:
 
       - name: Real Supabase Local Bootstrap
         run: |
-          npx supabase start -x studio,inbucket,storage,realtime,analytics,edge_runtime
-          npx supabase status -o env > /tmp/supabase-status.env
-          npx supabase migration up --local
+          node scripts/prepare-ci-migrations.mjs
+          npx supabase start -x studio,inbucket,storage,realtime,analytics,edge_runtime --workdir /tmp/supabase-workspace
+          npx supabase status -o env --workdir /tmp/supabase-workspace > /tmp/supabase-status.env
+          npx supabase migration up --local --workdir /tmp/supabase-workspace
 
       - name: Auth Fixture Bootstrap
         run: node scripts/bootstrap-disposable-supabase.mjs
@@ -124,4 +125,6 @@ jobs:
 
       - name: Shutdown Supabase Local
         if: always()
-        run: npx supabase stop || true
+        run: |
+          npx supabase stop --workdir /tmp/supabase-workspace || npx supabase stop || true
+          rm -rf /tmp/supabase-workspace || true
