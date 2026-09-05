@@ -57,9 +57,10 @@ jobs:
       - name: Real Supabase Local Bootstrap
         run: |
           node scripts/prepare-ci-migrations.mjs
-          npx supabase start -x studio,inbucket,storage,realtime,analytics,edge_runtime --workdir /tmp/supabase-workspace
+          npx supabase start -x studio,mailpit,storage-api,imgproxy,realtime,edge-runtime,logflare,vector,supavisor --workdir /tmp/supabase-workspace
           npx supabase status -o env --workdir /tmp/supabase-workspace > /tmp/supabase-status.env
           npx supabase migration up --local --workdir /tmp/supabase-workspace
+          node scripts/verify-canonical-schema.mjs
 
       - name: Auth Fixture Bootstrap
         run: node scripts/bootstrap-disposable-supabase.mjs
