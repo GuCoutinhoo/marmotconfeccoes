@@ -88,6 +88,8 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
     assert.notEqual(updateRoleRes.error.code, '23505', 'Duplicate key constraint (23505) does NOT count as security enforcement');
     assert.notEqual(updateRoleRes.error.code, '23503', 'Foreign key constraint (23503) does NOT count as security enforcement');
     assert.notEqual(updateRoleRes.error.code, '23502', 'Missing field constraint (23502) does NOT count as security enforcement');
+    assert.notEqual(updateRoleRes.error.code, '42P17', 'Infinite recursion error (42P17) does NOT count as security enforcement');
+    assert.notEqual(updateRoleRes.error.code, '22P02', 'Syntax error (22P02) does NOT count as security enforcement');
 
     const isSecurityError = updateRoleRes.error.code === '42501' ||
                             updateRoleRes.error.code === 'P0001' ||
@@ -112,6 +114,48 @@ test('Integration Suite: P0 Profile Role Decoupling & Authority Enforcement', as
     assert.equal(res.status, 200, 'GET /api/auth/me must succeed');
     const data = await res.json();
     assert.equal(data.user?.role, 'customer', 'Backend must report role as customer');
+  });
+
+  // --------------------------------------------------------------------------
+  // TESTE A.1: Cliente consegue ler e editar apenas o próprio perfil nos campos permitidos (sem 42P17)
+  // --------------------------------------------------------------------------
+  await t.test('TESTE A.1: Customer can read and update permitted fields on own profile without 42P17 recursion', async () => {
+    assert.ok(userAToken, 'AUTHENTICATION_REQUIRED: Customer token must be active');
+    const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: { headers: { Authorization: `Bearer ${userAToken}` } },
+      auth: { persistSession: false },
+    });
+
+    // 1. Read own profile
+    const { data: profile, error: readErr } = await userClient
+      .from('profiles')
+      .select('id, email, name, role, phone')
+      .eq('id', userAId)
+      .single();
+
+    assert.ifError(readErr, 'Customer must be able to read own profile without error');
+    assert.ok(profile, 'Profile must be returned');
+    assert.equal(profile.id, userAId, 'Must be own profile');
+    assert.equal(profile.role, 'customer', 'Role must be customer');
+
+    // 2. Update permitted fields (e.g. phone)
+    const testPhone = '11999998888';
+    const { error: updateErr } = await userClient
+      .from('profiles')
+      .update({ phone: testPhone })
+      .eq('id', userAId);
+
+    assert.ifError(updateErr, 'Customer must be able to update permitted fields on own profile without 42P17 recursion');
+
+    // 3. Verify updated field
+    const { data: updatedProfile, error: verifyErr } = await userClient
+      .from('profiles')
+      .select('phone')
+      .eq('id', userAId)
+      .single();
+
+    assert.ifError(verifyErr, 'Must read updated profile');
+    assert.equal(updatedProfile?.phone, testPhone, 'Phone must be updated');
   });
 
   // --------------------------------------------------------------------------

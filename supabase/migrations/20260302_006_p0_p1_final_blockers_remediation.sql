@@ -24,17 +24,9 @@ BEGIN
     RETURN TRUE;
   END IF;
 
-  -- JWT app_metadata role check
+  -- JWT app_metadata role check (Strictly app_metadata only, never profiles table)
   IF COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', '') = 'admin' THEN
     RETURN TRUE;
-  END IF;
-
-  -- Fallback check against profiles table
-  IF auth.uid() IS NOT NULL THEN
-    RETURN EXISTS (
-      SELECT 1 FROM public.profiles
-      WHERE id = auth.uid() AND role = 'admin'
-    );
   END IF;
 
   RETURN FALSE;
@@ -59,14 +51,7 @@ BEGIN
     RETURN TRUE;
   END IF;
 
-  IF user_id IS NULL THEN
-    RETURN FALSE;
-  END IF;
-
-  RETURN EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = user_id AND role = 'admin'
-  );
+  RETURN FALSE;
 END;
 $$;
 

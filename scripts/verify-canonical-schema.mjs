@@ -143,7 +143,31 @@ async function verifySchema() {
       }
       console.log('[SCHEMA VERIFICATION] Privilege escalation triggers verified on public.profiles.');
 
-      // 2e. Schema migrations history table
+      // 2e. profiles RLS policies Invariant: Canonical policies only, zero recursive subqueries
+      const policyRes = await client.query(`
+        SELECT policyname, qual, with_check 
+        FROM pg_policies 
+        WHERE schemaname = 'public' AND tablename = 'profiles';
+      `);
+      const existingPolicies = policyRes.rows.map((r) => r.policyname);
+      const canonicalPolicyNames = new Set([
+        'profiles_select_policy',
+        'profiles_update_policy',
+        'profiles_insert_policy',
+        'profiles_delete_policy',
+      ]);
+      for (const row of policyRes.rows) {
+        if (!canonicalPolicyNames.has(row.policyname)) {
+          throw new Error(`[SCHEMA SECURITY REGRESSION] Unexpected/legacy policy '${row.policyname}' found on public.profiles!`);
+        }
+        const fullExpr = ((row.qual || '') + ' ' + (row.with_check || '')).toLowerCase();
+        if (fullExpr.includes('from public.profiles') || fullExpr.includes('from profiles')) {
+          throw new Error(`[SCHEMA SECURITY REGRESSION] Policy '${row.policyname}' on public.profiles contains recursive query to profiles table!`);
+        }
+      }
+      console.log(`[SCHEMA VERIFICATION] public.profiles RLS verified (${existingPolicies.length} canonical non-recursive policies: ${existingPolicies.join(', ')}).`);
+
+      // 2f. Schema migrations history table
       const migRes = await client.query('SELECT count(*)::int as count FROM public.schema_migrations;');
       console.log(`[SCHEMA VERIFICATION] public.schema_migrations confirmed tracking ${migRes.rows[0].count} migrations.`);
 

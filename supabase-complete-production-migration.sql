@@ -1454,6 +1454,9 @@ DROP POLICY IF EXISTS "Admin manage coupons" ON public.coupons;
 CREATE POLICY "Admin manage coupons" ON public.coupons FOR ALL USING (public.is_admin()) WITH CHECK (public.is_admin());
 
 -- Profiles RLS - Canonical Generation (Decoupled from profiles.role, optimized with InitPlan)
+DROP POLICY IF EXISTS "Profiles are readable by owner or admin" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles can be updated by owner (except role)" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles can be inserted by owner" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles read restricted to owner and admin" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles update restricted to owner and admin" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles insert restricted to owner and admin" ON public.profiles;

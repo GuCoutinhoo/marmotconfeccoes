@@ -13,6 +13,9 @@
 -- =========================================================================
 -- 1. CONSOLIDATE PROFILES RLS POLICIES
 -- =========================================================================
+DROP POLICY IF EXISTS "Profiles are readable by owner or admin" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles can be updated by owner (except role)" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles can be inserted by owner" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles read restricted to owner and admin" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles update restricted to owner and admin" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles insert restricted to owner and admin" ON public.profiles;
@@ -21,6 +24,21 @@ DROP POLICY IF EXISTS "Profiles select allowed for user or admin" ON public.prof
 DROP POLICY IF EXISTS "Profiles update allowed for user or admin" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles insert allowed for user or admin" ON public.profiles;
 DROP POLICY IF EXISTS "Profiles delete only for admin" ON public.profiles;
+DROP POLICY IF EXISTS "Public profiles read for owner or admin" ON public.profiles;
+DROP POLICY IF EXISTS "Perfis podem ser lidos publicamente ou pelo dono" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Usuário pode atualizar apenas seu próprio perfil" ON public.profiles;
+DROP POLICY IF EXISTS "Anyone can insert profile" ON public.profiles;
+DROP POLICY IF EXISTS "Criação de novos perfis liberada" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles allow insert" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles allow read" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles insert during registration" ON public.profiles;
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone" ON public.profiles;
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert their own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Allow authenticated users to read profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Allow all" ON public.profiles;
 DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
 DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
 DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;

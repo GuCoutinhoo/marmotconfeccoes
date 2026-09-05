@@ -3,21 +3,16 @@
 -- DESCRIPTION: Funções de autorização, triggers de cadastro seguro e RLS Policies
 -- =========================================================================
 
--- 1. Helper function to check if the caller is an administrator
+-- 1. Helper function to check if the caller is an administrator (Strictly service_role / JWT app_metadata only)
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, pg_temp
 AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.profiles
-    WHERE id = auth.uid() AND role = 'admin'
-  )
-  OR (
-    SELECT COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', '') = 'admin'
-  );
+  SELECT (COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', '') = 'admin')
+         OR (COALESCE(auth.role(), '') = 'service_role');
 $$;
 
 -- 2. Trigger for new user registration (Prevents client-side privilege escalation)
@@ -75,24 +70,39 @@ ALTER TABLE public.admin_audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- 4. RLS POLICIES FOR PROFILES
 DROP POLICY IF EXISTS "Profiles are readable by owner or admin" ON public.profiles;
-CREATE POLICY "Profiles are readable by owner or admin"
+DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
+CREATE POLICY "profiles_select_policy"
   ON public.profiles FOR SELECT
-  USING (auth.uid() = id OR public.is_admin());
+  USING (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND (select auth.uid()) = id)
+  );
 
 DROP POLICY IF EXISTS "Profiles can be updated by owner (except role)" ON public.profiles;
-CREATE POLICY "Profiles can be updated by owner (except role)"
+DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
+CREATE POLICY "profiles_update_policy"
   ON public.profiles FOR UPDATE
-  USING (auth.uid() = id OR public.is_admin())
+  USING (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND (select auth.uid()) = id)
+  )
   WITH CHECK (
-    public.is_admin() OR (
-      auth.uid() = id AND role = (SELECT role FROM public.profiles WHERE id = auth.uid())
-    )
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND (select auth.uid()) = id)
   );
 
 DROP POLICY IF EXISTS "Profiles can be inserted by owner" ON public.profiles;
-CREATE POLICY "Profiles can be inserted by owner"
+DROP POLICY IF EXISTS "profiles_insert_policy" ON public.profiles;
+CREATE POLICY "profiles_insert_policy"
   ON public.profiles FOR INSERT
-  WITH CHECK (auth.uid() = id OR public.is_admin());
+  WITH CHECK (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND (select auth.uid()) = id)
+  );
 
 -- 5. RLS POLICIES FOR PRODUCTS
 DROP POLICY IF EXISTS "Products are viewable by everyone" ON public.products;

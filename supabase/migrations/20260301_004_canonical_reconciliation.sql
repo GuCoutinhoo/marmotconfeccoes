@@ -32,26 +32,20 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS avatar_url TEXT;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
 
--- Função segura para verificar se o usuário autenticado é admin
+-- Função segura para verificar se o usuário autenticado é admin (Strictly service_role / JWT app_metadata only)
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
 LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
-SET search_path = public, auth
+SET search_path = public, pg_temp
 AS $$
-DECLARE
-  v_role TEXT;
 BEGIN
-  IF auth.uid() IS NULL THEN
-    RETURN FALSE;
+  IF auth.role() = 'service_role' THEN
+    RETURN TRUE;
   END IF;
 
-  SELECT role INTO v_role
-  FROM public.profiles
-  WHERE id = auth.uid();
-
-  RETURN (v_role = 'admin') OR (COALESCE(auth.jwt() -> 'app_metadata' ->> 'role', '') = 'admin');
+  RETURN COALESCE((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin', FALSE);
 END;
 $$;
 
@@ -429,13 +423,29 @@ ALTER TABLE public.payment_effects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- Profiles Policies
+DROP POLICY IF EXISTS "Profiles are readable by owner or admin" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles can be updated by owner (except role)" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles can be inserted by owner" ON public.profiles;
 DROP POLICY IF EXISTS "profiles_select_policy" ON public.profiles;
 CREATE POLICY "profiles_select_policy" ON public.profiles
-  FOR SELECT USING (auth.uid() = id OR public.is_admin());
+  FOR SELECT USING (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND (select auth.uid()) = id)
+  );
 
 DROP POLICY IF EXISTS "profiles_update_policy" ON public.profiles;
 CREATE POLICY "profiles_update_policy" ON public.profiles
-  FOR UPDATE USING (auth.uid() = id OR public.is_admin());
+  FOR UPDATE USING (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND (select auth.uid()) = id)
+  )
+  WITH CHECK (
+    (select auth.role()) = 'service_role'
+    OR ((select auth.jwt()) -> 'app_metadata' ->> 'role') = 'admin'
+    OR ((select auth.uid()) IS NOT NULL AND (select auth.uid()) = id)
+  );
 
 -- Products Policies (Leitura pública, mutação estrita de admin)
 DROP POLICY IF EXISTS "products_select_public" ON public.products;

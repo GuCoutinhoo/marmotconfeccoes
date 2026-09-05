@@ -219,18 +219,41 @@ test('Integration Suite: Behavioral Remediation & Security Enforcement', async (
   // 4. Database Security: Direct REST inserts & RPC lockdown
   // --------------------------------------------------------------------------
   await t.test('Database Security: Direct REST insert to product_reviews is blocked by RLS (42501)', async () => {
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    const customerToken = process.env.TEST_CUSTOMER_TOKEN;
+    const testUserId = process.env.TEST_CUSTOMER_ID || crypto.randomUUID();
+
+    // 1. Authenticated customer attempt with valid real user UUID
+    if (customerToken) {
+      const sbAuth = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        global: { headers: { Authorization: `Bearer ${customerToken}` } },
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+      const authRes = await sbAuth.from('product_reviews').insert({
+        product_id: 'prod-mol-016',
+        user_id: testUserId,
+        user_name: 'Authenticated Test Customer',
+        rating: 5,
+        comment: 'Direct REST insertion attempt by authenticated customer bypassing backend',
+      });
+      assert.ok(authRes.error, 'Direct REST insert by authenticated user must fail');
+      assert.notEqual(authRes.error.code, '22P02', 'Error must NOT be 22P02 (invalid UUID syntax)');
+      assert.equal(authRes.error.code, '42501', 'Error code must be 42501 (permission denied / RLS blocked)');
+    }
+
+    // 2. Anonymous attempt with valid UUID
+    const sbAnon = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
-    const res = await sb.from('product_reviews').insert({
+    const anonRes = await sbAnon.from('product_reviews').insert({
       product_id: 'prod-mol-016',
-      user_id: 'direct-attacker-id',
-      user_name: 'Direct Attacker',
+      user_id: testUserId,
+      user_name: 'Anonymous Attacker',
       rating: 5,
-      comment: 'Direct REST insertion attempt bypassing backend',
+      comment: 'Direct REST insertion attempt by anon bypassing backend',
     });
-    assert.ok(res.error, 'Direct REST insert must fail');
-    assert.equal(res.error.code, '42501', 'Error code must be 42501 (permission denied / RLS blocked)');
+    assert.ok(anonRes.error, 'Direct REST insert by anon must fail');
+    assert.notEqual(anonRes.error.code, '22P02', 'Error must NOT be 22P02 (invalid UUID syntax)');
+    assert.equal(anonRes.error.code, '42501', 'Error code must be 42501 (permission denied / RLS blocked)');
   });
 
   await t.test('Database Security: Direct RPC call to is_admin as anon returns permission denied (42501)', async () => {
