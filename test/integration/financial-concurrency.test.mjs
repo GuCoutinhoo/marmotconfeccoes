@@ -94,10 +94,14 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
   }
 
   async function insertProduct(product) {
+    const imagesJson = typeof product.images === 'string'
+      ? product.images
+      : JSON.stringify(product.images || []);
+
     if (pool) {
       await pool.query(
         `INSERT INTO public.products (id, title, price, stock_count, category, status, images, created_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8)
          ON CONFLICT (id) DO UPDATE SET stock_count = EXCLUDED.stock_count;`,
         [
           product.id,
@@ -106,12 +110,15 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
           product.stock_count,
           product.category,
           product.status,
-          product.images,
+          imagesJson,
           product.created_at || new Date().toISOString(),
         ]
       );
     } else {
-      const { error } = await supabaseAdmin.from('products').upsert(product);
+      const { error } = await supabaseAdmin.from('products').upsert({
+        ...product,
+        images: Array.isArray(product.images) ? product.images : JSON.parse(imagesJson),
+      });
       if (error) throw error;
     }
   }
@@ -237,7 +244,7 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
       stock_count: 10,
       category: 'Camisetas',
       status: 'active',
-      images: ['https://placehold.co/400x400.png'],
+      images: JSON.stringify(['https://placehold.co/400x400.png']),
       created_at: new Date().toISOString(),
     });
 
@@ -300,7 +307,7 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
       stock_count: 1,
       category: 'Camisetas',
       status: 'active',
-      images: ['https://placehold.co/400x400.png'],
+      images: JSON.stringify(['https://placehold.co/400x400.png']),
       created_at: new Date().toISOString(),
     });
 
