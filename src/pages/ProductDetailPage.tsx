@@ -218,7 +218,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   return (
     <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <Breadcrumb
           items={[
             { label: 'Início', onClick: () => onNavigate('home') },

@@ -31,7 +31,7 @@ export const CompactCustomerReviews: React.FC = () => {
 
   return (
     <section className="py-16 bg-[#F8F9FA] border-b border-[#E4E4E7]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
@@ -51,7 +51,7 @@ export const CompactCustomerReviews: React.FC = () => {
         </div>
 
         {/* Compact Review Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7 xl:gap-8">
           {reviews.map((rev, idx) => (
             <div
               key={idx}

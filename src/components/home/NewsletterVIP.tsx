@@ -27,9 +27,9 @@ export const NewsletterVIP: React.FC = () => {
 
   return (
     <section className="py-16 bg-white border-b border-[#E4E4E7]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-[#F8F9FA] border border-[#E4E4E7] rounded-2xl p-6 sm:p-10 relative overflow-hidden shadow-sm">
-          <div className="max-w-xl mx-auto text-center space-y-4 relative z-10">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+        <div className="bg-[#F8F9FA] border border-[#E4E4E7] rounded-2xl p-8 sm:p-12 lg:p-14 relative overflow-hidden shadow-sm">
+          <div className="max-w-2xl mx-auto text-center space-y-4 relative z-10">
             <div className="inline-flex items-center gap-1.5 bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] px-3 py-1 rounded-full text-xs font-mono font-bold uppercase">
               <Sparkles className="w-3.5 h-3.5" /> CLUBE DO ATELIÊ
             </div>

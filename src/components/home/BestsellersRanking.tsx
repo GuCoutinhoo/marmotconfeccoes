@@ -26,7 +26,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
 
   return (
     <section className="py-20 bg-white border-b border-[#E4E4E7]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
@@ -50,7 +50,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
         </div>
 
         {/* 8 Bestsellers Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-7 xl:gap-8">
           {isProductsEmpty ? (
             Array.from({ length: 8 }).map((_, idx) => (
               <div key={`bs-skel-${idx}`} className="flex flex-col h-full">

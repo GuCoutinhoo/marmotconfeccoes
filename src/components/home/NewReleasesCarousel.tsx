@@ -41,7 +41,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
   return (
     <section className="py-20 bg-[#F8F9FA] border-b border-[#E4E4E7]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Header with Navigation Controls */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
           <div>
@@ -91,7 +91,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         >
           {isProductsEmpty ? (
             Array.from({ length: 4 }).map((_, idx) => (
-              <div key={`skel-${idx}`} className="w-[280px] sm:w-[320px] shrink-0 snap-start">
+              <div key={`skel-${idx}`} className="w-[280px] sm:w-[320px] lg:w-[345px] xl:w-[365px] shrink-0 snap-start">
                 <ProductSkeleton />
               </div>
             ))
@@ -99,7 +99,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
             newReleases.map((product) => (
               <div
                 key={product.id}
-                className="w-[280px] sm:w-[320px] shrink-0 snap-start"
+                className="w-[280px] sm:w-[320px] lg:w-[345px] xl:w-[365px] shrink-0 snap-start"
               >
                 <ProductCard
                   product={product}

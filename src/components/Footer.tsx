@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer className="bg-white border-t border-[#E4E4E7] text-[#18181B] pt-14 pb-8">
       {/* Newsletter Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-14">
         <div className="bg-[#F8F9FA] border border-[#E4E4E7] p-8 md:p-10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
           <div className="relative z-10 max-w-xl">
             <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-2 block">
@@ -65,15 +65,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Main Footer Navigation Columns */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-[#E4E4E7]">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-[#E4E4E7]">
         {/* Brand Column */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate('home')}>
-            <div className="w-8 h-8 bg-[#e8b600] text-[#0D0D0E] font-black text-lg flex items-center justify-center rounded-lg shadow-sm">
-              M
-            </div>
-            <span className="text-lg font-black tracking-widest uppercase text-[#18181B]">
-              MARMOT <span className="text-[#B45309]">CONFECÇÕES</span>
+          <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => onNavigate('home')}>
+            <span className="text-lg font-black tracking-[0.14em] uppercase text-[#18181B]">
+              MARMOT <span className="text-zinc-400">CONFECÇÕES</span>
             </span>
           </div>
 
@@ -141,7 +138,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Bottom Bar Payment Seals & Copyright */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#71717A]">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#71717A]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-1.5 text-[#52525B] font-medium">
             <Lock className="w-3.5 h-3.5 text-[#B45309]" /> Checkout Seguro <strong className="text-[#18181B]">Mercado Pago</strong>

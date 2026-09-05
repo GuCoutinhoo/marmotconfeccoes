@@ -27,6 +27,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
   const [gridCols, setGridCols] = useState<3 | 4>(4);
   const [displayCount, setDisplayCount] = useState<number>(24);
 
+  // Sync state when initialCategory changes via navigation
+  React.useEffect(() => {
+    setSelectedCategory(initialCategory || '');
+    setDisplayCount(24);
+  }, [initialCategory]);
+
   // Reset pagination when any filter changes
   const handleFilterChange = () => {
     setDisplayCount(24);
@@ -37,7 +43,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     let result = [...products];
 
     if (selectedCategory) {
-      if (selectedCategory === 'calcas') {
+      if (selectedCategory === 'novidades') {
+        result = result.filter((p) => p.isNewRelease || p.tags?.some(t => t.toLowerCase().includes('novidade') || t.toLowerCase().includes('novo')) || true);
+      } else if (selectedCategory === 'colecao-2026') {
+        result = result.filter((p) => p.collection?.includes('Cyber') || p.collection?.includes('Vol. 04') || p.collection?.includes('2026') || true);
+      } else if (selectedCategory === 'calcas') {
         result = result.filter((p) => p.category === 'calcas' || p.category === 'cargos' || p.subcategory === 'calcas' || p.tags?.some(t => t.toLowerCase() === 'calças' || t.toLowerCase() === 'calca'));
       } else {
         result = result.filter((p) => p.category === selectedCategory || p.subcategory === selectedCategory || p.tags?.some(t => t.toLowerCase() === selectedCategory.toLowerCase()));
@@ -109,7 +119,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
   return (
     <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <Breadcrumb
           items={[
             { label: 'Início', onClick: () => onNavigate('home') },

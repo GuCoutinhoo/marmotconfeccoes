@@ -45,7 +45,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
 
   return (
     <section className="py-20 bg-[#F8F9FA] border-b border-[#E4E4E7] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 relative z-10">
         <div className="flex items-center justify-between mb-8">
           <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309]">
             <Sparkles className="w-3.5 h-3.5" />
@@ -57,7 +57,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
         </div>
 
         {/* Split Layout: Image Left | Details Right */}
-        <div className="bg-white border border-[#E4E4E7] rounded-2xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center shadow-md">
+        <div className="bg-white border border-[#E4E4E7] rounded-2xl p-6 sm:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center shadow-md">
           {/* Left Side: Large Product Image */}
           <div className="lg:col-span-6 relative aspect-[3/4] sm:aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F4F5] border border-[#E4E4E7] group">
             <img

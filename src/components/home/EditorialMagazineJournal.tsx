@@ -47,7 +47,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
 
   return (
     <section className="py-20 bg-white border-b border-[#E4E4E7]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 border-b border-[#E4E4E7] pb-8">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
@@ -68,7 +68,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
         </div>
 
         {/* Magazine Editorial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
           {articles.map((art) => (
             <div
               key={art.id}
@@ -76,7 +76,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
               className="group relative bg-white border border-[#E4E4E7] hover:border-[#18181B] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between"
             >
               {/* Image Header */}
-              <div className="relative h-64 sm:h-72 overflow-hidden bg-[#F4F4F5]">
+              <div className="relative h-64 sm:h-72 lg:h-80 overflow-hidden bg-[#F4F4F5]">
                 <img
                   src={art.image}
                   alt={art.title}

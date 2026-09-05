@@ -593,7 +593,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
   return (
     <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Header Steps */}
         <div className="mb-10 text-center">
           <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">

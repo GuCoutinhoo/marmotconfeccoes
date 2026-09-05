@@ -120,7 +120,7 @@ export const TrackingPage: React.FC<TrackingPageProps> = ({
 
   return (
     <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-10">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 space-y-8">
         <Breadcrumb items={[{ label: 'Rastreio de Pedido' }]} />
 
         {/* Hero Header Search */}
