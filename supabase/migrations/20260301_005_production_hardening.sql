@@ -728,6 +728,9 @@ BEGIN
 END;
 $$;
 
+-- Drop previous 4-parameter overload if present from earlier migration
+DROP FUNCTION IF EXISTS public.complete_webhook_event(TEXT, TEXT, TEXT, TEXT);
+
 -- Complete Webhook Event
 CREATE OR REPLACE FUNCTION public.complete_webhook_event(
   p_gateway TEXT,
@@ -813,19 +816,20 @@ $$;
 -- 4. FUNCTION GRANTS (PRINCIPLE OF LEAST PRIVILEGE)
 -- =========================================================================
 
-REVOKE EXECUTE ON FUNCTION public.process_approved_order_atomic FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB) TO authenticated, service_role;
 
-REVOKE EXECUTE ON FUNCTION public.deduct_inventory_atomic FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.deduct_inventory_atomic TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.deduct_inventory_atomic(TEXT, INTEGER, TEXT, TEXT) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.deduct_inventory_atomic(TEXT, INTEGER, TEXT, TEXT) TO authenticated, service_role;
 
-REVOKE EXECUTE ON FUNCTION public.claim_webhook_event FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.claim_webhook_event TO authenticated, service_role;
+REVOKE EXECUTE ON FUNCTION public.claim_webhook_event(TEXT, TEXT, TEXT, JSONB) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.claim_webhook_event(TEXT, TEXT, TEXT, JSONB) TO authenticated, service_role;
 
-REVOKE EXECUTE ON FUNCTION public.complete_webhook_event FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.complete_webhook_event TO authenticated, service_role;
+DROP FUNCTION IF EXISTS public.complete_webhook_event(TEXT, TEXT, TEXT, TEXT);
+REVOKE EXECUTE ON FUNCTION public.complete_webhook_event(TEXT, TEXT, TEXT, TEXT, TEXT) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.complete_webhook_event(TEXT, TEXT, TEXT, TEXT, TEXT) TO authenticated, service_role;
 
-GRANT EXECUTE ON FUNCTION public.is_admin TO PUBLIC, anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO PUBLIC, anon, authenticated, service_role;
 
 -- =========================================================================
 -- 5. ROW LEVEL SECURITY (RLS) POLICIES
