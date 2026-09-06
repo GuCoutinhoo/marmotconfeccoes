@@ -5,29 +5,29 @@ interface BannerHeroProps {
   onNavigate: (page: string, param?: string) => void;
 }
 
-const HERO_IMAGE = 'https://i.postimg.cc/tTGgns2X/hero-update.png';
+const HERO_IMAGE = '/hero-novo.png';
 
 export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
   return (
-    <section className="relative w-full bg-[#0B0B0E] text-white border-b border-[#E4E4E7] overflow-hidden">
-      {/* Main Editorial Hero Canvas - Full Bleed Image */}
-      <div className="relative min-h-[530px] sm:min-h-[590px] lg:min-h-[630px] xl:min-h-[660px] flex items-center">
+    <section className="relative w-full bg-[#0B0B0E] text-white border-b border-[#E4E4E7] overflow-hidden -mt-[68px] sm:-mt-[72px]">
+      {/* Main Editorial Hero Canvas - Full Bleed Image behind Header */}
+      <div className="relative min-h-[600px] sm:min-h-[660px] lg:min-h-[700px] xl:min-h-[730px] flex items-center">
         
-        {/* Full Hero Background Image - Spanning 100% width with 0 white smoke/fog */}
+        {/* Full Hero Background Image - Spanning 100% width and height, passing behind the header */}
         <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
           <img
             src={HERO_IMAGE}
             alt="Marmot Confecções - Coleção Streetwear"
             fetchPriority="high"
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover object-[75%_top] sm:object-[70%_top] md:object-[60%_top] lg:object-[center_top] brightness-[0.95] contrast-[1.05]"
+            className="w-full h-[108%] sm:h-[112%] lg:h-[114%] object-cover object-[75%_top] sm:object-[70%_top] md:object-[62%_top] lg:object-[68%_top] -translate-y-[4%] sm:-translate-y-[5%] lg:-translate-y-[6%] brightness-[0.95] contrast-[1.05]"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent lg:via-black/30 lg:to-transparent" />
           <div className="sm:hidden absolute inset-0 bg-black/30" />
         </div>
 
-        {/* Hero Content Container - High Contrast Editorial Layout */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+        {/* Hero Content Container - High Contrast Editorial Layout with top padding clearing header */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20">
           <div className="max-w-[620px] xl:max-w-[700px] flex flex-col items-start">
             
             {/* 1. Badge */}

@@ -151,6 +151,8 @@ export function AppContent() {
       <Header
         onNavigate={handleNavigate}
         onOpenSearch={() => setIsSearchOpen(true)}
+        currentPage={currentPage}
+        currentCategory={pageParam}
       />
 
       {/* Main Page Body with non-blocking Suspense boundaries */}
