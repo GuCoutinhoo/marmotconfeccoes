@@ -62,8 +62,8 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   const effectivePrice = product.promoPrice || product.price;
 
   return (
-    <section className="py-10 sm:py-14 lg:py-16 bg-[#F8F9FA] border-b border-[#E4E4E7] relative overflow-hidden">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 relative z-10">
+    <section className="py-10 sm:py-12 lg:py-14 bg-[#F8F9FA] border-b border-[#E4E4E7] relative overflow-hidden">
+      <div className="w-full max-w-[1820px] 2xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 relative z-10">
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309]">
             <Sparkles className="w-3.5 h-3.5" />

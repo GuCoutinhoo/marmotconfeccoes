@@ -155,9 +155,9 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   return (
     <section
       id="category-showcase-section"
-      className="py-14 sm:py-16 lg:py-20 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
+      className="py-10 sm:py-12 lg:py-14 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
     >
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+      <div className="w-full max-w-[1820px] 2xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* ========================================================= */}
         {/* CABEÇALHO ELEVADO COM HIERARQUIA TIPOGRÁFICA E CONTROLES  */}
         {/* ========================================================= */}
@@ -277,7 +277,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                   key={cat.id || cat.slug || index}
                   data-category-card
                   onClick={() => handleCardClick(cat.slug)}
-                  className="group relative h-[480px] sm:h-[520px] lg:h-[550px] xl:h-[580px] w-[80vw] sm:w-[calc((100%-20px)/2.2)] lg:w-[calc((100%-72px)/3.28)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out"
+                  className="group relative h-[420px] sm:h-[460px] lg:h-[480px] xl:h-[510px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out"
                 >
                   {/* Foto editorial padronizada com a nova imagem da categoria */}
                   <img
@@ -292,10 +292,10 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                   />
 
                   {/* Gradiente Inferior Robusto & Conteúdo Editorial Completo */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-40% to-transparent p-5 sm:p-7 lg:p-8 flex flex-col justify-end z-20 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-40% to-transparent p-4 sm:p-6 lg:p-7 flex flex-col justify-end z-20 pointer-events-none">
                     <div className="space-y-1.5 transform transition-transform duration-300 group-hover:-translate-y-1">
                       {/* Título de Categoria em Destaque Imponente */}
-                      <h3 className="text-2xl sm:text-3xl lg:text-[34px] font-black text-white uppercase tracking-tight leading-none group-hover:text-[#F4C400] transition-colors">
+                      <h3 className="text-xl sm:text-2xl lg:text-[28px] font-black text-white uppercase tracking-tight leading-none group-hover:text-[#F4C400] transition-colors">
                         {cat.name}
                       </h3>
 
@@ -313,11 +313,11 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                     </div>
 
                     {/* Botão de Ação / Barra Explorar */}
-                    <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-white group-hover:text-[#F4C400] transition-colors">
-                      <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.14em]">
+                    <div className="mt-3.5 pt-2.5 border-t border-white/15 flex items-center justify-between text-white group-hover:text-[#F4C400] transition-colors">
+                      <span className="text-[10.5px] sm:text-xs font-mono font-bold uppercase tracking-[0.14em]">
                         EXPLORAR COLEÇÃO
                       </span>
-                      <div className="w-8 h-8 rounded-full bg-white/10 group-hover:bg-[#F4C400] group-hover:text-black flex items-center justify-center transition-all duration-300 group-hover:translate-x-1 shadow-sm">
+                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 group-hover:bg-[#F4C400] group-hover:text-black flex items-center justify-center transition-all duration-300 group-hover:translate-x-1 shadow-sm">
                         <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
                       </div>
                     </div>

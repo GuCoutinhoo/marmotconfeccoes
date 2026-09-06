@@ -22,7 +22,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer className="bg-white border-t border-[#E4E4E7] text-[#18181B] pt-12 pb-8">
       {/* Newsletter Section */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-12">
+      <div className="w-full max-w-[1820px] 2xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-12">
         <div className="bg-[#111113] border border-[#111113] p-7 sm:p-8 md:p-10 rounded-[2px] flex flex-col md:flex-row items-start md:items-end justify-between gap-7 relative overflow-hidden text-white">
           <div className="relative z-10 max-w-xl">
             <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#F4C400] mb-2 block">
@@ -65,7 +65,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Main Footer Navigation Columns */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-[#E4E4E7]">
+      <div className="w-full max-w-[1820px] 2xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-[#E4E4E7]">
         {/* Brand Column */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => onNavigate('home')}>
@@ -138,7 +138,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Bottom Bar Payment Seals & Copyright */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#71717A]">
+      <div className="w-full max-w-[1820px] 2xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#71717A]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-1.5 text-[#52525B] font-medium">
             <Lock className="w-3.5 h-3.5 text-[#B45309]" /> Checkout Seguro <strong className="text-[#18181B]">Mercado Pago</strong>
