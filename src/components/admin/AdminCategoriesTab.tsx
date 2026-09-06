@@ -4,6 +4,10 @@ import { useToast } from '../../context/ToastContext';
 import { Category } from '../../types';
 import { ImageAdjustModal } from './ImageAdjustModal';
 import {
+  getStoredCategoryImage,
+  saveCategoryImageToLocalStorage,
+} from '../../utils/categoryImageStorage';
+import {
   FolderTree,
   Plus,
   Edit2,
@@ -178,6 +182,8 @@ export const AdminCategoriesTab: React.FC = () => {
     const finalUrl = quickImagePreview || quickImageUrl;
     setIsSavingQuickImage(true);
     try {
+      saveCategoryImageToLocalStorage(quickImageCat.id, finalUrl);
+      saveCategoryImageToLocalStorage(quickImageCat.slug, finalUrl);
       await updateCategory(quickImageCat.id, { image: finalUrl });
       showToast('Imagem Atualizada!', `Foto da categoria ${quickImageCat.name} alterada com sucesso.`, 'success');
       setQuickImageCat(null);
@@ -201,6 +207,9 @@ export const AdminCategoriesTab: React.FC = () => {
 
     try {
       if (editingCategory) {
+        if (formImage.trim()) {
+          saveCategoryImageToLocalStorage(formSlug.trim() || editingCategory.slug, formImage.trim());
+        }
         await updateCategory(editingCategory.id, {
           name: formName.trim(),
           slug: formSlug.trim(),
@@ -213,6 +222,9 @@ export const AdminCategoriesTab: React.FC = () => {
         showToast('Categoria Atualizada!', `${formName} foi salva com sucesso.`, 'success');
         setEditingCategory(null);
       } else {
+        if (formImage.trim()) {
+          saveCategoryImageToLocalStorage(formSlug.trim() || formName.toLowerCase().replace(/\s+/g, '-'), formImage.trim());
+        }
         await addCategory({
           name: formName.trim(),
           slug: formSlug.trim() || formName.toLowerCase().replace(/\s+/g, '-'),
@@ -272,7 +284,7 @@ export const AdminCategoriesTab: React.FC = () => {
             {/* Category Image Header with overlay actions */}
             <div className="relative h-48 w-full bg-[#F9F9F7] overflow-hidden">
               <img
-                src={cat.image}
+                src={getStoredCategoryImage(cat.slug || cat.id) || cat.image}
                 alt={cat.name}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

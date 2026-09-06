@@ -3,12 +3,17 @@ import { ArrowRight, ChevronLeft, ChevronRight, Compass } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { INITIAL_8_CATEGORIES } from '../../data/categories';
 import { handleProductImageError } from '../../utils/imageUtils';
+import {
+  getStoredCategoryImage,
+  ensureCategoryImagesStoredInLocalStorage,
+  DEFAULT_CATEGORY_IMAGE_URLS,
+} from '../../utils/categoryImageStorage';
 
 interface CategoryNavigationGridProps {
   onNavigate: (page: string, param?: string) => void;
 }
 
-// Curated high-fashion streetwear editorial imagery for cohesive lookbook aesthetics
+// Curated high-fashion streetwear editorial imagery with cache-busted latest project assets
 const CATEGORY_EDITORIAL_ASSETS: Record<
   string,
   {
@@ -17,31 +22,31 @@ const CATEGORY_EDITORIAL_ASSETS: Record<
   }
 > = {
   camisetas: {
-    image: '/categories/categoria-camisetas.png',
+    image: '/categories/categoria-camisetas.png?v=20260906_v2',
     subheading: 'Heavyweight 260g & Boxy Fit',
   },
   moletons: {
-    image: '/categories/categoria-moletons.png',
+    image: '/categories/categoria-moletons.png?v=20260906_v2',
     subheading: 'Hoodies Densos 400g/m²',
   },
   jaquetas: {
-    image: '/categories/categoria-jaquetas.png',
+    image: '/categories/categoria-jaquetas.png?v=20260906_v2',
     subheading: 'Puffers & Varsity Outerwear',
   },
   calcas: {
-    image: '/categories/categoria-calcas.png',
+    image: '/categories/categoria-calcas.png?v=20260906_v2',
     subheading: 'Baggy Denim & Wide Leg',
   },
   shorts: {
-    image: '/categories/categoria-shorts.png',
+    image: '/categories/categoria-shorts.png?v=20260906_v2',
     subheading: 'Mesh Basketball & Sweat Shorts',
   },
   tenis: {
-    image: '/categories/categoria-tenis.png',
+    image: '/categories/categoria-tenis.png?v=20260906_v2',
     subheading: 'Sneakers Chunky & Solados Tratorados',
   },
   acessorios: {
-    image: '/categories/categoria-acessorios.png',
+    image: '/categories/categoria-acessorios.png?v=20260906_v2',
     subheading: 'Bags Táticas, Correntes & EDC',
   },
 };
@@ -65,6 +70,13 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   const displayCategories = baseCategories.filter(
     (cat) => cat.slug?.toLowerCase() !== 'cargos' && cat.id?.toLowerCase() !== 'cargos'
   );
+
+  // Ensure all category images are saved in browser localStorage
+  useEffect(() => {
+    ensureCategoryImagesStoredInLocalStorage().catch((err) => {
+      console.warn('Erro ao sincronizar imagens com localStorage:', err);
+    });
+  }, []);
 
   // Track scroll limits & active slide
   const handleScrollUpdate = useCallback(() => {
@@ -265,11 +277,15 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             {displayCategories.map((cat, index) => {
               const slugKey = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
               const asset = CATEGORY_EDITORIAL_ASSETS[slugKey];
-              // Keep the new category images
+              const storedImg = getStoredCategoryImage(slugKey);
+
+              // Priority: 1. Stored image in browser localStorage 2. Explicit category image 3. Editorial asset 4. Default versioned URL
               const cardImage =
-                cat.image && (cat.image.startsWith('/categories/') || cat.image.startsWith('/uploads/'))
-                  ? cat.image
-                  : asset?.image || cat.image;
+                storedImg ||
+                (cat.image && !cat.image.includes('unsplash.com') ? cat.image : null) ||
+                asset?.image ||
+                DEFAULT_CATEGORY_IMAGE_URLS[slugKey] ||
+                `/categories/categoria-${slugKey}.png?v=20260906_v2`;
               const cardSubheading = cat.tagline || cat.description || asset?.subheading;
 
               return (
@@ -288,7 +304,14 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                     referrerPolicy="no-referrer"
                     draggable={false}
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.90] group-hover:brightness-100 select-none"
-                    onError={(e) => handleProductImageError(e, cat.slug, `cat-${index}`)}
+                    onError={(e) => {
+                      const fallback = DEFAULT_CATEGORY_IMAGE_URLS[slugKey] || `/categories/categoria-${slugKey}.png`;
+                      if (e.currentTarget.src !== fallback) {
+                        e.currentTarget.src = fallback;
+                      } else {
+                        handleProductImageError(e, cat.slug, `cat-${index}`);
+                      }
+                    }}
                   />
 
                   {/* Gradiente Inferior Robusto & Conteúdo Editorial Completo */}

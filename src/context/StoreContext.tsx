@@ -2,6 +2,12 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { Category, Product } from '../types';
 import { INITIAL_8_CATEGORIES } from '../data/categories';
 import {
+  getStoredCategoryImage,
+  getAllStoredCategoryImages,
+  saveCategoryImageToLocalStorage,
+  ensureCategoryImagesStoredInLocalStorage,
+} from '../utils/categoryImageStorage';
+import {
   fetchProductsFromSupabaseDirect,
   fetchCategoriesFromSupabaseDirect,
   validateAndDeduplicateProducts,
@@ -46,18 +52,28 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Categories state: fallback to initial structural categories
+  // Categories state: fallback to initial structural categories, synced with browser localStorage
   const [categories, setCategories] = useState<Category[]>(() => {
     try {
+      const storedMap = getAllStoredCategoryImages();
       const cached = localStorage.getItem('@marmot_cached_categories');
       if (cached) {
         const parsed = JSON.parse(cached);
         // If cache has old Unsplash images, do NOT use it
         const hasLegacy = Array.isArray(parsed) && parsed.some((c: any) => c?.image?.includes('unsplash.com'));
-        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) {
+          return parsed.map((cat: Category) => {
+            const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
+            return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
+          });
+        }
       }
     } catch {}
-    return INITIAL_8_CATEGORIES || [];
+    const storedMap = getAllStoredCategoryImages();
+    return (INITIAL_8_CATEGORIES || []).map((cat) => {
+      const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
+      return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
+    });
   });
 
   // STRICT SINGLE SOURCE OF TRUTH: Initial products state MUST be empty []
@@ -67,7 +83,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [isFetchingFreshData, setIsFetchingFreshData] = useState<boolean>(false);
 
-  // Clean any old corrupted legacy caches on mount
+  // Clean any old corrupted legacy caches on mount & ensure category images in localStorage
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -79,6 +95,24 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
     } catch {}
+
+    // Ensure category images are saved in browser localStorage
+    ensureCategoryImagesStoredInLocalStorage().then((storedMap) => {
+      if (storedMap && Object.keys(storedMap).length > 0) {
+        setCategories((prev) => {
+          const updated = prev.map((c) => {
+            const norm = c.slug?.toLowerCase() || c.id?.toLowerCase() || '';
+            return storedMap[norm] ? { ...c, image: storedMap[norm] } : c;
+          });
+          try {
+            localStorage.setItem('@marmot_cached_categories', JSON.stringify(updated));
+          } catch {}
+          return updated;
+        });
+      }
+    }).catch((err) => {
+      console.warn('[StoreContext] Erro ao sincronizar imagens com localStorage:', err);
+    });
   }, []);
 
   // Race condition protection: always ensure only the latest request can commit to state
@@ -183,9 +217,17 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       if (loadedCategories.length > 0) {
-        setCategories(loadedCategories);
+        const storedMap = getAllStoredCategoryImages();
+        const mergedCategories = loadedCategories.map((c) => {
+          const norm = c.slug?.toLowerCase() || c.id?.toLowerCase() || '';
+          if (storedMap[norm]) {
+            return { ...c, image: storedMap[norm] };
+          }
+          return c;
+        });
+        setCategories(mergedCategories);
         try {
-          localStorage.setItem('@marmot_cached_categories', JSON.stringify(loadedCategories));
+          localStorage.setItem('@marmot_cached_categories', JSON.stringify(mergedCategories));
         } catch {}
       }
     } catch (error) {
@@ -309,6 +351,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateCategory = async (id: string, categoryData: Partial<Category>): Promise<Category> => {
     try {
+      if (categoryData.image) {
+        saveCategoryImageToLocalStorage(id, categoryData.image);
+      }
       const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
@@ -322,7 +367,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const updated: Category = await res.json();
-      setCategories((prev) => prev.map((c) => (c.id === id || c.slug === id ? updated : c)));
+      if (updated.image) {
+        saveCategoryImageToLocalStorage(updated.id || updated.slug, updated.image);
+      }
+      setCategories((prev) => {
+        const next = prev.map((c) => (c.id === id || c.slug === id ? updated : c));
+        try {
+          localStorage.setItem('@marmot_cached_categories', JSON.stringify(next));
+        } catch {}
+        return next;
+      });
       return updated;
     } catch (error) {
       console.error('Update category error:', error);
