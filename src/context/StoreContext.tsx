@@ -52,7 +52,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const cached = localStorage.getItem('@marmot_cached_categories');
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        // If cache has old Unsplash images, do NOT use it
+        const hasLegacy = Array.isArray(parsed) && parsed.some((c: any) => c?.image?.includes('unsplash.com'));
+        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) return parsed;
       }
     } catch {}
     return INITIAL_8_CATEGORIES || [];
@@ -71,6 +73,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (typeof window !== 'undefined' && window.localStorage) {
         localStorage.removeItem('@marmot_cached_products');
         localStorage.removeItem('@marmot_cached_products_v2');
+        const cachedCat = localStorage.getItem('@marmot_cached_categories');
+        if (cachedCat && cachedCat.includes('unsplash.com')) {
+          localStorage.removeItem('@marmot_cached_categories');
+        }
       }
     } catch {}
   }, []);
@@ -138,10 +144,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
-      // 2. If Supabase returned empty or unavailable, fallback to backend API
-      if (loadedProducts.length === 0 || loadedCategories.length === 0) {
+      // 2. If Supabase returned empty, unavailable, or with legacy unsplash URLs, fallback to backend API
+      const hasLegacyCatImages = loadedCategories.some((c) => c.image && c.image.includes('unsplash.com'));
+      if (loadedProducts.length === 0 || loadedCategories.length === 0 || hasLegacyCatImages) {
         const [prodRes, catRes] = await Promise.all([
-          fetch('/api/products', { cache: 'no-store' }).catch(() => null),
+          loadedProducts.length === 0 ? fetch('/api/products', { cache: 'no-store' }).catch(() => null) : null,
           fetch('/api/categories', { cache: 'no-store' }).catch(() => null),
         ]);
 
@@ -152,7 +159,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           }
         }
 
-        if (loadedCategories.length === 0 && catRes && catRes.ok) {
+        if (catRes && catRes.ok) {
           const data = await catRes.json();
           if (Array.isArray(data) && data.length > 0) {
             loadedCategories = data;

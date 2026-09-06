@@ -1,11 +1,50 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Compass } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { INITIAL_8_CATEGORIES } from '../../data/categories';
+import { handleProductImageError } from '../../utils/imageUtils';
 
 interface CategoryNavigationGridProps {
   onNavigate: (page: string, param?: string) => void;
 }
+
+// Curated high-fashion streetwear editorial imagery for cohesive lookbook aesthetics
+const CATEGORY_EDITORIAL_ASSETS: Record<
+  string,
+  {
+    image: string;
+    subheading: string;
+  }
+> = {
+  camisetas: {
+    image: '/categories/categoria-camisetas.png',
+    subheading: 'Heavyweight 260g & Boxy Fit',
+  },
+  moletons: {
+    image: '/categories/categoria-moletons.png',
+    subheading: 'Hoodies Densos 400g/m²',
+  },
+  jaquetas: {
+    image: '/categories/categoria-jaquetas.png',
+    subheading: 'Puffers & Varsity Outerwear',
+  },
+  calcas: {
+    image: '/categories/categoria-calcas.png',
+    subheading: 'Baggy Denim & Wide Leg',
+  },
+  shorts: {
+    image: '/categories/categoria-shorts.png',
+    subheading: 'Mesh Basketball & Sweat Shorts',
+  },
+  tenis: {
+    image: '/categories/categoria-tenis.png',
+    subheading: 'Sneakers Chunky & Solados Tratorados',
+  },
+  acessorios: {
+    image: '/categories/categoria-acessorios.png',
+    subheading: 'Bags Táticas, Correntes & EDC',
+  },
+};
 
 export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ onNavigate }) => {
   const { categories } = useStore();
@@ -13,6 +52,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   // Mouse drag-to-scroll state
   const isDraggingRef = useRef(false);
@@ -20,10 +60,13 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   const scrollLeftRef = useRef(0);
   const hasDraggedRef = useRef(false);
 
-  // Ensure 8 streetwear categories
-  const displayCategories = categories && categories.length >= 8 ? categories : INITIAL_8_CATEGORIES;
+  // Ensure streetwear categories excluding Cargos as requested
+  const baseCategories = categories && categories.length > 0 ? categories : INITIAL_8_CATEGORIES;
+  const displayCategories = baseCategories.filter(
+    (cat) => cat.slug?.toLowerCase() !== 'cargos' && cat.id?.toLowerCase() !== 'cargos'
+  );
 
-  // Track scroll limits
+  // Track scroll limits & active slide
   const handleScrollUpdate = useCallback(() => {
     const el = scrollContainerRef.current;
     if (!el) return;
@@ -31,9 +74,17 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     const { scrollLeft, scrollWidth, clientWidth } = el;
     const maxScroll = scrollWidth - clientWidth;
 
-    setCanScrollLeft(scrollLeft > 10);
-    setCanScrollRight(scrollLeft < maxScroll - 10);
-  }, []);
+    setCanScrollLeft(scrollLeft > 12);
+    setCanScrollRight(scrollLeft < maxScroll - 12);
+
+    // Calculate approximate active slide
+    const firstCard = el.querySelector<HTMLElement>('[data-category-card]');
+    if (firstCard) {
+      const cardWidth = firstCard.offsetWidth + 24;
+      const index = Math.round(scrollLeft / cardWidth);
+      setActiveSlideIndex(Math.min(index, displayCategories.length - 1));
+    }
+  }, [displayCategories.length]);
 
   useEffect(() => {
     const el = scrollContainerRef.current;
@@ -47,15 +98,15 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
       el.removeEventListener('scroll', handleScrollUpdate);
       window.removeEventListener('resize', handleScrollUpdate);
     };
-  }, [handleScrollUpdate, displayCategories]);
+  }, [handleScrollUpdate]);
 
-  // Scroll smoothly by card width
+  // Scroll smoothly by exact card width + gap
   const scrollByDirection = (direction: 'left' | 'right') => {
     const el = scrollContainerRef.current;
     if (!el) return;
 
     const firstCard = el.querySelector<HTMLElement>('[data-category-card]');
-    const step = firstCard ? firstCard.offsetWidth + 24 : el.clientWidth * 0.75;
+    const step = firstCard ? firstCard.offsetWidth + 24 : el.clientWidth * 0.8;
 
     el.scrollBy({
       left: direction === 'left' ? -step : step,
@@ -63,7 +114,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     });
   };
 
-  // Mouse drag handlers
+  // Mouse drag handlers for fluid interaction
   const handleMouseDown = (e: React.MouseEvent) => {
     const el = scrollContainerRef.current;
     if (!el) return;
@@ -80,7 +131,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     if (!el) return;
 
     const x = e.pageX - el.offsetLeft;
-    const walk = (x - startXRef.current) * 1.3;
+    const walk = (x - startXRef.current) * 1.35;
 
     if (Math.abs(walk) > 6) {
       hasDraggedRef.current = true;
@@ -104,29 +155,30 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   return (
     <section
       id="category-showcase-section"
-      className="py-14 sm:py-16 lg:py-[72px] bg-white border-b border-[#E4E4E7] select-none overflow-hidden"
+      className="py-14 sm:py-16 lg:py-20 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
     >
-      {/* Container harmonioso alinhado com o restante do site */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        
         {/* ========================================================= */}
-        {/* CABEÇALHO COM HIERARQUIA EQUILIBRADA E CONTROLES SUAVES   */}
+        {/* CABEÇALHO ELEVADO COM HIERARQUIA TIPOGRÁFICA E CONTROLES  */}
         {/* ========================================================= */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-7 sm:mb-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8 sm:mb-10">
           <div>
-            <span className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#B45309] block mb-1.5">
-              SILHUETAS STREETWEAR
-            </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-[#111113] leading-tight">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 bg-[#B45309] rounded-full inline-block animate-pulse" />
+              <span className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#B45309]">
+                SILHUETAS STREETWEAR // MARMOT ARCHIVE
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-[42px] font-black uppercase tracking-tight text-[#0B0B0E] leading-none">
               COMPRE POR CATEGORIA
             </h2>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-1.5 max-w-lg font-normal leading-relaxed">
-              Explore o catálogo completo de peças divididas por silhueta e utilidade streetwear.
+            <p className="text-xs sm:text-sm text-zinc-500 mt-2 max-w-xl font-normal leading-relaxed">
+              Modelagens autorais desenvolvidas para caimento estruturado, tecidos pesados e acabamento de ateliê.
             </p>
           </div>
 
-          {/* Canto superior direito: Link limpo + Setas refinadas */}
-          <div className="flex items-center gap-4 sm:gap-5 shrink-0 self-start sm:self-end">
+          {/* Canto superior direito: Link limpo + Indicador de slide + Setas refinadas */}
+          <div className="flex items-center gap-4 sm:gap-6 shrink-0 self-start md:self-end">
             <button
               onClick={() => onNavigate('shop')}
               className="text-xs sm:text-sm font-bold uppercase tracking-wider text-zinc-800 hover:text-black hover:underline inline-flex items-center gap-1.5 cursor-pointer transition-colors group"
@@ -135,88 +187,152 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all" />
             </button>
 
-            <div className="flex items-center gap-1.5 pl-3 border-l border-zinc-200">
+            {/* Slide Index Badge */}
+            <div className="hidden sm:flex items-center gap-1 text-[11px] font-mono font-bold text-zinc-400 px-2.5 py-1 bg-zinc-100 rounded-[2px] border border-zinc-200">
+              <span className="text-black font-extrabold">{String(activeSlideIndex + 1).padStart(2, '0')}</span>
+              <span>/</span>
+              <span>{String(displayCategories.length).padStart(2, '0')}</span>
+            </div>
+
+            {/* Seta de navegação suave e visível */}
+            <div className="flex items-center gap-2 pl-3 border-l border-zinc-200">
               <button
                 type="button"
                 onClick={() => scrollByDirection('left')}
                 disabled={!canScrollLeft}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-none border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-700 disabled:opacity-25 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-[2px] border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-900 disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
                 title="Categorias anteriores"
                 aria-label="Ver categorias anteriores"
               >
-                <ChevronLeft className="w-4 h-4 stroke-[2]" />
+                <ChevronLeft className="w-5 h-5 stroke-[2.2]" />
               </button>
 
               <button
                 type="button"
                 onClick={() => scrollByDirection('right')}
                 disabled={!canScrollRight}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-none bg-[#09090B] hover:bg-zinc-800 text-white disabled:opacity-25 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer shadow-2xs active:scale-95"
+                className="w-10 h-10 sm:w-11 sm:h-11 rounded-[2px] bg-[#0B0B0E] hover:bg-zinc-800 text-white disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
                 title="Próximas categorias"
                 aria-label="Ver próximas categorias"
               >
-                <ChevronRight className="w-4 h-4 stroke-[2]" />
+                <ChevronRight className="w-5 h-5 stroke-[2.2]" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* ========================================================= */}
-        {/* VITRINE HORIZONTAL REFINADA (3 CARDS POR VEZ NO DESKTOP)  */}
-        {/* ========================================================= */}
-        <div
-          ref={scrollContainerRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUpOrLeave}
-          onMouseLeave={handleMouseUpOrLeave}
-          className="flex items-stretch gap-5 sm:gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory py-1 cursor-grab active:cursor-grabbing"
-        >
-          {displayCategories.map((cat, index) => (
-            <article
-              key={cat.id || cat.slug || index}
-              data-category-card
-              onClick={() => handleCardClick(cat.slug)}
-              className="group relative h-[420px] sm:h-[450px] lg:h-[480px] w-[78vw] sm:w-[calc(50%-12px)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start rounded-none overflow-hidden bg-zinc-900 border border-zinc-200/70 hover:border-zinc-900/40 cursor-pointer hover:shadow-[0_14px_30px_rgba(24,24,27,0.08)] transition-all duration-300"
+        {/* ========================================================================= */}
+        {/* CARROSSEL HORIZONTAL DE CATEGORIAS: 3 CARDS COMPLETOS + 4º CARD CORTADO   */}
+        {/* ========================================================================= */}
+        <div className="relative group/carousel">
+          {/* Floating Left Action Arrow (Desktop) */}
+          {canScrollLeft && (
+            <button
+              type="button"
+              onClick={() => scrollByDirection('left')}
+              className="hidden lg:flex absolute -left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-[2px] bg-black/85 hover:bg-black text-white backdrop-blur-md border border-white/20 items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              aria-label="Deslizar para a esquerda"
             >
-              {/* Imagem proporcional e nítida */}
-              <img
-                src={cat.image}
-                alt={cat.name}
-                loading={index < 3 ? 'eager' : 'lazy'}
-                decoding="async"
-                referrerPolicy="no-referrer"
-                draggable={false}
-                className="w-full h-full object-cover object-center group-hover:scale-[1.03] transition-transform duration-500 ease-out brightness-[0.93] group-hover:brightness-100"
-              />
+              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
+            </button>
+          )}
 
-              {/* Overlay suave com gradiente natural */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent p-6 sm:p-7 flex flex-col justify-end z-10 pointer-events-none">
-                <div className="flex items-end justify-between gap-3">
-                  <div className="space-y-1">
-                    <span className="text-[10.5px] font-mono font-bold tracking-[0.16em] text-[#F4C400] uppercase block">
-                      {cat.productCount ? `${cat.productCount} PEÇAS` : 'CATÁLOGO'}
-                    </span>
-                    <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight group-hover:text-[#F4C400] transition-colors">
-                      {cat.name}
-                    </h3>
-                    {cat.tagline && (
-                      <p className="text-xs text-zinc-300/90 font-normal line-clamp-1 pt-0.5">
-                        {cat.tagline}
+          {/* Floating Right Action Arrow (Desktop) */}
+          {canScrollRight && (
+            <button
+              type="button"
+              onClick={() => scrollByDirection('right')}
+              className="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-[2px] bg-black/85 hover:bg-black text-white backdrop-blur-md border border-white/20 items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer animate-pulse"
+              aria-label="Deslizar para a direita"
+            >
+              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
+            </button>
+          )}
+
+          {/* Track Horizontal com matemática precisa:
+              - Mobile (< md): 1 card completo + corte sutil do 2º (w-[80vw])
+              - Tablet (md): 2 cards completos + corte do 3º (calc((100% - 20px)/2.25))
+              - Desktop (lg & xl): 3 cards completos + ~28% do 4º card cortado (calc((100% - 3*24px)/3.28))
+          */}
+          <div
+            ref={scrollContainerRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUpOrLeave}
+            onMouseLeave={handleMouseUpOrLeave}
+            className="flex items-stretch gap-5 sm:gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory py-2 cursor-grab active:cursor-grabbing"
+          >
+            {displayCategories.map((cat, index) => {
+              const slugKey = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
+              const asset = CATEGORY_EDITORIAL_ASSETS[slugKey];
+              // Keep the new category images
+              const cardImage =
+                cat.image && (cat.image.startsWith('/categories/') || cat.image.startsWith('/uploads/'))
+                  ? cat.image
+                  : asset?.image || cat.image;
+              const cardSubheading = cat.tagline || cat.description || asset?.subheading;
+
+              return (
+                <article
+                  key={cat.id || cat.slug || index}
+                  data-category-card
+                  onClick={() => handleCardClick(cat.slug)}
+                  className="group relative h-[480px] sm:h-[520px] lg:h-[550px] xl:h-[580px] w-[80vw] sm:w-[calc((100%-20px)/2.2)] lg:w-[calc((100%-72px)/3.28)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out"
+                >
+                  {/* Foto editorial padronizada com a nova imagem da categoria */}
+                  <img
+                    src={cardImage}
+                    alt={cat.name}
+                    loading={index < 4 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    draggable={false}
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.90] group-hover:brightness-100 select-none"
+                    onError={(e) => handleProductImageError(e, cat.slug, `cat-${index}`)}
+                  />
+
+                  {/* Gradiente Inferior Robusto & Conteúdo Editorial Completo */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-40% to-transparent p-5 sm:p-7 lg:p-8 flex flex-col justify-end z-20 pointer-events-none">
+                    <div className="space-y-1.5 transform transition-transform duration-300 group-hover:-translate-y-1">
+                      {/* Título de Categoria em Destaque Imponente */}
+                      <h3 className="text-2xl sm:text-3xl lg:text-[34px] font-black text-white uppercase tracking-tight leading-none group-hover:text-[#F4C400] transition-colors">
+                        {cat.name}
+                      </h3>
+
+                      {/* Subtítulo / Descrição de Caimento */}
+                      <p className="text-xs sm:text-[13px] text-zinc-300 font-medium line-clamp-1 pt-0.5 leading-snug">
+                        {cardSubheading}
                       </p>
-                    )}
-                  </div>
 
-                  <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-white/95 group-hover:text-[#F4C400] shrink-0 pb-0.5 group-hover:translate-x-1 transition-all duration-200">
-                    <span>EXPLORAR</span>
-                    <ArrowRight className="w-3.5 h-3.5 stroke-[2.2]" />
+                      {/* Subcategorias em chips discretos */}
+                      {cat.subcategories && cat.subcategories.length > 0 && (
+                        <p className="text-[11px] font-mono text-zinc-400/90 line-clamp-1 pt-1 tracking-wide">
+                          {cat.subcategories.slice(0, 3).join(' • ')}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Botão de Ação / Barra Explorar */}
+                    <div className="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-white group-hover:text-[#F4C400] transition-colors">
+                      <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.14em]">
+                        EXPLORAR COLEÇÃO
+                      </span>
+                      <div className="w-8 h-8 rounded-full bg-white/10 group-hover:bg-[#F4C400] group-hover:text-black flex items-center justify-center transition-all duration-300 group-hover:translate-x-1 shadow-sm">
+                        <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </article>
-          ))}
+                </article>
+              );
+            })}
+          </div>
         </div>
 
+        {/* Indicador de Deslizar em Telas Menores */}
+        <div className="mt-4 sm:hidden flex items-center justify-center gap-1 text-[11px] font-mono text-zinc-400">
+          <Compass className="w-3.5 h-3.5 text-[#B45309]" />
+          <span>Deslize para ver todas as silhuetas</span>
+        </div>
       </div>
     </section>
   );

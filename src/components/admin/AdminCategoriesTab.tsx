@@ -20,6 +20,7 @@ import {
   AlertCircle,
   Crop,
   Sliders,
+  Loader2,
 } from 'lucide-react';
 
 export const AdminCategoriesTab: React.FC = () => {
@@ -36,6 +37,7 @@ export const AdminCategoriesTab: React.FC = () => {
   const [quickImageUrl, setQuickImageUrl] = useState('');
   const [quickImagePreview, setQuickImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSavingQuickImage, setIsSavingQuickImage] = useState(false);
 
   // Image Adjustment Modal State
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
@@ -174,11 +176,19 @@ export const AdminCategoriesTab: React.FC = () => {
   const handleSaveQuickImage = async () => {
     if (!quickImageCat || (!quickImageUrl && !quickImagePreview)) return;
     const finalUrl = quickImagePreview || quickImageUrl;
-    await updateCategory(quickImageCat.id, { image: finalUrl });
-    showToast('Imagem Atualizada!', `Foto da categoria ${quickImageCat.name} alterada.`, 'success');
-    setQuickImageCat(null);
-    setQuickImageUrl('');
-    setQuickImagePreview(null);
+    setIsSavingQuickImage(true);
+    try {
+      await updateCategory(quickImageCat.id, { image: finalUrl });
+      showToast('Imagem Atualizada!', `Foto da categoria ${quickImageCat.name} alterada com sucesso.`, 'success');
+      setQuickImageCat(null);
+      setQuickImageUrl('');
+      setQuickImagePreview(null);
+    } catch (err: any) {
+      console.error('Erro ao salvar nova foto da categoria:', err);
+      showToast('Erro ao Salvar', err?.message || 'Falha ao salvar a nova foto da categoria.', 'error');
+    } finally {
+      setIsSavingQuickImage(false);
+    }
   };
 
   // Save Category Form (Add / Edit)
@@ -484,16 +494,25 @@ export const AdminCategoriesTab: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setQuickImageCat(null)}
-                className="flex-1 bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] py-3 rounded-xl text-xs font-bold uppercase shadow-xs"
+                disabled={isSavingQuickImage}
+                className="flex-1 bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] py-3 rounded-xl text-xs font-bold uppercase shadow-xs disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleSaveQuickImage}
-                className="flex-1 bg-[#F0C84B] text-black font-extrabold py-3 rounded-xl text-xs uppercase hover:bg-amber-400 transition-colors shadow-xs"
+                disabled={isSavingQuickImage}
+                className="flex-1 bg-[#F0C84B] text-black font-extrabold py-3 rounded-xl text-xs uppercase hover:bg-amber-400 transition-colors shadow-xs disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
-                Salvar Nova Foto
+                {isSavingQuickImage ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Salvando...
+                  </>
+                ) : (
+                  'Salvar Nova Foto'
+                )}
               </button>
             </div>
           </div>
