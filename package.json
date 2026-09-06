@@ -13,7 +13,9 @@
     "test": "node --test test/*.test.mjs",
     "test:integration": "node --test test/integration/test-mode-security.test.mjs test/integration/behavioral-remediation.test.mjs test/integration/p0-profile-role-decoupling.test.mjs",
     "test:concurrency": "node --test test/integration/financial-concurrency.test.mjs",
-    "test:all": "node --test test/*.test.mjs test/integration/*.test.mjs"
+    "test:all": "node --test test/*.test.mjs test/integration/*.test.mjs",
+    "import-product-images": "node scripts/import-product-images.mjs",
+    "import-product-images:dry-run": "node scripts/import-product-images.mjs --dry-run"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
