@@ -31,7 +31,7 @@ export const CompactCustomerReviews: React.FC = () => {
 
   return (
     <section className="py-12 sm:py-14 lg:py-16 bg-[#F8F9FA] border-b border-[#E4E4E7]">
-      <div className="w-full max-w-[1820px] 2xl:max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
