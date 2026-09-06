@@ -41,7 +41,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
   return (
     <section className="py-12 sm:py-14 lg:py-16 bg-[#F8F9FA] border-b border-[#E4E4E7]">
-      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Header with Navigation Controls */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>

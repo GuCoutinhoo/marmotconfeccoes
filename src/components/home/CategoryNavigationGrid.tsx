@@ -157,7 +157,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
       id="category-showcase-section"
       className="py-10 sm:py-12 lg:py-14 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
     >
-      <div className="w-full max-w-[1680px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* ========================================================= */}
         {/* CABEÇALHO ELEVADO COM HIERARQUIA TIPOGRÁFICA E CONTROLES  */}
         {/* ========================================================= */}
