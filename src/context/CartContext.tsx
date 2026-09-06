@@ -460,6 +460,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             productId: p.id || `prod-${idx + 1}`,
             id: p.id || `prod-${idx + 1}`,
             quantity: item.quantity || 1,
+            size: item.selectedSize,
+            colorName: item.selectedColor.colorName || item.selectedColor.color,
             weight: Number(p.weight) || 0.35,
             width: Number(p.width) || 20,
             height: Number(p.height) || 4,

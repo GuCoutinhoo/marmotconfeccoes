@@ -94,6 +94,7 @@ export interface Coupon {
 
 export interface ShippingOption {
   id: string | number;
+  quoteId?: string;
   serviceId?: string | number;
   companyId?: number;
   name: string;

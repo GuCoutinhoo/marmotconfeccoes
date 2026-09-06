@@ -511,9 +511,13 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const handlePayNow = async (orderId: string) => {
     try {
       showToast('Conectando ao Mercado Pago...', 'Gerando link de pagamento para o pedido.', 'info');
+      const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
       const res = await fetch(`/api/orders/${orderId}/pay-now`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
       });
       const data = await res.json();
       if (res.ok && (data.init_point || data.targetUrl || data.sandbox_init_point)) {

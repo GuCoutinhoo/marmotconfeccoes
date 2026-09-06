@@ -5,10 +5,22 @@ import path from 'node:path';
 
 const sqlPath = path.resolve(process.cwd(), 'supabase-complete-production-migration.sql');
 const apiPath = path.resolve(process.cwd(), 'api/index.ts');
+const checkoutPath = path.resolve(process.cwd(), 'src/pages/CheckoutPage.tsx');
+const cartContextPath = path.resolve(process.cwd(), 'src/context/CartContext.tsx');
+const shippingCalculatorPath = path.resolve(process.cwd(), 'src/components/ShippingCalculator.tsx');
+const mercadoPagoUrlHelperPath = path.resolve(process.cwd(), 'src/services/mercadoPagoPreferenceUrls.ts');
+const mercadoPagoBackendPath = path.resolve(process.cwd(), 'src/services/mercadopagoBackend.ts');
+const mercadoPagoServicePath = path.resolve(process.cwd(), 'src/services/mercadopagoService.ts');
 
 test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
   const sql = fs.readFileSync(sqlPath, 'utf8');
   const api = fs.readFileSync(apiPath, 'utf8');
+  const checkout = fs.readFileSync(checkoutPath, 'utf8');
+  const cartContext = fs.readFileSync(cartContextPath, 'utf8');
+  const shippingCalculator = fs.readFileSync(shippingCalculatorPath, 'utf8');
+  const mercadoPagoUrlHelper = fs.readFileSync(mercadoPagoUrlHelperPath, 'utf8');
+  const mercadoPagoBackend = fs.readFileSync(mercadoPagoBackendPath, 'utf8');
+  const mercadoPagoService = fs.readFileSync(mercadoPagoServicePath, 'utf8');
 
   await t.test('1. process_approved_order_atomic locks order FOR UPDATE before idempotency check', () => {
     const fnStart = sql.indexOf('CREATE OR REPLACE FUNCTION public.process_approved_order_atomic');
@@ -63,5 +75,135 @@ test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
   await t.test('8. Tracking webhooks prevent status spoofing by validating secret or re-verifying with carrier API', () => {
     assert.ok(api.includes('MELHOR_ENVIO_WEBHOOK_SECRET'), 'Must check webhook secret');
     assert.ok(api.includes('/me/shipment/tracking'), 'Must query canonical carrier API if unauthenticated');
+  });
+
+  await t.test('9. Checkout forwards the authoritative shipping quote identifier', () => {
+    assert.ok(
+      checkout.includes('shippingQuoteId: activeShippingOption?.quoteId'),
+      'Checkout must forward the quoteId returned by the shipping API'
+    );
+  });
+
+  await t.test('10. Shipping quote lookup uses the real database primary key', () => {
+    assert.ok(api.includes(".eq('id', quoteId)"), 'Shipping quote lookup must filter by shipping_quotes.id');
+    assert.ok(!api.includes('quote_id.eq.${quoteId}'), 'Lookup must not reference the nonexistent quote_id column');
+  });
+
+  await t.test('11. Shipping calculation and checkout bind the same product variant', () => {
+    assert.ok(cartContext.includes('size: item.selectedSize'), 'Shipping request must include selected size');
+    assert.ok(
+      cartContext.includes('colorName: item.selectedColor.colorName || item.selectedColor.color'),
+      'Shipping request must include selected color'
+    );
+    assert.ok(
+      api.includes("colorName: String(item.colorName || item.color || dbProduct.colors?.[0]?.colorName || 'Padrão')"),
+      'Shipping quote hash must preserve the selected color'
+    );
+    assert.ok(
+      shippingCalculator.includes('colorName: item.selectedColor.colorName || item.selectedColor.color'),
+      'Reusable shipping calculator must preserve cart variant color'
+    );
+  });
+
+  await t.test('12. New checkout lets the backend generate the authoritative order ID', () => {
+    assert.ok(!checkout.includes('const [draftOrderId'), 'Frontend must not invent a draft order ID');
+    assert.ok(!checkout.includes('orderId: currentOrderId'), 'New checkout must not send a nonexistent order as reusable');
+    assert.ok(
+      api.includes('orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`'),
+      'Backend must generate the authoritative ID for new orders'
+    );
+  });
+
+  await t.test('13. Mercado Pago callbacks are omitted for localhost and private URLs', () => {
+    assert.ok(
+      mercadoPagoUrlHelper.includes("if (!isPublicHttpsUrl(cleanBaseUrl)) return {};"),
+      'Callback fields must be omitted unless APP_URL is public HTTPS'
+    );
+    assert.ok(mercadoPagoUrlHelper.includes("host === 'localhost'"), 'localhost must be rejected');
+    assert.ok(mercadoPagoUrlHelper.includes("octets[0] === 192 && octets[1] === 168"), 'Private LAN addresses must be rejected');
+    assert.ok(api.includes('...callbackFields'), 'Preference routes must use the shared callback policy');
+    assert.ok(
+      mercadoPagoUrlHelper.includes('options.callbackUrl') &&
+      mercadoPagoUrlHelper.indexOf('options.callbackUrl') < mercadoPagoUrlHelper.indexOf('options.appUrl'),
+      'An explicit public Mercado Pago callback URL must take precedence over local APP_URL'
+    );
+    assert.ok(api.includes('callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL'));
+  });
+
+  await t.test('14. Mercado Pago failures remain retryable without inventing order IDs', () => {
+    assert.ok(api.includes("code: 'MERCADOPAGO_PREFERENCE_ERROR'"), 'Gateway failure must have a stable error code');
+    assert.ok(api.includes('orderId: newOrder.id'), 'Gateway failure must return the persisted server order ID');
+    assert.ok(checkout.includes('existingOrderId: retryOrderId'), 'Checkout retry must reuse only the server-issued order ID');
+    assert.ok(checkout.includes('setRetryOrderId(errData.orderId.trim())'), 'Checkout must retain the server-issued ID after a gateway error');
+  });
+
+  await t.test('15. Order-created email waits for a valid Mercado Pago preference', () => {
+    const preferenceSuccess = api.indexOf('const prefResponse = await preference.create({ body: preferencePayload });');
+    const orderEmail = api.indexOf("template: 'order_created'", preferenceSuccess);
+    assert.ok(preferenceSuccess > 0 && orderEmail > preferenceSuccess, 'Order-created email must be sent only after preference creation succeeds');
+  });
+
+  await t.test('16. Local product image URLs are not forwarded to Mercado Pago', () => {
+    assert.ok(api.includes('resolveMercadoPagoPictureUrl(item.image, appUrl)'));
+    assert.ok(
+      mercadoPagoUrlHelper.includes('if (!baseUrl || !isPublicHttpsUrl(baseUrl)) return undefined;'),
+      'Relative images must be omitted when APP_URL is local'
+    );
+  });
+
+  await t.test('17. End-user auth never mutates the cached Supabase service-role client', () => {
+    assert.ok(api.includes('private supabaseAuth: SupabaseClient | null = null;'));
+    const registerRoute = api.slice(api.indexOf("app.post('/api/auth/register'"), api.indexOf("app.post('/api/auth/login'"));
+    const loginRoute = api.slice(api.indexOf("app.post('/api/auth/login'"), api.indexOf("app.get('/api/auth/me'"));
+    assert.ok(registerRoute.includes('db.getSupabaseAuthClient()'), 'Registration must use the dedicated anon auth client');
+    assert.ok(loginRoute.includes('db.getSupabaseAuthClient()'), 'Login must use the dedicated anon auth client');
+    assert.ok(!registerRoute.includes('db.getSupabaseAdminClient()'), 'Registration must never authenticate on the service-role client');
+    assert.ok(!loginRoute.includes('db.getSupabaseAdminClient()'), 'Login must never authenticate on the service-role client');
+  });
+
+  await t.test('18. Mercado Pago retries preserve discounts, exact cents, and payment idempotency', () => {
+    assert.ok(
+      api.split('buildMercadoPagoProductItems(').length >= 4,
+      'Both initial checkout and pay-now must use the shared discounted-item builder'
+    );
+    assert.ok(api.includes('const remainderUnits = lineNetCents % quantity;'), 'Discount distribution must reconcile indivisible cents');
+    assert.ok(
+      mercadoPagoBackend.includes('`order-${params.orderId}-${params.paymentMethod}`'),
+      'Transparent payment retries must reuse a deterministic idempotency key'
+    );
+    assert.ok(!mercadoPagoBackend.includes('`order-${params.orderId}-${Date.now()}`'));
+    const cachedClientBlock = mercadoPagoService.slice(
+      mercadoPagoService.indexOf('cachedClient = new MercadoPagoConfig'),
+      mercadoPagoService.indexOf('cachedAccessToken = token')
+    );
+    assert.ok(!cachedClientBlock.includes('idempotencyKey'), 'A cached SDK client must not reuse one idempotency key for unrelated requests');
+  });
+
+  await t.test('19. Checkout Pro return is automatic and fail-closed', () => {
+    assert.ok(mercadoPagoUrlHelper.includes("auto_return: 'approved'"), 'Approved payments must auto-return');
+    assert.ok(mercadoPagoUrlHelper.includes('/checkout?mp_return=success&order_id='));
+    assert.ok(mercadoPagoUrlHelper.includes('/checkout?mp_return=failure&order_id='));
+    assert.ok(mercadoPagoUrlHelper.includes('/checkout?mp_return=pending&order_id='));
+    assert.ok(
+      api.includes("app.post('/api/mercado-pago/return/verify', requireAuth"),
+      'The browser return must be authenticated'
+    );
+    assert.ok(
+      api.includes("externalReference !== order.id") && api.includes("'MERCADOPAGO_ORDER_MISMATCH'"),
+      'Payment external_reference must match the authoritative order ID'
+    );
+    assert.ok(
+      api.includes('if (!paymentData && !explicitPaymentId)'),
+      'An explicit payment_id must never fall back to another payment search result'
+    );
+    assert.ok(
+      checkout.includes("fetch('/api/mercado-pago/return/verify'") &&
+      checkout.includes('data.paymentValidated !== true'),
+      'The confirmation page must depend on server-side payment validation'
+    );
+    assert.ok(
+      !checkout.includes('Fallback to fetch current order state from DB'),
+      'A failed return verification must never be converted into a confirmation from URL/database fallback'
+    );
   });
 });

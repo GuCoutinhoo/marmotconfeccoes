@@ -30,7 +30,21 @@
     "passwordHash": "",
     "role": "customer",
     "isVerified": true,
-    "addresses": [],
+    "addresses": [
+      {
+        "id": "addr-1788638781395-1855",
+        "recipientName": "cliente",
+        "cep": "01311-100",
+        "street": "Avenida Paulista",
+        "number": "630",
+        "complement": "",
+        "neighborhood": "Bela Vista",
+        "city": "São Paulo",
+        "state": "SP",
+        "isDefault": true,
+        "phone": ""
+      }
+    ],
     "createdAt": "2026-08-17T20:25:05.384Z",
     "lastLogin": "2026-08-17T20:25:05.384Z"
   }

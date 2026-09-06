@@ -7,6 +7,11 @@ import {
   verifyMercadoPagoWebhookSignature,
 } from './mercadopagoService';
 import { Order, OrderItem } from '../types';
+import {
+  buildMercadoPagoCallbackFields,
+  resolveMercadoPagoCallbackBaseUrl,
+  resolveMercadoPagoPictureUrl,
+} from './mercadoPagoPreferenceUrls';
 
 // In-memory set of processed webhook event IDs to guarantee strict idempotency
 const processedWebhookEvents = new Set<string>();
@@ -116,13 +121,23 @@ export async function createMercadoPagoPayment(params: {
   idempotencyKey?: string;
 }) {
   const config = getMercadoPagoConfig();
-  const payment = getPaymentClient(params.idempotencyKey || `order-${params.orderId}-${Date.now()}`);
+  const payment = getPaymentClient(params.idempotencyKey || `order-${params.orderId}-${params.paymentMethod}`);
 
-  const cleanCpf = params.payer.identification?.number?.replace(/\D/g, '') || '11144477735';
+  const cleanCpf = params.payer.identification?.number?.replace(/\D/g, '') || '';
+  if (!/^\d{11}$/.test(cleanCpf)) {
+    throw new Error('CPF válido do pagador é obrigatório para processar o pagamento.');
+  }
   const firstName = params.payer.first_name || 'Cliente';
   const lastName = params.payer.last_name || 'Marmot';
 
   if (params.paymentMethod === 'PIX') {
+    const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
+      callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
+      appUrl: process.env.APP_URL,
+      vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+      vercelUrl: process.env.VERCEL_URL,
+    });
+    const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, params.orderId);
     const body = {
       transaction_amount: Number(params.totalAmount.toFixed(2)),
       description: params.description || `Pedido Marmot Streetwear #${params.orderId}`,
@@ -137,7 +152,7 @@ export async function createMercadoPagoPayment(params: {
         },
       },
       external_reference: params.orderId,
-      notification_url: `${process.env.APP_URL || ''}/api/mercadopago/webhook`,
+      ...(callbackFields.notification_url ? { notification_url: callbackFields.notification_url } : {}),
     };
 
     console.log(`[MercadoPago PIX] Criando cobrança PIX para Pedido #${params.orderId} (R$ ${params.totalAmount})`);
@@ -150,6 +165,13 @@ export async function createMercadoPagoPayment(params: {
       throw new Error('Token do cartão é obrigatório para processar pagamento transparente.');
     }
 
+    const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
+      callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
+      appUrl: process.env.APP_URL,
+      vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+      vercelUrl: process.env.VERCEL_URL,
+    });
+    const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, params.orderId);
     const body = {
       transaction_amount: Number(params.totalAmount.toFixed(2)),
       token: params.cardToken,
@@ -165,7 +187,7 @@ export async function createMercadoPagoPayment(params: {
         },
       },
       external_reference: params.orderId,
-      notification_url: `${process.env.APP_URL || ''}/api/mercadopago/webhook`,
+      ...(callbackFields.notification_url ? { notification_url: callbackFields.notification_url } : {}),
     };
 
     console.log(`[MercadoPago Card] Processando cartão para Pedido #${params.orderId} (R$ ${params.totalAmount})`);
@@ -174,6 +196,13 @@ export async function createMercadoPagoPayment(params: {
   }
 
   if (params.paymentMethod === 'Boleto Bancário') {
+    const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
+      callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
+      appUrl: process.env.APP_URL,
+      vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+      vercelUrl: process.env.VERCEL_URL,
+    });
+    const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, params.orderId);
     const body = {
       transaction_amount: Number(params.totalAmount.toFixed(2)),
       description: params.description || `Pedido Marmot Streetwear #${params.orderId}`,
@@ -188,7 +217,7 @@ export async function createMercadoPagoPayment(params: {
         },
       },
       external_reference: params.orderId,
-      notification_url: `${process.env.APP_URL || ''}/api/mercadopago/webhook`,
+      ...(callbackFields.notification_url ? { notification_url: callbackFields.notification_url } : {}),
     };
 
     console.log(`[MercadoPago Boleto] Criando Boleto para Pedido #${params.orderId} (R$ ${params.totalAmount})`);
@@ -212,14 +241,17 @@ export async function createMercadoPagoPreference(params: {
 }) {
   const preference = getPreferenceClient();
 
-  const preferenceItems = params.items.map((item) => ({
-    id: `item-${Date.now()}`,
-    title: item.title,
-    unit_price: Number(item.unitPrice.toFixed(2)),
-    quantity: item.quantity,
-    currency_id: 'BRL',
-    picture_url: item.pictureUrl,
-  }));
+  const preferenceItems = params.items.map((item, index) => {
+    const pictureUrl = resolveMercadoPagoPictureUrl(item.pictureUrl, params.baseUrl);
+    return {
+      id: `item-${index + 1}`,
+      title: item.title,
+      unit_price: Number(item.unitPrice.toFixed(2)),
+      quantity: Math.max(1, item.quantity),
+      currency_id: 'BRL',
+      ...(pictureUrl ? { picture_url: pictureUrl } : {}),
+    };
+  });
 
   if (params.shippingFee > 0) {
     preferenceItems.push({
@@ -233,6 +265,12 @@ export async function createMercadoPagoPreference(params: {
   }
 
   const cleanBase = params.baseUrl.replace(/\/$/, '');
+  const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
+    callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
+    appUrl: cleanBase,
+    vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    vercelUrl: process.env.VERCEL_URL,
+  });
 
   const body = {
     items: preferenceItems,
@@ -240,14 +278,8 @@ export async function createMercadoPagoPreference(params: {
       email: params.payerEmail,
       name: params.payerName,
     },
-    back_urls: {
-      success: `${cleanBase}/checkout?status=success&order_id=${params.orderId}`,
-      pending: `${cleanBase}/checkout?status=pending&order_id=${params.orderId}`,
-      failure: `${cleanBase}/checkout?status=failure&order_id=${params.orderId}`,
-    },
-    auto_return: 'approved' as const,
+    ...buildMercadoPagoCallbackFields(callbackBaseUrl, params.orderId),
     external_reference: params.orderId,
-    notification_url: `${cleanBase}/api/mercadopago/webhook`,
     statement_descriptor: 'MARMOT STREET',
   };
 

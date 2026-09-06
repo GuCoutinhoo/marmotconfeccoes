@@ -92,7 +92,6 @@ export function getMercadoPagoClient(): MercadoPagoConfig {
       accessToken: token.trim(),
       options: {
         timeout: 10000,
-        idempotencyKey: crypto.randomUUID(),
       },
     });
     cachedAccessToken = token;

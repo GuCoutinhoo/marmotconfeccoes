@@ -500,7 +500,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <ShippingCalculator
               productId={product.id}
               subtotal={(product.promoPrice || product.price) * quantity}
-              items={[{ productId: product.id, quantity }]}
+              items={[{
+                productId: product.id,
+                quantity,
+                size: selectedSize,
+                colorName: selectedColor.colorName || selectedColor.color,
+              }]}
             />
 
             {/* Trust Assurances */}

@@ -1,5 +1,65 @@
 [
   {
+    "id": "sim-1788665542128-sumo",
+    "recipient": "cliente@marmot.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-541081-8590 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-541081-8590",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "createdAt": "2026-09-06T03:32:22.128Z"
+  },
+  {
+    "id": "sim-1788664567556-ngdw",
+    "recipient": "cliente@marmot.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-566590-8715 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-566590-8715",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "createdAt": "2026-09-06T03:16:07.556Z"
+  },
+  {
+    "id": "sim-1788664152649-at5t",
+    "recipient": "cliente@marmot.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-151648-2225 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-151648-2225",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "createdAt": "2026-09-06T03:09:12.649Z"
+  },
+  {
+    "id": "sim-1788663981931-61zb",
+    "recipient": "codex-checkout-1788663979719@example.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-980999-7175 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-980999-7175",
+    "userId": "2aae7be5-30f8-42f8-9dfa-544088d425ab",
+    "createdAt": "2026-09-06T03:06:21.931Z"
+  },
+  {
+    "id": "sim-1788663754529-379p",
+    "recipient": "codex-checkout-1788663752340@example.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-753474-9500 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-753474-9500",
+    "userId": "0b53b9c9-bca3-4356-8812-37135c64e299",
+    "createdAt": "2026-09-06T03:02:34.529Z"
+  },
+  {
+    "id": "sim-1788662896924-vvng",
+    "recipient": "cliente@marmot.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-896656-6103 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-896656-6103",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "createdAt": "2026-09-06T02:48:16.924Z"
+  },
+  {
     "id": "sim-1788216570529-k44i",
     "recipient": "comprador.marmot@gmail.com",
     "template": "order_created",

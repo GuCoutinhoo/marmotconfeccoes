@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "addr-1788638781395-1855",
+    "recipientName": "cliente",
+    "cep": "01311-100",
+    "street": "Avenida Paulista",
+    "number": "630",
+    "complement": "",
+    "neighborhood": "Bela Vista",
+    "city": "São Paulo",
+    "state": "SP",
+    "isDefault": true,
+    "phone": "",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61"
+  }
+]

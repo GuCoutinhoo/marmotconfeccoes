@@ -53,7 +53,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
               >
                 {/* Linha 1 */}
                 <span className="block text-white">
-                  PESO NO TECIDO.
+                  PSO NO TECIDO.
                 </span>
                 {/* Linha 2 */}
                 <span className="block mt-1.5 sm:mt-2 text-zinc-200">

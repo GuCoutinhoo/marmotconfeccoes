@@ -91,33 +91,13 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
   }
 
   // Official production variable: MELHOR_ENVIO_TOKEN
-  const token = (
-    process.env.MELHOR_ENVIO_TOKEN ||
-    process.env.TOKEN_MELHOR_ENVIO ||
-    process.env.MELHORENVIO_TOKEN ||
-    ''
-  ).trim();
+  const token = (process.env.MELHOR_ENVIO_TOKEN || '').trim();
 
-  const refreshToken = (
-    process.env.MELHOR_ENVIO_REFRESH_TOKEN ||
-    process.env.MELHORENVIO_REFRESH_TOKEN ||
-    savedSettings.refreshToken ||
-    ''
-  ).trim();
+  const refreshToken = (process.env.MELHOR_ENVIO_REFRESH_TOKEN || savedSettings.refreshToken || '').trim();
 
-  const clientId = (
-    process.env.MELHOR_ENVIO_CLIENT_ID ||
-    process.env.MELHORENVIO_CLIENT_ID ||
-    savedSettings.clientId ||
-    ''
-  ).trim();
+  const clientId = (process.env.MELHOR_ENVIO_CLIENT_ID || savedSettings.clientId || '').trim();
 
-  const clientSecret = (
-    process.env.MELHOR_ENVIO_CLIENT_SECRET ||
-    process.env.MELHORENVIO_CLIENT_SECRET ||
-    savedSettings.clientSecret ||
-    ''
-  ).trim();
+  const clientSecret = (process.env.MELHOR_ENVIO_CLIENT_SECRET || savedSettings.clientSecret || '').trim();
 
   const redirectUri = (
     process.env.MELHOR_ENVIO_REDIRECT_URI ||
@@ -125,22 +105,9 @@ export function getMelhorEnvioConfig(): MelhorEnvioConfig {
     ''
   ).trim();
 
-  const originPostalCode = (
-    process.env.MELHOR_ENVIO_ORIGIN_CEP ||
-    process.env.STORE_ORIGIN_CEP ||
-    process.env.ORIGIN_CEP ||
-    process.env.ORIGIN_POSTAL_CODE ||
-    savedSettings.originPostalCode ||
-    '03806010'
-  ).replace(/\D/g, '');
+  const originPostalCode = (process.env.MELHOR_ENVIO_ORIGIN_CEP || savedSettings.originPostalCode || '03806010').replace(/\D/g, '');
 
-  const rawEnv = (
-    process.env.MELHOR_ENVIO_ENV ||
-    process.env.MELHOR_ENVIO_ENVIRONMENT ||
-    process.env.MELHORENVIO_ENV ||
-    savedSettings.environment ||
-    'production'
-  ).toLowerCase().trim();
+  const rawEnv = (process.env.MELHOR_ENVIO_ENV || savedSettings.environment || 'production').toLowerCase().trim();
 
   const environment: 'production' | 'sandbox' = rawEnv === 'sandbox' ? 'sandbox' : 'production';
   const appName = process.env.MELHOR_ENVIO_APP_NAME || savedSettings.appName || 'Marmot Confeccoes';

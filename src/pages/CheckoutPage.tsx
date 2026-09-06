@@ -34,6 +34,14 @@ interface CheckoutPageProps {
   onNavigate: (page: string, param?: string) => void;
 }
 
+function getCheckoutAuthHeaders(includeJson = false): Record<string, string> {
+  const token = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
+  return {
+    ...(includeJson ? { 'Content-Type': 'application/json' } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
 export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const {
     cart,
@@ -104,8 +112,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const [contactPhone, setContactPhone] = useState(user?.phone || '');
   const [contactCpf, setContactCpf] = useState(user?.cpf ? formatCpf(user.cpf) : '');
   const [cpfError, setCpfError] = useState<string | null>(null);
-  const [draftOrderId, setDraftOrderId] = useState<string>('');
-
   // Keep contact info and CPF synced if user finishes loading
   useEffect(() => {
     if (user) {
@@ -183,61 +189,67 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
+  const [retryOrderId, setRetryOrderId] = useState<string | null>(null);
   const [isVerifyingStatus, setIsVerifyingStatus] = useState(false);
 
-  // Check URL params on mount when returning from Mercado Pago
+  // Validate a Checkout Pro return using the exact payment_id at the backend.
+  // URL status fields are display hints only and are never trusted as approval.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const orderIdParam = params.get('order_id') || params.get('external_reference');
     const paymentIdParam = params.get('payment_id') || params.get('collection_id');
-    const statusParam = params.get('status') || params.get('collection_status');
+    const isMercadoPagoReturn = Boolean(params.get('mp_return') || params.get('preference_id') || paymentIdParam);
 
-    if (orderIdParam) {
+    if (isMercadoPagoReturn && (!orderIdParam || !paymentIdParam)) {
+      showToast(
+        'Retorno de pagamento incompleto',
+        'O Mercado Pago não informou os identificadores necessários. Consulte o pedido na sua conta.',
+        'error',
+      );
+      return;
+    }
+
+    if (orderIdParam && paymentIdParam) {
       (async () => {
         setIsVerifyingStatus(true);
         try {
-          // Verify with backend against Mercado Pago API
-          const queryParams = new URLSearchParams();
-          if (paymentIdParam) queryParams.set('payment_id', paymentIdParam);
-          if (statusParam) queryParams.set('status', statusParam);
-
-          const verifyUrl = `/api/mercadopago/verify-payment/${encodeURIComponent(orderIdParam)}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-          const res = await fetch(verifyUrl);
+          const res = await fetch('/api/mercado-pago/return/verify', {
+            method: 'POST',
+            headers: getCheckoutAuthHeaders(true),
+            body: JSON.stringify({ orderId: orderIdParam, paymentId: paymentIdParam }),
+          });
 
           if (res.ok) {
             const data = await res.json();
+            if (data.paymentValidated !== true) {
+              throw new Error('O backend não confirmou a vinculação do pagamento ao pedido.');
+            }
+
             const returnedOrder: Order = data.order;
             setCompletedOrder(returnedOrder);
             registerOrder(returnedOrder);
             setStep(3);
 
-            if (data.approved || returnedOrder.status === 'Pagamento Aprovado' || returnedOrder.paymentStatus === 'Pago') {
+            if (data.approved === true && data.status === 'approved' && returnedOrder.paymentStatus === 'Pago') {
               // Only clear cart upon confirmed payment approval
               clearCart();
               showToast('Pagamento Aprovado!', `Seu pedido #${returnedOrder.id} foi confirmado pelo Mercado Pago.`, 'success');
-            } else if (returnedOrder.status === 'Pagamento Recusado' || returnedOrder.paymentStatus === 'Recusado' || data.status === 'rejected') {
+            } else if (data.status === 'rejected' || returnedOrder.paymentStatus === 'Recusado') {
               showToast('Pagamento Não Autorizado', 'O pagamento não foi aprovado pelo Mercado Pago. Você pode tentar outro método.', 'error');
             } else {
-              // Order is awaiting payment / pending
               showToast('Pagamento Pendente', 'Seu pedido foi registrado, mas o pagamento ainda não foi confirmado.', 'info');
             }
           } else {
-            // Fallback to fetch current order state from DB
-            const fallbackRes = await fetch(`/api/orders/${encodeURIComponent(orderIdParam)}`);
-            if (fallbackRes.ok) {
-              const fallbackOrder: Order = await fallbackRes.json();
-              setCompletedOrder(fallbackOrder);
-              registerOrder(fallbackOrder);
-              setStep(3);
-              if (fallbackOrder.status === 'Pagamento Aprovado' || fallbackOrder.paymentStatus === 'Pago') {
-                clearCart();
-              }
-            } else {
-              showToast('Pedido Não Encontrado', 'Não foi possível localizar o pedido informado.', 'error');
-            }
+            const errorData = await res.json().catch(() => ({}));
+            throw new Error(errorData.error || 'Não foi possível validar o pagamento diretamente no Mercado Pago.');
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error('[Return from MP verification error]', err);
+          showToast(
+            'Pagamento ainda não confirmado',
+            err?.message || 'Consulte o pedido na sua conta antes de tentar novamente.',
+            'error',
+          );
         } finally {
           setIsVerifyingStatus(false);
         }
@@ -265,7 +277,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       try {
         const paymentId = completedOrder.paymentDetails?.mercadoPagoPaymentId;
         const verifyUrl = `/api/mercadopago/verify-payment/${encodeURIComponent(completedOrder.id)}${paymentId ? `?payment_id=${encodeURIComponent(paymentId)}` : ''}`;
-        const res = await fetch(verifyUrl);
+        const res = await fetch(verifyUrl, { headers: getCheckoutAuthHeaders() });
         if (res.ok) {
           const data = await res.json();
           const updatedOrder: Order = data.order;
@@ -295,7 +307,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
     try {
       const paymentId = completedOrder.paymentDetails?.mercadoPagoPaymentId;
       const verifyUrl = `/api/mercadopago/verify-payment/${encodeURIComponent(completedOrder.id)}${paymentId ? `?payment_id=${encodeURIComponent(paymentId)}` : ''}`;
-      const res = await fetch(verifyUrl);
+      const res = await fetch(verifyUrl, { headers: getCheckoutAuthHeaders() });
 
       if (res.ok) {
         const data = await res.json();
@@ -498,13 +510,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         : 'Mercado Pago Checkout Pro';
 
       const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
-      let currentOrderId = draftOrderId;
-      if (!currentOrderId) {
-        currentOrderId = `MM-${Math.floor(100000 + Math.random() * 900000)}`;
-        setDraftOrderId(currentOrderId);
-      }
       const orderPayload = {
-        orderId: currentOrderId,
+        ...(retryOrderId ? { existingOrderId: retryOrderId } : {}),
         userId: user?.id || undefined,
         items: cartItems.map((item) => ({
           productId: item.product.id,
@@ -521,6 +528,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         },
         shippingCarrier: carrierName,
         shippingService: serviceName,
+        shippingQuoteId: activeShippingOption?.quoteId,
         shippingServiceId: activeShippingOption?.serviceId ? String(activeShippingOption.serviceId) : undefined,
         shippingDeliveryTime: activeShippingOption?.deliveryTime,
         payer: {
@@ -552,6 +560,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
+        if (typeof errData.orderId === 'string' && errData.orderId.trim()) {
+          setRetryOrderId(errData.orderId.trim());
+        }
         throw new Error(errData.message || errData.error || 'Erro ao gerar o checkout do Mercado Pago.');
       }
 
@@ -566,6 +577,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         registerOrder(data.order);
         setCompletedOrder(data.order);
       }
+      setRetryOrderId(null);
 
       setRedirectUrl(targetCheckoutUrl);
       // NOTE: Cart is NOT cleared here! Only cleared after verified approval from Mercado Pago.

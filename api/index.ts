@@ -9,6 +9,11 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import sharp from 'sharp';
 import { MercadoPagoConfig, Preference, Payment, WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
+import {
+  buildMercadoPagoCallbackFields,
+  resolveMercadoPagoCallbackBaseUrl,
+  resolveMercadoPagoPictureUrl,
+} from '../src/services/mercadoPagoPreferenceUrls';
 import { IS_TEST_MODE } from '../src/server/runtime-flags';
 
 export { IS_TEST_MODE };
@@ -822,6 +827,7 @@ export class DatabaseManager {
   private pgPool: Pool | null = null;
   private supabase: SupabaseClient | null = null;
   private supabaseAdmin: SupabaseClient | null = null;
+  private supabaseAuth: SupabaseClient | null = null;
   private adminToken: string | null = null;
   private adminTokenExpiresAt = 0;
   private mode: 'postgres' | 'supabase' | 'durable_file' = 'durable_file';
@@ -851,13 +857,16 @@ export class DatabaseManager {
   }
 
   private detectAndInitMode() {
-    const dbUrl = process.env.DISPOSABLE_DATABASE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.POSTGRESQL_URL;
-    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
-    const supabaseKey = (process.env.SUPABASE_DISPOSABLE_URL ? (process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || process.env.SUPABASE_DISPOSABLE_ANON_KEY) : null) || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
+    const dbUrl = process.env.DISPOSABLE_DATABASE_URL || process.env.DATABASE_URL;
 
-    if (supabaseUrl && supabaseKey && !supabaseUrl.includes('placeholder')) {
+    const runtimeSupabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL;
+    const runtimeSupabaseKey = process.env.SUPABASE_DISPOSABLE_URL
+      ? (process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || process.env.SUPABASE_DISPOSABLE_ANON_KEY)
+      : (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY);
+
+    if (runtimeSupabaseUrl && runtimeSupabaseKey && !runtimeSupabaseUrl.includes('placeholder')) {
       try {
-        this.supabase = createClient(supabaseUrl, supabaseKey, {
+        this.supabase = createClient(runtimeSupabaseUrl, runtimeSupabaseKey, {
           auth: {
             persistSession: false,
             autoRefreshToken: false,
@@ -1432,16 +1441,45 @@ export class DatabaseManager {
   }
 
   /**
+   * Dedicated anon-key client for end-user authentication operations.
+   * Never authenticate a user on the cached service-role client: doing so
+   * replaces its Authorization context and makes later administrative writes
+   * unexpectedly subject to that user's RLS policies.
+   */
+  public getSupabaseAuthClient(): SupabaseClient | null {
+    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL;
+    const anonKey = process.env.SUPABASE_DISPOSABLE_URL
+      ? process.env.SUPABASE_DISPOSABLE_ANON_KEY
+      : process.env.SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !anonKey || supabaseUrl.includes('placeholder')) {
+      return null;
+    }
+
+    if (!this.supabaseAuth) {
+      this.supabaseAuth = createClient(supabaseUrl, anonKey.trim(), {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+          detectSessionInUrl: false,
+        },
+      });
+    }
+
+    return this.supabaseAuth;
+  }
+
+  /**
    * Returns authoritative Supabase client with service_role secret for administrative writes.
    * Fail-Closed Security Policy: Never falls back to anon client for admin operations.
    */
   public async getSupabaseAdminClient(): Promise<SupabaseClient | null> {
     const serviceKey = (process.env.SUPABASE_DISPOSABLE_URL ? process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY : null) || process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || 'https://ktmkvysnjfphcfntazut.supabase.co';
+    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL;
 
     if (serviceKey && serviceKey.trim() !== '') {
       const cleanKey = serviceKey.trim();
-      const anonKey = process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const anonKey = process.env.SUPABASE_ANON_KEY;
 
       // Fail-closed guard: Reject anon/publishable keys passed erroneously as service role key
       if (cleanKey.startsWith('sb_publishable_') || (anonKey && cleanKey === anonKey.trim())) {
@@ -2540,8 +2578,8 @@ export class DatabaseManager {
     }
     if (!Array.isArray(quotes) || quotes.length === 0) return;
     for (const q of quotes) {
-      const qKey = q.id || q.quote_id;
-      const idx = this.shippingQuotes.findIndex((existing) => (existing.id === qKey || existing.quote_id === qKey));
+      const qKey = q.id;
+      const idx = this.shippingQuotes.findIndex((existing) => existing.id === qKey);
       if (idx >= 0) {
         this.shippingQuotes[idx] = q;
       } else {
@@ -2558,7 +2596,7 @@ export class DatabaseManager {
         const { data, error } = await adminClient
           .from('shipping_quotes')
           .select('*')
-          .or(`id.eq.${quoteId},quote_id.eq.${quoteId}`)
+          .eq('id', quoteId)
           .maybeSingle();
         if (error) {
           console.error('[DB] Supabase query shipping_quotes failed:', error.message);
@@ -2579,7 +2617,7 @@ export class DatabaseManager {
       return null;
     }
 
-    return this.shippingQuotes.find((q) => q.id === quoteId || q.quote_id === quoteId) || null;
+    return this.shippingQuotes.find((q) => q.id === quoteId) || null;
   }
 
   // ==========================================
@@ -2763,12 +2801,18 @@ export class DatabaseManager {
           delivery_time: order.shippingDeliveryTime || null,
         },
         shipping_details: (order as any).shippingDetails || null,
+        shipping_carrier: order.shippingCarrier || null,
+        shipping_provider: (order as any).shippingProvider || order.shippingCarrier || null,
+        shipping_service: order.shippingService || null,
+        shipping_service_id: order.shippingServiceId || null,
+        shipping_delivery_time: order.shippingDeliveryTime || null,
         payment_method: order.paymentMethod || null,
         payment_details: order.paymentDetails || {},
         subtotal: Number(order.subtotal || 0),
-        shipping: Number(order.shippingFee || (order as any).shipping || 0),
         shipping_fee: Number(order.shippingFee || (order as any).shipping || 0),
+        shipping_price: Number(order.shippingFee || (order as any).shipping || 0),
         discount: Number(order.discount || 0),
+        coupon_code: (order as any).couponCode || (order as any).coupon_code || null,
         total: Number(order.total || 0),
         status: order.status || 'Aguardando Pagamento',
         payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' || order.status === 'Em Separação' ? 'Pago' : 'Pendente'),
@@ -5558,7 +5602,7 @@ export function generateCanonicalCartHash(
     const sizeA = String(a.size || '');
     const sizeB = String(b.size || '');
     if (sizeA !== sizeB) return sizeA.localeCompare(sizeB);
-    return String(a.color || a.colorName || '').localeCompare(String(b.color || b.colorName || ''));
+    return String(a.colorName || a.color || '').localeCompare(String(b.colorName || b.color || ''));
   });
 
   const parts = sortedItems.map((item) => {
@@ -5569,7 +5613,7 @@ export function generateCanonicalCartHash(
     const wd = Number(item.width || 0).toFixed(1);
     const l = Number(item.length || 0).toFixed(1);
     const size = String(item.size || 'M');
-    const color = String(item.color || item.colorName || 'Padrao');
+    const color = String(item.colorName || item.color || 'Padrão');
     return `${pId}:${size}:${color}:${qty}:w${w}:h${h}:wd${wd}:l${l}`;
   });
 
@@ -5780,7 +5824,7 @@ function validateSenderDocument(doc: string | undefined | null): {
 }
 
 function getAdminEmailList(): string[] {
-  const envAdmins = process.env.ADMIN_EMAILS || process.env.ADMIN_EMAIL || '';
+  const envAdmins = process.env.ADMIN_EMAILS || '';
   const parsed = envAdmins.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
   return parsed;
 }
@@ -5790,7 +5834,7 @@ async function verifyAuthToken(token: string): Promise<{ userId: string; email: 
   if (!token || typeof token !== 'string') return null;
 
   // Supabase Auth Server is the sole authoritative authentication provider
-  const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+  const supabase = db.getSupabaseAuthClient();
   if (!supabase) {
     console.error('[AUTH CRITICAL] Supabase client unavailable for token verification.');
     return null;
@@ -5911,7 +5955,7 @@ app.get(['/api/health', '/health'], async (req, res) => {
     }
   }
 
-  const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
   const meConfig = getMelhorEnvioConfig();
 
   res.json({
@@ -5965,8 +6009,8 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
     }
 
     const meConfig = getMelhorEnvioConfig();
-    const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
-    const mpWebhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET || process.env.MERCADO_PAGO_WEBHOOK_SECRET;
+    const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+    const mpWebhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
     const resendKey = process.env.RESEND_API_KEY;
 
     // Evaluate statuses: 'OK' | 'WARNING' | 'ERROR' | 'NOT_CONFIGURED'
@@ -6225,7 +6269,7 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres.' });
     }
 
-    const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+    const supabase = db.getSupabaseAuthClient();
     if (!supabase) {
       return res.status(503).json({ error: 'Serviço de autenticação Supabase indisponível no momento.' });
     }
@@ -6278,7 +6322,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
     }
 
-    const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+    const supabase = db.getSupabaseAuthClient();
     if (!supabase) {
       return res.status(503).json({ error: 'Serviço de autenticação Supabase indisponível no momento.' });
     }
@@ -7056,12 +7100,7 @@ export interface ServerMelhorEnvioConfig {
 
 export function getMelhorEnvioConfig(): ServerMelhorEnvioConfig {
   // Official standard variable: MELHOR_ENVIO_TOKEN
-  const token = (
-    process.env.MELHOR_ENVIO_TOKEN ||
-    process.env.TOKEN_MELHOR_ENVIO ||
-    process.env.MELHORENVIO_TOKEN ||
-    ''
-  ).trim();
+  const token = (process.env.MELHOR_ENVIO_TOKEN || '').trim();
 
   const rawEnv = (process.env.MELHOR_ENVIO_ENV || 'production').toLowerCase().trim();
   const environment: 'production' | 'sandbox' = rawEnv === 'sandbox' ? 'sandbox' : 'production';
@@ -7069,12 +7108,7 @@ export function getMelhorEnvioConfig(): ServerMelhorEnvioConfig {
     ? 'https://sandbox.melhorenvio.com.br/api/v2'
     : 'https://melhorenvio.com.br/api/v2';
 
-  const originPostalCode = (
-    process.env.MELHOR_ENVIO_ORIGIN_CEP ||
-    process.env.STORE_ORIGIN_CEP ||
-    process.env.ORIGIN_CEP ||
-    '03806010'
-  ).replace(/\D/g, '');
+  const originPostalCode = (process.env.MELHOR_ENVIO_ORIGIN_CEP || '03806010').replace(/\D/g, '');
 
   const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confecções';
   const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
@@ -7136,6 +7170,8 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
 
     const shippingProducts: Array<{
       id: string;
+      size: string;
+      colorName: string;
       weight: number;
       height: number;
       width: number;
@@ -7202,6 +7238,8 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
 
       const productData = {
         id: prodId,
+        size: String(item.size || 'M'),
+        colorName: String(item.colorName || item.color || dbProduct.colors?.[0]?.colorName || 'Padrão'),
         weight: Number(rawWeight),
         height: Number(rawHeight),
         width: Number(rawWidth),
@@ -7550,11 +7588,89 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
 
 // --- Mercado Pago Helpers & SDK Integration ---
 function getMercadoPagoClient() {
-  const token = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
   if (!token || token.trim().length < 10) {
     return null;
   }
   return new MercadoPagoConfig({ accessToken: token.trim(), options: { timeout: 10000 } });
+}
+
+function buildMercadoPagoPhone(rawPhone: unknown): { area_code: string; number: string } | undefined {
+  const digits = String(rawPhone || '').replace(/\D/g, '');
+  if (digits.length < 10 || digits.length > 11) return undefined;
+  return { area_code: digits.slice(0, 2), number: digits.slice(2) };
+}
+
+function buildMercadoPagoProductItems(
+  items: OrderItem[],
+  subtotal: number,
+  discount: number,
+  appUrl: string,
+): any[] {
+  const grossCents = Math.max(0, Math.round(subtotal * 100));
+  const netCents = Math.max(0, Math.round((subtotal - discount) * 100));
+  let allocatedNetCents = 0;
+  const result: any[] = [];
+
+  items.forEach((item, itemIndex) => {
+    const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
+    const lineGrossCents = Math.max(0, Math.round(Number(item.price || 0) * quantity * 100));
+    const isLastItem = itemIndex === items.length - 1;
+    const lineNetCents = discount > 0 && grossCents > 0
+      ? (isLastItem
+          ? Math.max(0, netCents - allocatedNetCents)
+          : Math.max(0, Math.round((netCents * lineGrossCents) / grossCents)))
+      : lineGrossCents;
+
+    allocatedNetCents += lineNetCents;
+    if (lineNetCents <= 0) return;
+
+    const pictureUrl = resolveMercadoPagoPictureUrl(item.image, appUrl);
+    const commonFields = {
+      title: item.title,
+      description: `${item.title} (Tam: ${item.size}, Cor: ${item.color})`,
+      ...(pictureUrl ? { picture_url: pictureUrl } : {}),
+      category_id: 'fashion',
+      currency_id: 'BRL',
+    };
+
+    // Split a discounted line into at most two cent-exact price groups. This
+    // preserves the order total even when the discount is not divisible by
+    // the quantity, avoiding false "Pagamento Divergente" webhook results.
+    const baseUnitCents = Math.floor(lineNetCents / quantity);
+    const remainderUnits = lineNetCents % quantity;
+
+    if (baseUnitCents <= 0) {
+      result.push({
+        id: `${item.productId}-${itemIndex + 1}-total`,
+        ...commonFields,
+        description: `${commonFields.description} — ${quantity} unidade(s)`,
+        quantity: 1,
+        unit_price: Number((lineNetCents / 100).toFixed(2)),
+      });
+      return;
+    }
+
+    const baseUnits = quantity - remainderUnits;
+    if (baseUnits > 0) {
+      result.push({
+        id: `${item.productId}-${itemIndex + 1}-base`,
+        ...commonFields,
+        quantity: baseUnits,
+        unit_price: Number((baseUnitCents / 100).toFixed(2)),
+      });
+    }
+    if (remainderUnits > 0) {
+      result.push({
+        id: `${item.productId}-${itemIndex + 1}-remainder`,
+        ...commonFields,
+        quantity: remainderUnits,
+        unit_price: Number(((baseUnitCents + 1) / 100).toFixed(2)),
+      });
+    }
+  });
+
+  return result;
 }
 
 function verifyMercadoPagoWebhookSignature(req: express.Request, secret?: string): boolean {
@@ -7658,7 +7774,7 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         title: dbProduct.title,
         image: dbProduct.images?.[0] || dbProduct.image || '',
         size: String(item.size || 'M'),
-        color: String(item.colorName || (dbProduct.colors?.[0]?.colorName) || 'Padrão'),
+        color: String(item.colorName || item.color || (dbProduct.colors?.[0]?.colorName) || 'Padrão'),
         price: Number(officialUnitPrice.toFixed(2)),
         quantity: qty,
         subtotal: itemSubtotal,
@@ -7891,76 +8007,31 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       throw saveErr;
     }
 
-    if (newOrder.customerEmail) {
-      sendTransactionalEmail({
-        to: newOrder.customerEmail,
-        subject: `Pedido #${newOrder.id} Gerado // MARMOT`,
-        template: 'order_created',
-        orderId: newOrder.id,
-        userId: newOrder.userId,
-        html: `<div style="font-family: sans-serif; background: #0c0c0c; color: #fff; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto;">
-          <h2 style="letter-spacing: 0.1em; color: #ffffff;">PEDIDO RECEBIDO // MARMOT</h2>
-          <p>Recebemos o registro do seu pedido <strong>#${newOrder.id}</strong>.</p>
-          <p>Total do pedido: <strong>R$ ${newOrder.total.toFixed(2)}</strong></p>
-          <p style="color: #d6b35a; font-size: 13px;">Aguardando confirmação do pagamento via Mercado Pago.</p>
-        </div>`,
-      }).catch(() => {});
-    }
-
     // 7. Determine base URL for callbacks
     const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
     const protocol = (req.headers['x-forwarded-proto'] as string) || (req.secure ? 'https' : 'http');
     const appUrl = (process.env.APP_URL && !process.env.APP_URL.includes('MY_APP_URL'))
       ? process.env.APP_URL.replace(/\/$/, '')
       : `${protocol}://${host}`;
+    const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
+      callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
+      appUrl,
+      vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+      vercelUrl: process.env.VERCEL_URL,
+    });
+    const mercadoPagoAssetBaseUrl = callbackBaseUrl || appUrl;
 
     // 8. Construct Mercado Pago Preference payload with dynamic items & prices
-    let mpItems: any[] = [];
-    if (discount > 0 && subtotal > 0) {
-      const netProductTotal = Math.max(0, Number((subtotal - discount).toFixed(2)));
-      let distributedSum = 0;
-      mpItems = validatedItems.map((item, idx) => {
-        let itemTotal: number;
-        if (idx === validatedItems.length - 1) {
-          itemTotal = Math.max(0.01, Number((netProductTotal - distributedSum).toFixed(2)));
-        } else {
-          const itemProportion = (item.price * item.quantity) / subtotal;
-          itemTotal = Number((netProductTotal * itemProportion).toFixed(2));
-          distributedSum += itemTotal;
-        }
-
-        const adjustedUnitPrice = Number((itemTotal / item.quantity).toFixed(2));
-        return {
-          id: item.productId,
-          title: item.title,
-          description: `${item.title} (Tam: ${item.size}, Cor: ${item.color})`,
-          picture_url: item.image?.startsWith('http') ? item.image : `${appUrl}${item.image || ''}`,
-          category_id: 'fashion',
-          quantity: item.quantity,
-          currency_id: 'BRL',
-          unit_price: Math.max(0.01, adjustedUnitPrice),
-        };
-      });
-    } else {
-      mpItems = validatedItems.map((item) => ({
-        id: item.productId,
-        title: item.title,
-        description: `${item.title} (Tam: ${item.size}, Cor: ${item.color})`,
-        picture_url: item.image?.startsWith('http') ? item.image : `${appUrl}${item.image || ''}`,
-        category_id: 'fashion',
-        quantity: item.quantity,
-        currency_id: 'BRL',
-        unit_price: Number(item.price.toFixed(2)),
-      }));
-    }
+    let mpItems: any[] = buildMercadoPagoProductItems(validatedItems, subtotal, discount, mercadoPagoAssetBaseUrl);
 
     // Include shipping fee as an explicit line item in the preference so Checkout Pro transaction_amount reflects total including freight
     if (validatedShippingFee > 0) {
+      const shippingPictureUrl = resolveMercadoPagoPictureUrl('/assets/shipping-box.png', mercadoPagoAssetBaseUrl);
       mpItems.push({
         id: `shipping-${shippingServiceId || 'fee'}`,
         title: `Frete — ${shippingCarrier || 'Entrega'} ${shippingService ? `(${shippingService})` : ''}`.trim(),
         description: `Envio para ${shippingAddress?.city || ''} - ${shippingAddress?.state || ''} (CEP: ${shippingAddress?.cep || ''}, Prazo: ${shippingDeliveryTime || 5} dias úteis)`,
-        picture_url: `${appUrl}/assets/shipping-box.png`,
+        ...(shippingPictureUrl ? { picture_url: shippingPictureUrl } : {}),
         category_id: 'shipping',
         quantity: 1,
         currency_id: 'BRL',
@@ -7969,13 +8040,22 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     }
 
     const isSandbox = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'sandbox';
+    const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, newOrder.id);
+
+    if (!callbackFields.back_urls) {
+      console.warn('[MP_CALLBACKS_DISABLED]', JSON.stringify({
+        requestId,
+        orderId: newOrder.id,
+        reason: 'APP_URL não é uma URL HTTPS pública; retornos automáticos e webhook foram omitidos no ambiente local.',
+      }));
+    }
 
     const preferencePayload: any = {
       items: mpItems,
       payer: {
         name: payer?.name || shippingAddress?.recipientName || 'Cliente',
         email: payer?.email || 'contato@marmot.com.br',
-        phone: payer?.phone ? { number: payer.phone.replace(/\D/g, '') } : undefined,
+        phone: buildMercadoPagoPhone(payer?.phone),
         identification: payer?.cpf ? { type: 'CPF', number: payer.cpf.replace(/\D/g, '') } : undefined,
         address: shippingAddress ? {
           zip_code: (shippingAddress.cep || '').replace(/\D/g, ''),
@@ -7983,14 +8063,8 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
           street_number: Number(shippingAddress.number) || 0,
         } : undefined,
       },
-      back_urls: {
-        success: `${appUrl}/checkout?status=success&order_id=${newOrder.id}`,
-        failure: `${appUrl}/checkout?status=failure&order_id=${newOrder.id}`,
-        pending: `${appUrl}/checkout?status=pending&order_id=${newOrder.id}`,
-      },
-      auto_return: 'approved',
+      ...callbackFields,
       external_reference: newOrder.id,
-      notification_url: `${appUrl}/api/mercado-pago/webhook`,
       statement_descriptor: 'MARMOT STORE',
       metadata: {
         order_id: newOrder.id,
@@ -8047,6 +8121,22 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         mercadoPagoInitPoint: isSandbox && sandboxInitPoint ? sandboxInitPoint : initPoint,
       };
       await db.saveOrder(newOrder);
+
+      if (newOrder.customerEmail && !existingOrder?.paymentDetails?.mercadoPagoPreferenceId) {
+        sendTransactionalEmail({
+          to: newOrder.customerEmail,
+          subject: `Pedido #${newOrder.id} Gerado // MARMOT`,
+          template: 'order_created',
+          orderId: newOrder.id,
+          userId: newOrder.userId,
+          html: `<div style="font-family: sans-serif; background: #0c0c0c; color: #fff; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto;">
+            <h2 style="letter-spacing: 0.1em; color: #ffffff;">PEDIDO RECEBIDO // MARMOT</h2>
+            <p>Recebemos o registro do seu pedido <strong>#${newOrder.id}</strong>.</p>
+            <p>Total do pedido: <strong>R$ ${newOrder.total.toFixed(2)}</strong></p>
+            <p style="color: #d6b35a; font-size: 13px;">Aguardando confirmação do pagamento via Mercado Pago.</p>
+          </div>`,
+        }).catch(() => {});
+      }
     } catch (mpErr: any) {
       console.error('[MP_PREFERENCE_ERROR]', JSON.stringify({
         requestId,
@@ -8054,7 +8144,9 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         error: mpErr.message,
         durationMs: Date.now() - mpStart,
       }));
-      return res.status(500).json({
+      return res.status(502).json({
+        code: 'MERCADOPAGO_PREFERENCE_ERROR',
+        orderId: newOrder.id,
         error: 'Erro ao gerar preferência no Mercado Pago.',
         message: mpErr.message || 'Falha na comunicação com a API do Mercado Pago.',
       });
@@ -8099,8 +8191,73 @@ app.post('/api/mercadopago/preference', handleCreatePreference);
 app.post('/api/mercadopago/create-preference', handleCreatePreference);
 app.post('/api/mercadopago/payments', handleCreatePreference);
 
+function createPaymentVerificationError(message: string, statusCode: number, code: string): Error {
+  const error: any = new Error(message);
+  error.statusCode = statusCode;
+  error.code = code;
+  return error;
+}
+
+function assertMercadoPagoPaymentBelongsToOrder(
+  order: Order,
+  paymentData: any,
+  expectedPaymentId?: string,
+): void {
+  const paymentId = String(paymentData?.id || '').trim();
+  const requestedPaymentId = String(expectedPaymentId || '').trim();
+  const externalReference = String(paymentData?.external_reference || '').trim();
+  const metadataOrderId = String(paymentData?.metadata?.order_id || '').trim();
+  const expectedPreferenceId = String(order.paymentDetails?.mercadoPagoPreferenceId || '').trim();
+  const paymentPreferenceId = String(paymentData?.preference_id || '').trim();
+
+  if (!paymentId) {
+    throw createPaymentVerificationError(
+      'A resposta do Mercado Pago não contém um identificador de pagamento válido.',
+      502,
+      'MERCADOPAGO_PAYMENT_INVALID',
+    );
+  }
+
+  if (requestedPaymentId && paymentId !== requestedPaymentId) {
+    throw createPaymentVerificationError(
+      'O pagamento retornado pelo Mercado Pago não corresponde ao payment_id informado.',
+      409,
+      'MERCADOPAGO_PAYMENT_ID_MISMATCH',
+    );
+  }
+
+  // external_reference is written by this application when the preference is
+  // created and is the authoritative binding between a Mercado Pago payment
+  // and a Marmot order. Never apply a payment without this exact match.
+  if (!externalReference || externalReference !== order.id) {
+    throw createPaymentVerificationError(
+      'O pagamento consultado não pertence ao pedido informado.',
+      409,
+      'MERCADOPAGO_ORDER_MISMATCH',
+    );
+  }
+
+  if (metadataOrderId && metadataOrderId !== order.id) {
+    throw createPaymentVerificationError(
+      'Os metadados do pagamento não correspondem ao pedido informado.',
+      409,
+      'MERCADOPAGO_METADATA_MISMATCH',
+    );
+  }
+
+  if (expectedPreferenceId && paymentPreferenceId && paymentPreferenceId !== expectedPreferenceId) {
+    throw createPaymentVerificationError(
+      'O pagamento pertence a outra preferência do Mercado Pago.',
+      409,
+      'MERCADOPAGO_PREFERENCE_MISMATCH',
+    );
+  }
+}
+
 // Shared helper to apply verified Mercado Pago payment data to an order with strict idempotency
 async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): Promise<Order> {
+  assertMercadoPagoPaymentBelongsToOrder(order, paymentData);
+
   const status = paymentData.status; // 'approved' | 'pending' | 'in_process' | 'rejected' | 'cancelled' | 'refunded' | 'charged_back'
   const statusDetail = paymentData.status_detail;
   const wasAlreadyApproved = order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago';
@@ -8245,7 +8402,7 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
 }
 
 // Function to securely query Mercado Pago API to verify payment status of an order
-async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?: string): Promise<{ order: Order; paymentData: any | null; isApproved: boolean; status: string }> {
+async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?: string): Promise<{ order: Order; paymentData: any | null; isApproved: boolean; status: string; paymentValidated: boolean }> {
   let order = await db.getOrderById(orderId);
   const cleanId = String(orderId || '').trim();
 
@@ -8267,65 +8424,84 @@ async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?
     throw notFoundErr;
   }
 
-  // If already marked as approved in DB, return approved state
-  if (order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago') {
-    return { order, paymentData: null, isApproved: true, status: 'approved' };
+  const explicitPaymentId = String(paymentIdParam || '').trim();
+
+  // Status polling may use the webhook-confirmed database state. A browser
+  // return containing payment_id, however, must always re-fetch that exact
+  // payment from Mercado Pago before rendering an approval.
+  if (!explicitPaymentId && (order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago')) {
+    return { order, paymentData: null, isApproved: true, status: 'approved', paymentValidated: false };
   }
 
-  const token = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  if (!token || token.trim().length < 10) {
+    throw createPaymentVerificationError(
+      'A credencial do Mercado Pago não está configurada no servidor.',
+      503,
+      'MERCADOPAGO_NOT_CONFIGURED',
+    );
+  }
+
   let paymentData: any = null;
-  const targetPaymentId = paymentIdParam || order.paymentDetails?.mercadoPagoPaymentId;
+  const targetPaymentId = explicitPaymentId || String(order.paymentDetails?.mercadoPagoPaymentId || '').trim();
 
-  if (token && token.trim().length >= 10) {
-    const mpClient = getMercadoPagoClient();
+  const mpClient = getMercadoPagoClient();
 
-    // 1. Try querying specific payment ID if provided
-    if (targetPaymentId && targetPaymentId !== 'null' && targetPaymentId !== 'undefined') {
-      try {
-        if (mpClient) {
-          const paymentApi = new Payment(mpClient);
-          paymentData = await paymentApi.get({ id: String(targetPaymentId) });
-        } else {
-          const fetchRes = await fetch(`https://api.mercadopago.com/v1/payments/${targetPaymentId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (fetchRes.ok) {
-            paymentData = await fetchRes.json();
-          }
-        }
-      } catch (err) {
-        console.warn(`[Mercado Pago Verification] Could not fetch payment ${targetPaymentId} directly:`, err);
+  // 1. Query a specific payment ID when one is known. If the browser supplied
+  // payment_id, never fall back to another payment for the same order.
+  if (targetPaymentId && targetPaymentId !== 'null' && targetPaymentId !== 'undefined') {
+    try {
+      if (!mpClient) {
+        throw createPaymentVerificationError(
+          'Cliente do Mercado Pago indisponível no servidor.',
+          503,
+          'MERCADOPAGO_NOT_CONFIGURED',
+        );
+      }
+      const paymentApi = new Payment(mpClient);
+      paymentData = await paymentApi.get({ id: String(targetPaymentId) });
+    } catch (err: any) {
+      console.warn(`[Mercado Pago Verification] Could not fetch payment ${targetPaymentId} directly:`, err?.message || err);
+      if (explicitPaymentId) {
+        throw createPaymentVerificationError(
+          'Não foi possível confirmar o payment_id informado diretamente no Mercado Pago.',
+          err?.status === 404 || err?.statusCode === 404 ? 404 : 502,
+          'MERCADOPAGO_PAYMENT_LOOKUP_FAILED',
+        );
       }
     }
+  }
 
-    // 2. If no payment data yet, search payments by external_reference (Order ID)
-    if (!paymentData) {
-      try {
-        const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(order.id)}&sort=date_created&criteria=desc`;
-        const searchRes = await fetch(searchUrl, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (searchRes.ok) {
-          const searchJson = await searchRes.json();
-          if (searchJson.results && searchJson.results.length > 0) {
-            paymentData = searchJson.results[0];
-          }
+  // 2. Polling without an explicit browser return may search by the order's
+  // external_reference. Every result is still checked below before mutation.
+  if (!paymentData && !explicitPaymentId) {
+    try {
+      const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(order.id)}&sort=date_created&criteria=desc`;
+      const searchRes = await fetch(searchUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (searchRes.ok) {
+        const searchJson = await searchRes.json();
+        if (searchJson.results && searchJson.results.length > 0) {
+          paymentData = searchJson.results[0];
         }
-      } catch (searchErr) {
-        console.warn(`[Mercado Pago Verification] Search by external_reference error:`, searchErr);
       }
+    } catch (searchErr) {
+      console.warn(`[Mercado Pago Verification] Search by external_reference error:`, searchErr);
     }
   }
 
   // If real payment data was retrieved from Mercado Pago API
   if (paymentData) {
+    assertMercadoPagoPaymentBelongsToOrder(order, paymentData, explicitPaymentId || targetPaymentId);
     const updatedOrder = await applyMercadoPagoPaymentToOrder(order, paymentData);
-    const isApproved = updatedOrder.status === 'Pagamento Aprovado' || updatedOrder.paymentStatus === 'Pago';
+    const isApproved = paymentData.status === 'approved' && updatedOrder.paymentStatus === 'Pago';
     return {
       order: updatedOrder,
       paymentData,
       isApproved,
       status: paymentData.status || (isApproved ? 'approved' : 'pending'),
+      paymentValidated: true,
     };
   }
 
@@ -8342,14 +8518,15 @@ async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?
     paymentData: null,
     isApproved: false,
     status: 'pending',
+    paymentValidated: false,
   };
 }
 
 // Webhook / IPN Notification Endpoint with Persistent Database-Backed Idempotency
 app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks/mercadopago'], async (req, res) => {
   try {
-    const webhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET || process.env.MERCADO_PAGO_WEBHOOK_SECRET;
-    const hasAccessToken = Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN);
+    const webhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+    const hasAccessToken = Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN);
     const hasWebhookSecret = Boolean(webhookSecret && webhookSecret.trim().length > 0);
     const mpEnv = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase();
 
@@ -8382,7 +8559,7 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
       let procError: string | undefined;
 
       try {
-        const token = process.env.MERCADOPAGO_ACCESS_TOKEN || process.env.MERCADO_PAGO_ACCESS_TOKEN;
+        const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
         let paymentData: any = null;
 
         if (token && token.length >= 10) {
@@ -8438,26 +8615,81 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
   }
 });
 
-// Dedicated Real-time Verification Endpoint
+function canAuthenticatedUserAccessOrder(req: any, order: Order): boolean {
+  if (req.user?.role === 'admin') return true;
+  if (order.userId) return order.userId === req.user?.id;
+
+  const authenticatedEmail = String(req.user?.email || '').trim().toLowerCase();
+  const orderEmail = String(order.customerEmail || '').trim().toLowerCase();
+  return Boolean(authenticatedEmail && orderEmail && authenticatedEmail === orderEmail);
+}
+
+// Checkout Pro return verification. This endpoint intentionally requires both
+// IDs and never accepts status/approval from the browser query string.
+app.post('/api/mercado-pago/return/verify', requireAuth, async (req: any, res) => {
+  try {
+    const orderId = String(req.body?.orderId || req.body?.order_id || '').trim();
+    const paymentId = String(req.body?.paymentId || req.body?.payment_id || req.body?.collection_id || '').trim();
+
+    if (!orderId || !paymentId) {
+      return res.status(400).json({
+        success: false,
+        code: 'MERCADOPAGO_RETURN_PARAMS_MISSING',
+        error: 'O retorno do Mercado Pago não contém order_id e payment_id válidos.',
+      });
+    }
+
+    const existingOrder = await db.getOrderById(orderId);
+    if (!existingOrder) {
+      return res.status(404).json({
+        success: false,
+        code: 'ORDER_NOT_FOUND',
+        error: 'Pedido informado no retorno não encontrado.',
+      });
+    }
+
+    if (!canAuthenticatedUserAccessOrder(req, existingOrder)) {
+      return res.status(403).json({
+        success: false,
+        code: 'ORDER_ACCESS_DENIED',
+        error: 'Acesso negado. Você não é o titular deste pedido.',
+      });
+    }
+
+    const result = await fetchAndVerifyMercadoPagoPayment(orderId, paymentId);
+    return res.json({
+      success: true,
+      paymentValidated: result.paymentValidated,
+      approved: result.isApproved,
+      status: result.status,
+      order: result.order,
+      paymentDetails: result.order.paymentDetails,
+    });
+  } catch (error: any) {
+    const statusCode = error.statusCode || 500;
+    console.error(`[Mercado Pago Return Verification Error ${statusCode}]:`, error.message);
+    return res.status(statusCode).json({
+      success: false,
+      code: error.code || 'MERCADOPAGO_RETURN_VERIFICATION_FAILED',
+      error: error.message || 'Erro ao validar o retorno diretamente no Mercado Pago.',
+    });
+  }
+});
+
+// Authenticated real-time verification endpoint used for status polling.
 app.all([
   '/api/mercadopago/verify-payment/:orderId',
   '/api/mercado-pago/verify-payment/:orderId',
   '/api/orders/:orderId/verify-payment',
   '/api/mercadopago/check-status/:orderId',
-], async (req, res) => {
+], requireAuth, async (req: any, res) => {
   try {
     const { orderId } = req.params;
     const paymentId = (req.query.payment_id || req.query.collection_id || req.body?.payment_id || req.body?.collection_id) as string;
 
     const existingOrder = await db.getOrderById(orderId);
-    if (existingOrder && existingOrder.userId) {
-      const token = extractToken(req);
-      if (token) {
-        const verified = await verifyAuthToken(token);
-        if (verified && verified.userId !== existingOrder.userId && verified.role !== 'admin') {
-          return res.status(403).json({ error: 'Acesso negado. Você não é o titular deste pedido.' });
-        }
-      }
+    if (existingOrder && !canAuthenticatedUserAccessOrder(req, existingOrder)) {
+      return res.status(403).json({ error: 'Acesso negado. Você não é o titular deste pedido.' });
     }
 
     const result = await fetchAndVerifyMercadoPagoPayment(orderId, paymentId);
@@ -8465,6 +8697,7 @@ app.all([
       success: true,
       approved: result.isApproved,
       status: result.status,
+      paymentValidated: result.paymentValidated,
       order: result.order,
       paymentDetails: result.order.paymentDetails,
     });
@@ -8474,6 +8707,7 @@ app.all([
     return res.status(statusCode).json({
       success: false,
       notFound: statusCode === 404,
+      code: error.code || 'MERCADOPAGO_VERIFICATION_FAILED',
       error: error.message || 'Erro ao verificar pagamento no Mercado Pago.',
     });
   }
@@ -9913,11 +10147,16 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
     // Ownership check if order belongs to a registered user
     if (order.userId) {
       const token = extractToken(req);
-      if (token) {
-        const verified = await verifyAuthToken(token);
-        if (verified && verified.userId !== order.userId && verified.role !== 'admin') {
-          return res.status(403).json({ error: 'Acesso negado. Você não é o titular deste pedido.' });
-        }
+      if (!token) {
+        return res.status(401).json({ error: 'Autenticação obrigatória para pagar este pedido.' });
+      }
+
+      const verified = await verifyAuthToken(token);
+      if (!verified) {
+        return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
+      }
+      if (verified.userId !== order.userId && verified.role !== 'admin') {
+        return res.status(403).json({ error: 'Acesso negado. Você não é o titular deste pedido.' });
       }
     }
 
@@ -9926,26 +10165,30 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
     const appUrl = (process.env.APP_URL && !process.env.APP_URL.includes('MY_APP_URL'))
       ? process.env.APP_URL.replace(/\/$/, '')
       : `${protocol}://${host}`;
+    const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
+      callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
+      appUrl,
+      vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+      vercelUrl: process.env.VERCEL_URL,
+    });
+    const mercadoPagoAssetBaseUrl = callbackBaseUrl || appUrl;
 
     const isSandbox = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'sandbox';
 
-    const mpItems: any[] = (order.items || []).map((item) => ({
-      id: item.productId,
-      title: item.title,
-      description: `${item.title} (Tam: ${item.size}, Cor: ${item.color})`,
-      picture_url: item.image?.startsWith('http') ? item.image : `${appUrl}${item.image || ''}`,
-      category_id: 'fashion',
-      quantity: item.quantity,
-      currency_id: 'BRL',
-      unit_price: Number(item.price.toFixed(2)),
-    }));
+    const mpItems: any[] = buildMercadoPagoProductItems(
+      order.items || [],
+      Number(order.subtotal || 0),
+      Number(order.discount || 0),
+      mercadoPagoAssetBaseUrl,
+    );
 
     if (order.shippingFee && order.shippingFee > 0) {
+      const shippingPictureUrl = resolveMercadoPagoPictureUrl('/assets/shipping-box.png', mercadoPagoAssetBaseUrl);
       mpItems.push({
         id: `shipping-${order.shippingServiceId || 'fee'}`,
         title: `Frete — ${order.shippingCarrier || 'Entrega'} ${order.shippingService ? `(${order.shippingService})` : ''}`.trim(),
         description: `Envio para ${order.shippingAddress?.city || ''} - ${order.shippingAddress?.state || ''} (CEP: ${order.shippingAddress?.cep || ''})`,
-        picture_url: `${appUrl}/assets/shipping-box.png`,
+        ...(shippingPictureUrl ? { picture_url: shippingPictureUrl } : {}),
         category_id: 'shipping',
         quantity: 1,
         currency_id: 'BRL',
@@ -9953,26 +10196,29 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
       });
     }
 
+    const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, order.id);
+    if (!callbackFields.back_urls) {
+      console.warn('[MP_CALLBACKS_DISABLED]', JSON.stringify({
+        orderId: order.id,
+        route: 'pay-now',
+        reason: 'APP_URL não é uma URL HTTPS pública; retornos automáticos e webhook foram omitidos no ambiente local.',
+      }));
+    }
+
     const preferencePayload: any = {
       items: mpItems,
       payer: {
         name: order.shippingAddress?.recipientName || order.customerName || 'Cliente',
         email: order.customerEmail || 'contato@marmot.com.br',
-        phone: order.customerPhone ? { number: order.customerPhone.replace(/\D/g, '') } : undefined,
+        phone: buildMercadoPagoPhone(order.customerPhone),
         address: order.shippingAddress ? {
           zip_code: (order.shippingAddress.cep || '').replace(/\D/g, ''),
           street_name: order.shippingAddress.street || '',
           street_number: Number(order.shippingAddress.number) || 0,
         } : undefined,
       },
-      back_urls: {
-        success: `${appUrl}/checkout?status=success&order_id=${order.id}`,
-        failure: `${appUrl}/checkout?status=failure&order_id=${order.id}`,
-        pending: `${appUrl}/checkout?status=pending&order_id=${order.id}`,
-      },
-      auto_return: 'approved',
+      ...callbackFields,
       external_reference: order.id,
-      notification_url: `${appUrl}/api/mercado-pago/webhook`,
       statement_descriptor: 'MARMOT STORE',
       metadata: {
         order_id: order.id,
@@ -9985,36 +10231,50 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
     let initPoint = '';
     let sandboxInitPoint = '';
 
-    if (mpClient) {
-      try {
-        const preference = new Preference(mpClient);
-        const prefResponse = await preference.create({ body: preferencePayload });
+    if (!mpClient) {
+      return res.status(500).json({
+        code: 'MERCADOPAGO_NOT_CONFIGURED',
+        error: 'Credenciais do Mercado Pago não configuradas no servidor.',
+      });
+    }
 
-        preferenceId = prefResponse.id || '';
-        initPoint = prefResponse.init_point || '';
-        sandboxInitPoint = prefResponse.sandbox_init_point || '';
+    try {
+      const preference = new Preference(mpClient);
+      const prefResponse = await preference.create({ body: preferencePayload });
 
-        order.paymentDetails = {
-          ...order.paymentDetails,
-          mercadoPagoPreferenceId: preferenceId,
-          mercadoPagoInitPoint: isSandbox && sandboxInitPoint ? sandboxInitPoint : initPoint,
-        };
-        await db.saveOrder(order);
-      } catch (mpErr: any) {
-        console.error('[Pay Now Preference Error]:', mpErr);
+      preferenceId = prefResponse.id || '';
+      initPoint = prefResponse.init_point || '';
+      sandboxInitPoint = prefResponse.sandbox_init_point || '';
+
+      if (!initPoint && !sandboxInitPoint) {
+        throw new Error('Mercado Pago não retornou uma URL de checkout válida (init_point ausente).');
       }
+
+      order.paymentDetails = {
+        ...order.paymentDetails,
+        mercadoPagoPreferenceId: preferenceId,
+        mercadoPagoInitPoint: isSandbox && sandboxInitPoint ? sandboxInitPoint : initPoint,
+      };
+      await db.saveOrder(order);
+    } catch (mpErr: any) {
+      console.error('[Pay Now Preference Error]:', mpErr?.message || mpErr);
+      return res.status(502).json({
+        code: 'MERCADOPAGO_PREFERENCE_ERROR',
+        orderId: order.id,
+        error: mpErr?.message || 'Erro ao gerar link de pagamento no Mercado Pago.',
+      });
     }
 
     const targetUrl = (isSandbox && sandboxInitPoint)
       ? sandboxInitPoint
-      : (initPoint || `${appUrl}/checkout?status=pending&order_id=${order.id}`);
+      : (initPoint || sandboxInitPoint);
 
     return res.json({
       success: true,
       orderId: order.id,
       preferenceId,
-      init_point: initPoint || targetUrl,
-      sandbox_init_point: sandboxInitPoint || targetUrl,
+      init_point: initPoint,
+      sandbox_init_point: sandboxInitPoint,
       targetUrl,
     });
   } catch (err: any) {
@@ -10917,7 +11177,7 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
 // Protected Vercel Cron Endpoint for Serverless Logistics Sync (Fail-Closed)
 app.get(['/api/cron/tracking-sync', '/api/cron/sync-tracking'], async (req, res) => {
   try {
-    const cronSecret = (process.env.CRON_SECRET || process.env.VERCEL_CRON_SECRET || '').trim();
+    const cronSecret = (process.env.CRON_SECRET || '').trim();
     const authHeader = (req.headers.authorization || '').trim();
     if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
       return res.status(401).json({ error: 'Não autorizado para execução do cron de sincronização.' });

@@ -4,20 +4,8 @@ import { Product, Category, Address, Order, CartItem, ProductVariant } from '../
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
 
-const getEnvVar = (viteKey: string, processKey: string, fallback: string): string => {
-  try {
-    if (typeof import.meta !== 'undefined' && import.meta && (import.meta as any).env && (import.meta as any).env[viteKey]) {
-      return (import.meta as any).env[viteKey];
-    }
-  } catch {}
-  if (typeof process !== 'undefined' && process.env && process.env[processKey]) {
-    return process.env[processKey]!;
-  }
-  return fallback;
-};
-
-let resolvedUrl = getEnvVar('VITE_SUPABASE_URL', 'SUPABASE_URL', SUPABASE_PROJECT_URL);
-let resolvedAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', SUPABASE_DEFAULT_ANON_KEY);
+let resolvedUrl = import.meta.env.VITE_SUPABASE_URL?.trim() || SUPABASE_PROJECT_URL;
+let resolvedAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || SUPABASE_DEFAULT_ANON_KEY;
 
 // Security & Connectivity Guard:
 // If running in browser and the URL is an internal loopback/emulator address (127.0.0.1, localhost, or port 54321)

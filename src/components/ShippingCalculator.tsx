@@ -9,7 +9,7 @@ import { filterAndSortShippingQuotes } from '../services/carrierFilter';
 interface ShippingCalculatorProps {
   subtotal?: number;
   productId?: string;
-  items?: Array<{ productId: string; quantity: number }>;
+  items?: Array<{ productId: string; quantity: number; size?: string; colorName?: string }>;
   onSelectOption?: (option: ShippingOption) => void;
   initialPostalCode?: string;
   compact?: boolean;
@@ -90,6 +90,8 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
         productId: string;
         id: string;
         quantity: number;
+        size?: string;
+        colorName?: string;
         weight?: number;
         width?: number;
         height?: number;
@@ -105,6 +107,8 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
             productId: it.productId,
             id: it.productId,
             quantity: it.quantity || 1,
+            size: it.size,
+            colorName: it.colorName,
             weight: prod?.weight !== undefined ? Number(prod.weight) : undefined,
             width: prod?.width !== undefined ? Number(prod.width) : undefined,
             height: prod?.height !== undefined ? Number(prod.height) : undefined,
@@ -131,6 +135,8 @@ export const ShippingCalculator: React.FC<ShippingCalculatorProps> = ({
           productId: item.product.id || `prod-${idx + 1}`,
           id: item.product.id || `prod-${idx + 1}`,
           quantity: item.quantity || 1,
+          size: item.selectedSize,
+          colorName: item.selectedColor.colorName || item.selectedColor.color,
           weight: Number(item.product.weight),
           width: Number(item.product.width),
           height: Number(item.product.height),
