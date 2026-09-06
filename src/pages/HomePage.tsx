@@ -6,7 +6,6 @@ import { BestsellersRanking } from '../components/home/BestsellersRanking';
 import { SingleProductSpotlight } from '../components/home/SingleProductSpotlight';
 import { EditorialMagazineJournal } from '../components/home/EditorialMagazineJournal';
 import { CompactCustomerReviews } from '../components/home/CompactCustomerReviews';
-import { NewsletterVIP } from '../components/home/NewsletterVIP';
 import { useStore } from '../context/StoreContext';
 import { Product } from '../types';
 
@@ -53,8 +52,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onQuickView }) =
       {/* 7. Avaliações Reais de Compradores */}
       <CompactCustomerReviews />
 
-      {/* 8. Newsletter & Clube Marmot */}
-      <NewsletterVIP />
+      {/* O cadastro permanece no rodapé global para evitar duas chamadas idênticas em sequência. */}
     </div>
   );
 };

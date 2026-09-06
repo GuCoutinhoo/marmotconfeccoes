@@ -555,7 +555,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
           <Breadcrumb items={[{ label: 'Autenticação de Conta' }]} />
 
           {/* Main Auth Card */}
-          <div className="bg-white border border-[#E4E4E7] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+          <div className="auth-panel bg-white border border-[#DCDCE0] rounded-[2px] p-6 sm:p-8 space-y-6">
             {/* Header Tabs */}
             <div className="flex border-b border-[#E4E4E7] pb-3 gap-4 text-xs font-black uppercase tracking-wider">
               <button

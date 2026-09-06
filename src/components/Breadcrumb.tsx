@@ -11,18 +11,22 @@ export interface BreadcrumbProps {
 }
 
 export const Breadcrumb: React.FC<BreadcrumbProps> = ({ items }) => {
+  const firstItemIsHome = items[0]?.label.trim().toLocaleLowerCase('pt-BR') === 'início';
+  const homeAction = firstItemIsHome ? items[0]?.onClick : undefined;
+  const trailItems = firstItemIsHome ? items.slice(1) : items;
+
   return (
-    <nav className="flex items-center gap-1.5 text-xs text-[#71717A] py-3 overflow-x-auto whitespace-nowrap scrollbar-none">
+    <nav aria-label="Navegação estrutural" className="flex items-center gap-1.5 text-[12px] text-[#71717A] py-2 overflow-x-auto whitespace-nowrap scrollbar-none">
       <button
-        onClick={items[0]?.onClick}
+        onClick={homeAction}
         className="flex items-center gap-1 hover:text-[#18181B] transition-colors cursor-pointer"
       >
         <Home className="w-3.5 h-3.5" />
         <span>Início</span>
       </button>
 
-      {items.map((item, index) => (
-        <React.Fragment key={index}>
+      {trailItems.map((item, index) => (
+        <React.Fragment key={`${item.label}-${index}`}>
           <ChevronRight className="w-3 h-3 text-[#A1A1AA] shrink-0" />
           {item.onClick ? (
             <button

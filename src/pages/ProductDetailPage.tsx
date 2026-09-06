@@ -217,7 +217,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     .slice(0, 4);
 
   return (
-    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-8">
+    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-5 sm:py-8">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <Breadcrumb
           items={[
@@ -229,11 +229,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         />
 
         {/* Product Main Display Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 my-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mt-6 mb-10 items-start">
           {/* 1. Left Column: Gallery (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Image */}
-            <div className="relative aspect-[3/4] sm:aspect-[2/3] bg-[#F4F4F5] border border-[#E4E4E7] rounded-2xl overflow-hidden group shadow-xs">
+            <div className="relative aspect-[3/4] sm:aspect-[2/3] bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] overflow-hidden group">
               <img
                 src={images[selectedImageIndex] || images[0]}
                 alt={product.title}
@@ -245,12 +245,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               {/* Minimal Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                 {product.isNewRelease && (
-                  <span className="bg-[#18181B] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md shadow-md">
+                  <span className="bg-[#18181B] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-[2px]">
                     NOVO DROP
                   </span>
                 )}
                 {product.promoPrice && (
-                  <span className="bg-[#DC2626] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-md shadow-md">
+                  <span className="bg-[#DC2626] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-[2px]">
                     -{Math.round(((product.price - product.promoPrice) / product.price) * 100)}% OFF
                   </span>
                 )}
@@ -331,7 +331,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             </div>
 
             {/* Price & Installments Card */}
-            <div className="p-5 bg-white border border-[#E4E4E7] rounded-2xl space-y-3 shadow-xs">
+            <div className="p-5 bg-white border border-[#DCDCE0] rounded-[2px] space-y-3">
               <div className="flex items-baseline justify-between">
                 <div>
                   <div className="flex items-baseline gap-3">
@@ -531,7 +531,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         </div>
 
         {/* 3. Product Specifications & Care Tabs */}
-        <div className="my-16 bg-white border border-[#E4E4E7] rounded-2xl p-6 md:p-8 space-y-6 shadow-xs">
+        <div className="my-12 sm:my-14 bg-white border border-[#DCDCE0] rounded-[2px] p-6 md:p-8 space-y-6">
           <div className="flex border-b border-[#E4E4E7] gap-6 overflow-x-auto scrollbar-none pb-2">
             {[
               { id: 'details', label: 'Especificações & Detalhes' },

@@ -19,8 +19,11 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   const { addToCart, openMiniCart } = useCart();
   const { showToast } = useToast();
 
-  // Select hero product (first heavyweight piece or first active product)
-  const product = products.find((p) => p.isBestSeller || p.isNewRelease) || products[0];
+  // A signature apparel piece communicates the collection better than a small accessory.
+  const product = products.find((p) => p.slug === 'camiseta-heavy-boxy')
+    || products.find((p) => p.category === 'camisetas' && (p.isBestSeller || p.isNewRelease))
+    || products.find((p) => ['moletons', 'jaquetas'].includes(p.category) && (p.isBestSeller || p.isNewRelease))
+    || products[0];
 
   const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || 'M');
   const [selectedColor, setSelectedColor] = useState(
@@ -44,9 +47,9 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   const effectivePrice = product.promoPrice || product.price;
 
   return (
-    <section className="py-20 bg-[#F8F9FA] border-b border-[#E4E4E7] relative overflow-hidden">
+    <section className="py-14 sm:py-16 lg:py-[72px] bg-[#F8F9FA] border-b border-[#E4E4E7] relative overflow-hidden">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 relative z-10">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309]">
             <Sparkles className="w-3.5 h-3.5" />
             <span>DESTAQUE DE ATELIÊ // SIGNATURE PIECE</span>
@@ -57,9 +60,9 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
         </div>
 
         {/* Split Layout: Image Left | Details Right */}
-        <div className="bg-white border border-[#E4E4E7] rounded-2xl p-6 sm:p-10 lg:p-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center shadow-md">
+        <div className="bg-white border border-[#DCDCE0] rounded-[2px] p-5 sm:p-8 lg:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Side: Large Product Image */}
-          <div className="lg:col-span-6 relative aspect-[3/4] sm:aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F4F5] border border-[#E4E4E7] group">
+          <div className="lg:col-span-5 relative aspect-[3/4] sm:aspect-[4/5] lg:aspect-[4/3] rounded-[2px] overflow-hidden bg-[#F4F4F5] border border-[#DCDCE0] group">
             <img
               src={productImage}
               alt={product.title}
@@ -71,21 +74,21 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
             />
             {/* Badge */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-              <span className="bg-[#18181B] text-white text-[10px] font-black uppercase px-3 py-1 rounded-md shadow-sm">
+              <span className="bg-[#18181B] text-white text-[10px] font-black uppercase px-3 py-1 rounded-[2px]">
                 MALHA HEAVY 400G/M²
               </span>
             </div>
 
             <button
               onClick={() => onQuickView(product)}
-              className="absolute bottom-4 right-4 bg-white/95 hover:bg-[#18181B] hover:text-white border border-[#E4E4E7] text-[#18181B] p-3 rounded-xl backdrop-blur-md transition-all flex items-center gap-2 text-xs font-bold uppercase shadow-sm cursor-pointer"
+              className="absolute bottom-4 right-4 bg-white/95 hover:bg-[#18181B] hover:text-white border border-[#DCDCE0] text-[#18181B] p-3 rounded-[2px] backdrop-blur-md transition-colors flex items-center gap-2 text-xs font-bold uppercase cursor-pointer"
             >
               <Eye className="w-4 h-4" /> Espiada Rápida
             </button>
           </div>
 
           {/* Right Side: Product Details & Purchase CTA */}
-          <div className="lg:col-span-6 space-y-6">
+          <div className="lg:col-span-7 space-y-6">
             <div>
               <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase tracking-wider mb-2">
                 <span>{product.category}</span>
@@ -118,7 +121,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
             </p>
 
             {/* Key Specs */}
-            <div className="grid grid-cols-2 gap-3 text-xs bg-[#F8F9FA] p-4 rounded-xl border border-[#E4E4E7]">
+            <div className="grid grid-cols-2 gap-3 text-xs bg-[#F8F9FA] p-4 rounded-[2px] border border-[#DCDCE0]">
               <div>
                 <span className="text-[#71717A] text-[10px] uppercase font-bold block">Gramatura</span>
                 <span className="font-bold text-[#18181B]">400g/m² Heavyweight</span>
@@ -154,7 +157,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
-                    className={`w-11 h-11 rounded-xl text-xs font-bold uppercase transition-all border cursor-pointer ${
+                    className={`w-11 h-11 rounded-[2px] text-xs font-bold uppercase transition-colors border cursor-pointer ${
                       selectedSize === sz
                         ? 'bg-[#18181B] text-white border-[#18181B] shadow-sm font-black'
                         : 'bg-[#F4F4F5] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B]'
@@ -170,7 +173,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 onClick={handleAddToCart}
-                className={`flex-1 py-4 px-6 rounded-xl font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-2.5 shadow-sm active:scale-[0.98] cursor-pointer ${
+                className={`flex-1 py-4 px-6 rounded-[2px] font-black text-xs uppercase tracking-widest transition-colors flex items-center justify-center gap-2.5 cursor-pointer ${
                   added
                     ? 'bg-emerald-600 text-white'
                     : 'bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500]'
@@ -189,7 +192,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
 
               <button
                 onClick={() => onNavigate('product', product.id)}
-                className="py-4 px-6 rounded-xl bg-white border border-[#E4E4E7] text-[#18181B] hover:bg-[#F4F4F5] hover:border-[#18181B] font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                className="py-4 px-6 rounded-[2px] bg-white border border-[#DCDCE0] text-[#18181B] hover:bg-[#F4F4F5] hover:border-[#18181B] font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 Ver Detalhes <ArrowRight className="w-4 h-4" />
               </button>

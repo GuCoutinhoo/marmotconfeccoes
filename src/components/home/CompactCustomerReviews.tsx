@@ -30,7 +30,7 @@ export const CompactCustomerReviews: React.FC = () => {
   ];
 
   return (
-    <section className="py-16 bg-[#F8F9FA] border-b border-[#E4E4E7]">
+    <section className="py-14 sm:py-16 bg-[#F8F9FA] border-b border-[#E4E4E7]">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
@@ -55,7 +55,7 @@ export const CompactCustomerReviews: React.FC = () => {
           {reviews.map((rev, idx) => (
             <div
               key={idx}
-              className="bg-white border border-[#E4E4E7] p-6 rounded-2xl space-y-3 hover:border-[#18181B] transition-colors shadow-sm"
+              className="bg-white border border-[#DCDCE0] p-5 sm:p-6 rounded-[2px] space-y-3 hover:border-[#18181B] transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex text-[#B45309] gap-0.5">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -67,10 +67,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
   const { user, registerOrder, addAddress, isLoading: authLoading } = useAuth();
   const { showToast } = useToast();
+  const authRedirectHandledRef = useRef(false);
 
   // Strict Authentication Guard: Unauthenticated visitors cannot access Checkout
   useEffect(() => {
     if (!authLoading && !user) {
+      if (authRedirectHandledRef.current) return;
+      authRedirectHandledRef.current = true;
       showToast('Login Obrigatório', 'Faça login ou crie uma conta para finalizar sua compra.', 'info');
       onNavigate('account', 'login');
     }

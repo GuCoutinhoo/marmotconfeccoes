@@ -146,7 +146,7 @@ export function AppContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] text-[#18181B] flex flex-col font-sans selection:bg-[#F4C400] selection:text-black">
+    <div className="marmot-editorial min-h-screen bg-[#F8F9FA] text-[#18181B] flex flex-col font-sans selection:bg-[#F4C400] selection:text-black">
       {/* Persistent Header */}
       <Header
         onNavigate={handleNavigate}

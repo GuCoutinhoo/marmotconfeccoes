@@ -118,7 +118,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
     (priceRange < 700 ? 1 : 0);
 
   return (
-    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-8">
+    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-5 sm:py-8">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <Breadcrumb
           items={[
@@ -129,7 +129,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         />
 
         {/* Page Header */}
-        <div className="my-6">
+        <div className="mt-5 mb-7 sm:mt-6 sm:mb-8">
           <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
             <span>ATELIÊ AUTORAL</span>
           </div>
@@ -142,11 +142,11 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         </div>
 
         {/* Top Control Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white border border-[#E4E4E7] rounded-2xl mb-8 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white border border-[#DCDCE0] rounded-[2px] mb-7">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileFilterOpen(true)}
-              className="lg:hidden flex items-center gap-2 bg-[#F8F9FA] border border-[#E4E4E7] hover:bg-[#18181B] hover:text-white text-[#18181B] px-3.5 py-2 rounded-xl text-xs font-bold uppercase transition-colors cursor-pointer"
+              className="lg:hidden flex items-center gap-2 bg-[#F8F9FA] border border-[#DCDCE0] hover:bg-[#18181B] hover:text-white text-[#18181B] px-3.5 py-2 rounded-[2px] text-xs font-bold uppercase transition-colors cursor-pointer"
             >
               <Filter className="w-4 h-4 text-[#B45309]" />
               Filtros {activeFiltersCount > 0 && `(${activeFiltersCount})`}
@@ -159,10 +159,10 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
           <div className="flex items-center gap-4">
             {/* Grid Layout Switcher */}
-            <div className="hidden md:flex items-center gap-1 bg-[#F4F4F5] p-1 border border-[#E4E4E7] rounded-xl">
+            <div className="hidden md:flex items-center gap-1 bg-[#F4F4F5] p-1 border border-[#DCDCE0] rounded-[2px]">
               <button
                 onClick={() => setGridCols(3)}
-                className={`px-2.5 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-[2px] text-xs transition-colors cursor-pointer ${
                   gridCols === 3 ? 'bg-[#18181B] text-white font-bold' : 'text-[#71717A] hover:text-[#18181B]'
                 }`}
                 title="3 colunas"
@@ -171,7 +171,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               </button>
               <button
                 onClick={() => setGridCols(4)}
-                className={`px-2.5 py-1 rounded-lg text-xs transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-[2px] text-xs transition-colors cursor-pointer ${
                   gridCols === 4 ? 'bg-[#18181B] text-white font-bold' : 'text-[#71717A] hover:text-[#18181B]'
                 }`}
                 title="4 colunas"
@@ -186,7 +186,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-[#F8F9FA] border border-[#E4E4E7] text-[#18181B] px-3 py-2 rounded-xl text-xs focus:outline-none focus:border-[#18181B] cursor-pointer"
+                className="bg-[#F8F9FA] border border-[#DCDCE0] text-[#18181B] px-3 py-2 rounded-[2px] text-xs focus:outline-none focus:border-[#18181B] cursor-pointer"
               >
                 <option value="featured">Destaques do Drop</option>
                 <option value="newest">Mais Recentes</option>
@@ -201,7 +201,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
         {/* Main Body Grid: Sidebar + Product Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Desktop Filter Sidebar (3 cols) */}
-          <aside className="hidden lg:block lg:col-span-3 bg-white border border-[#E4E4E7] p-6 rounded-2xl space-y-6 sticky top-28 shadow-xs">
+          <aside className="hidden lg:block lg:col-span-3 bg-white border border-[#DCDCE0] p-6 rounded-[2px] space-y-6 sticky top-28">
             <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-4">
               <h3 className="text-xs font-black uppercase tracking-wider text-[#18181B] flex items-center gap-2">
                 <Filter className="w-4 h-4 text-[#B45309]" /> Filtros
@@ -224,7 +224,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
               <div className="space-y-1 text-xs">
                 <button
                   onClick={() => setSelectedCategory('')}
-                  className={`w-full text-left py-1.5 px-2.5 rounded-lg transition-colors flex justify-between items-center cursor-pointer ${
+                  className={`w-full text-left py-1.5 px-2.5 rounded-[2px] transition-colors flex justify-between items-center cursor-pointer ${
                     selectedCategory === ''
                       ? 'bg-[#18181B] text-white font-bold'
                       : 'text-[#52525B] hover:text-[#18181B] hover:bg-[#F4F4F5]'
@@ -237,7 +237,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={c.slug}
                     onClick={() => setSelectedCategory(selectedCategory === c.slug ? '' : c.slug)}
-                    className={`w-full text-left py-1.5 px-2.5 rounded-lg transition-colors flex justify-between items-center cursor-pointer ${
+                    className={`w-full text-left py-1.5 px-2.5 rounded-[2px] transition-colors flex justify-between items-center cursor-pointer ${
                       selectedCategory === c.slug
                         ? 'bg-[#18181B] text-white font-bold'
                         : 'text-[#52525B] hover:text-[#18181B] hover:bg-[#F4F4F5]'
@@ -262,7 +262,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   <button
                     key={sz}
                     onClick={() => toggleSize(sz)}
-                    className={`py-2 rounded-lg text-xs font-bold uppercase border transition-all cursor-pointer ${
+                    className={`py-2 rounded-[2px] text-xs font-bold uppercase border transition-colors cursor-pointer ${
                       selectedSizes.includes(sz)
                         ? 'bg-[#18181B] text-white border-[#18181B] font-black'
                         : 'bg-[#F8F9FA] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B]'
@@ -299,12 +299,12 @@ export const ShopPage: React.FC<ShopPageProps> = ({
           {/* Product Grid Area (9 cols) */}
           <main className="lg:col-span-9">
             {filteredProducts.length === 0 ? (
-              <div className="bg-white border border-[#E4E4E7] rounded-2xl p-12 text-center space-y-4 shadow-xs">
+              <div className="bg-white border border-[#DCDCE0] rounded-[2px] p-12 text-center space-y-4">
                 <p className="text-base font-bold text-[#18181B]">Nenhum produto encontrado com os filtros selecionados.</p>
                 <p className="text-xs text-[#71717A]">Tente ajustar a faixa de preço ou remover as categorias selecionadas.</p>
                 <button
                   onClick={resetFilters}
-                  className="px-6 py-3 bg-[#F4C400] text-[#0B0B0E] font-bold text-xs uppercase rounded-xl hover:bg-[#E5B500] transition-colors cursor-pointer shadow-xs"
+                  className="px-6 py-3 bg-[#F4C400] text-[#0B0B0E] font-bold text-xs uppercase rounded-[2px] hover:bg-[#E5B500] transition-colors cursor-pointer"
                 >
                   Limpar Todos os Filtros
                 </button>
@@ -312,7 +312,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
             ) : (
               <div className="space-y-8">
                 <div
-                  className={`grid gap-5 sm:gap-6 ${
+                  className={`grid gap-3 sm:gap-5 ${
                     gridCols === 3
                       ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
                       : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
@@ -337,7 +337,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                   {visibleProducts.length < filteredProducts.length && (
                     <button
                       onClick={() => setDisplayCount((prev) => prev + 24)}
-                      className="py-3 px-8 bg-[#18181B] text-white hover:bg-[#27272A] font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm active:scale-95 cursor-pointer"
+                      className="py-3 px-8 bg-[#18181B] text-white hover:bg-[#27272A] font-bold text-xs uppercase tracking-wider rounded-[2px] transition-colors cursor-pointer"
                     >
                       Carregar Mais Peças (+24)
                     </button>
@@ -369,7 +369,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
                 <button
                   key={c.slug}
                   onClick={() => setSelectedCategory(selectedCategory === c.slug ? '' : c.slug)}
-                  className={`w-full text-left py-2 px-3 rounded-lg flex justify-between cursor-pointer ${
+                  className={`w-full text-left py-2 px-3 rounded-[2px] flex justify-between cursor-pointer ${
                     selectedCategory === c.slug
                       ? 'bg-[#18181B] text-white font-bold'
                       : 'text-[#52525B] hover:bg-[#F4F4F5]'
@@ -382,7 +382,7 @@ export const ShopPage: React.FC<ShopPageProps> = ({
 
             <button
               onClick={() => setIsMobileFilterOpen(false)}
-              className="w-full py-3.5 bg-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase rounded-xl cursor-pointer shadow-xs"
+              className="w-full py-3.5 bg-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase rounded-[2px] cursor-pointer"
             >
               Aplicar Filtros
             </button>

@@ -104,8 +104,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
   if (!isAdmin) {
     return (
       <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-16 flex items-center justify-center px-4">
-        <div className="bg-white border border-[#E4E4E7] p-8 md:p-10 rounded-2xl max-w-md w-full space-y-6 shadow-xl text-center">
-          <div className="w-16 h-16 bg-red-50 text-red-600 border border-red-200 rounded-2xl flex items-center justify-center mx-auto shadow-xs">
+        <div className="bg-white border border-[#D4D4D8] border-t-4 border-t-[#18181B] p-8 md:p-10 rounded-[2px] max-w-md w-full space-y-6 shadow-[0_18px_45px_rgba(24,24,27,0.08)] text-center">
+          <div className="w-16 h-16 bg-red-50 text-red-600 border border-red-200 rounded-[2px] flex items-center justify-center mx-auto">
             <Lock className="w-8 h-8" />
           </div>
 
@@ -137,7 +137,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
                 if (user) logout();
                 onNavigate('account');
               }}
-              className="w-full bg-[#0B0B0E] text-white hover:bg-[#27272A] font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-[#0B0B0E] text-white hover:bg-[#27272A] font-extrabold text-xs uppercase py-3.5 rounded-[2px] transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               {user ? 'TROCAR DE CONTA / LOGIN ADMIN' : 'FAZER LOGIN COMO ADMINISTRADOR'}
@@ -145,7 +145,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
 
             <button
               onClick={() => onNavigate('home')}
-              className="w-full bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase py-3 rounded-xl transition-all cursor-pointer"
+              className="w-full bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase py-3 rounded-[2px] transition-colors cursor-pointer"
             >
               Voltar para a Loja
             </button>

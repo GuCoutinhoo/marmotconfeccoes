@@ -104,7 +104,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   return (
     <section
       id="category-showcase-section"
-      className="py-16 sm:py-20 bg-white border-b border-[#E4E4E7] select-none overflow-hidden"
+      className="py-14 sm:py-16 lg:py-[72px] bg-white border-b border-[#E4E4E7] select-none overflow-hidden"
     >
       {/* Container harmonioso alinhado com o restante do site */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
@@ -112,7 +112,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
         {/* ========================================================= */}
         {/* CABEÇALHO COM HIERARQUIA EQUILIBRADA E CONTROLES SUAVES   */}
         {/* ========================================================= */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8 sm:mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-7 sm:mb-8">
           <div>
             <span className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#B45309] block mb-1.5">
               SILHUETAS STREETWEAR
@@ -177,7 +177,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               key={cat.id || cat.slug || index}
               data-category-card
               onClick={() => handleCardClick(cat.slug)}
-              className="group relative h-[460px] sm:h-[500px] lg:h-[530px] w-[78vw] sm:w-[calc(50%-12px)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start rounded-none overflow-hidden bg-zinc-900 border border-zinc-200/70 hover:border-zinc-900/40 cursor-pointer shadow-xs hover:shadow-lg transition-all duration-300"
+              className="group relative h-[420px] sm:h-[450px] lg:h-[480px] w-[78vw] sm:w-[calc(50%-12px)] lg:w-[calc((100%-48px)/3)] shrink-0 snap-start rounded-none overflow-hidden bg-zinc-900 border border-zinc-200/70 hover:border-zinc-900/40 cursor-pointer hover:shadow-[0_14px_30px_rgba(24,24,27,0.08)] transition-all duration-300"
             >
               {/* Imagem proporcional e nítida */}
               <img

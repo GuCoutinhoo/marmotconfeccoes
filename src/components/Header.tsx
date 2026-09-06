@@ -238,7 +238,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
             {/* Mobile Hamburger Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden w-10 h-10 -ml-1 rounded-full text-zinc-800 hover:text-black hover:bg-zinc-100/80 flex items-center justify-center transition-colors cursor-pointer"
+            className="xl:hidden w-10 h-10 -ml-1 rounded-full text-zinc-800 hover:text-black hover:bg-zinc-100/80 flex items-center justify-center transition-colors cursor-pointer"
               aria-label="Abrir menu de navegação"
             >
               <Menu className="w-5 h-5 stroke-[2]" />
@@ -257,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
           </div>
 
           {/* CENTER: Desktop Navigation - Spaced out and elegantly distributed */}
-          <nav className="hidden lg:flex items-center justify-center gap-6 xl:gap-8 2xl:gap-10 text-[12.5px] font-bold uppercase tracking-[0.14em] text-zinc-600 flex-1 px-2 lg:px-4">
+          <nav className="hidden xl:flex items-center justify-center gap-4 2xl:gap-7 text-[12px] font-bold uppercase tracking-[0.12em] text-zinc-600 flex-1 px-1 2xl:px-4">
             {NAV_ITEMS.map((item) => {
               const isOpen = activeHoverMenu === item.id;
               return (
@@ -289,7 +289,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
                   {/* Elegant Floating Submenu Flyout */}
                   {item.hasSubmenu && isOpen && item.subcategories && (
                     <div
-                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white/98 backdrop-blur-xl border border-zinc-200/80 rounded-2xl shadow-[0_20px_40px_rgba(0,0,0,0.08)] p-3.5 z-50 animate-fadeIn"
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white/98 backdrop-blur-xl border border-zinc-200/80 rounded-[3px] shadow-[0_16px_35px_rgba(0,0,0,0.08)] p-3.5 z-50 animate-fadeIn"
                       onMouseEnter={() => handleMouseEnterNav(item.id)}
                       onMouseLeave={handleMouseLeaveNav}
                     >
@@ -316,7 +316,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
                                 onNavigate('shop', sub.slug || item.slug);
                               }
                             }}
-                            className="w-full text-left px-2.5 py-2 rounded-xl text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-50 flex items-center justify-between group/sub transition-colors cursor-pointer"
+                            className="w-full text-left px-2.5 py-2 rounded-[2px] text-xs font-semibold text-zinc-700 hover:text-black hover:bg-zinc-50 flex items-center justify-between group/sub transition-colors cursor-pointer"
                           >
                             <span>{sub.name}</span>
                             <ArrowRight className="w-3 h-3 text-zinc-300 group-hover/sub:text-[#09090B] group-hover/sub:translate-x-0.5 transition-all" />
@@ -350,7 +350,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
             <button
               type="button"
               onClick={onOpenSearch}
-              className="hidden sm:flex items-center gap-2.5 px-3.5 h-10 rounded-md bg-zinc-100/75 hover:bg-zinc-100 border border-zinc-200/60 hover:border-zinc-300/80 text-zinc-400 hover:text-zinc-600 transition-all cursor-pointer w-44 md:w-50 lg:w-56 xl:w-64 shrink-0 shadow-2xs group"
+              className="hidden sm:flex items-center gap-2.5 px-3.5 h-10 rounded-[3px] bg-zinc-100/75 hover:bg-zinc-100 border border-zinc-200/60 hover:border-zinc-300/80 text-zinc-400 hover:text-zinc-600 transition-all cursor-pointer w-44 md:w-52 xl:w-48 2xl:w-60 shrink-0 group"
               title="Buscar produtos (Ctrl+K)"
               aria-label="Buscar produtos"
             >
@@ -398,14 +398,14 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
                 <button
                   type="button"
                   onClick={() => onNavigate('account', 'login')}
-                  className="px-3.5 h-10 flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.12em] text-zinc-700 hover:text-black hover:bg-zinc-100/80 rounded-md transition-colors cursor-pointer whitespace-nowrap"
+                  className="px-3 h-10 flex items-center justify-center text-[12px] font-bold uppercase tracking-[0.1em] text-zinc-700 hover:text-black hover:bg-zinc-100/80 rounded-[3px] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   LOGIN
                 </button>
                 <button
                   type="button"
                   onClick={() => onNavigate('account', 'register')}
-                  className="px-4 h-10 flex items-center justify-center bg-[#F4C400] hover:bg-[#E5B500] text-[#09090B] text-[12px] font-black uppercase tracking-[0.12em] rounded-md transition-all active:scale-95 shadow-xs cursor-pointer whitespace-nowrap"
+                  className="px-3.5 h-10 flex items-center justify-center bg-[#F4C400] hover:bg-[#E5B500] text-[#09090B] text-[12px] font-black uppercase tracking-[0.1em] rounded-[3px] transition-colors cursor-pointer whitespace-nowrap"
                 >
                   CADASTRAR
                 </button>
@@ -509,7 +509,7 @@ export const Header: React.FC<HeaderProps> = ({ onNavigate, onOpenSearch }) => {
                     setIsMobileMenuOpen(false);
                     onOpenSearch();
                   }}
-                  className="w-full py-2.5 px-3.5 bg-white border border-zinc-200/80 rounded-full text-left text-xs text-zinc-500 flex items-center gap-2.5 shadow-2xs hover:border-zinc-400 transition-colors cursor-pointer"
+                  className="w-full py-2.5 px-3.5 bg-white border border-zinc-200/80 rounded-[3px] text-left text-xs text-zinc-500 flex items-center gap-2.5 hover:border-zinc-400 transition-colors cursor-pointer"
                 >
                   <Search className="w-4 h-4 text-zinc-400 stroke-[1.8]" />
                   <span>Buscar moletons, calças, camisetas...</span>

@@ -46,9 +46,9 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
   ];
 
   return (
-    <section className="py-20 bg-white border-b border-[#E4E4E7]">
+    <section className="py-14 sm:py-16 lg:py-[72px] bg-white border-b border-[#E4E4E7]">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 border-b border-[#E4E4E7] pb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 border-b border-[#E4E4E7] pb-6">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
               <BookOpen className="w-3.5 h-3.5" />
@@ -62,18 +62,18 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
             </p>
           </div>
 
-          <span className="text-xs font-mono font-bold text-[#B45309] uppercase border border-[#E4E4E7] bg-[#F8F9FA] px-4 py-2 rounded-xl">
+          <span className="text-xs font-mono font-bold text-[#B45309] uppercase border border-[#DCDCE0] bg-[#F8F9FA] px-4 py-2 rounded-[2px]">
             EDITION // 2026
           </span>
         </div>
 
         {/* Magazine Editorial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
-          {articles.map((art) => (
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-6">
+          {articles.map((art, idx) => (
             <div
               key={art.id}
               onClick={() => onNavigate('shop')}
-              className="group relative bg-white border border-[#E4E4E7] hover:border-[#18181B] rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md flex flex-col justify-between"
+              className={`group relative bg-white border border-[#DCDCE0] hover:border-[#18181B] rounded-[2px] overflow-hidden cursor-pointer transition-[border-color,box-shadow] duration-200 hover:shadow-[0_12px_30px_rgba(24,24,27,0.06)] flex flex-col justify-between ${idx % 4 === 0 || idx % 4 === 3 ? 'md:col-span-7' : 'md:col-span-5'}`}
             >
               {/* Image Header */}
               <div className="relative h-64 sm:h-72 lg:h-80 overflow-hidden bg-[#F4F4F5]">
@@ -88,7 +88,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
                 <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                  <span className="bg-[#18181B] text-white text-[9px] font-black uppercase px-2.5 py-1 rounded shadow">
+                  <span className="bg-[#18181B] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-[2px]">
                     {art.tag}
                   </span>
                 </div>

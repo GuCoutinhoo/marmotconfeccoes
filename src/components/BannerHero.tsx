@@ -11,17 +11,17 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
   return (
     <section className="relative w-full bg-[#0B0B0E] text-white border-b border-[#E4E4E7] overflow-hidden">
       {/* Main Editorial Hero Canvas - Full Bleed Image */}
-      <div className="relative min-h-[560px] sm:min-h-[620px] lg:min-h-[700px] xl:min-h-[760px] flex items-center">
+      <div className="relative min-h-[530px] sm:min-h-[590px] lg:min-h-[630px] xl:min-h-[660px] flex items-center">
         
         {/* Full Hero Background Image - Spanning 100% width with 0 white smoke/fog */}
         <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
           <img
             src={HERO_IMAGE}
             alt="Marmot Confecções - Coleção Streetwear"
+            fetchPriority="high"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover object-[75%_top] sm:object-[70%_top] md:object-[60%_top] lg:object-[center_top] brightness-[0.95] contrast-[1.05]"
           />
-          {/* Gentle dark gradient on the left side to guarantee crystal-clear text readability over the full image */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent lg:via-black/30 lg:to-transparent" />
           <div className="sm:hidden absolute inset-0 bg-black/30" />
         </div>
@@ -31,8 +31,8 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
           <div className="max-w-[620px] xl:max-w-[700px] flex flex-col items-start">
             
             {/* 1. Badge */}
-            <div className="inline-flex items-center gap-3 px-4 py-2 sm:py-2.5 bg-black/60 border border-white/20 backdrop-blur-md shadow-lg rounded-lg">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#F4C400] shrink-0 animate-pulse shadow-[0_0_8px_rgba(244,196,0,0.8)]" />
+            <div className="inline-flex items-center gap-3 px-4 py-2 sm:py-2.5 bg-black/55 border border-white/25 backdrop-blur-sm rounded-[2px]">
+              <span className="w-2 h-2 bg-[#F4C400] shrink-0" />
               <span className="text-[12px] sm:text-[13px] font-mono font-bold tracking-[0.2em] uppercase text-[#F4C400]">
                 COLEÇÃO 2026
               </span>
@@ -79,7 +79,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
             <div className="mt-8 sm:mt-9 lg:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 w-full sm:w-auto">
               <button
                 onClick={() => onNavigate('shop')}
-                className="h-[54px] sm:h-[58px] px-8 sm:px-10 bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] font-black text-sm sm:text-[15px] uppercase tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-2.5 shadow-[0_4px_20px_rgba(244,196,0,0.3)] hover:scale-[1.02] active:scale-[0.98] group shrink-0 cursor-pointer"
+                className="h-[54px] sm:h-[56px] px-8 sm:px-10 bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] border border-[#F4C400] font-black text-sm sm:text-[15px] uppercase tracking-[0.1em] transition-colors duration-200 flex items-center justify-center gap-2.5 group shrink-0 cursor-pointer"
               >
                 <span>EXPLORAR O DROP</span>
                 <ArrowRight className="w-4.5 h-4.5 transition-transform duration-200 group-hover:translate-x-1" />
@@ -87,7 +87,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
 
               <button
                 onClick={() => onNavigate('shop', 'oversized')}
-                className="h-[54px] sm:h-[58px] px-7 sm:px-9 bg-black/40 hover:bg-black/60 text-white border border-white/30 hover:border-white font-bold text-sm sm:text-[15px] uppercase tracking-[0.08em] backdrop-blur-sm transition-all duration-200 flex items-center justify-center shrink-0 cursor-pointer shadow-sm active:scale-[0.98]"
+                className="h-[54px] sm:h-[56px] px-7 sm:px-9 bg-black/30 hover:bg-white hover:text-black text-white border border-white/35 hover:border-white font-bold text-sm sm:text-[15px] uppercase tracking-[0.08em] backdrop-blur-sm transition-colors duration-200 flex items-center justify-center shrink-0 cursor-pointer"
               >
                 <span>VER CAMISETAS & MOLETONS</span>
               </button>
@@ -119,7 +119,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
       <div className="border-t border-[#E4E4E7] bg-white/95 backdrop-blur-md py-3 px-4 sm:px-6 lg:px-[4.5vw]">
         <div className="w-full flex flex-wrap items-center justify-between gap-4 text-[11px] sm:text-[11.5px] font-mono text-[#71717A] uppercase tracking-[0.14em]">
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-[#F4C400] shrink-0 animate-pulse" />
+            <span className="w-2 h-2 bg-[#F4C400] shrink-0" />
             <span className="text-[#18181B] font-medium">ALGODÃO PENTEADO 260G A 400G/M²</span>
           </div>
 

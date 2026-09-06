@@ -40,10 +40,10 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
   };
 
   return (
-    <section className="py-20 bg-[#F8F9FA] border-b border-[#E4E4E7]">
+    <section className="py-14 sm:py-16 lg:py-[72px] bg-[#F8F9FA] border-b border-[#E4E4E7]">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Header with Navigation Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
               <Sparkles className="w-3.5 h-3.5" />
@@ -68,14 +68,14 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => scroll('left')}
-                className="p-2.5 rounded-full bg-white border border-[#E4E4E7] text-[#18181B] hover:bg-[#18181B] hover:text-white shadow-sm transition-all cursor-pointer"
+                className="p-2.5 rounded-[2px] bg-white border border-[#DCDCE0] text-[#18181B] hover:bg-[#18181B] hover:text-white transition-colors cursor-pointer"
                 aria-label="Anterior"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={() => scroll('right')}
-                className="p-2.5 rounded-full bg-white border border-[#E4E4E7] text-[#18181B] hover:bg-[#18181B] hover:text-white shadow-sm transition-all cursor-pointer"
+                className="p-2.5 rounded-[2px] bg-white border border-[#DCDCE0] text-[#18181B] hover:bg-[#18181B] hover:text-white transition-colors cursor-pointer"
                 aria-label="Próximo"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -87,7 +87,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         {/* Carousel Slider */}
         <div
           ref={scrollRef}
-          className="flex gap-6 overflow-x-auto scrollbar-none pb-4 scroll-smooth snap-x snap-mandatory"
+          className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-none pb-3 scroll-smooth snap-x snap-mandatory"
         >
           {isProductsEmpty ? (
             Array.from({ length: 4 }).map((_, idx) => (

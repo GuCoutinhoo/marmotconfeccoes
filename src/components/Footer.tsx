@@ -20,18 +20,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   };
 
   return (
-    <footer className="bg-white border-t border-[#E4E4E7] text-[#18181B] pt-14 pb-8">
+    <footer className="bg-white border-t border-[#E4E4E7] text-[#18181B] pt-12 pb-8">
       {/* Newsletter Section */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-14">
-        <div className="bg-[#F8F9FA] border border-[#E4E4E7] p-8 md:p-10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-12">
+        <div className="bg-[#111113] border border-[#111113] p-7 sm:p-8 md:p-10 rounded-[2px] flex flex-col md:flex-row items-start md:items-end justify-between gap-7 relative overflow-hidden text-white">
           <div className="relative z-10 max-w-xl">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-2 block">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#F4C400] mb-2 block">
               CLUBE MARMOT // ATELIER DROPS
             </span>
-            <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-2 text-[#18181B]">
+            <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-2 text-white">
               RECEBA DROPS EXCLUSIVOS E 10% OFF NO PRIMEIRO PEDIDO
             </h3>
-            <p className="text-xs text-[#52525B] leading-relaxed font-medium">
+            <p className="text-sm text-zinc-400 leading-relaxed font-medium">
               Assine nossa lista para ter acesso prioritário a reposições de estoque, lotes autorais e cupons exclusivos.
             </p>
           </div>
@@ -50,11 +50,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Seu e-mail..."
                   required
-                  className="bg-white border border-[#E4E4E7] text-xs px-4 py-3.5 rounded-xl text-[#18181B] focus:outline-none focus:border-[#18181B] placeholder-[#71717A] flex-1"
+                  className="bg-white border border-zinc-600 text-sm px-4 py-3.5 rounded-[2px] text-[#18181B] focus:outline-none focus:border-[#F4C400] placeholder-[#71717A] flex-1"
                 />
                 <button
                   type="submit"
-                  className="bg-[#18181B] text-white font-black text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl hover:bg-black transition-colors flex items-center justify-center gap-2 shrink-0 shadow-md"
+                  className="bg-[#F4C400] text-[#111113] font-black text-xs uppercase tracking-wider px-6 py-3.5 rounded-[2px] hover:bg-[#ffd21a] transition-colors flex items-center justify-center gap-2 shrink-0"
                 >
                   Cadastrar <ArrowRight className="w-4 h-4" />
                 </button>
@@ -84,7 +84,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
-              className="p-2.5 bg-[#F4F4F5] border border-[#E4E4E7] rounded-xl text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-all"
+              className="p-2.5 bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-colors"
             >
               <Instagram className="w-4 h-4" />
             </a>
@@ -93,7 +93,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               target="_blank"
               rel="noreferrer"
               aria-label="YouTube"
-              className="p-2.5 bg-[#F4F4F5] border border-[#E4E4E7] rounded-xl text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-all"
+              className="p-2.5 bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-colors"
             >
               <Youtube className="w-4 h-4" />
             </a>

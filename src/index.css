@@ -82,3 +82,28 @@
   background: #A1A1AA;
 }
 
+/* Keep structural surfaces restrained while preserving circular controls and swatches. */
+.marmot-editorial .rounded-2xl,
+.marmot-editorial .rounded-3xl {
+  border-radius: 6px;
+}
+
+.marmot-editorial .rounded-xl {
+  border-radius: 4px;
+}
+
+.auth-panel input,
+.auth-panel button[type="submit"] {
+  border-radius: 2px;
+}
+
+.auth-panel input {
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation-play-state: paused;
+  }
+}
+
