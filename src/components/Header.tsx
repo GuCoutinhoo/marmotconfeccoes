@@ -135,12 +135,27 @@ export const Header: React.FC<HeaderProps> = ({
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [activeHoverMenu, setActiveHoverMenu] = useState<string | null>(null);
   const [expandedMobileCategory, setExpandedMobileCategory] = useState<string | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { totalCartItems, openMiniCart } = useCart();
   const { wishlistCount } = useWishlist();
   const { user } = useAuth();
+
+  // Detect page scroll to animate header into floating island
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPos = window.scrollY;
+      setIsScrolled(scrollPos > 24);
+    };
+
+    // Check on mount
+    handleScroll();
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Prevent background scroll when mobile drawer is open
   useEffect(() => {
@@ -204,10 +219,24 @@ export const Header: React.FC<HeaderProps> = ({
   const displayCartCount = totalCartItems;
 
   return (
-    <header className="sticky top-0 z-[80] w-full select-none font-sans">
-      {/* Header Bar - Full width at top with permanently rounded bottom borders */}
-      <div className="w-full bg-white rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_6px_25px_rgba(0,0,0,0.06)] border-b border-zinc-100">
-        <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 h-[68px] sm:h-[72px] flex items-center justify-between gap-2 sm:gap-4">
+    <header 
+      className={`sticky top-0 z-[80] w-full select-none font-sans transition-all duration-300 ease-out ${
+        isScrolled ? 'pt-1.5 sm:pt-2 px-1.5 sm:px-3' : 'pt-0 px-0'
+      }`}
+    >
+      {/* Header Bar - Full width edge-to-edge with smooth floating capsule animation */}
+      <div 
+        className={`w-full transition-all duration-300 ease-out ${
+          isScrolled 
+            ? 'bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.12)] border border-zinc-200/80 px-4 sm:px-6 lg:px-8' 
+            : 'bg-white rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_6px_25px_rgba(0,0,0,0.06)] border-b border-zinc-100 px-4 sm:px-6 lg:px-8'
+        }`}
+      >
+        <div 
+          className={`w-full flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 ease-out ${
+            isScrolled ? 'h-[56px] sm:h-[60px]' : 'h-[68px] sm:h-[72px]'
+          }`}
+        >
           
           {/* LEFT: Mobile Toggle + Logo (M A R M O T • | ARCHIVE) */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -225,12 +254,24 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={() => onNavigate('home')}
               className="cursor-pointer flex items-center select-none group"
             >
-              <span className="font-extrabold text-[17px] sm:text-[19px] tracking-[0.28em] text-black uppercase leading-none">
+              <span 
+                className={`font-extrabold tracking-[0.28em] text-black uppercase leading-none transition-all duration-300 ${
+                  isScrolled ? 'text-[15px] sm:text-[17px]' : 'text-[17px] sm:text-[19px]'
+                }`}
+              >
                 MARMOT
               </span>
-              <span className="w-2.5 h-2.5 rounded-full bg-[#F4C400] ml-1.5 shrink-0 inline-block shadow-xs" />
+              <span 
+                className={`rounded-full bg-[#F4C400] ml-1.5 shrink-0 inline-block shadow-xs transition-all duration-300 ${
+                  isScrolled ? 'w-2 h-2' : 'w-2.5 h-2.5'
+                }`} 
+              />
               <span className="h-4 w-px bg-zinc-300 mx-2.5 sm:mx-3 inline-block" />
-              <span className="text-[10px] font-mono font-bold tracking-[0.25em] text-zinc-400 uppercase leading-none">
+              <span 
+                className={`font-mono font-bold tracking-[0.25em] text-zinc-400 uppercase leading-none transition-all duration-300 ${
+                  isScrolled ? 'text-[9px] sm:text-[9.5px]' : 'text-[10px]'
+                }`}
+              >
                 ARCHIVE
               </span>
             </div>
