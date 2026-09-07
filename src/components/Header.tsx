@@ -143,11 +143,22 @@ export const Header: React.FC<HeaderProps> = ({
   const { wishlistCount } = useWishlist();
   const { user } = useAuth();
 
-  // Detect page scroll to animate header into floating island
+  // Detect page scroll to animate header into floating island with smooth hysteresis
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      const scrollPos = window.scrollY;
-      setIsScrolled(scrollPos > 24);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollPos = window.scrollY;
+          setIsScrolled((prev) => {
+            if (!prev && scrollPos > 85) return true;
+            if (prev && scrollPos < 35) return false;
+            return prev;
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     // Check on mount
@@ -222,22 +233,22 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header 
-      className={`sticky top-0 z-[80] w-full select-none font-sans transition-all duration-300 ease-out ${
+      className={`sticky top-0 z-[80] w-full select-none font-sans transition-all duration-500 ease-in-out ${
         isScrolled ? 'pt-1.5 sm:pt-2 px-1.5 sm:px-3' : 'pt-0 px-0'
       }`}
     >
       {/* Header Bar - Full width edge-to-edge with smooth floating capsule animation */}
       <div 
-        className={`w-full transition-all duration-300 ease-out ${
+        className={`w-full transition-all duration-500 ease-in-out ${
           isScrolled 
             ? 'bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.12)] border border-zinc-200/80 px-4 sm:px-6 lg:px-8' 
             : isTransparent
-              ? 'bg-transparent border-transparent shadow-none px-4 sm:px-6 lg:px-10'
+              ? 'bg-white/0 border-transparent shadow-none px-4 sm:px-6 lg:px-10'
               : 'bg-white rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_6px_25px_rgba(0,0,0,0.06)] border-b border-zinc-100 px-4 sm:px-6 lg:px-8'
         }`}
       >
         <div 
-          className={`w-full flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 ease-out ${
+          className={`w-full flex items-center justify-between gap-2 sm:gap-4 transition-all duration-500 ease-in-out ${
             isScrolled ? 'h-[56px] sm:h-[60px]' : 'h-[68px] sm:h-[72px]'
           }`}
         >
@@ -247,7 +258,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Mobile Hamburger Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className={`xl:hidden w-9 h-9 -ml-1 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+              className={`xl:hidden w-9 h-9 -ml-1 rounded-full flex items-center justify-center transition-colors duration-500 ease-in-out cursor-pointer ${
                 isTransparent
                   ? 'text-white hover:bg-white/10'
                   : 'text-black hover:bg-zinc-100'
@@ -263,7 +274,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="cursor-pointer flex items-center select-none group"
             >
               <span 
-                className={`font-extrabold tracking-[0.28em] uppercase leading-none transition-all duration-300 ${
+                className={`font-extrabold tracking-[0.28em] uppercase leading-none transition-all duration-500 ease-in-out ${
                   isTransparent ? 'text-white' : 'text-black'
                 } ${
                   isScrolled ? 'text-[15px] sm:text-[17px]' : 'text-[17px] sm:text-[19px]'
@@ -271,22 +282,17 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 MARMOT
               </span>
-              <span 
-                className={`rounded-full bg-[#F4C400] ml-1.5 shrink-0 inline-block shadow-xs transition-all duration-300 ${
-                  isScrolled ? 'w-2 h-2' : 'w-2.5 h-2.5'
-                }`} 
-              />
-              <span className={`h-4 w-px mx-2.5 sm:mx-3 inline-block transition-colors ${
+              <span className={`h-4 w-px mx-2.5 sm:mx-3 inline-block transition-colors duration-500 ease-in-out ${
                 isTransparent ? 'bg-white/30' : 'bg-zinc-300'
               }`} />
               <span 
-                className={`font-mono font-bold tracking-[0.25em] uppercase leading-none transition-all duration-300 ${
+                className={`font-mono font-bold tracking-[0.25em] uppercase leading-none transition-all duration-500 ease-in-out ${
                   isTransparent ? 'text-zinc-300' : 'text-zinc-400'
                 } ${
                   isScrolled ? 'text-[9px] sm:text-[9.5px]' : 'text-[10px]'
                 }`}
               >
-                ARCHIVE
+                CONFECÇÕES
               </span>
             </div>
           </div>
@@ -306,11 +312,11 @@ export const Header: React.FC<HeaderProps> = ({
                 >
                   <button
                     onClick={() => handleNavClick(item)}
-                    className="group flex flex-col items-center cursor-pointer transition-colors"
+                    className="group flex flex-col items-center cursor-pointer transition-colors duration-500 ease-in-out"
                   >
                     <div className="flex items-center gap-1">
                       <span
-                        className={`transition-colors ${
+                        className={`transition-colors duration-500 ease-in-out ${
                           active
                             ? 'text-[#F4C400]'
                             : isTransparent
@@ -324,7 +330,7 @@ export const Header: React.FC<HeaderProps> = ({
                       {/* Dropdown Chevron indicator */}
                       {item.hasSubmenu && (
                         <ChevronDown
-                          className={`w-3.5 h-3.5 transition-transform duration-200 stroke-[2] ${
+                          className={`w-3.5 h-3.5 transition-all duration-500 ease-in-out stroke-[2] ${
                             active 
                               ? 'text-[#F4C400]' 
                               : isTransparent
@@ -339,7 +345,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {active ? (
                       <span className="w-full h-[2.5px] bg-[#F4C400] rounded-full mt-1.5 block" />
                     ) : (
-                      <span className={`w-0 h-[2.5px] bg-transparent mt-1.5 block transition-all group-hover:w-full ${
+                      <span className={`w-0 h-[2.5px] bg-transparent mt-1.5 block transition-all duration-500 ease-in-out group-hover:w-full ${
                         isTransparent ? 'group-hover:bg-[#F4C400]' : 'group-hover:bg-[#F4C400]/40'
                       }`} />
                     )}
@@ -398,7 +404,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onOpenSearch}
-              className={`transition-colors p-1.5 cursor-pointer ${
+              className={`transition-colors duration-500 ease-in-out p-1.5 cursor-pointer ${
                 isTransparent
                   ? 'text-white hover:text-[#F4C400]'
                   : 'text-black hover:text-[#E5A800]'
@@ -413,7 +419,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('account', 'wishlist')}
-              className={`relative transition-colors p-1.5 cursor-pointer ${
+              className={`relative transition-colors duration-500 ease-in-out p-1.5 cursor-pointer ${
                 isTransparent
                   ? 'text-white hover:text-[#F4C400]'
                   : 'text-black hover:text-[#E5A800]'
@@ -422,7 +428,7 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Ver favoritos"
             >
               <Heart className="w-5 h-5 stroke-[1.8]" />
-              <span className={`absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 bg-[#F4C400] text-black font-bold text-[9.5px] font-mono rounded-full flex items-center justify-center ring-2 shadow-2xs leading-none ${
+              <span className={`absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 bg-[#F4C400] text-black font-bold text-[9.5px] font-mono rounded-full flex items-center justify-center ring-2 shadow-2xs leading-none transition-all duration-500 ease-in-out ${
                 isTransparent ? 'ring-black/60' : 'ring-white'
               }`}>
                 {displayWishlistCount}
@@ -434,7 +440,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={handleUserClick}
-                className={`flex items-center gap-1.5 transition-colors p-1.5 cursor-pointer ${
+                className={`flex items-center gap-1.5 transition-colors duration-500 ease-in-out p-1.5 cursor-pointer ${
                   isTransparent
                     ? 'text-white hover:text-[#F4C400]'
                     : 'text-black hover:text-[#E5A800]'
@@ -443,14 +449,14 @@ export const Header: React.FC<HeaderProps> = ({
                 aria-label="Entrar ou acessar conta"
               >
                 <User className="w-5 h-5 stroke-[1.8]" />
-                <span className={`text-xs font-bold uppercase tracking-wider ${
+                <span className={`text-xs font-bold uppercase tracking-wider transition-colors duration-500 ease-in-out ${
                   isTransparent ? 'text-white' : 'text-black'
                 }`}>
                   {user ? user.name.split(' ')[0] : 'ENTRAR'}
                 </span>
                 {user && (
                   <ChevronDown
-                    className={`w-3 h-3 transition-transform ${
+                    className={`w-3 h-3 transition-transform duration-500 ease-in-out ${
                       isTransparent ? 'text-white/70' : 'text-zinc-500'
                     } ${
                       isUserDropdownOpen ? 'rotate-180' : ''
@@ -470,7 +476,7 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             {/* 4. Vertical Divider Line */}
-            <span className={`h-5 w-px mx-1 sm:mx-2 inline-block transition-colors ${
+            <span className={`h-5 w-px mx-1 sm:mx-2 inline-block transition-colors duration-500 ease-in-out ${
               isTransparent ? 'bg-white/30' : 'bg-zinc-300'
             }`} />
 
@@ -478,7 +484,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={openMiniCart}
-              className={`relative transition-colors p-1.5 cursor-pointer ${
+              className={`relative transition-colors duration-500 ease-in-out p-1.5 cursor-pointer ${
                 isTransparent
                   ? 'text-white hover:text-[#F4C400]'
                   : 'text-black hover:text-[#E5A800]'
@@ -487,7 +493,7 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label="Abrir sacola de compras"
             >
               <ShoppingBag className="w-5 h-5 stroke-[1.8]" />
-              <span className={`absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 bg-[#F4C400] text-black font-bold text-[9.5px] font-mono rounded-full flex items-center justify-center ring-2 shadow-2xs leading-none ${
+              <span className={`absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 bg-[#F4C400] text-black font-bold text-[9.5px] font-mono rounded-full flex items-center justify-center ring-2 shadow-2xs leading-none transition-all duration-500 ease-in-out ${
                 isTransparent ? 'ring-black/60' : 'ring-white'
               }`}>
                 {displayCartCount}
