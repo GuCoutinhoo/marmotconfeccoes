@@ -24,7 +24,7 @@ interface DropProductItem {
   colorCountText: string;
 }
 
-// Exact 5 items featured in the reference image
+// Exact 5 items featured in the drop with coherent product photography
 const CANONICAL_DROP_ITEMS: DropProductItem[] = [
   {
     id: 'drop-camiseta-atelie-mountain',
@@ -34,7 +34,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     price: 149.90,
     installments: 'ou 3x de R$ 49,97 sem juros',
     pixPrice: 'R$ 142,41 no PIX (5% OFF)',
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Off-White', hex: '#EAE5D9' },
       { name: 'Preto', hex: '#18181B' },
@@ -134,7 +134,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     }
   );
 
-  // Trigger content entrance animations at 15% - 25% intersection
+  // Trigger content entrance animations whenever entering the section
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -142,15 +142,12 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setHasEntered(true);
-            observer.disconnect();
-          }
+          setHasEntered(entry.isIntersecting);
         });
       },
       {
-        threshold: 0.18,
-        rootMargin: '0px 0px -50px 0px',
+        threshold: 0.15,
+        rootMargin: '0px 0px -40px 0px',
       }
     );
 
@@ -160,10 +157,10 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollAmount = clientWidth * 0.72;
-      scrollRef.current.scrollTo({
-        left: direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+      const cardEl = scrollRef.current.querySelector('article');
+      const scrollAmount = cardEl ? cardEl.clientWidth + 24 : 380;
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth',
       });
     }
@@ -237,11 +234,11 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     <section
       ref={sectionRef}
       id="ultimos-lancamentos-drop"
-      className="relative w-full overflow-hidden min-h-[clamp(540px,42.85vw,860px)] flex flex-col justify-between pt-7 sm:pt-8 md:pt-9 pb-8 sm:pb-9 md:pb-10 select-none bg-[#FAFAFA]"
+      className="relative w-full overflow-hidden pt-8 sm:pt-10 md:pt-12 pb-7 sm:pb-8 md:pb-9 select-none bg-[#09090B]"
     >
       {/* =========================================================================
-          CAMADA 1: FUNDO CLARO ORIGINAL DA PÁGINA (bg-[#FAFAFA])
-          CAMADA 2: IMAGEM "categoria design v4" (DE PONTA A PONTA, SEM CORTES)
+          CAMADA 1: FUNDO ESCURO EDITORIAL
+          CAMADA 2: IMAGEM ORIGINAL "categoria design" COM TRANSIÇÃO SUAVE DE ESCURECIMENTO
          ========================================================================= */}
       <motion.div
         style={{ opacity: bgOpacity }}
@@ -249,7 +246,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         aria-hidden="true"
       >
         <img
-          src="/categoria design v4.png"
+          src="/categoria-design-original.png"
           alt=""
           loading="eager"
           decoding="async"
@@ -257,7 +254,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
             const target = e.currentTarget;
             if (!target.dataset.triedFallback) {
               target.dataset.triedFallback = 'true';
-              target.src = '/categoria-design-v4.png';
+              target.src = '/categoria design v4.original.png';
             }
           }}
           className="w-full h-full object-cover object-center select-none"
@@ -265,26 +262,26 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
       </motion.div>
 
       {/* =========================================================================
-          CAMADA 3: CONTEÚDO DA SEÇÃO ACIMA DA IMAGEM
+          CAMADA 3: CONTEÚDO DA SEÇÃO
          ========================================================================= */}
-      <div className="relative z-10 w-full max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16">
-        {/* CABEÇALHO: DIRETO DO ATELIÊ, ÚLTIMOS LANÇAMENTOS + FOGO AO LADO */}
+      <div className="relative z-10 w-full max-w-[1640px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-14">
+        {/* CABEÇALHO REFINADO COM COMPOSIÇÃO EQUILIBRADA */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-5 mb-5 sm:mb-6">
-          <div className="max-w-3xl">
-            {/* Step 1 in Entrance: "DIRETO DO ATELIÊ" with Orange Spark */}
+          <div className="max-w-2xl">
+            {/* Tag DIRETO DO ATELIÊ com estrela técnica */}
             <motion.div
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
               animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
               transition={{ duration: 0.45, ease: 'easeOut' }}
-              className="flex items-center gap-2 text-xs sm:text-[13px] font-black uppercase tracking-[0.22em] text-[#FF6B00] mb-1.5"
+              className="flex items-center gap-2 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.24em] text-[#FF6B00] mb-1.5"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF6B00] shrink-0">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF6B00] shrink-0">
                 <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
               </svg>
               <span>DIRETO DO ATELIÊ</span>
             </motion.div>
 
-            {/* Step 2 in Entrance: "ÚLTIMOS LANÇAMENTOS" */}
+            {/* Título Principal */}
             <motion.h2
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
               animate={
@@ -303,34 +300,34 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                 times: [0, 0.65, 1],
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[46px] font-black uppercase tracking-[-0.02em] text-white leading-none whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-[38px] xl:text-[42px] font-black uppercase tracking-[-0.02em] text-white leading-none whitespace-nowrap drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]"
             >
               ÚLTIMOS LANÇAMENTOS
             </motion.h2>
 
-            {/* Step 3 in Entrance: Editorial Subtitle */}
+            {/* Subtítulo com tipografia editorial */}
             <motion.p
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
               animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
               transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-              className="text-zinc-300 text-xs sm:text-sm md:text-[14px] font-normal tracking-normal mt-2 max-w-xl leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]"
+              className="text-zinc-400 text-xs sm:text-sm font-normal tracking-wide mt-2 max-w-lg leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]"
             >
               Peças recém-saídas da confecção com estoques limitados e tiragem exclusiva.
             </motion.p>
           </div>
 
-          {/* Top Right Controls: DROP / 003, Divider, VER TODOS -> and Nav Arrows */}
+          {/* Bloco à direita: DROP / 003, Linha, VER TODOS e Navegação */}
           <motion.div
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 16 }}
             animate={hasEntered ? { opacity: 1, x: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 16 }}
             transition={{ duration: 0.5, delay: 0.25, ease: 'easeOut' }}
-            className="flex items-center self-start lg:self-end gap-3 sm:gap-4 flex-wrap"
+            className="flex items-center self-start lg:self-end gap-3 sm:gap-4 flex-wrap pb-1"
           >
             <div className="flex items-center">
-              <span className="font-mono text-xs sm:text-[13px] font-bold tracking-[0.2em] text-zinc-300">
+              <span className="font-mono text-[11px] sm:text-xs font-bold tracking-[0.22em] text-zinc-300">
                 DROP / 003
               </span>
-              <span className="w-7 sm:w-10 h-px mx-3 sm:mx-4 inline-block bg-white/30" />
+              <span className="w-5 sm:w-8 h-px mx-3 sm:mx-4 inline-block bg-white/25" />
               <button
                 type="button"
                 onClick={() => onNavigate('shop')}
@@ -341,12 +338,12 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               </button>
             </div>
 
-            {/* Carousel Arrow Buttons */}
-            <div className="flex items-center gap-2 ml-1.5 sm:ml-3">
+            {/* Setas de Navegação */}
+            <div className="flex items-center gap-2 ml-1 sm:ml-2">
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="w-8.5 h-8.5 sm:w-9.5 sm:h-9.5 rounded-md bg-[#13141A]/90 hover:bg-black text-zinc-300 hover:text-white border border-white/20 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-md"
+                className="w-9 h-9 sm:w-9.5 sm:h-9.5 rounded-none bg-black/70 hover:bg-black text-zinc-300 hover:text-white border border-white/20 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-md backdrop-blur-sm"
                 aria-label="Anterior"
               >
                 <ChevronLeft className="w-4.5 h-4.5 stroke-[2]" />
@@ -354,7 +351,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="w-8.5 h-8.5 sm:w-9.5 sm:h-9.5 rounded-md bg-[#13141A]/90 hover:bg-black text-zinc-300 hover:text-white border border-white/20 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-md"
+                className="w-9 h-9 sm:w-9.5 sm:h-9.5 rounded-none bg-black/70 hover:bg-black text-zinc-300 hover:text-white border border-white/20 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-md backdrop-blur-sm"
                 aria-label="Próximo"
               >
                 <ChevronRight className="w-4.5 h-4.5 stroke-[2]" />
@@ -364,11 +361,11 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         </div>
 
         {/* =========================================================================
-            CAROUSEL ROW: LIGHT CARDS CONTRASTING ON BACKGROUND
+            CAROUSEL ROW: 3 CARDS COMPLETOS + PEEK INTENCIONAL DO PRÓXIMO CARD
            ========================================================================= */}
         <div
           ref={scrollRef}
-          className="flex gap-4 sm:gap-5 md:gap-6 overflow-x-auto scrollbar-none pb-4 pt-1 scroll-smooth snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
+          className="flex gap-5 sm:gap-6 md:gap-6 overflow-x-auto scrollbar-none pb-3 pt-1 scroll-smooth snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
         >
           {CANONICAL_DROP_ITEMS.map((item, index) => {
             const isFav = isInWishlist(item.id);
@@ -378,46 +375,46 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                 initial={
                   shouldReduceMotion
                     ? { opacity: 1 }
-                    : { opacity: 0, y: 25, scale: 0.985 }
+                    : { opacity: 0, y: 20, scale: 0.985 }
                 }
                 animate={
                   hasEntered
                     ? { opacity: 1, y: 0, scale: 1 }
                     : shouldReduceMotion
                     ? { opacity: 1 }
-                    : { opacity: 0, y: 25, scale: 0.985 }
+                    : { opacity: 0, y: 20, scale: 0.985 }
                 }
                 transition={{
                   duration: 0.5,
-                  delay: 0.3 + index * 0.06,
+                  delay: 0.25 + index * 0.05,
                   ease: [0.25, 1, 0.5, 1],
                 }}
-                className="group relative w-[240px] sm:w-[260px] md:w-[280px] lg:w-[295px] shrink-0 snap-start bg-white rounded-none overflow-hidden shadow-2xl border border-zinc-200/80 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_45px_rgba(0,0,0,0.35)] cursor-pointer"
+                className="group relative w-[285px] sm:w-[325px] md:w-[355px] lg:w-[370px] xl:w-[385px] shrink-0 snap-start bg-white rounded-none overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.35)] border border-zinc-200/90 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_22px_48px_rgba(0,0,0,0.5)] cursor-pointer"
                 onClick={() => handleCardClick(item)}
               >
-                {/* Product Image Area */}
-                <div className="relative aspect-[4/3.8] w-full bg-[#EBECEF] overflow-hidden">
+                {/* Área da Fotografia do Produto */}
+                <div className="relative aspect-[4/4.1] w-full bg-[#F3F4F6] overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}
                     loading="lazy"
                     decoding="async"
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
                   />
 
-                  {/* NOVO DROP Badge on Top-Left */}
-                  <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
-                    <span className="bg-black/95 text-white text-[9px] sm:text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-none shadow-sm inline-block">
+                  {/* NOVO DROP Badge refinado */}
+                  <div className="absolute top-3 left-3 z-10 pointer-events-none">
+                    <span className="bg-black/90 backdrop-blur-md text-white text-[9px] sm:text-[9.5px] font-mono font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-none shadow-sm inline-block border border-white/10">
                       NOVO DROP
                     </span>
                   </div>
 
-                  {/* Wishlist Heart Button on Top-Right */}
+                  {/* Botão de Favorito Minimalista */}
                   <button
                     type="button"
                     onClick={(e) => handleWishlistClick(e, item)}
-                    className="absolute top-2.5 right-2.5 z-20 w-7.5 h-7.5 rounded-full bg-white/95 shadow-md flex items-center justify-center text-zinc-700 hover:text-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md shadow-sm border border-black/5 flex items-center justify-center text-zinc-700 hover:text-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer"
                     aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
                   >
                     <Heart
@@ -428,41 +425,41 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                   </button>
                 </div>
 
-                {/* Card White Body */}
-                <div className="p-3.5 sm:p-4 flex flex-col justify-between bg-white text-zinc-900">
+                {/* Corpo do Card com Espaçamento e Respiro */}
+                <div className="p-4 sm:p-5 flex flex-col justify-between bg-white text-zinc-900 flex-1">
                   <div>
-                    {/* Category Label */}
-                    <span className="block text-[9.5px] font-extrabold uppercase tracking-[0.18em] text-zinc-400 mb-1">
+                    {/* Categoria */}
+                    <span className="block text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-zinc-400 mb-1">
                       {item.categoryName}
                     </span>
 
-                    {/* Title */}
-                    <h3 className="text-[14px] sm:text-[15px] font-black text-zinc-950 tracking-tight leading-tight line-clamp-1">
+                    {/* Título do Produto */}
+                    <h3 className="text-[15px] sm:text-[16px] font-black text-zinc-950 tracking-[-0.01em] leading-snug line-clamp-1 group-hover:text-[#FF6B00] transition-colors">
                       {item.title}
                     </h3>
 
-                    {/* Subtle Horizontal Divider with Orange Accent Bar on the Left */}
-                    <div className="relative w-full h-px bg-zinc-200 my-2.5 sm:my-3">
-                      <span className="absolute left-0 top-0 h-px w-7 bg-[#FF6B00] transition-all duration-300 group-hover:w-12" />
+                    {/* Divisor Delicado com Acento Laranja */}
+                    <div className="relative w-full h-px bg-zinc-200/80 my-3">
+                      <span className="absolute left-0 top-0 h-px w-8 bg-[#FF6B00] transition-all duration-300 group-hover:w-16" />
                     </div>
 
-                    {/* Pricing Block */}
+                    {/* Bloco de Preços */}
                     <div className="flex flex-col gap-0.5">
-                      <div className="text-[16px] sm:text-[17px] font-black text-zinc-950 tracking-tight">
+                      <div className="text-[17px] sm:text-[18px] font-black text-zinc-950 tracking-tight">
                         R$ {item.price.toFixed(2).replace('.', ',')}
                       </div>
-                      <div className="text-[10.5px] sm:text-[11px] text-zinc-500 font-medium">
+                      <div className="text-[11px] sm:text-[11.5px] text-zinc-500 font-medium">
                         {item.installments}
                       </div>
-                      <div className="text-[10.5px] sm:text-[11px] font-black text-[#E65100]">
+                      <div className="text-[11px] sm:text-[11.5px] font-black text-[#E65100]">
                         {item.pixPrice}
                       </div>
                     </div>
                   </div>
 
-                  {/* Swatches & Color Count */}
-                  <div className="flex items-center gap-1.5 mt-2.5 sm:mt-3 pt-2 border-t border-zinc-100">
-                    <div className="flex items-center gap-1">
+                  {/* Cores e Contagem */}
+                  <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-zinc-100">
+                    <div className="flex items-center gap-1.5">
                       {item.colors.map((c, i) => (
                         <span
                           key={i}
@@ -472,7 +469,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                         />
                       ))}
                     </div>
-                    <span className="text-[10.5px] text-zinc-500 font-medium ml-1">
+                    <span className="text-[10.5px] sm:text-[11px] text-zinc-400 font-mono font-medium">
                       {item.colorCountText}
                     </span>
                   </div>
@@ -483,9 +480,9 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         </div>
 
         {/* =========================================================================
-            BOTTOM BRANDING
+            RODAPÉ VISUAL COMPACTO DA SEÇÃO
            ========================================================================= */}
-        <div className="relative pt-4 sm:pt-5 mt-1">
+        <div className="relative pt-4 sm:pt-5 mt-2">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/15 pt-3 sm:pt-4">
             {/* Bottom-Left Branding: MARMOT EST. 2018 */}
             <div className="flex flex-col text-left">

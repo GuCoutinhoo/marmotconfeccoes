@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, ChevronLeft, ChevronRight, Compass } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { INITIAL_8_CATEGORIES } from '../../data/categories';
@@ -53,11 +54,35 @@ const CATEGORY_EDITORIAL_ASSETS: Record<
 
 export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ onNavigate }) => {
   const { categories } = useStore();
+  const sectionRef = useRef<HTMLElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [isSectionInView, setIsSectionInView] = useState(false);
+
+  // Monitora a visibilidade da seção para disparar a animação dos cards toda vez que o usuário entrar
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          setIsSectionInView(entry.isIntersecting);
+        });
+      },
+      {
+        threshold: 0.12,
+        rootMargin: '0px 0px -40px 0px',
+      }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Mouse drag-to-scroll state
   const isDraggingRef = useRef(false);
@@ -167,13 +192,25 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   return (
     <section
       id="category-showcase-section"
-      className="py-6 sm:py-7 lg:py-8 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
+      ref={sectionRef}
+      className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
     >
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* ========================================================= */}
         {/* CABEÇALHO ELEVADO COM HIERARQUIA TIPOGRÁFICA E CONTROLES  */}
         {/* ========================================================= */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-5 sm:mb-6">
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 14 }}
+          animate={
+            isSectionInView
+              ? { opacity: 1, y: 0 }
+              : shouldReduceMotion
+              ? { opacity: 1 }
+              : { opacity: 0, y: 14 }
+          }
+          transition={{ duration: 0.45, ease: 'easeOut' }}
+          className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-5 sm:mb-6"
+        >
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1.5 h-1.5 bg-[#B45309] rounded-full inline-block animate-pulse" />
@@ -231,7 +268,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* ========================================================================= */}
         {/* CARROSSEL HORIZONTAL DE CATEGORIAS: 3 CARDS COMPLETOS + 4º CARD CORTADO   */}
@@ -289,11 +326,24 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               const cardSubheading = cat.tagline || cat.description || asset?.subheading;
 
               return (
-                <article
+                <motion.article
                   key={cat.id || cat.slug || index}
                   data-category-card
                   onClick={() => handleCardClick(cat.slug)}
-                  className="group relative h-[310px] sm:h-[340px] lg:h-[360px] xl:h-[380px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out"
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 36, scale: 0.96 }}
+                  animate={
+                    isSectionInView
+                      ? { opacity: 1, y: 0, scale: 1 }
+                      : shouldReduceMotion
+                      ? { opacity: 1 }
+                      : { opacity: 0, y: 36, scale: 0.96 }
+                  }
+                  transition={{
+                    duration: 0.52,
+                    delay: shouldReduceMotion ? 0 : Math.min(index * 0.08, 0.48),
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                  className="group relative h-[460px] sm:h-[500px] lg:h-[550px] xl:h-[600px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
                 >
                   {/* Foto editorial padronizada com a nova imagem da categoria */}
                   <img
@@ -315,7 +365,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                   />
 
                   {/* Gradiente Inferior Robusto & Conteúdo Editorial Completo */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-40% to-transparent p-4 sm:p-6 lg:p-7 flex flex-col justify-end z-20 pointer-events-none">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 via-35% to-transparent p-5 sm:p-7 lg:p-8 flex flex-col justify-end z-20 pointer-events-none">
                     <div className="space-y-1.5 transform transition-transform duration-300 group-hover:-translate-y-1">
                       {/* Título de Categoria em Destaque Imponente */}
                       <h3 className="text-xl sm:text-2xl lg:text-[28px] font-black text-white uppercase tracking-tight leading-none group-hover:text-[#F4C400] transition-colors">
@@ -345,7 +395,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                       </div>
                     </div>
                   </div>
-                </article>
+                </motion.article>
               );
             })}
           </div>
