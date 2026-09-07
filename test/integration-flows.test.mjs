@@ -5,7 +5,10 @@ import path from 'node:path';
 
 const sqlPath = path.resolve(process.cwd(), 'supabase-complete-production-migration.sql');
 const fulfillmentSqlPath = path.resolve(process.cwd(), 'supabase/migrations/20260907140252_complete_shipping_fulfillment.sql');
+const eventDrivenSqlPath = path.resolve(process.cwd(), 'supabase/migrations/20260907233335_event_driven_hobby_runtime.sql');
 const apiPath = path.resolve(process.cwd(), 'api/index.ts');
+const vercelPath = path.resolve(process.cwd(), 'vercel.json');
+const envExamplePath = path.resolve(process.cwd(), '.env.example');
 const checkoutPath = path.resolve(process.cwd(), 'src/pages/CheckoutPage.tsx');
 const cartContextPath = path.resolve(process.cwd(), 'src/context/CartContext.tsx');
 const shippingCalculatorPath = path.resolve(process.cwd(), 'src/components/ShippingCalculator.tsx');
@@ -16,7 +19,10 @@ const mercadoPagoServicePath = path.resolve(process.cwd(), 'src/services/mercado
 test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
   const sql = fs.readFileSync(sqlPath, 'utf8');
   const fulfillmentSql = fs.readFileSync(fulfillmentSqlPath, 'utf8');
+  const eventDrivenSql = fs.readFileSync(eventDrivenSqlPath, 'utf8');
   const api = fs.readFileSync(apiPath, 'utf8');
+  const vercelConfig = JSON.parse(fs.readFileSync(vercelPath, 'utf8'));
+  const envExample = fs.readFileSync(envExamplePath, 'utf8');
   const checkout = fs.readFileSync(checkoutPath, 'utf8');
   const cartContext = fs.readFileSync(cartContextPath, 'utf8');
   const shippingCalculator = fs.readFileSync(shippingCalculatorPath, 'utf8');
@@ -239,18 +245,35 @@ test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
     assert.ok(api.includes("existingOperation.shipment_id"));
   });
 
-  await t.test('23. Approved webhook schedules fulfillment and cron retries incomplete paid orders', () => {
+  await t.test('23. Fulfillment recovery is event-driven and compatible with serverless execution', () => {
     const webhookStart = api.indexOf("app.all(['/api/mercado-pago/webhook'");
     const webhookBody = api.slice(webhookStart, webhookStart + 18000);
-    assert.ok(webhookBody.includes("processMelhorEnvioShipment(fulfillmentOrderId!, { source: 'webhook' })"));
-    assert.ok(api.includes('async function processPendingPaidShipments'));
-    assert.ok(api.includes('await processPendingPaidShipments(3)'));
+    assert.ok(webhookBody.includes("scheduleShipmentFulfillment(fulfillmentOrderId, 'webhook')"));
+    assert.ok(webhookBody.includes("scheduleShipmentFulfillment(linkedOrder.id, 'webhook_retry')"));
+    assert.ok(api.includes("scheduleShipmentFulfillment(result.order.id, 'payment_return')"));
+    assert.ok(api.includes("scheduleShipmentFulfillment(result.order.id, 'payment_verification')"));
+    assert.ok(api.includes('waitUntil(task)'));
+    assert.ok(eventDrivenSql.includes("'status', 'already_completed'"));
+    assert.ok(eventDrivenSql.includes("'order_id', v_event.order_id"));
+    assert.ok(!api.includes('processPendingPaidShipments'));
+  });
+
+  await t.test('23b. Vercel runtime has no scheduled route, schedule, timer, or dedicated secret', () => {
+    assert.equal(vercelConfig.crons, undefined);
+    assert.equal(vercelConfig.fluid, true);
+    assert.ok(!JSON.stringify(vercelConfig).includes('*/15'));
+    assert.ok(!api.includes('/api/cron/'));
+    assert.ok(!api.includes('CRON_SECRET'));
+    assert.ok(!api.includes('setInterval('));
+    assert.ok(!envExample.includes('CRON_SECRET'));
+    assert.ok(api.includes("app.post('/api/admin/tracking/sync-active', requireAdmin"));
+    assert.ok(api.includes("app.use('/api', (_req, res)"));
   });
 
   await t.test('24. Webhook idempotency is notification-based and database-atomic', () => {
     assert.ok(api.includes('const notificationId = req.body?.id'));
     assert.ok(api.includes("req.body?.data?.id || req.query.id"));
-    assert.ok(api.includes('notificationId\n      ?'));
+    assert.match(api, /notificationId\r?\n\s*\?/);
     assert.ok(fulfillmentSql.includes('ON CONFLICT (gateway, event_key) DO NOTHING'));
     assert.ok(fulfillmentSql.includes('FOR UPDATE'));
   });

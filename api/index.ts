@@ -5,6 +5,7 @@ import os from 'os';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { Pool } from 'pg';
+import { waitUntil } from '@vercel/functions';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import sharp from 'sharp';
@@ -4322,7 +4323,7 @@ export class DatabaseManager {
     eventId: string,
     eventType: string = 'payment',
     payload: any = {}
-  ): Promise<{ shouldProcess: boolean; status: string }> {
+  ): Promise<{ shouldProcess: boolean; status: string; orderId?: string }> {
     await this.initialize();
     if (this.mode === 'supabase') {
       try {
@@ -4337,7 +4338,11 @@ export class DatabaseManager {
           throw new Error(error.message);
         }
         if (data) {
-          return { shouldProcess: Boolean(data.should_process ?? data.shouldProcess), status: String(data.status) };
+          return {
+            shouldProcess: Boolean(data.should_process ?? data.shouldProcess),
+            status: String(data.status),
+            orderId: data.order_id || data.orderId || undefined,
+          };
         }
       } catch (err: any) {
         console.error('[DB] Supabase claim_webhook_event exception:', err?.message || err);
@@ -5730,19 +5735,23 @@ class RateLimiter {
   private windowMs: number;
   private maxRequests: number;
   private name: string;
+  private lastCleanupAt = 0;
 
   constructor(windowMs: number, maxRequests: number, name: string) {
     this.windowMs = windowMs;
     this.maxRequests = maxRequests;
     this.name = name;
-    setInterval(() => {
-      const now = Date.now();
-      for (const [key, val] of this.requests.entries()) {
-        if (now > val.resetTime) {
-          this.requests.delete(key);
-        }
+  }
+
+  private cleanupExpiredRequests(now: number): void {
+    if (now - this.lastCleanupAt < 5 * 60 * 1000) return;
+
+    this.lastCleanupAt = now;
+    for (const [key, val] of this.requests.entries()) {
+      if (now > val.resetTime) {
+        this.requests.delete(key);
       }
-    }, 5 * 60 * 1000).unref();
+    }
   }
 
   public middleware() {
@@ -5750,6 +5759,7 @@ class RateLimiter {
       const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.ip || req.socket.remoteAddress || 'unknown';
       const key = `${this.name}:${ip}`;
       const now = Date.now();
+      this.cleanupExpiredRequests(now);
       const record = this.requests.get(key);
 
       if (!record || now > record.resetTime) {
@@ -8819,6 +8829,18 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
       // Persistent distributed claim check (PostgreSQL UNIQUE constraint + state table)
       const claim = await db.claimWebhookEvent('mercadopago', eventKey, String(topic || 'payment'), req.body || req.query);
       if (!claim.shouldProcess) {
+        if (claim.status === 'already_completed' && claim.orderId) {
+          const linkedOrder = await db.getOrderById(claim.orderId);
+          if (linkedOrder && needsShipmentFulfillment(linkedOrder)) {
+            scheduleShipmentFulfillment(linkedOrder.id, 'webhook_retry');
+            return res.status(200).json({
+              success: true,
+              message: 'Evento já liquidado; recuperação da expedição acionada com segurança.',
+              status: claim.status,
+              freightQueued: true,
+            });
+          }
+        }
         console.log(`[Mercado Pago Webhook Idempotency]: Event ${eventKey} already claimed/processed (${claim.status}). Acknowledging 200 OK.`);
         return res.status(200).json({ success: true, message: 'Evento já registrado ou em processamento.', status: claim.status });
       }
@@ -8891,13 +8913,7 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
     }
 
     if (fulfillmentOrderId) {
-      // Fast best-effort dispatch for long-lived/local servers. The cron worker
-      // below is the durable recovery path for serverless runtimes.
-      setImmediate(() => {
-        processMelhorEnvioShipment(fulfillmentOrderId!, { source: 'webhook' }).catch((error: any) => {
-          console.error('[ME_SHIPMENT_ASYNC_ERROR]', { orderId: fulfillmentOrderId, code: error?.code, step: error?.step });
-        });
-      });
+      scheduleShipmentFulfillment(fulfillmentOrderId, 'webhook');
     }
 
     return res.status(200).json({ success: true, message: 'Webhook processado com sucesso.', freightQueued: Boolean(fulfillmentOrderId) });
@@ -8949,6 +8965,9 @@ app.post('/api/mercado-pago/return/verify', requireAuth, async (req: any, res) =
     }
 
     const result = await fetchAndVerifyMercadoPagoPayment(orderId, paymentId);
+    if (result.isApproved && needsShipmentFulfillment(result.order)) {
+      scheduleShipmentFulfillment(result.order.id, 'payment_return');
+    }
     return res.json({
       success: true,
       paymentValidated: result.paymentValidated,
@@ -8985,6 +9004,9 @@ app.all([
     }
 
     const result = await fetchAndVerifyMercadoPagoPayment(orderId, paymentId);
+    if (result.isApproved && needsShipmentFulfillment(result.order)) {
+      scheduleShipmentFulfillment(result.order.id, 'payment_verification');
+    }
     return res.json({
       success: true,
       approved: result.isApproved,
@@ -9472,9 +9494,17 @@ function isPaidOrderForFulfillment(order: Order): boolean {
   return order.paymentStatus === 'Pago' && Boolean(order.paymentDetails?.mercadoPagoPaymentId || (order as any).mercado_pago_payment_id);
 }
 
+function needsShipmentFulfillment(order: Order): boolean {
+  return isPaidOrderForFulfillment(order) && (
+    order.shipmentPurchaseStatus !== 'purchased' ||
+    order.labelGenerationStatus !== 'generated' ||
+    !order.shippingLabelUrl
+  );
+}
+
 async function processMelhorEnvioShipment(
   orderId: string,
-  actor?: { source: 'webhook' | 'cron' | 'admin'; email?: string; name?: string },
+  actor?: { source: 'webhook' | 'webhook_retry' | 'payment_return' | 'payment_verification' | 'admin'; email?: string; name?: string },
 ): Promise<ShipmentProcessingResult> {
   const startTime = Date.now();
   let order = await db.getOrderById(orderId);
@@ -9970,6 +10000,36 @@ async function processMelhorEnvioShipment(
     console.error('[ME_SHIPMENT_ERROR]', { orderId, code: normalized.code, step: failureStep, source: actor?.source || 'system', durationMs: Date.now() - startTime });
     throw normalized;
   }
+}
+
+// Legacy periodic responsibility: recover paid orders whose shipment purchase or label
+// generation did not finish. The replacement is driven by validated payment events and
+// authenticated payment revalidation requests. On Vercel,
+// waitUntil keeps the serverless invocation alive after the HTTP response;
+// locally the same promise runs in the current Node process for development.
+function scheduleShipmentFulfillment(
+  orderId: string,
+  source: 'webhook' | 'webhook_retry' | 'payment_return' | 'payment_verification',
+): void {
+  const task = processMelhorEnvioShipment(orderId, { source }).catch((error: any) => {
+    console.error('[ME_SHIPMENT_EVENT_DRIVEN_ERROR]', {
+      orderId,
+      source,
+      code: error?.code || 'SHIPMENT_PROCESSING_FAILED',
+      step: error?.step,
+    });
+  });
+
+  if (process.env.VERCEL) {
+    try {
+      waitUntil(task);
+      return;
+    } catch (error: any) {
+      console.error('[ME_SHIPMENT_WAIT_UNTIL_ERROR]', { orderId, source, message: error?.message });
+    }
+  }
+
+  void task;
 }
 
 // --- ADMIN: GERAR ENVIO REAL NO MELHOR ENVIO COM MÁQUINA DE ESTADOS E VALIDAÇÕES RIGOROSAS ---
@@ -11442,7 +11502,8 @@ async function applyShippingEventToOrder(
   }
 }
 
-// Background sync for active orders tracking against Melhor Envio API
+// The carrier webhook is the primary tracking update path. This request-driven routine
+// remains only as an authenticated administrative recovery action for exceptional cases.
 async function syncActiveOrdersTrackingServer(): Promise<{ totalActive: number; checked: number; updated: number; errors: number }> {
   const token = getMelhorEnvioTokenServer();
   const allOrders = await db.getOrders();
@@ -11512,67 +11573,6 @@ async function syncActiveOrdersTrackingServer(): Promise<{ totalActive: number; 
     errors: errorCount,
   };
 }
-
-async function processPendingPaidShipments(limit = 3): Promise<{ queued: number; completed: number; locked: number; failed: number }> {
-  const orders = await db.getOrders();
-  const candidates = orders
-    .filter((order) =>
-      isPaidOrderForFulfillment(order) &&
-      order.status !== 'Cancelado' &&
-      order.paymentStatus !== 'Reembolsado' &&
-      (order.shipmentPurchaseStatus !== 'purchased' || order.labelGenerationStatus !== 'generated' || !order.shippingLabelUrl)
-    )
-    .sort((a, b) => new Date(a.paidAt || a.createdAt || 0).getTime() - new Date(b.paidAt || b.createdAt || 0).getTime())
-    .slice(0, Math.max(1, Math.min(limit, 10)));
-
-  let completed = 0;
-  let locked = 0;
-  let failed = 0;
-  for (const order of candidates) {
-    try {
-      await processMelhorEnvioShipment(order.id, { source: 'cron' });
-      completed += 1;
-    } catch (error: any) {
-      if (error?.code === 'SHIPMENT_IN_PROGRESS') locked += 1;
-      else failed += 1;
-    }
-  }
-
-  return { queued: candidates.length, completed, locked, failed };
-}
-
-// Background recurring sync (only in persistent node process, avoided in serverless/tests)
-if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
-  const syncInterval = setInterval(() => {
-    syncActiveOrdersTrackingServer().catch((e) => console.warn('[Background Tracking Sync Notice]:', e.message));
-  }, 5 * 60 * 1000);
-  if (syncInterval && typeof syncInterval.unref === 'function') {
-    syncInterval.unref();
-  }
-}
-
-// Protected Vercel Cron Endpoint for Serverless Logistics Sync (Fail-Closed)
-app.get(['/api/cron/tracking-sync', '/api/cron/sync-tracking'], async (req, res) => {
-  try {
-    const cronSecret = (process.env.CRON_SECRET || '').trim();
-    const authHeader = (req.headers.authorization || '').trim();
-    if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-      return res.status(401).json({ error: 'Não autorizado para execução do cron de sincronização.' });
-    }
-
-    const fulfillment = await processPendingPaidShipments(3);
-    const stats = await syncActiveOrdersTrackingServer();
-    res.json({
-      success: true,
-      timestamp: new Date().toISOString(),
-      fulfillment,
-      stats,
-    });
-  } catch (err: any) {
-    console.error('[Cron Tracking Sync Error]:', err);
-    res.status(500).json({ error: 'Erro na execução da sincronização de rastreios.', message: err.message });
-  }
-});
 
 // --- MELHOR ENVIO & CARRIER WEBHOOKS (Protected & Verified) ---
 app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhooks/melhorenvio', '/api/webhooks/tracking'], async (req, res) => {
@@ -11657,7 +11657,7 @@ app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhoo
     return res.status(200).json({ success: true, message: result.message, transitionApplied: result.transitionApplied });
   } catch (err: any) {
     console.error('[Melhor Envio Webhook Error]:', err);
-    res.status(200).json({ success: false, error: err.message });
+    res.status(500).json({ success: false, error: 'Falha temporária ao processar o evento de rastreamento.' });
   }
 });
 
@@ -11950,6 +11950,12 @@ app.all(['/api/admin/simulate-concurrency-tests', '/api/test/concurrency-simulat
     console.error('[Concurrency Simulation Error]:', globalErr);
     return res.status(500).json({ success: false, error: globalErr.message });
   }
+});
+
+// Keep unknown API paths from falling through to the Vite SPA in local development.
+// In production this also makes removed or mistyped serverless endpoints fail explicitly.
+app.use('/api', (_req, res) => {
+  return res.status(404).json({ error: 'Endpoint de API não encontrado.' });
 });
 
 // Vercel Serverless Function Handler

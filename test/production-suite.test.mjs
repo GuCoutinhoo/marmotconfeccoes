@@ -48,9 +48,12 @@ test('Security & Architecture Audit Assertions', async (t) => {
     assert.ok(backend.includes('p_event_key: eventId'), 'claim_webhook_event parameter key mismatch');
     assert.ok(backend.includes('deduct_inventory_atomic') || backend.includes('process_approved_order_atomic'), 'Atomic stock deduction call missing');
 
-    // Logistics carrier fallback and cron fail-closed
+    // Logistics carrier fallback and event-driven serverless execution
     assert.ok(backend.includes("orderStatus: 'UNMODIFIED'"), 'Carrier unknown status fallback transition must be UNMODIFIED');
-    assert.ok(backend.includes("if (!cronSecret || authHeader !== `Bearer ${cronSecret}`"), 'Cron endpoint must fail closed if CRON_SECRET is missing');
+    assert.ok(backend.includes('waitUntil(task)'), 'Vercel background fulfillment must be attached to the payment request');
+    assert.ok(!backend.includes('/api/cron/'), 'Scheduled endpoint must not remain in the backend');
+    assert.ok(!backend.includes('CRON_SECRET'), 'Scheduled-task-only secret must not remain in the backend');
+    assert.ok(!backend.includes('setInterval('), 'Serverless backend must not depend on persistent timers');
   });
 
   await t.test('Shipping and Remetente Rules Validation', () => {
