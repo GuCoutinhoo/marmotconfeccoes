@@ -167,13 +167,13 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   return (
     <section
       id="category-showcase-section"
-      className="py-10 sm:py-12 lg:py-14 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
+      className="py-6 sm:py-7 lg:py-8 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
     >
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* ========================================================= */}
         {/* CABEÇALHO ELEVADO COM HIERARQUIA TIPOGRÁFICA E CONTROLES  */}
         {/* ========================================================= */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8 sm:mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="w-1.5 h-1.5 bg-[#B45309] rounded-full inline-block animate-pulse" />
@@ -293,7 +293,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                   key={cat.id || cat.slug || index}
                   data-category-card
                   onClick={() => handleCardClick(cat.slug)}
-                  className="group relative h-[420px] sm:h-[460px] lg:h-[480px] xl:h-[510px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out"
+                  className="group relative h-[310px] sm:h-[340px] lg:h-[360px] xl:h-[380px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-500 ease-out"
                 >
                   {/* Foto editorial padronizada com a nova imagem da categoria */}
                   <img
