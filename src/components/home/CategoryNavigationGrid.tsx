@@ -23,31 +23,31 @@ const CATEGORY_EDITORIAL_ASSETS: Record<
   }
 > = {
   camisetas: {
-    image: '/categories/categoria-camisetas.png?v=20260906_v2',
+    image: '/categories/categoria-camisetas.png?v=20260907_v4_ultrahd',
     subheading: 'Heavyweight 260g & Boxy Fit',
   },
   moletons: {
-    image: '/categories/categoria-moletons.png?v=20260906_v2',
+    image: '/categories/categoria-moletons.png?v=20260907_v4_ultrahd',
     subheading: 'Hoodies Densos 400g/m²',
   },
   jaquetas: {
-    image: '/categories/categoria-jaquetas.png?v=20260906_v2',
+    image: '/categories/categoria-jaquetas.png?v=20260907_v4_ultrahd',
     subheading: 'Puffers & Varsity Outerwear',
   },
   calcas: {
-    image: '/categories/categoria-calcas.png?v=20260906_v2',
+    image: '/categories/categoria-calcas.png?v=20260907_v4_ultrahd',
     subheading: 'Baggy Denim & Wide Leg',
   },
   shorts: {
-    image: '/categories/categoria-shorts.png?v=20260906_v2',
+    image: '/categories/categoria-shorts.png?v=20260907_v4_ultrahd',
     subheading: 'Mesh Basketball & Sweat Shorts',
   },
   tenis: {
-    image: '/categories/categoria-tenis.png?v=20260906_v2',
+    image: '/categories/categoria-tenis.png?v=20260907_v4_ultrahd',
     subheading: 'Sneakers Chunky & Solados Tratorados',
   },
   acessorios: {
-    image: '/categories/categoria-acessorios.png?v=20260906_v2',
+    image: '/categories/categoria-acessorios.png?v=20260907_v4_ultrahd',
     subheading: 'Bags Táticas, Correntes & EDC',
   },
 };
@@ -363,7 +363,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                 (cat.image && !cat.image.includes('unsplash.com') ? cat.image : null) ||
                 asset?.image ||
                 DEFAULT_CATEGORY_IMAGE_URLS[slugKey] ||
-                `/categories/categoria-${slugKey}.png?v=20260906_v2`;
+                `/categories/categoria-${slugKey}.png?v=20260907_v4_ultrahd`;
               const cardSubheading = cat.tagline || cat.description || asset?.subheading;
 
               return (
@@ -384,9 +384,9 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                     delay: shouldReduceMotion ? 0 : Math.min(index * 0.08, 0.48),
                     ease: [0.22, 1, 0.36, 1],
                   }}
-                  className="group relative h-[460px] sm:h-[500px] lg:h-[550px] xl:h-[600px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#18181B] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
+                  className="group relative h-[460px] sm:h-[500px] lg:h-[550px] xl:h-[600px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#121214] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
                 >
-                  {/* Foto editorial padronizada com a nova imagem da categoria */}
+                  {/* Foto editorial de alta definição padronizada */}
                   <img
                     src={cardImage}
                     alt={cat.name}
@@ -394,7 +394,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                     decoding="async"
                     referrerPolicy="no-referrer"
                     draggable={false}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.90] group-hover:brightness-100 select-none"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out brightness-100 contrast-[1.03] saturate-[1.05] select-none"
                     onError={(e) => {
                       const fallback = DEFAULT_CATEGORY_IMAGE_URLS[slugKey] || `/categories/categoria-${slugKey}.png`;
                       if (e.currentTarget.src !== fallback) {
@@ -405,8 +405,8 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                     }}
                   />
 
-                  {/* Gradiente Inferior Robusto & Conteúdo Editorial Completo */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 via-35% to-transparent p-5 sm:p-7 lg:p-8 flex flex-col justify-end z-20 pointer-events-none">
+                  {/* Gradiente Inferior Refinado que protege o texto sem escurecer a foto */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-22% to-transparent p-5 sm:p-7 lg:p-8 flex flex-col justify-end z-20 pointer-events-none">
                     <div className="space-y-1.5 transform transition-transform duration-300 group-hover:-translate-y-1">
                       {/* Título de Categoria em Destaque Imponente */}
                       <h3 className="text-xl sm:text-2xl lg:text-[28px] font-black text-white uppercase tracking-tight leading-none group-hover:text-[#F4C400] transition-colors">

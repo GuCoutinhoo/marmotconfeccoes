@@ -24,7 +24,7 @@ interface DropProductItem {
   colorCountText: string;
 }
 
-// Exact 5 items featured in the drop with coherent product photography
+// Exact curated items featured in the drop with coherent product photography
 const CANONICAL_DROP_ITEMS: DropProductItem[] = [
   {
     id: 'drop-camiseta-atelie-mountain',
@@ -72,6 +72,21 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
+    id: 'drop-moletom-box-hoodie',
+    slug: 'moletom-box-hoodie',
+    title: 'Moletom Box Heavy Hoodie',
+    categoryName: 'VESTUÁRIO',
+    price: 289.90,
+    installments: 'ou 3x de R$ 96,63 sem juros',
+    pixPrice: 'R$ 275,41 no PIX (5% OFF)',
+    image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+    colors: [
+      { name: 'Chumbo Washed', hex: '#2B2B30' },
+      { name: 'Off-Black', hex: '#18181A' },
+    ],
+    colorCountText: '2 cores',
+  },
+  {
     id: 'drop-bucket-hat-explore',
     slug: 'bucket-hat-explore',
     title: 'Bucket Hat Explore',
@@ -100,6 +115,65 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
       { name: 'Grafite', hex: '#3B3B42' },
     ],
     colorCountText: '2 cores',
+  },
+  {
+    id: 'drop-calca-cargo-ripstop',
+    slug: 'calca-cargo-tactical',
+    title: 'Calça Cargo Tactical Ripstop',
+    categoryName: 'VESTUÁRIO',
+    price: 279.90,
+    installments: 'ou 3x de R$ 93,30 sem juros',
+    pixPrice: 'R$ 265,91 no PIX (5% OFF)',
+    image: 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=800&q=80',
+    colors: [
+      { name: 'Preto', hex: '#18181B' },
+      { name: 'Oliva Militar', hex: '#3E4238' },
+    ],
+    colorCountText: '2 cores',
+  },
+  {
+    id: 'drop-corta-vento-utility',
+    slug: 'corta-vento-anorak-utility',
+    title: 'Corta-Vento Anorak Utility',
+    categoryName: 'VESTUÁRIO',
+    price: 349.90,
+    installments: 'ou 3x de R$ 116,63 sem juros',
+    pixPrice: 'R$ 332,41 no PIX (5% OFF)',
+    image: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=800&q=80',
+    colors: [
+      { name: 'Preto / Cinza', hex: '#212124' },
+      { name: 'Gelo', hex: '#D6D6CE' },
+    ],
+    colorCountText: '2 cores',
+  },
+  {
+    id: 'drop-bone-dad-hat-corduroy',
+    slug: 'bone-dad-hat-corduroy',
+    title: 'Boné Dad Hat Corduroy',
+    categoryName: 'ACESSÓRIOS',
+    price: 139.90,
+    installments: 'ou 3x de R$ 46,63 sem juros',
+    pixPrice: 'R$ 132,91 no PIX (5% OFF)',
+    image: 'https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=800&q=80',
+    colors: [
+      { name: 'Marrom Tabaco', hex: '#4E3629' },
+      { name: 'Verde Floresta', hex: '#26382B' },
+    ],
+    colorCountText: '2 cores',
+  },
+  {
+    id: 'drop-meia-crew-jacquard',
+    slug: 'meia-crew-jacquard-2pack',
+    title: 'Meia Crew Jacquard 2-Pack',
+    categoryName: 'ACESSÓRIOS',
+    price: 69.90,
+    installments: 'ou 2x de R$ 34,95 sem juros',
+    pixPrice: 'R$ 66,41 no PIX (5% OFF)',
+    image: 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&w=800&q=80',
+    colors: [
+      { name: 'Off-White & Preto', hex: '#EBE8DE' },
+    ],
+    colorCountText: '1 opção',
   },
 ];
 
@@ -253,11 +327,11 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     <section
       ref={sectionRef}
       id="ultimos-lancamentos-drop"
-      className="relative w-full overflow-hidden py-4 sm:py-5 lg:py-6 select-none bg-[#09090B]"
+      className="relative w-full overflow-hidden py-10 sm:py-12 md:py-14 lg:py-16 xl:py-20 select-none bg-[#09090B]"
     >
       {/* =========================================================================
-          BACKGROUND ART: Imagem mantida em proporção normal (sem zoom, sem aumento,
-          sem distorção), com enquadramento superior limpo.
+          BACKGROUND ART: Imagem deslocada para cima conforme solicitado,
+          revelando a frase "NEW DROP" por completo acima dos cards.
          ========================================================================= */}
       <motion.div
         initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
@@ -291,22 +365,22 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               target.src = '/categoria design v4.original.png';
             }
           }}
-          className="w-full h-full object-cover object-top select-none"
+          className="w-full h-[108%] max-w-none object-cover object-top -translate-y-1.5 sm:-translate-y-2 md:-translate-y-3 lg:-translate-y-3.5 select-none"
         />
 
         {/* Suave véu no topo para que os textos do cabeçalho e controles fiquem super legíveis */}
-        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black/55 via-black/25 to-transparent pointer-events-none" />
+        <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/40 via-black/15 to-transparent pointer-events-none" />
 
         {/* Leve sombra suave atrás da área dos cards para destacá-los das montanhas */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_50%_52%,rgba(9,9,11,0.45)_0%,rgba(9,9,11,0.12)_70%,transparent_100%)] pointer-events-none" />
       </motion.div>
 
       {/* =========================================================================
-          CONTEÚDO DA SEÇÃO (COMPACTO E PROPORCIONAL PARA CABER NA TELA)
+          CONTEÚDO DA SEÇÃO (LAYOUT PRESERVADO COM ALTURA EQUILIBRADA)
          ========================================================================= */}
       <div className="relative z-10 w-full max-w-[1740px] mx-auto px-3 sm:px-5 md:px-6 lg:px-7 xl:px-8">
         {/* CABEÇALHO EDITORIAL: Compacto, alinhado e refinado */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-3 sm:gap-4 mb-3.5 sm:mb-4 lg:mb-4.5">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-3 sm:gap-4 mb-5 sm:mb-6 lg:mb-7 xl:mb-8">
           <div className="max-w-xl">
             {/* Tag DIRETO DO ATELIÊ com ícone refinado */}
             <motion.div
@@ -397,12 +471,11 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         </div>
 
         {/* =========================================================================
-            CARROSSEL COMPACTO: Cards redimensionados com altura controlada
-            para caber perfeitamente na tela sem empurrar a página
+            CARROSSEL: Mais produtos adicionados, altura confortável e proporção perfeita
            ========================================================================= */}
         <div
           ref={scrollRef}
-          className="flex gap-3.5 sm:gap-4 lg:gap-4.5 overflow-x-auto scrollbar-none pb-2 pt-0.5 scroll-smooth snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0"
+          className="flex gap-3.5 sm:gap-4 lg:gap-4.5 overflow-x-auto scrollbar-none pb-2.5 pt-0.5 scroll-smooth snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0"
         >
           {CANONICAL_DROP_ITEMS.map((item, index) => {
             const isFav = isInWishlist(item.id);
@@ -428,11 +501,11 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                   delay: 0.12 + index * 0.05,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="group relative w-[205px] sm:w-[230px] md:w-[245px] lg:w-[calc((100%-3*1.125rem)/3.65)] xl:w-[calc((100%-3.5*1.125rem)/4.15)] max-w-[275px] shrink-0 snap-start bg-[#F6F5F0] rounded-[3px] overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.45)] border border-[#E4E1D8] flex flex-col justify-between transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.6)] cursor-pointer"
+                className="group relative w-[215px] sm:w-[240px] md:w-[255px] lg:w-[calc((100%-3*1.125rem)/3.65)] xl:w-[calc((100%-3.5*1.125rem)/4.15)] max-w-[285px] shrink-0 snap-start bg-[#F6F5F0] rounded-[3px] overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.45)] border border-[#E4E1D8] flex flex-col justify-between transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.6)] cursor-pointer"
                 onClick={() => handleCardClick(item)}
               >
-                {/* ÁREA VISUAL DA FOTO: Proporção compacta (1/1.04) para caber na tela */}
-                <div className="relative aspect-[1/1.04] w-full bg-[#EAE7DF] overflow-hidden">
+                {/* ÁREA VISUAL DA FOTO: Proporção elegante (1/1.12) com altura ajustada */}
+                <div className="relative aspect-[1/1.12] w-full bg-[#EAE7DF] overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}

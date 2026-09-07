@@ -4,16 +4,16 @@ import { Category } from '../types';
 export const CATEGORY_IMAGE_STORAGE_KEY = '@marmot_cached_category_images';
 export const CATEGORY_STORAGE_KEY = '@marmot_cached_categories';
 export const CATEGORY_IMAGES_VERSION_KEY = '@marmot_category_images_version';
-export const CURRENT_CATEGORY_IMAGES_VERSION = '20260906_v2';
+export const CURRENT_CATEGORY_IMAGES_VERSION = '20260907_v4_ultrahd';
 
 export const DEFAULT_CATEGORY_IMAGE_URLS: Record<string, string> = {
-  camisetas: '/categories/categoria-camisetas.png?v=20260906_v2',
-  moletons: '/categories/categoria-moletons.png?v=20260906_v2',
-  jaquetas: '/categories/categoria-jaquetas.png?v=20260906_v2',
-  calcas: '/categories/categoria-calcas.png?v=20260906_v2',
-  shorts: '/categories/categoria-shorts.png?v=20260906_v2',
-  tenis: '/categories/categoria-tenis.png?v=20260906_v2',
-  acessorios: '/categories/categoria-acessorios.png?v=20260906_v2',
+  camisetas: '/categories/categoria-camisetas.png?v=20260907_v4_ultrahd',
+  moletons: '/categories/categoria-moletons.png?v=20260907_v4_ultrahd',
+  jaquetas: '/categories/categoria-jaquetas.png?v=20260907_v4_ultrahd',
+  calcas: '/categories/categoria-calcas.png?v=20260907_v4_ultrahd',
+  shorts: '/categories/categoria-shorts.png?v=20260907_v4_ultrahd',
+  tenis: '/categories/categoria-tenis.png?v=20260907_v4_ultrahd',
+  acessorios: '/categories/categoria-acessorios.png?v=20260907_v4_ultrahd',
 };
 
 // Normalize slug/id for consistent key lookup
@@ -54,8 +54,11 @@ export function getAllStoredCategoryImages(): Record<string, string> {
  */
 export function getStoredCategoryImage(slugOrId: string): string | null {
   const norm = normalizeCategorySlug(slugOrId);
+  const defaultUrl = DEFAULT_CATEGORY_IMAGE_URLS[norm];
   const storedMap = getAllStoredCategoryImages();
-  if (storedMap[norm]) {
+
+  // If stored image is a compressed low-res dataUrl or outdated, prefer high-res default asset
+  if (storedMap[norm] && !storedMap[norm].startsWith('data:image/')) {
     return storedMap[norm];
   }
 
@@ -68,14 +71,14 @@ export function getStoredCategoryImage(slugOrId: string): string | null {
         const found = cats.find(
           (c) => normalizeCategorySlug(c.slug || c.id) === norm
         );
-        if (found?.image && !found.image.includes('unsplash.com')) {
+        if (found?.image && !found.image.includes('unsplash.com') && !found.image.startsWith('data:image/')) {
           return found.image;
         }
       }
     }
   } catch {}
 
-  return DEFAULT_CATEGORY_IMAGE_URLS[norm] || null;
+  return defaultUrl || null;
 }
 
 /**
@@ -192,39 +195,17 @@ export async function ensureCategoryImagesStoredInLocalStorage(forceRefresh = fa
 
   const updatedMap: Record<string, string> = { ...stored };
 
-  // First ensure default URLs are recorded
+  // Ensure direct high-resolution URLs are recorded without downscaling
   for (const slug of slugs) {
     const defaultUrl = DEFAULT_CATEGORY_IMAGE_URLS[slug];
-    if (isOutdated || !updatedMap[slug] || updatedMap[slug].includes('unsplash.com')) {
-      updatedMap[slug] = defaultUrl;
-    }
+    updatedMap[slug] = defaultUrl;
   }
 
-  // Save preliminary map so it is instantly available
+  // Save map with HD asset paths
   try {
     localStorage.setItem(CATEGORY_IMAGE_STORAGE_KEY, JSON.stringify(updatedMap));
     localStorage.setItem(CATEGORY_IMAGES_VERSION_KEY, CURRENT_CATEGORY_IMAGES_VERSION);
   } catch {}
-
-  // Next, asynchronously convert to optimized base64 data URLs to guarantee offline persistence in localStorage
-  for (const slug of slugs) {
-    const url = DEFAULT_CATEGORY_IMAGE_URLS[slug];
-    try {
-      const dataUrl = await convertImageToOptimizedDataUrl(url);
-      if (dataUrl && dataUrl.startsWith('data:image/')) {
-        updatedMap[slug] = dataUrl;
-        // Save incrementally to prevent loss if quota is near
-        try {
-          localStorage.setItem(CATEGORY_IMAGE_STORAGE_KEY, JSON.stringify(updatedMap));
-        } catch (storageErr) {
-          console.warn('[CategoryImageStorage] Quota storage warning:', storageErr);
-          break;
-        }
-      }
-    } catch (conversionErr) {
-      console.warn(`[CategoryImageStorage] Falha ao converter imagem ${slug} para base64:`, conversionErr);
-    }
-  }
 
   // Update cached categories with the new images
   try {
