@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { Product } from '../../types';
 import { useWishlist } from '../../context/WishlistContext';
 import { useToast } from '../../context/ToastContext';
@@ -185,16 +185,59 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
   const sectionRef = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hasEntered, setHasEntered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
 
-  // Monitora a rolagem para disparar a animação APENAS quando o usuário descer (de cima do hero para baixo).
-  // Quando estiver perto, a animação suave transiciona o fundo de branco para a imagem.
-  // Quando rolar de baixo para cima, a seção e seus elementos permanecem visíveis sem re-animar.
+  // Scroll tracking contínuo para profundidade visual, background e parallax cinematográfico
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
+
+  // Parallax sutil e contínuo nas montanhas (20-40px no desktop, 10-15px no mobile)
+  const mountainsY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    shouldReduceMotion ? [0, 0] : isMobile ? [-12, 12] : [-25, 25]
+  );
+
+  // Parallax horizontal suave na textura tipográfica NEW DROP
+  const newDropParallaxX = useTransform(
+    scrollYProgress,
+    [0, 1],
+    shouldReduceMotion ? [0, 0] : isMobile ? [12, -12] : [24, -24]
+  );
+
+  // Revelação fluida da escuridão e contraste conforme a seção entra na viewport
+  const bgScrollOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.20],
+    [0.15, 1]
+  );
+
+  const bgScrollFilter = useTransform(
+    scrollYProgress,
+    [0, 0.20],
+    ['contrast(1.15) brightness(0.85)', 'contrast(1.00) brightness(1.00)']
+  );
+
+  const bgScrollTranslateY = useTransform(
+    scrollYProgress,
+    [0, 0.20],
+    shouldReduceMotion ? [0, 0] : isMobile ? [8, 0] : [16, 0]
+  );
+
+  // Monitora o scroll para disparar a coreografia editorial de entrada no momento exato
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
+
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
 
     let lastScrollY = window.scrollY || window.pageYOffset || 0;
     let isScrollingDown = true;
@@ -211,21 +254,19 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
       const rect = el.getBoundingClientRect();
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
 
-      // 1. Reset silencioso: Se o usuário estiver acima da seção (no topo/Hero/Categorias)
-      // e a seção estiver completamente abaixo da viewport (fora do campo visual)
+      // 1. Reset silencioso: Se o usuário estiver acima da seção e ela sair da viewport
       if (rect.top >= windowHeight) {
         setHasEntered(false);
         return;
       }
 
-      // 2. Disparo da animação: Apenas ao rolar para BAIXO quando o topo da seção estiver perto da viewport
-      if (isScrollingDown && rect.top <= windowHeight * 0.98 && rect.bottom >= 0) {
+      // 2. Disparo da animação editorial quando 15-20% da seção entrar na viewport
+      if (isScrollingDown && rect.top <= windowHeight * 0.86 && rect.bottom >= 0) {
         setHasEntered(true);
         return;
       }
 
-      // 3. Ao rolar para CIMA (de baixo para cima):
-      // A seção NUNCA deve re-animar ou ficar invisível. Mantém-se visível em estado final.
+      // 3. Ao rolar para cima: mantém a seção revelada e estável, sem repetições bruscas
       if (!isScrollingDown && rect.bottom >= 0 && rect.top < windowHeight) {
         setHasEntered(true);
       }
@@ -235,16 +276,18 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     const initialRect = el.getBoundingClientRect();
     const initialWindowHeight = window.innerHeight || document.documentElement.clientHeight;
 
-    if (initialScrollY > 200 || (initialRect.top < initialWindowHeight * 0.85 && initialRect.bottom > 0)) {
+    if (initialScrollY > 200 || (initialRect.top < initialWindowHeight * 0.86 && initialRect.bottom > 0)) {
       setHasEntered(true);
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll, { passive: true });
+    window.addEventListener('resize', checkMobile, { passive: true });
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleScroll);
+      window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
@@ -330,43 +373,71 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
       className="relative w-full overflow-hidden py-10 sm:py-12 md:py-14 lg:py-16 xl:py-20 select-none bg-[#09090B]"
     >
       {/* =========================================================================
-          BACKGROUND ART: Imagem deslocada para cima conforme solicitado,
-          revelando a frase "NEW DROP" por completo acima dos cards.
+          BACKGROUND ART: Revelação progressiva da escuridão, parallax sutil
+          nas montanhas e textura tipográfica "NEW DROP"
          ========================================================================= */}
       <motion.div
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
-        animate={
-          hasEntered
-            ? { opacity: 1 }
-            : shouldReduceMotion
-            ? { opacity: 1 }
-            : { opacity: 0 }
-        }
-        transition={{
-          duration: 1.2,
-          ease: [0.25, 0.1, 0.25, 1],
+        style={{
+          opacity: hasEntered ? 1 : bgScrollOpacity,
+          filter: hasEntered ? 'contrast(1.00) brightness(1.00)' : bgScrollFilter,
+          y: hasEntered ? 0 : bgScrollTranslateY,
         }}
         className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#09090B]"
         aria-hidden="true"
       >
-        <img
-          src="/lancamento-hero-v1.png"
-          alt=""
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          onError={(e) => {
-            const target = e.currentTarget;
-            if (!target.dataset.triedFallback1) {
-              target.dataset.triedFallback1 = 'true';
-              target.src = '/lançamento hero v1.png';
-            } else if (!target.dataset.triedFallback2) {
-              target.dataset.triedFallback2 = 'true';
-              target.src = '/categoria design v4.original.png';
-            }
+        <motion.div
+          style={{
+            y: mountainsY,
           }}
-          className="w-full h-[108%] max-w-none object-cover object-top -translate-y-1.5 sm:-translate-y-2 md:-translate-y-3 lg:-translate-y-3.5 select-none"
-        />
+          className="w-full h-full"
+        >
+          <img
+            src="/lancamento-hero-v1.png"
+            alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            onError={(e) => {
+              const target = e.currentTarget;
+              if (!target.dataset.triedFallback1) {
+                target.dataset.triedFallback1 = 'true';
+                target.src = '/lançamento hero v1.png';
+              } else if (!target.dataset.triedFallback2) {
+                target.dataset.triedFallback2 = 'true';
+                target.src = '/categoria design v4.original.png';
+              }
+            }}
+            className="w-full h-[116%] max-w-none object-cover object-top -translate-y-2 sm:-translate-y-3 md:-translate-y-4 lg:-translate-y-4.5 select-none"
+          />
+        </motion.div>
+
+        {/* NEW DROP GIGANTE DE FUNDO: Textura tipográfica sutil com entrada suave e parallax horizontal */}
+        <motion.div
+          style={{
+            x: newDropParallaxX,
+          }}
+          initial={
+            shouldReduceMotion
+              ? { opacity: 0.055, x: 0 }
+              : { opacity: 0, x: isMobile ? 25 : 45 }
+          }
+          animate={
+            hasEntered
+              ? { opacity: 0.055, x: 0 }
+              : shouldReduceMotion
+              ? { opacity: 0.055, x: 0 }
+              : { opacity: 0, x: isMobile ? 25 : 45 }
+          }
+          transition={{
+            duration: 0.85,
+            delay: 0.06,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className="absolute top-1.5 sm:top-2.5 md:top-3.5 left-1/2 -translate-x-1/2 w-full max-w-[1740px] px-3 sm:px-6 pointer-events-none select-none z-[1] overflow-hidden"
+          aria-hidden="true"
+        >
+          
+        </motion.div>
 
         {/* Suave véu no topo para que os textos do cabeçalho e controles fiquem super legíveis */}
         <div className="absolute top-0 inset-x-0 h-24 bg-gradient-to-b from-black/40 via-black/15 to-transparent pointer-events-none" />
@@ -382,45 +453,90 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         {/* CABEÇALHO EDITORIAL: Compacto, alinhado e refinado */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-3 sm:gap-4 mb-5 sm:mb-6 lg:mb-7 xl:mb-8">
           <div className="max-w-xl">
-            {/* Tag DIRETO DO ATELIÊ com ícone refinado */}
+            {/* Tag DIRETO DO ATELIÊ com ícone refinado e micro flash da estrela */}
             <motion.div
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
-              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.22em] text-[#FF6B00] mb-1"
             >
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF6B00] shrink-0">
+              <motion.svg
+                width="11"
+                height="11"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="text-[#FF6B00] shrink-0"
+                initial={shouldReduceMotion ? { scale: 1 } : { scale: 0.7 }}
+                animate={
+                  hasEntered
+                    ? { scale: [0.7, 1.15, 1] }
+                    : shouldReduceMotion
+                    ? { scale: 1 }
+                    : { scale: 0.7 }
+                }
+                transition={{
+                  duration: 0.38,
+                  delay: 0.04,
+                  times: [0, 0.55, 1],
+                  ease: 'easeOut',
+                }}
+              >
                 <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
-              </svg>
+              </motion.svg>
               <span>DIRETO DO ATELIÊ</span>
             </motion.div>
 
-            {/* Título Principal Compacto */}
+            {/* Título Principal Compacto com Impacto Editorial (overshoot 2-3px) */}
             <motion.h2
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: isMobile ? 18 : 28 }}
               animate={
                 hasEntered
-                  ? { opacity: 1, y: 0 }
+                  ? {
+                      opacity: 1,
+                      y: shouldReduceMotion ? 0 : [isMobile ? 18 : 28, -2.5, 0],
+                    }
                   : shouldReduceMotion
-                  ? { opacity: 1 }
-                  : { opacity: 0, y: 8 }
+                  ? { opacity: 1, y: 0 }
+                  : { opacity: 0, y: isMobile ? 18 : 28 }
               }
               transition={{
-                duration: 0.5,
-                delay: 0.06,
-                ease: [0.22, 1, 0.36, 1],
+                duration: 0.52,
+                delay: 0.08,
+                times: [0, 0.7, 1],
+                ease: [0.16, 1, 0.3, 1],
               }}
               className="text-xl sm:text-2xl md:text-3xl lg:text-[30px] font-black uppercase tracking-[-0.02em] text-white leading-none whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]"
             >
               ÚLTIMOS LANÇAMENTOS
             </motion.h2>
 
+            {/* Linha Laranja como Assinatura Visual MARMOT (expande horizontalmente 0 -> 1) */}
+            <div className="relative overflow-hidden py-0.5 my-1">
+              <motion.div
+                initial={shouldReduceMotion ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }}
+                animate={
+                  hasEntered
+                    ? { scaleX: 1, opacity: 1 }
+                    : shouldReduceMotion
+                    ? { scaleX: 1, opacity: 1 }
+                    : { scaleX: 0, opacity: 0 }
+                }
+                transition={{
+                  duration: 0.46,
+                  delay: 0.22,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                style={{ originX: 0 }}
+                className="h-[1.5px] w-28 sm:w-40 md:w-48 bg-gradient-to-r from-[#FF6B00] via-[#FF6B00] to-[#FF6B00]/25 rounded-full shadow-[0_0_8px_rgba(255,107,0,0.55)]"
+              />
+            </div>
+
             {/* Subtítulo Editorial */}
             <motion.p
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
-              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
-              transition={{ duration: 0.45, delay: 0.12, ease: 'easeOut' }}
-              className="text-zinc-300 text-xs sm:text-[12.5px] font-normal tracking-wide mt-1 max-w-lg leading-snug drop-shadow-[0_1px_5px_rgba(0,0,0,0.8)]"
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+              transition={{ duration: 0.42, delay: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="text-zinc-300 text-xs sm:text-[12.5px] font-normal tracking-wide mt-0.5 max-w-lg leading-snug drop-shadow-[0_1px_5px_rgba(0,0,0,0.8)]"
             >
               Novas peças. Tiragem limitada. Feitas para não passar despercebidas.
             </motion.p>
@@ -428,9 +544,9 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
           {/* DROP / 003 ───── VER TODOS ↗ + Setas de Navegação Compactas */}
           <motion.div
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 10 }}
-            animate={hasEntered ? { opacity: 1, x: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 10 }}
-            transition={{ duration: 0.45, delay: 0.15, ease: 'easeOut' }}
+            initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
+            animate={hasEntered ? { opacity: 1, x: 0 } : shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 10 }}
+            transition={{ duration: 0.45, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="flex items-center self-start lg:self-end gap-2.5 sm:gap-3 flex-wrap pb-0.5"
           >
             <div className="flex items-center bg-black/40 backdrop-blur-md px-3 py-1.2 rounded-[2px] border border-white/10">
@@ -486,38 +602,59 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                 key={item.id}
                 initial={
                   shouldReduceMotion
-                    ? { opacity: 1 }
-                    : { opacity: 0, y: 14, x: -4 }
+                    ? { opacity: 1, y: 0, scale: 1 }
+                    : { opacity: 0, y: isMobile ? 22 : 35, scale: 0.975 }
                 }
                 animate={
                   hasEntered
-                    ? { opacity: 1, y: 0, x: 0 }
+                    ? { opacity: 1, y: 0, scale: 1 }
                     : shouldReduceMotion
-                    ? { opacity: 1 }
-                    : { opacity: 0, y: 14, x: -4 }
+                    ? { opacity: 1, y: 0, scale: 1 }
+                    : { opacity: 0, y: isMobile ? 22 : 35, scale: 0.975 }
                 }
                 transition={{
-                  duration: 0.45,
-                  delay: 0.12 + index * 0.05,
-                  ease: [0.22, 1, 0.36, 1],
+                  duration: 0.52,
+                  delay: isMobile ? 0.26 + index * 0.055 : 0.35 + index * 0.08,
+                  ease: [0.16, 1, 0.3, 1],
                 }}
                 className="group relative w-[215px] sm:w-[240px] md:w-[255px] lg:w-[calc((100%-3*1.125rem)/3.65)] xl:w-[calc((100%-3.5*1.125rem)/4.15)] max-w-[285px] shrink-0 snap-start bg-[#F6F5F0] rounded-[3px] overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.45)] border border-[#E4E1D8] flex flex-col justify-between transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.6)] cursor-pointer"
                 onClick={() => handleCardClick(item)}
               >
-                {/* ÁREA VISUAL DA FOTO: Proporção elegante (1/1.12) com altura ajustada */}
+                {/* ÁREA VISUAL DA FOTO: Proporção elegante (1/1.12) com reveal vertical por clip-path e micro-scale */}
                 <div className="relative aspect-[1/1.12] w-full bg-[#EAE7DF] overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                    className={`w-full h-full object-cover object-center transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                      isAccessory
-                        ? 'scale-[1.05] group-hover:scale-[1.08]'
-                        : 'scale-100 group-hover:scale-[1.025]'
-                    }`}
-                  />
+                  <motion.div
+                    initial={
+                      shouldReduceMotion
+                        ? { clipPath: 'inset(0% 0% 0% 0%)', scale: 1 }
+                        : { clipPath: 'inset(100% 0% 0% 0%)', scale: 1.025 }
+                    }
+                    animate={
+                      hasEntered
+                        ? { clipPath: 'inset(0% 0% 0% 0%)', scale: 1 }
+                        : shouldReduceMotion
+                        ? { clipPath: 'inset(0% 0% 0% 0%)', scale: 1 }
+                        : { clipPath: 'inset(100% 0% 0% 0%)', scale: 1.025 }
+                    }
+                    transition={{
+                      duration: 0.56,
+                      delay: isMobile ? 0.30 + index * 0.055 : 0.42 + index * 0.08,
+                      ease: [0.16, 1, 0.3, 1],
+                    }}
+                    className="w-full h-full"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                      className={`w-full h-full object-cover object-center transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                        isAccessory
+                          ? 'scale-[1.05] group-hover:scale-[1.08]'
+                          : 'scale-100 group-hover:scale-[1.025]'
+                      }`}
+                    />
+                  </motion.div>
 
                   {/* Badge Refinado NOVO / 003 */}
                   <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
@@ -595,8 +732,13 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           })}
         </div>
 
-        {/* PARTE INFERIOR: Barra sutil e compacta */}
-        <div className="relative pt-2 sm:pt-2.5 mt-0.5">
+        {/* PARTE INFERIOR: Barra sutil e compacta com estabilização fluida */}
+        <motion.div
+          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+          animate={hasEntered ? { opacity: 1 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.5, delay: 0.65, ease: 'easeOut' }}
+          className="relative pt-2 sm:pt-2.5 mt-0.5"
+        >
           <div className="flex flex-col sm:flex-row items-center justify-between gap-1.5 border-t border-white/10 pt-2 sm:pt-2.5">
             {/* MARMOT / EST. 2018 */}
             <div className="flex items-center gap-2 text-left">
@@ -619,7 +761,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               <span>PERTENCER</span>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
