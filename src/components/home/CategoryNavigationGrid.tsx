@@ -63,25 +63,66 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [isSectionInView, setIsSectionInView] = useState(false);
 
-  // Monitora a visibilidade da seção para disparar a animação dos cards toda vez que o usuário entrar
+  // Monitora a rolagem para disparar a animação APENAS quando o usuário descer (de cima do hero para baixo).
+  // Quando rolar de baixo para cima, a seção permanece estável e visível sem re-animar.
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setIsSectionInView(entry.isIntersecting);
-        });
-      },
-      {
-        threshold: 0.12,
-        rootMargin: '0px 0px -40px 0px',
-      }
-    );
+    let lastScrollY = window.scrollY || window.pageYOffset || 0;
+    let isScrollingDown = true;
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY || window.pageYOffset || 0;
+      const diff = currentScrollY - lastScrollY;
+
+      // Detecta direção com margem para evitar falso-positivo em micro-movimentos
+      if (Math.abs(diff) > 2) {
+        isScrollingDown = diff > 0;
+      }
+      lastScrollY = currentScrollY;
+
+      const rect = el.getBoundingClientRect();
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+      // 1. Reset silencioso: Se o usuário estiver no topo (Hero) e a seção estiver
+      // completamente abaixo da viewport (fora do campo visual), reseta o estado
+      // permitindo nova animação caso o usuário volte a rolar para baixo.
+      if (rect.top >= windowHeight) {
+        setIsSectionInView(false);
+        return;
+      }
+
+      // 2. Disparo da animação: Apenas ao rolar para BAIXO quando o topo da seção entra na viewport
+      if (isScrollingDown && rect.top <= windowHeight * 0.88 && rect.bottom >= 0) {
+        setIsSectionInView(true);
+        return;
+      }
+
+      // 3. Ao rolar para CIMA (de baixo para cima):
+      // A seção NUNCA deve ser escondida ou re-animada.
+      // Se ela estiver na viewport ou acima dela, mantém-se visível no seu estado final.
+      if (!isScrollingDown && rect.bottom >= 0 && rect.top < windowHeight) {
+        setIsSectionInView(true);
+      }
+    };
+
+    // Verificação inicial no carregamento da página
+    const initialScrollY = window.scrollY || window.pageYOffset || 0;
+    const initialRect = el.getBoundingClientRect();
+    const initialWindowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    if (initialScrollY > 100 || (initialRect.top < initialWindowHeight * 0.88 && initialRect.bottom > 0)) {
+      setIsSectionInView(true);
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   // Mouse drag-to-scroll state

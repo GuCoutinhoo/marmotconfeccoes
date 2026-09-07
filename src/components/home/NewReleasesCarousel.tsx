@@ -115,44 +115,75 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
 
-  // Scroll progress for the section relative to viewport:
-  // "start end": when section top touches viewport bottom (progress = 0)
-  // "end start": when section bottom leaves viewport top (progress = 1)
+  // Scroll progress para a transição de opacidade do fundo
+  // Inicia quando o topo da seção encosta no fim da tela ('start end')
+  // Conclui suavemente conforme o usuário se aproxima e centraliza a seção ('start 20%')
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ['start end', 'end start'],
+    offset: ['start end', 'start 20%'],
   });
 
-  // Ultra-smooth, gradual scroll-driven background transition
-  // The smoothstep cubic ease eliminates any sharp snapping or sudden opacity jumps
-  const bgOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.4, 0.6, 1],
-    [0, 1, 1, 0],
-    {
-      ease: (t) => t * t * (3 - 2 * t),
-    }
-  );
+  // Transição suave de opacity acompanhando o scroll (branco -> imagem começa a aparecer -> imagem totalmente visível)
+  const bgOpacity = useTransform(scrollYProgress, [0, 1], [0, 1], {
+    ease: (t) => t * t * (3 - 2 * t),
+  });
 
-  // Trigger content entrance animations whenever entering the section
+  // Monitora a rolagem para disparar a animação APENAS quando o usuário descer (de cima do hero para baixo).
+  // Quando rolar de baixo para cima, a seção e seus elementos permanecem visíveis sem re-animar.
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setHasEntered(entry.isIntersecting);
-        });
-      },
-      {
-        threshold: 0.15,
-        rootMargin: '0px 0px -40px 0px',
-      }
-    );
+    let lastScrollY = window.scrollY || window.pageYOffset || 0;
+    let isScrollingDown = true;
 
-    observer.observe(el);
-    return () => observer.disconnect();
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY || window.pageYOffset || 0;
+      const diff = currentScrollY - lastScrollY;
+
+      if (Math.abs(diff) > 2) {
+        isScrollingDown = diff > 0;
+      }
+      lastScrollY = currentScrollY;
+
+      const rect = el.getBoundingClientRect();
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+      // 1. Reset silencioso: Se o usuário estiver acima da seção (no topo/Hero/Categorias)
+      // e a seção estiver completamente abaixo da viewport (fora do campo visual)
+      if (rect.top >= windowHeight) {
+        setHasEntered(false);
+        return;
+      }
+
+      // 2. Disparo da animação: Apenas ao rolar para BAIXO quando o topo da seção entra na viewport
+      if (isScrollingDown && rect.top <= windowHeight * 0.85 && rect.bottom >= 0) {
+        setHasEntered(true);
+        return;
+      }
+
+      // 3. Ao rolar para CIMA (de baixo para cima):
+      // A seção NUNCA deve re-animar ou ficar invisível. Mantém-se visível em estado final.
+      if (!isScrollingDown && rect.bottom >= 0 && rect.top < windowHeight) {
+        setHasEntered(true);
+      }
+    };
+
+    const initialScrollY = window.scrollY || window.pageYOffset || 0;
+    const initialRect = el.getBoundingClientRect();
+    const initialWindowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    if (initialScrollY > 200 || (initialRect.top < initialWindowHeight * 0.85 && initialRect.bottom > 0)) {
+      setHasEntered(true);
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   const handleScroll = (direction: 'left' | 'right') => {
@@ -234,30 +265,36 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     <section
       ref={sectionRef}
       id="ultimos-lancamentos-drop"
-      className="relative w-full overflow-hidden pt-8 sm:pt-10 md:pt-12 pb-7 sm:pb-8 md:pb-9 select-none bg-[#09090B]"
+      className="relative w-full overflow-hidden pt-8 sm:pt-10 md:pt-12 pb-7 sm:pb-8 md:pb-9 select-none bg-white"
     >
       {/* =========================================================================
-          CAMADA 1: FUNDO ESCURO EDITORIAL
-          CAMADA 2: IMAGEM ORIGINAL "categoria design" COM TRANSIÇÃO SUAVE DE ESCURECIMENTO
+          CAMADA 1 & 2: TRANSIÇÃO SUAVE DE FUNDO BASEADA NO SCROLL
+          A seção começa com fundo branco/normal e conforme o usuário rola para baixo,
+          a imagem e a atmosfera escura aparecem suavemente sem troca brusca:
+          branco -> imagem começa a aparecer -> imagem totalmente visível na seção.
          ========================================================================= */}
       <motion.div
-        style={{ opacity: bgOpacity }}
-        className="absolute inset-0 z-0 pointer-events-none overflow-hidden transition-opacity duration-700 ease-out bg-[#080808] flex items-center justify-center"
+        style={{ opacity: shouldReduceMotion ? 1 : bgOpacity }}
+        className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#080808]"
         aria-hidden="true"
       >
         <img
-          src="/categoria-design-original.png"
+          src="/lancamento-hero-v1.png"
           alt=""
           loading="eager"
+          fetchPriority="high"
           decoding="async"
           onError={(e) => {
             const target = e.currentTarget;
-            if (!target.dataset.triedFallback) {
-              target.dataset.triedFallback = 'true';
+            if (!target.dataset.triedFallback1) {
+              target.dataset.triedFallback1 = 'true';
+              target.src = '/lançamento hero v1.png';
+            } else if (!target.dataset.triedFallback2) {
+              target.dataset.triedFallback2 = 'true';
               target.src = '/categoria design v4.original.png';
             }
           }}
-          className="w-full h-full object-cover object-center select-none"
+          className="w-full h-full object-cover object-top select-none"
         />
       </motion.div>
 
