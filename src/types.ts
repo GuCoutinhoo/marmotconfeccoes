@@ -194,9 +194,14 @@ export type OrderStatus =
 
 export type PaymentStatus = 'Pendente' | 'Pago' | 'Aprovado' | 'Recusado' | 'Cancelado' | 'Estornado' | 'Reembolsado';
 
+export type ShipmentPurchaseStatus = 'not_started' | 'processing' | 'purchased' | 'failed';
+export type LabelGenerationStatus = 'not_started' | 'processing' | 'generated' | 'failed';
+
 export type ShippingDeliveryStatus =
   | 'Aguardando preparação'
+  | 'Aguardando compra de frete'
   | 'Preparando'
+  | 'Frete comprado'
   | 'Envio criado'
   | 'Etiqueta gerada'
   | 'Pronto para envio'
@@ -295,6 +300,14 @@ export interface Order {
   shippingPrice?: number;
   shippingDeliveryTime?: number;
   shippingDestinationPostalCode?: string;
+  shippingQuoteId?: string;
+  shippingOption?: Record<string, any>;
+  shippingDetails?: Record<string, any>;
+  shipmentPurchaseStatus?: ShipmentPurchaseStatus;
+  labelGenerationStatus?: LabelGenerationStatus;
+  shipmentPurchasedAt?: string;
+  labelGeneratedAt?: string;
+  shipmentLastError?: string;
   trackingCode?: string;
   estimatedDelivery: string;
   // Lifecycle Timestamps

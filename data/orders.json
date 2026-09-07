@@ -1,84 +1,20 @@
 [
   {
-    "id": "MM-541081-8590",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "customerCpf": "44606992816",
-    "date": "06/09/2026",
-    "status": "Aguardando Pagamento",
-    "paymentStatus": "Pendente",
-    "shippingStatus": "Aguardando preparação",
+    "id": "MM-347949-9350",
+    "date": "28/08/2026",
     "items": [
       {
-        "id": "item-1788665540963-y9g7",
-        "productId": "prod-cam-002",
-        "sku": "MM-CAM-002",
-        "title": "Camiseta Double Layer",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "price": 189.9,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "weight": 1,
-        "height": 4,
-        "width": 12,
-        "length": 17
-      }
-    ],
-    "subtotal": 189.9,
-    "discount": 0,
-    "shippingFee": 15.97,
-    "total": 205.87,
-    "paymentMethod": "PIX",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "recipientName": "cliente",
-      "cep": "01311100",
-      "street": "Avenida Paulista",
-      "number": "630",
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "city": "São Paulo",
-      "state": "SP",
-      "isDefault": true
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2,
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:32:21",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "paymentDetails": {
-      "mercadoPagoPreferenceId": "3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8"
-    },
-    "createdAt": "2026-09-06T03:32:21.095Z"
-  },
-  {
-    "id": "MM-566590-8715",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788664566470-u1l9",
+        "id": "item-1787881347949-brpu",
         "sku": "MM-CAM-002",
         "size": "P",
         "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
         "price": 189.9,
         "title": "Camiseta Double Layer",
-        "width": 12,
+        "width": 25,
         "height": 4,
-        "length": 17,
-        "weight": 1,
+        "length": 30,
+        "weight": 0.35,
         "quantity": 1,
         "subtotal": 189.9,
         "productId": "prod-cam-002"
@@ -90,552 +26,21 @@
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:16:06",
+        "timestamp": "28/08/2026, 01:42:27",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-09-06T03:16:06.591Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951",
-      "mercadoPagoPreferenceId": "3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-151648-2225",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788664151524-lp3a",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 205.87,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:09:11",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-09-06T03:09:11.663Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "1199999999",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-3822707d-0f4d-4d21-872c-780d8a688375",
-      "mercadoPagoPreferenceId": "3595359362-3822707d-0f4d-4d21-872c-780d8a688375"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-980999-7175",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788663980950-kzwo",
-        "sku": "MM-CAM-002",
-        "size": "M",
-        "color": "Preto + Cinza",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 3,
-        "subtotal": 569.7,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 569.7,
-    "status": "Aguardando Pagamento",
-    "userId": "2aae7be5-30f8-42f8-9dfa-544088d425ab",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:06:21",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 569.7,
-    "createdAt": "2026-09-06T03:06:21.016Z",
-    "customerCpf": "11144477735",
-    "shippingFee": 0,
-    "customerName": "Cliente Teste Local",
-    "customerEmail": "codex-checkout-1788663979719@example.com",
-    "customerPhone": "11999999999",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7",
-      "mercadoPagoPreferenceId": "3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "cep": "01311100",
-      "city": "Sao Paulo",
-      "state": "SP",
-      "number": "1000",
-      "street": "Avenida Paulista",
-      "neighborhood": "Bela Vista",
-      "recipientName": "Cliente Teste Local"
-    },
-    "shippingCarrier": "Melhor Envio",
-    "shippingService": "Transportadora Padrão",
-    "estimatedDelivery": "5 a 7 dias úteis",
-    "shippingDeliveryTime": 5
-  },
-  {
-    "id": "MM-753474-9500",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788663753444-27ez",
-        "sku": "MM-CAM-002",
-        "size": "M",
-        "color": "Preto + Cinza",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 3,
-        "subtotal": 569.7,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 569.7,
-    "status": "Aguardando Pagamento",
-    "userId": "0b53b9c9-bca3-4356-8812-37135c64e299",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:02:33",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 569.7,
-    "createdAt": "2026-09-06T03:02:33.490Z",
-    "customerCpf": "11144477735",
-    "shippingFee": 0,
-    "customerName": "Cliente Teste Local",
-    "customerEmail": "codex-checkout-1788663752340@example.com",
-    "customerPhone": "11999999999",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f",
-      "mercadoPagoPreferenceId": "3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "cep": "01311100",
-      "city": "Sao Paulo",
-      "state": "SP",
-      "number": "1000",
-      "street": "Avenida Paulista",
-      "neighborhood": "Bela Vista",
-      "recipientName": "Cliente Teste Local"
-    },
-    "shippingCarrier": "Melhor Envio",
-    "shippingService": "Transportadora Padrão",
-    "estimatedDelivery": "5 a 7 dias úteis",
-    "shippingDeliveryTime": 5
-  },
-  {
-    "id": "MM-896656-6103",
-    "date": "05/09/2026",
-    "items": [
-      {
-        "id": "item-1788662896509-upg1",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 205.87,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "05/09/2026, 23:48:16",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-09-06T02:48:16.672Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-320340",
-    "date": "30/08/2026",
-    "items": [
-      {
-        "id": "item-1788131636428-74ft",
-        "sku": "MM-CAM-001",
-        "size": "P",
-        "color": "Preto",
-        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
-        "price": 149.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 149.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 165.47,
-    "paidAt": "2026-08-30T19:14:10.000-04:00",
-    "status": "Em Separação",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "30/08/2026, 23:13:56",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "id": "hist-1788131657015-h69e",
-        "source": "mercado_pago",
-        "status": "Em Separação",
-        "orderId": "MM-320340",
-        "newStatus": "Em Separação",
-        "timestamp": "30/08/2026, 23:14:17",
-        "occurredAt": "2026-08-30T19:14:10.000-04:00",
-        "description": "Pagamento de R$ 165.47 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
-        "previousStatus": "Aguardando Pagamento",
-        "externalEventId": "175475070235"
-      }
-    ],
-    "discount": 0,
-    "subtotal": 149.9,
-    "createdAt": "2026-08-30T23:13:56.700Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.57,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-30T19:14:10.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
-      "mercadoPagoPaymentId": "175475070235",
-      "mercadoPagoPreferenceId": "3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Preparando",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "separationStartedAt": "2026-08-30T23:14:16.728Z",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-716508",
-    "date": "30/08/2026",
-    "items": [
-      {
-        "id": "item-1788126185075-mvhl",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      },
-      {
-        "id": "item-1788126185075-z1rd",
-        "sku": "MM-CAM-001",
-        "size": "M",
-        "color": "Preto",
-        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
-        "price": 149.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 149.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 360.92,
-    "paidAt": "2026-08-30T17:43:18.000-04:00",
-    "status": "Em Separação",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "30/08/2026, 21:43:05",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "id": "hist-1788126206778-zt66",
-        "source": "mercado_pago",
-        "status": "Em Separação",
-        "orderId": "MM-716508",
-        "newStatus": "Em Separação",
-        "timestamp": "30/08/2026, 21:43:26",
-        "occurredAt": "2026-08-30T17:43:18.000-04:00",
-        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
-        "previousStatus": "Aguardando Pagamento",
-        "externalEventId": "175462854597"
-      }
-    ],
-    "discount": 0,
-    "subtotal": 339.8,
-    "createdAt": "2026-08-30T21:43:05.555Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 21.12,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-30T17:43:18.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
-      "mercadoPagoPaymentId": "175462854597",
-      "mercadoPagoPreferenceId": "3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Preparando",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "separationStartedAt": "2026-08-30T21:43:25.579Z",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-725901",
-    "date": "30/08/2026",
-    "items": [
-      {
-        "id": "item-1788125107661-8o24",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      },
-      {
-        "id": "item-1788125107661-9wdc",
-        "sku": "MM-CAM-001",
-        "size": "P",
-        "color": "Preto",
-        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
-        "price": 149.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 149.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 360.92,
-    "paidAt": "2026-08-30T17:25:21.000-04:00",
-    "status": "Em Separação",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "30/08/2026, 21:25:08",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "id": "hist-1788125127584-7c75",
-        "source": "mercado_pago",
-        "status": "Em Separação",
-        "orderId": "MM-725901",
-        "newStatus": "Em Separação",
-        "timestamp": "30/08/2026, 21:25:27",
-        "occurredAt": "2026-08-30T17:25:21.000-04:00",
-        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
-        "previousStatus": "Aguardando Pagamento",
-        "externalEventId": "176409955418"
-      }
-    ],
-    "discount": 0,
-    "subtotal": 339.8,
-    "createdAt": "2026-08-30T21:25:08.491Z",
+    "createdAt": "2026-08-28T01:42:27.980Z",
     "customerCpf": "",
-    "shippingFee": 21.12,
+    "shippingFee": 15.97,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
     "customerPhone": "",
     "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-30T17:25:21.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
-      "mercadoPagoPaymentId": "176409955418",
-      "mercadoPagoPreferenceId": "3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Preparando",
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
     "shippingAddress": {
       "id": "addr-1787166871376-6986",
       "cep": "01311100",
@@ -652,135 +57,176 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "separationStartedAt": "2026-08-30T21:25:27.147Z",
     "shippingDeliveryTime": 2
   },
   {
-    "id": "MM-710946",
+    "id": "MM-397031",
     "date": "28/08/2026",
     "items": [
       {
-        "id": "item-1787953148260-2lyb",
-        "sku": "MM-CAM-001",
+        "id": "item-1787881746065-h7m2",
+        "sku": "MM-CAM-002",
         "size": "P",
-        "color": "Preto",
-        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
         "price": 189.9,
-        "title": "Camiseta Contrast Stitch",
+        "title": "Camiseta Double Layer",
         "width": 25,
         "height": 4,
         "length": 30,
         "weight": 0.35,
         "quantity": 1,
         "subtotal": 189.9,
-        "productId": "prod-cam-001"
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 01:49:09",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T01:49:09.290Z",
+    "customerCpf": "",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-647844",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787882074006-9kz5",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 01:54:57",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T01:54:57.088Z",
+    "customerCpf": "",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d",
+      "mercadoPagoPreferenceId": "3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": false,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-295799",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787882728339-jmnb",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
       }
     ],
     "total": 204.92,
-    "status": "Pronto para Envio",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 21:39:08",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "status": "Pagamento Aprovado",
-        "timestamp": "28/08/2026, 21:39:28",
-        "description": "Pagamento de R$ 204.92 aprovado no Mercado Pago (account_money)."
-      },
-      {
-        "status": "Pronto para Envio",
-        "timestamp": "29/08/2026, 21:04:18",
-        "description": "Etiqueta oficial gerada via Melhor Envio (ID: ME-1788037457635, Rastreio: BR-710946-ME)."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-08-28T21:39:08.786Z",
-    "customerCpf": "",
-    "shippingFee": 15.02,
-    "customerName": "cliente",
-    "trackingCode": "BR-710946-ME",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-28T17:39:20.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
-      "mercadoPagoPaymentId": "175159831347",
-      "mercadoPagoPreferenceId": "3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Pronto para envio",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": false,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2,
-    "melhorEnvioShipmentId": "ME-1788037457635"
-  },
-  {
-    "id": "MM-349347",
-    "date": "28/08/2026",
-    "items": [
-      {
-        "id": "item-1787953127218-jz2t",
-        "sku": "MM-CAM-001",
-        "size": "P",
-        "color": "Preto",
-        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
-        "price": 189.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 25,
-        "height": 4,
-        "length": 30,
-        "weight": 0.35,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 204.52,
     "status": "Aguardando Pagamento",
     "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 21:38:48",
+        "timestamp": "28/08/2026, 02:05:28",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T21:38:48.152Z",
+    "createdAt": "2026-08-28T02:05:28.642Z",
     "customerCpf": "",
-    "shippingFee": 14.62,
+    "shippingFee": 15.02,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
     "customerPhone": "",
     "paymentMethod": "PIX",
     "paymentStatus": "Pendente",
     "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70",
-      "mercadoPagoPreferenceId": "3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70"
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-e8515e52-3c5f-4612-a809-bfb6716c9e53",
+      "mercadoPagoPreferenceId": "3595359362-e8515e52-3c5f-4612-a809-bfb6716c9e53"
     },
     "shippingStatus": "Aguardando preparação",
     "shippingAddress": {
@@ -790,7 +236,101 @@
       "state": "SP",
       "number": "630",
       "street": "Avenida Paulista",
-      "isDefault": false,
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-492502",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787882154483-sswd",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 2,
+        "subtotal": 379.8,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 401.32,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 01:55:54",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 01:56:07",
+        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 01:56:08",
+        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 01:56:13",
+        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 01:56:22",
+        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 01:56:26",
+        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 379.8,
+    "createdAt": "2026-08-28T01:55:54.685Z",
+    "customerCpf": "",
+    "shippingFee": 21.52,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pagamento Divergente",
+    "paymentDetails": {
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-2886454d-fd62-4502-a685-4f164c6b8420",
+      "mercadoPagoPaymentId": "175973951218",
+      "mercadoPagoPreferenceId": "3595359362-2886454d-fd62-4502-a685-4f164c6b8420",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
       "complement": "",
       "neighborhood": "Bela Vista",
       "recipientName": "cliente"
@@ -965,70 +505,6 @@
     "shippingDeliveryTime": 2
   },
   {
-    "id": "MM-295799",
-    "date": "28/08/2026",
-    "items": [
-      {
-        "id": "item-1787882728339-jmnb",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 25,
-        "height": 4,
-        "length": 30,
-        "weight": 0.35,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 204.92,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 02:05:28",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-08-28T02:05:28.642Z",
-    "customerCpf": "",
-    "shippingFee": 15.02,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-e8515e52-3c5f-4612-a809-bfb6716c9e53",
-      "mercadoPagoPreferenceId": "3595359362-e8515e52-3c5f-4612-a809-bfb6716c9e53"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
     "id": "MM-377781",
     "date": "28/08/2026",
     "items": [
@@ -1093,143 +569,49 @@
     "shippingDeliveryTime": 2
   },
   {
-    "id": "MM-492502",
+    "id": "MM-349347",
     "date": "28/08/2026",
     "items": [
       {
-        "id": "item-1787882154483-sswd",
-        "sku": "MM-CAM-002",
+        "id": "item-1787953127218-jz2t",
+        "sku": "MM-CAM-001",
         "size": "P",
-        "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "Preto",
+        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
         "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 25,
-        "height": 4,
-        "length": 30,
-        "weight": 0.35,
-        "quantity": 2,
-        "subtotal": 379.8,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 401.32,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 01:55:54",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 01:56:07",
-        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 01:56:08",
-        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 01:56:13",
-        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 01:56:22",
-        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 01:56:26",
-        "description": "Valor pago no gateway (R$ 379.80) diverge do valor esperado do pedido (R$ 401.32). Aprovação bloqueada por segurança."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 379.8,
-    "createdAt": "2026-08-28T01:55:54.685Z",
-    "customerCpf": "",
-    "shippingFee": 21.52,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pagamento Divergente",
-    "paymentDetails": {
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-2886454d-fd62-4502-a685-4f164c6b8420",
-      "mercadoPagoPaymentId": "175973951218",
-      "mercadoPagoPreferenceId": "3595359362-2886454d-fd62-4502-a685-4f164c6b8420",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-647844",
-    "date": "28/08/2026",
-    "items": [
-      {
-        "id": "item-1787882074006-9kz5",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
+        "title": "Camiseta Contrast Stitch",
         "width": 25,
         "height": 4,
         "length": 30,
         "weight": 0.35,
         "quantity": 1,
         "subtotal": 189.9,
-        "productId": "prod-cam-002"
+        "productId": "prod-cam-001"
       }
     ],
-    "total": 205.87,
+    "total": 204.52,
     "status": "Aguardando Pagamento",
     "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 01:54:57",
+        "timestamp": "28/08/2026, 21:38:48",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T01:54:57.088Z",
+    "createdAt": "2026-08-28T21:38:48.152Z",
     "customerCpf": "",
-    "shippingFee": 15.97,
+    "shippingFee": 14.62,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
     "customerPhone": "",
     "paymentMethod": "PIX",
     "paymentStatus": "Pendente",
     "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d",
-      "mercadoPagoPreferenceId": "3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d"
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70",
+      "mercadoPagoPreferenceId": "3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70"
     },
     "shippingStatus": "Aguardando preparação",
     "shippingAddress": {
@@ -1250,6 +632,108 @@
     "shippingServiceId": "2",
     "shippingDeliveryTime": 2
   },
+  {
+    "id": "MM-716508",
+    "date": "30/08/2026",
+    "items": [
+      {
+        "id": "item-1788126185075-mvhl",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      },
+      {
+        "id": "item-1788126185075-z1rd",
+        "sku": "MM-CAM-001",
+        "size": "M",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 360.92,
+    "paidAt": "2026-08-30T17:43:18.000-04:00",
+    "status": "Em Separação",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "30/08/2026, 21:43:05",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "id": "hist-1788126206778-zt66",
+        "source": "mercado_pago",
+        "status": "Em Separação",
+        "orderId": "MM-716508",
+        "newStatus": "Em Separação",
+        "timestamp": "30/08/2026, 21:43:26",
+        "occurredAt": "2026-08-30T17:43:18.000-04:00",
+        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
+        "previousStatus": "Aguardando Pagamento",
+        "externalEventId": "175462854597"
+      }
+    ],
+    "discount": 0,
+    "subtotal": 339.8,
+    "createdAt": "2026-08-30T21:43:05.555Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 21.12,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-30T17:43:18.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
+      "mercadoPagoPaymentId": "175462854597",
+      "mercadoPagoPreferenceId": "3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Preparando",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "separationStartedAt": "2026-08-30T21:43:25.579Z",
+    "shippingDeliveryTime": 2
+  },
+  {},
+  {},
   {
     "id": "MM-394120",
     "date": "28/08/2026",
@@ -1311,21 +795,21 @@
     "shippingDeliveryTime": 2
   },
   {
-    "id": "MM-397031",
-    "date": "28/08/2026",
+    "id": "MM-896656-6103",
+    "date": "05/09/2026",
     "items": [
       {
-        "id": "item-1787881746065-h7m2",
+        "id": "item-1788662896509-upg1",
         "sku": "MM-CAM-002",
         "size": "P",
         "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
         "price": 189.9,
         "title": "Camiseta Double Layer",
-        "width": 25,
+        "width": 12,
         "height": 4,
-        "length": 30,
-        "weight": 0.35,
+        "length": 17,
+        "weight": 1,
         "quantity": 1,
         "subtotal": 189.9,
         "productId": "prod-cam-002"
@@ -1337,23 +821,23 @@
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 01:49:09",
+        "timestamp": "05/09/2026, 23:48:16",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T01:49:09.290Z",
-    "customerCpf": "",
+    "createdAt": "2026-09-06T02:48:16.672Z",
+    "customerCpf": "44606992816",
     "shippingFee": 15.97,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
+    "customerPhone": "11937500667",
     "paymentMethod": "PIX",
     "paymentStatus": "Pendente",
     "shippingStatus": "Aguardando preparação",
     "shippingAddress": {
-      "id": "addr-1787166871376-6986",
+      "id": "addr-1788638781395-1855",
       "cep": "01311100",
       "city": "São Paulo",
       "state": "SP",
@@ -1371,21 +855,141 @@
     "shippingDeliveryTime": 2
   },
   {
-    "id": "MM-347949-9350",
-    "date": "28/08/2026",
+    "id": "MM-753474-9500",
+    "date": "06/09/2026",
     "items": [
       {
-        "id": "item-1787881347949-brpu",
+        "id": "item-1788663753444-27ez",
+        "sku": "MM-CAM-002",
+        "size": "M",
+        "color": "Preto + Cinza",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 3,
+        "subtotal": 569.7,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 569.7,
+    "status": "Aguardando Pagamento",
+    "userId": "0b53b9c9-bca3-4356-8812-37135c64e299",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:02:33",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 569.7,
+    "createdAt": "2026-09-06T03:02:33.490Z",
+    "customerCpf": "11144477735",
+    "shippingFee": 0,
+    "customerName": "Cliente Teste Local",
+    "customerEmail": "codex-checkout-1788663752340@example.com",
+    "customerPhone": "11999999999",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f",
+      "mercadoPagoPreferenceId": "3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "cep": "01311100",
+      "city": "Sao Paulo",
+      "state": "SP",
+      "number": "1000",
+      "street": "Avenida Paulista",
+      "neighborhood": "Bela Vista",
+      "recipientName": "Cliente Teste Local"
+    },
+    "shippingCarrier": "Melhor Envio",
+    "shippingService": "Transportadora Padrão",
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "shippingDeliveryTime": 5
+  },
+  {
+    "id": "MM-980999-7175",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788663980950-kzwo",
+        "sku": "MM-CAM-002",
+        "size": "M",
+        "color": "Preto + Cinza",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 3,
+        "subtotal": 569.7,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 569.7,
+    "status": "Aguardando Pagamento",
+    "userId": "2aae7be5-30f8-42f8-9dfa-544088d425ab",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:06:21",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 569.7,
+    "createdAt": "2026-09-06T03:06:21.016Z",
+    "customerCpf": "11144477735",
+    "shippingFee": 0,
+    "customerName": "Cliente Teste Local",
+    "customerEmail": "codex-checkout-1788663979719@example.com",
+    "customerPhone": "11999999999",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7",
+      "mercadoPagoPreferenceId": "3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "cep": "01311100",
+      "city": "Sao Paulo",
+      "state": "SP",
+      "number": "1000",
+      "street": "Avenida Paulista",
+      "neighborhood": "Bela Vista",
+      "recipientName": "Cliente Teste Local"
+    },
+    "shippingCarrier": "Melhor Envio",
+    "shippingService": "Transportadora Padrão",
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "shippingDeliveryTime": 5
+  },
+  {
+    "id": "MM-151648-2225",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788664151524-lp3a",
         "sku": "MM-CAM-002",
         "size": "P",
         "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
         "price": 189.9,
         "title": "Camiseta Double Layer",
-        "width": 25,
+        "width": 12,
         "height": 4,
-        "length": 30,
-        "weight": 0.35,
+        "length": 17,
+        "weight": 1,
         "quantity": 1,
         "subtotal": 189.9,
         "productId": "prod-cam-002"
@@ -1397,21 +1001,362 @@
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 01:42:27",
+        "timestamp": "06/09/2026, 00:09:11",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T01:42:27.980Z",
-    "customerCpf": "",
+    "createdAt": "2026-09-06T03:09:11.663Z",
+    "customerCpf": "44606992816",
     "shippingFee": 15.97,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
+    "customerPhone": "1199999999",
     "paymentMethod": "PIX",
     "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-3822707d-0f4d-4d21-872c-780d8a688375",
+      "mercadoPagoPreferenceId": "3595359362-3822707d-0f4d-4d21-872c-780d8a688375"
+    },
     "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-566590-8715",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788664566470-u1l9",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:16:06",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-09-06T03:16:06.591Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951",
+      "mercadoPagoPreferenceId": "3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-541081-8590",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788665540963-y9g7",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:32:21",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-09-06T03:32:21.095Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8",
+      "mercadoPagoPreferenceId": "3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-057744-8797",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788745057582-uum3",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 22:37:37",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-09-07T01:37:37.748Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-d52cb017-125b-45db-834e-ce9c984957bd",
+      "mercadoPagoPreferenceId": "3595359362-d52cb017-125b-45db-834e-ce9c984957bd"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-205629-8577",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788745205481-l8ru",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 165.47,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 22:40:05",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 149.9,
+    "createdAt": "2026-09-07T01:40:05.629Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.57,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620",
+      "mercadoPagoPreferenceId": "3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2
+  },
+  {
+    "id": "MM-710946",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787953148260-2lyb",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
+        "price": 189.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 204.92,
+    "status": "Pronto para Envio",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 21:39:08",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "status": "Pagamento Aprovado",
+        "timestamp": "28/08/2026, 21:39:28",
+        "description": "Pagamento de R$ 204.92 aprovado no Mercado Pago (account_money)."
+      },
+      {
+        "status": "Pronto para Envio",
+        "timestamp": "29/08/2026, 21:04:18",
+        "description": "Etiqueta oficial gerada via Melhor Envio (ID: ME-1788037457635, Rastreio: BR-710946-ME)."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T21:39:08.786Z",
+    "customerCpf": "",
+    "shippingFee": 15.02,
+    "customerName": "cliente",
+    "trackingCode": "BR-710946-ME",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-28T17:39:20.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
+      "mercadoPagoPaymentId": "175159831347",
+      "mercadoPagoPreferenceId": "3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Pronto para envio",
     "shippingAddress": {
       "id": "addr-1787166871376-6986",
       "cep": "01311100",
@@ -1428,7 +1373,191 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "melhorEnvioShipmentId": "ME-1788037457635"
+  },
+  {
+    "id": "MM-320340",
+    "date": "30/08/2026",
+    "items": [
+      {
+        "id": "item-1788131636428-74ft",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 165.47,
+    "paidAt": "2026-08-30T19:14:10.000-04:00",
+    "status": "Em Separação",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "30/08/2026, 23:13:56",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "id": "hist-1788131657015-h69e",
+        "source": "mercado_pago",
+        "status": "Em Separação",
+        "orderId": "MM-320340",
+        "newStatus": "Em Separação",
+        "timestamp": "30/08/2026, 23:14:17",
+        "occurredAt": "2026-08-30T19:14:10.000-04:00",
+        "description": "Pagamento de R$ 165.47 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
+        "previousStatus": "Aguardando Pagamento",
+        "externalEventId": "175475070235"
+      }
+    ],
+    "discount": 0,
+    "subtotal": 149.9,
+    "createdAt": "2026-08-30T23:13:56.700Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.57,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-30T19:14:10.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
+      "mercadoPagoPaymentId": "175475070235",
+      "mercadoPagoPreferenceId": "3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Preparando",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "separationStartedAt": "2026-08-30T23:14:16.728Z",
     "shippingDeliveryTime": 2
   },
-  {}
+  {
+    "id": "MM-725901",
+    "date": "30/08/2026",
+    "items": [
+      {
+        "id": "item-1788125107661-8o24",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      },
+      {
+        "id": "item-1788125107661-9wdc",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 360.92,
+    "paidAt": "2026-08-30T17:25:21.000-04:00",
+    "status": "Em Separação",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "30/08/2026, 21:25:08",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "id": "hist-1788125127584-7c75",
+        "source": "mercado_pago",
+        "status": "Em Separação",
+        "orderId": "MM-725901",
+        "newStatus": "Em Separação",
+        "timestamp": "30/08/2026, 21:25:27",
+        "occurredAt": "2026-08-30T17:25:21.000-04:00",
+        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
+        "previousStatus": "Aguardando Pagamento",
+        "externalEventId": "176409955418"
+      }
+    ],
+    "discount": 0,
+    "subtotal": 339.8,
+    "createdAt": "2026-08-30T21:25:08.491Z",
+    "customerCpf": "",
+    "shippingFee": 21.12,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-30T17:25:21.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
+      "mercadoPagoPaymentId": "176409955418",
+      "mercadoPagoPreferenceId": "3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Preparando",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": false,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "separationStartedAt": "2026-08-30T21:25:27.147Z",
+    "shippingDeliveryTime": 2
+  }
 ]

@@ -211,9 +211,15 @@ export type OrderStatus =
 
 export type PaymentStatus = 'Pendente' | 'Aprovado' | 'Recusado' | 'Cancelado' | 'Reembolsado';
 
+export type ShipmentPurchaseStatus = 'not_started' | 'processing' | 'purchased' | 'failed';
+export type LabelGenerationStatus = 'not_started' | 'processing' | 'generated' | 'failed';
+
 export type ShippingDeliveryStatus =
   | 'Aguardando preparação'
+  | 'Aguardando compra de frete'
   | 'Preparando'
+  | 'Frete comprado'
+  | 'Etiqueta gerada'
   | 'Pronto para envio'
   | 'Despachado'
   | 'Postado'
@@ -266,6 +272,14 @@ export interface Order {
   shippingServiceId?: string;
   shippingDeliveryTime?: number;
   shippingStatus?: any;
+  shippingQuoteId?: string;
+  shippingOption?: any;
+  shippingDetails?: any;
+  shipmentPurchaseStatus?: ShipmentPurchaseStatus;
+  labelGenerationStatus?: LabelGenerationStatus;
+  shipmentPurchasedAt?: string;
+  labelGeneratedAt?: string;
+  shipmentLastError?: string;
   shippingFee: number;
   shippingPrice?: number;
   estimatedDelivery?: string;
@@ -2659,7 +2673,21 @@ export class DatabaseManager {
           if (!error && data) {
             const sbOrders: Order[] = data.map((item: any) => {
               if (item.data && typeof item.data === 'object' && item.data.id) {
-                return item.data;
+                return {
+                  ...item.data,
+                  id: item.id || item.data.id,
+                  paymentStatus: item.payment_status || item.data.paymentStatus,
+                  shippingStatus: item.shipping_status || item.data.shippingStatus,
+                  shippingQuoteId: item.shipping_quote_id || item.data.shippingQuoteId,
+                  shipmentPurchaseStatus: item.shipment_purchase_status || item.data.shipmentPurchaseStatus || 'not_started',
+                  labelGenerationStatus: item.label_generation_status || item.data.labelGenerationStatus || 'not_started',
+                  shipmentPurchasedAt: item.shipment_purchased_at || item.data.shipmentPurchasedAt,
+                  labelGeneratedAt: item.label_generated_at || item.data.labelGeneratedAt,
+                  shipmentLastError: item.shipment_last_error || item.data.shipmentLastError,
+                  melhorEnvioShipmentId: item.melhor_envio_shipment_id || item.data.melhorEnvioShipmentId,
+                  shippingLabelUrl: item.shipping_label_url || item.data.shippingLabelUrl,
+                  trackingCode: item.tracking_code || item.data.trackingCode,
+                };
               }
               return {
                 id: item.id || item.order_number,
@@ -2690,6 +2718,14 @@ export class DatabaseManager {
                   mercadoPagoPaymentId: item.mercado_pago_payment_id || null,
                 },
                 shippingDetails: item.data?.shippingDetails || null,
+                shippingQuoteId: item.shipping_quote_id || undefined,
+                shipmentPurchaseStatus: item.shipment_purchase_status || 'not_started',
+                labelGenerationStatus: item.label_generation_status || 'not_started',
+                shipmentPurchasedAt: item.shipment_purchased_at || undefined,
+                labelGeneratedAt: item.label_generated_at || undefined,
+                shipmentLastError: item.shipment_last_error || undefined,
+                melhorEnvioShipmentId: item.melhor_envio_shipment_id || undefined,
+                shippingLabelUrl: item.shipping_label_url || undefined,
                 createdAt: item.created_at || new Date().toISOString(),
               };
             });
@@ -2742,7 +2778,21 @@ export class DatabaseManager {
             .maybeSingle();
 
           if (!error && data) {
-            const order: Order = (data.data && typeof data.data === 'object' && data.data.id) ? data.data : {
+            const order: Order = (data.data && typeof data.data === 'object' && data.data.id) ? {
+              ...data.data,
+              id: data.id || data.data.id,
+              paymentStatus: data.payment_status || data.data.paymentStatus,
+              shippingStatus: data.shipping_status || data.data.shippingStatus,
+              shippingQuoteId: data.shipping_quote_id || data.data.shippingQuoteId,
+              shipmentPurchaseStatus: data.shipment_purchase_status || data.data.shipmentPurchaseStatus || 'not_started',
+              labelGenerationStatus: data.label_generation_status || data.data.labelGenerationStatus || 'not_started',
+              shipmentPurchasedAt: data.shipment_purchased_at || data.data.shipmentPurchasedAt,
+              labelGeneratedAt: data.label_generated_at || data.data.labelGeneratedAt,
+              shipmentLastError: data.shipment_last_error || data.data.shipmentLastError,
+              melhorEnvioShipmentId: data.melhor_envio_shipment_id || data.data.melhorEnvioShipmentId,
+              shippingLabelUrl: data.shipping_label_url || data.data.shippingLabelUrl,
+              trackingCode: data.tracking_code || data.data.trackingCode,
+            } : {
               id: data.id || clean,
               userId: data.user_id || undefined,
               customerName: data.customer_name || 'Cliente Marmot',
@@ -2768,6 +2818,14 @@ export class DatabaseManager {
               history: data.history || [],
               paymentDetails: data.data?.paymentDetails || {},
               shippingDetails: data.data?.shippingDetails || null,
+              shippingQuoteId: data.shipping_quote_id || undefined,
+              shipmentPurchaseStatus: data.shipment_purchase_status || 'not_started',
+              labelGenerationStatus: data.label_generation_status || 'not_started',
+              shipmentPurchasedAt: data.shipment_purchased_at || undefined,
+              labelGeneratedAt: data.label_generated_at || undefined,
+              shipmentLastError: data.shipment_last_error || undefined,
+              melhorEnvioShipmentId: data.melhor_envio_shipment_id || undefined,
+              shippingLabelUrl: data.shipping_label_url || undefined,
               createdAt: data.created_at || new Date().toISOString(),
             };
 
@@ -2819,6 +2877,7 @@ export class DatabaseManager {
           delivery_time: order.shippingDeliveryTime || null,
         },
         shipping_details: (order as any).shippingDetails || null,
+        shipping_quote_id: order.shippingQuoteId || (order as any).shipping_quote_id || null,
         shipping_carrier: order.shippingCarrier || null,
         shipping_provider: (order as any).shippingProvider || order.shippingCarrier || null,
         shipping_service: order.shippingService || null,
@@ -2828,13 +2887,18 @@ export class DatabaseManager {
         payment_details: order.paymentDetails || {},
         subtotal: Number(order.subtotal || 0),
         shipping_fee: Number(order.shippingFee || (order as any).shipping || 0),
-        shipping_price: Number(order.shippingFee || (order as any).shipping || 0),
+        shipping_price: Number(order.shippingPrice ?? order.shippingFee ?? (order as any).shipping ?? 0),
         discount: Number(order.discount || 0),
         coupon_code: (order as any).couponCode || (order as any).coupon_code || null,
         total: Number(order.total || 0),
         status: order.status || 'Aguardando Pagamento',
         payment_status: order.paymentStatus || (order.status === 'Pagamento Aprovado' || order.status === 'Em Separação' ? 'Pago' : 'Pendente'),
         shipping_status: order.shippingStatus || 'Aguardando preparação',
+        shipment_purchase_status: order.shipmentPurchaseStatus || 'not_started',
+        label_generation_status: order.labelGenerationStatus || 'not_started',
+        shipment_purchased_at: order.shipmentPurchasedAt || null,
+        label_generated_at: order.labelGeneratedAt || null,
+        shipment_last_error: order.shipmentLastError || null,
         tracking_code: order.trackingCode || null,
         tracking_url: (order as any).trackingUrl || (order as any).tracking_url || null,
         paid_at: order.paidAt || (order.paymentStatus === 'Pago' ? (order.createdAt || new Date().toISOString()) : null),
@@ -4262,25 +4326,22 @@ export class DatabaseManager {
     await this.initialize();
     if (this.mode === 'supabase') {
       try {
-        const client = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (client) {
-          const { data, error } = await client.rpc('claim_webhook_event', {
-            p_gateway: provider,
-            p_event_key: eventId,
-            p_topic: eventType,
-            p_payload: payload || {},
-          });
-          if (!error && data) {
-            return { shouldProcess: Boolean(data.should_process), status: String(data.status) };
-          }
-          if (error) {
-            console.warn('[DB] Supabase claim_webhook_event error:', error.message);
-            return { shouldProcess: false, status: 'claim_error' };
-          }
+        const client = await this.getRequiredSupabaseAdminClient('aquisição do lock de webhook');
+        const { data, error } = await client.rpc('claim_webhook_event', {
+          p_gateway: provider,
+          p_event_key: eventId,
+          p_topic: eventType,
+          p_payload: payload || {},
+        });
+        if (error) {
+          throw new Error(error.message);
+        }
+        if (data) {
+          return { shouldProcess: Boolean(data.should_process ?? data.shouldProcess), status: String(data.status) };
         }
       } catch (err: any) {
-        console.warn('[DB] Supabase claim_webhook_event exception:', err?.message || err);
-        return { shouldProcess: false, status: 'claim_exception' };
+        console.error('[DB] Supabase claim_webhook_event exception:', err?.message || err);
+        throw err;
       }
     }
     if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
@@ -4298,18 +4359,20 @@ export class DatabaseManager {
     await this.initialize();
     if (this.mode === 'supabase') {
       try {
-        const client = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (client) {
-          await client.rpc('complete_webhook_event', {
-            p_gateway: provider,
-            p_event_key: eventId,
-            p_status: errorMsg ? 'failed' : 'completed',
-            p_order_id: orderId || null,
-            p_error: errorMsg || null,
-          });
+        const client = await this.getRequiredSupabaseAdminClient('finalização do webhook');
+        const { error } = await client.rpc('complete_webhook_event', {
+          p_gateway: provider,
+          p_event_key: eventId,
+          p_status: errorMsg ? 'failed' : 'completed',
+          p_order_id: orderId || null,
+          p_error: errorMsg || null,
+        });
+        if (error) {
+          throw new Error(error.message);
         }
       } catch (err: any) {
-        console.warn('[DB] Supabase complete_webhook_event error:', err?.message || err);
+        console.error('[DB] Supabase complete_webhook_event error:', err?.message || err);
+        throw err;
       }
     }
   }
@@ -5191,58 +5254,30 @@ export class DatabaseManager {
     }
   }
 
-  public async claimShipmentGeneration(orderId: string): Promise<{ shouldProcess: boolean; isLocked?: boolean; existing?: any }> {
+  public async claimShipmentGeneration(orderId: string): Promise<{ shouldProcess: boolean; isLocked?: boolean; lockToken?: string; existing?: any }> {
     await this.initialize();
     const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
     const now = new Date().toISOString();
 
-    if (this.mode === 'supabase' && this.supabase) {
+    if (this.mode === 'supabase') {
       try {
-        const { data: existingOp, error: selectErr } = await this.supabase
-          .from('shipment_operations')
-          .select('*')
-          .eq('order_id', orderId)
-          .maybeSingle();
-
-        if (selectErr) {
-          console.error('[DB] Supabase claimShipmentGeneration query error:', selectErr.message);
-          if (isProd) {
-            throw new Error(`Infraestrutura de logística não configurada no Supabase (tabela shipment_operations: ${selectErr.message}). Execute a migration.`);
-          }
-        }
-
-        if (existingOp) {
-          if (existingOp.status === 'completed' && (existingOp.print_url || existingOp.shipment_id)) {
-            return { shouldProcess: false, isLocked: false, existing: existingOp };
-          }
-          if (existingOp.status === 'processing') {
-            const ageMs = Date.now() - new Date(existingOp.updated_at || existingOp.created_at).getTime();
-            // Lock ativo se a operação foi iniciada a menos de 2 minutos
-            if (ageMs < 2 * 60 * 1000) {
-              return { shouldProcess: false, isLocked: true, existing: existingOp };
-            }
-            console.warn(`[DB] Lock expirado (${Math.round(ageMs / 1000)}s atrás) para o pedido ${orderId}. Reconciliando operação.`);
-          }
-        }
-
-        // Adquire lock atômico no banco
-        const { error: upsertErr } = await this.supabase.from('shipment_operations').upsert({
-          order_id: orderId,
-          status: 'processing',
-          shipment_id: existingOp?.shipment_id || null,
-          current_step: 'validating',
-          error: null,
-          updated_at: now,
+        const adminClient = await this.getRequiredSupabaseAdminClient('aquisição do lock de expedição');
+        const { data, error } = await adminClient.rpc('claim_shipment_operation', {
+          p_order_id: orderId,
+          p_lock_timeout_seconds: 300,
         });
 
-        if (upsertErr) {
-          console.error('[DB] Supabase claim lock error:', upsertErr.message);
-          if (isProd) {
-            throw new Error(`Falha ao adquirir lock de geração de envio: ${upsertErr.message}`);
-          }
+        if (error) {
+          throw new Error(`Falha ao adquirir lock atômico de expedição: ${error.message}. Execute a migration complete_shipping_fulfillment.`);
         }
 
-        return { shouldProcess: true, existing: existingOp };
+        const operation = data?.operation || null;
+        return {
+          shouldProcess: Boolean(data?.should_process),
+          isLocked: Boolean(data?.is_locked),
+          lockToken: data?.lock_token || operation?.lock_token || undefined,
+          existing: operation,
+        };
       } catch (err: any) {
         if (isProd) throw err;
         console.warn('[DB] Supabase claimShipmentGeneration notice:', err);
@@ -5268,26 +5303,48 @@ export class DatabaseManager {
       status: 'processing',
       currentStep: 'validating',
       shipmentId: existing?.shipmentId || null,
+      lockToken: crypto.randomUUID(),
       updatedAt: now,
     };
     const idx = this.shipmentOperations.findIndex((o) => o.orderId === orderId);
     if (idx >= 0) this.shipmentOperations[idx] = op;
     else this.shipmentOperations.push(op);
 
-    return { shouldProcess: true, existing };
+    return { shouldProcess: true, lockToken: op.lockToken, existing };
   }
 
-  public async updateShipmentStep(orderId: string, step: string, shipmentId?: string): Promise<void> {
+  public async updateShipmentStep(
+    orderId: string,
+    step: string,
+    shipmentId?: string,
+    lockToken?: string,
+    lifecycle?: { purchasedAt?: string; labelGeneratedAt?: string; status?: 'processing' | 'completed' | 'failed'; trackingCode?: string; printUrl?: string; error?: string },
+  ): Promise<void> {
+    await this.initialize();
     const now = new Date().toISOString();
-    if (this.mode === 'supabase' && this.supabase) {
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
+    if (this.mode === 'supabase') {
       try {
+        const adminClient = await this.getRequiredSupabaseAdminClient('atualização do estado da expedição');
         const updateData: any = {
           current_step: step,
           updated_at: now,
         };
         if (shipmentId) updateData.shipment_id = shipmentId;
-        await this.supabase.from('shipment_operations').update(updateData).eq('order_id', orderId);
-      } catch (err) {
+        if (lifecycle?.purchasedAt) updateData.purchased_at = lifecycle.purchasedAt;
+        if (lifecycle?.labelGeneratedAt) updateData.label_generated_at = lifecycle.labelGeneratedAt;
+        if (lifecycle?.status) updateData.status = lifecycle.status;
+        if (lifecycle?.trackingCode) updateData.tracking_code = lifecycle.trackingCode;
+        if (lifecycle?.printUrl) updateData.print_url = lifecycle.printUrl;
+        if (lifecycle?.error !== undefined) updateData.error = lifecycle.error || null;
+
+        let query = adminClient.from('shipment_operations').update(updateData).eq('order_id', orderId);
+        if (lockToken) query = query.eq('lock_token', lockToken);
+        const { data, error } = await query.select('order_id').maybeSingle();
+        if (error) throw error;
+        if (!data) throw new Error('Lock de expedição perdido ou operação inexistente.');
+      } catch (err: any) {
+        if (isProd) throw err;
         console.warn('[DB] Supabase updateShipmentStep notice:', err);
       }
     }
@@ -5296,6 +5353,12 @@ export class DatabaseManager {
     if (op) {
       op.currentStep = step;
       if (shipmentId) op.shipmentId = shipmentId;
+      if (lifecycle?.purchasedAt) op.purchasedAt = lifecycle.purchasedAt;
+      if (lifecycle?.labelGeneratedAt) op.labelGeneratedAt = lifecycle.labelGeneratedAt;
+      if (lifecycle?.status) op.status = lifecycle.status;
+      if (lifecycle?.trackingCode) op.trackingCode = lifecycle.trackingCode;
+      if (lifecycle?.printUrl) op.printUrl = lifecycle.printUrl;
+      if (lifecycle?.error !== undefined) op.error = lifecycle.error;
       op.updatedAt = now;
     }
   }
@@ -5306,25 +5369,37 @@ export class DatabaseManager {
     trackingCode?: string,
     printUrl?: string,
     error?: string,
-    currentStep?: string
+    currentStep?: string,
+    lockToken?: string,
   ): Promise<void> {
     await this.initialize();
     const status = error ? 'failed' : 'completed';
     const now = new Date().toISOString();
 
-    if (this.mode === 'supabase' && this.supabase) {
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
+    if (this.mode === 'supabase') {
       try {
-        await this.supabase.from('shipment_operations').upsert({
-          order_id: orderId,
+        const adminClient = await this.getRequiredSupabaseAdminClient('finalização da operação de expedição');
+        const updateData: any = {
           status,
-          shipment_id: shipmentId || null,
-          tracking_code: trackingCode || null,
-          print_url: printUrl || null,
           current_step: currentStep || status,
           error: error || null,
+          error_message: error || null,
+          lock_expires_at: now,
           updated_at: now,
-        });
-      } catch (err) {
+        };
+        if (shipmentId) updateData.shipment_id = shipmentId;
+        if (trackingCode) updateData.tracking_code = trackingCode;
+        if (printUrl) updateData.print_url = printUrl;
+        if (!error) updateData.completed_at = now;
+
+        let query = adminClient.from('shipment_operations').update(updateData).eq('order_id', orderId);
+        if (lockToken) query = query.eq('lock_token', lockToken);
+        const { data, error: updateError } = await query.select('order_id').maybeSingle();
+        if (updateError) throw updateError;
+        if (!data) throw new Error('Lock de expedição perdido ou operação inexistente.');
+      } catch (err: any) {
+        if (isProd) throw err;
         console.warn('[DB] Supabase completeShipmentGeneration notice:', err);
       }
     }
@@ -6898,6 +6973,17 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
         ? dbProd.promoPrice
         : dbProd.price;
 
+      const weight = Number(dbProd.weight);
+      const height = Number(dbProd.height);
+      const width = Number(dbProd.width);
+      const length = Number(dbProd.length);
+      if (![officialPrice, weight, height, width, length].every((value) => Number.isFinite(value) && value > 0)) {
+        return res.status(400).json({
+          error: `Produto "${dbProd.title}" sem preço, peso ou dimensões oficiais válidas para expedição.`,
+          code: 'INVALID_PRODUCT_SPECS',
+        });
+      }
+
       const itemSubtotal = officialPrice * requestedQty;
       authoritativeSubtotal += itemSubtotal;
 
@@ -6911,10 +6997,10 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
         color: rawItem.color || 'black',
         colorName: rawItem.colorName || 'Preto',
         image: rawItem.image || dbProd.image || '',
-        weight: dbProd.weight || 0.35,
-        height: dbProd.height || 4,
-        width: dbProd.width || 20,
-        length: dbProd.length || 25,
+        weight,
+        height,
+        width,
+        length,
       });
     }
 
@@ -6992,10 +7078,17 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
 
       validatedQuoteData = quoteData;
       validatedShippingFee = isFreeShipping ? 0 : Number(quoteData.price.toFixed(2));
-    } else if (isFreeShipping) {
-      validatedShippingFee = 0;
     } else {
-      return res.status(400).json({ error: 'Cotação de frete obrigatória para pedidos com subtotal inferior a R$ 399,00. Por favor, calcule o frete para prosseguir.' });
+      return res.status(400).json({
+        error: 'Cotação real de frete obrigatória para todos os pedidos, inclusive quando a loja oferece frete grátis ao cliente.',
+        code: 'SHIPPING_QUOTE_REQUIRED',
+      });
+    }
+
+    const shippingAddress = body.shippingAddress;
+    const requiredAddressFields = ['street', 'number', 'neighborhood', 'city', 'state'] as const;
+    if (!shippingAddress || requiredAddressFields.some((field) => !String(shippingAddress[field] || '').trim())) {
+      return res.status(400).json({ error: 'Endereço de entrega incompleto.', code: 'INCOMPLETE_DEST_ADDRESS' });
     }
 
     const calculatedTotal = Math.max(0, Number((authoritativeSubtotal - authoritativeDiscount + validatedShippingFee).toFixed(2)));
@@ -7032,20 +7125,42 @@ app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), 
       customerPhone: sanitizeInput(body.customerPhone || (authUser as any)?.phone || ''),
       customerCpf: sanitizeInput(body.customerCpf || (authUser as any)?.cpf || ''),
       items: validatedItems,
-      shippingAddress: body.shippingAddress || {
-        recipientName: body.customerName || 'Cliente',
-        street: 'Avenida Principal',
-        number: '100',
-        neighborhood: 'Centro',
-        city: 'São Paulo',
-        state: 'SP',
-        cep: '01001-000',
+      shippingAddress,
+      shippingQuoteId: validatedQuoteData.id,
+      shippingOption: {
+        quoteId: validatedQuoteData.id,
+        serviceId: validatedQuoteData.service_id,
+        companyId: validatedQuoteData.company_id || undefined,
+        carrier: validatedQuoteData.carrier,
+        company: validatedQuoteData.carrier,
+        name: validatedQuoteData.service_name,
+        serviceName: validatedQuoteData.service_name,
+        quotedPrice: Number(validatedQuoteData.price),
+        customerPrice: validatedShippingFee,
+        originalPrice: Number(validatedQuoteData.original_price || validatedQuoteData.price),
+        deliveryTime: Number(validatedQuoteData.delivery_time),
+        currency: validatedQuoteData.currency || 'BRL',
+        originPostalCode: validatedQuoteData.origin_postal_code,
+        destinationPostalCode: validatedQuoteData.destination_postal_code,
+        environment: validatedQuoteData.environment,
       },
-      shippingOption: body.shippingOption || { id: 'pac', name: 'PAC - Correios', price: validatedShippingFee, deadline: '5 a 8 dias úteis' },
+      shippingDetails: {
+        source: 'melhor_envio_api',
+        quoteId: validatedQuoteData.id,
+        quotedAt: validatedQuoteData.created_at,
+        quoteExpiresAt: validatedQuoteData.expires_at,
+        destination: shippingAddress,
+      },
       shippingFee: validatedShippingFee,
-      shippingServiceId: (validatedQuoteData && validatedQuoteData.service_id !== undefined && validatedQuoteData.service_id !== null)
-        ? String(validatedQuoteData.service_id)
-        : (body.shippingServiceId !== undefined ? String(body.shippingServiceId) : undefined),
+      shippingPrice: Number(validatedQuoteData.price),
+      shippingProvider: 'Melhor Envio',
+      shippingCarrier: validatedQuoteData.carrier,
+      shippingService: validatedQuoteData.service_name,
+      shippingServiceId: String(validatedQuoteData.service_id),
+      shippingDeliveryTime: Number(validatedQuoteData.delivery_time),
+      shippingStatus: 'Aguardando preparação',
+      shipmentPurchaseStatus: 'not_started',
+      labelGenerationStatus: 'not_started',
       paymentMethod: body.paymentMethod || 'Mercado Pago',
       subtotal: authoritativeSubtotal,
       discount: authoritativeDiscount,
@@ -7126,6 +7241,40 @@ app.put('/api/admin/orders/:id/customer-cpf', requireAdmin, async (req: any, res
   }
 });
 
+app.put('/api/admin/orders/:id/invoice-key', requireAdmin, async (req: any, res) => {
+  try {
+    const invoiceKey = String(req.body?.invoiceKey || '').replace(/\D/g, '');
+    if (invoiceKey.length !== 44) {
+      return res.status(400).json({
+        error: 'A chave de acesso da NF-e deve conter exatamente 44 dígitos.',
+        code: 'INVALID_INVOICE_KEY',
+      });
+    }
+
+    const order = await db.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+
+    order.shippingDetails = {
+      ...(order.shippingDetails || {}),
+      invoiceKey,
+      invoiceKeyRegisteredAt: new Date().toISOString(),
+    };
+    if (!order.history) order.history = [];
+    order.history.push({
+      status: order.status,
+      source: 'admin',
+      timestamp: new Date().toLocaleString('pt-BR'),
+      occurredAt: new Date().toISOString(),
+      description: `Chave de NF-e registrada para a expedição por ${req.user?.name || 'Administrador'}.`,
+    });
+
+    const updated = await db.saveOrder(order);
+    res.json({ success: true, order: updated });
+  } catch (error: any) {
+    res.status(500).json({ error: error?.message || 'Erro ao registrar a chave de NF-e do pedido.' });
+  }
+});
+
 // --- Coupons (Admin Protected for listing/creating/deleting, Public for validation) ---
 app.get('/api/coupons', requireAdmin, async (req, res) => {
   const coupons = await db.getCoupons();
@@ -7179,7 +7328,7 @@ export function getMelhorEnvioConfig(): ServerMelhorEnvioConfig {
     ? 'https://sandbox.melhorenvio.com.br/api/v2'
     : 'https://melhorenvio.com.br/api/v2';
 
-  const originPostalCode = (process.env.MELHOR_ENVIO_ORIGIN_CEP || '03806010').replace(/\D/g, '');
+  const originPostalCode = (process.env.MELHOR_ENVIO_ORIGIN_CEP || '').replace(/\D/g, '');
 
   const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confecções';
   const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
@@ -7189,7 +7338,7 @@ export function getMelhorEnvioConfig(): ServerMelhorEnvioConfig {
     token,
     environment,
     baseUrl,
-    originPostalCode: originPostalCode.length === 8 ? originPostalCode : '03806010',
+    originPostalCode,
     appName,
     appEmail,
     userAgent,
@@ -7307,6 +7456,16 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
         });
       }
 
+      if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'INVALID_PRODUCT_PRICE',
+          message: `Produto "${dbProduct.title || prodId}" sem preço oficial válido no catálogo.`,
+          quotes: [],
+          options: [],
+        });
+      }
+
       const productData = {
         id: prodId,
         size: String(item.size || 'M'),
@@ -7316,7 +7475,7 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
         width: Number(rawWidth),
         length: Number(rawLength),
         quantity: qty,
-        insurance_value: insuranceValue > 0 ? insuranceValue : 150,
+        insurance_value: insuranceValue,
       };
 
       console.log('[SHIPPING PRODUCT DATA]', {
@@ -7358,44 +7517,29 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
     let meData: any[] = [];
 
     if (!token || token.length < 10) {
-      if (process.env.NODE_ENV !== 'production') {
-        meData = [
-          {
-            id: 1,
-            name: 'SEDEX',
-            price: 38.90,
-            custom_price: 38.90,
-            delivery_time: 2,
-            custom_delivery_time: 2,
-            company: { id: 1, name: 'Correios', picture: 'https://sandbox.melhorenvio.com.br/images/shipping-companies/correios.png' },
-            currency: 'R$',
-          },
-          {
-            id: 2,
-            name: 'PAC',
-            price: 24.50,
-            custom_price: 24.50,
-            delivery_time: 5,
-            custom_delivery_time: 5,
-            company: { id: 1, name: 'Correios', picture: 'https://sandbox.melhorenvio.com.br/images/shipping-companies/correios.png' },
-            currency: 'R$',
-          },
-        ];
-      } else {
-        console.log('[SHIPPING_REQUEST_END]', {
-          requestId,
-          result: 'error',
-          code: 'MELHOR_ENVIO_TOKEN_MISSING',
-          durationMs: Date.now() - startTime,
-        });
-        return res.status(503).json({
-          success: false,
-          error: 'MELHOR_ENVIO_TOKEN_MISSING',
-          message: 'Token de autenticação do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN nas variáveis de ambiente da Vercel (escopo Production).',
-          quotes: [],
-          options: [],
-        });
-      }
+      console.log('[SHIPPING_REQUEST_END]', {
+        requestId,
+        result: 'error',
+        code: 'MELHOR_ENVIO_TOKEN_MISSING',
+        durationMs: Date.now() - startTime,
+      });
+      return res.status(503).json({
+        success: false,
+        error: 'MELHOR_ENVIO_TOKEN_MISSING',
+        message: 'Token de autenticação do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN.',
+        quotes: [],
+        options: [],
+      });
+    }
+
+    if (originPostalCode.length !== 8) {
+      return res.status(503).json({
+        success: false,
+        error: 'MELHOR_ENVIO_ORIGIN_CEP_MISSING',
+        message: 'CEP de origem do Melhor Envio não configurado corretamente no servidor.',
+        quotes: [],
+        options: [],
+      });
     } else {
       // Format products for Melhor Envio payload (unit dimensions + quantity)
       const melhorEnvioProducts = shippingProducts.map((p) => ({
@@ -7576,10 +7720,16 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
             carrier: q.carrier,
             service_name: q.name,
             price: q.price,
-            delivery_time: q.deliveryTime || 1,
-            cart_hash: cartHash,
-            expires_at: expiresAt,
-          }));
+             delivery_time: q.deliveryTime || 1,
+             cart_hash: cartHash,
+             expires_at: expiresAt,
+             origin_postal_code: originPostalCode,
+             company_id: q.companyId || null,
+             original_price: q.originalPrice,
+             currency: 'BRL',
+             environment,
+             raw_quote: meData.find((item: any) => String(item.id) === String(q.serviceId)) || {},
+           }));
 
         if (quoteInserts.length > 0) {
           const adminClient = await db.getSupabaseAdminClient();
@@ -7836,6 +7986,17 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         ? dbProduct.promoPrice
         : dbProduct.price;
 
+      const itemWeight = Number(dbProduct.weight);
+      const itemHeight = Number(dbProduct.height);
+      const itemWidth = Number(dbProduct.width);
+      const itemLength = Number(dbProduct.length);
+      if (![officialUnitPrice, itemWeight, itemHeight, itemWidth, itemLength].every((value) => Number.isFinite(value) && value > 0)) {
+        return res.status(400).json({
+          error: `Produto "${dbProduct.title}" sem preço, peso ou dimensões oficiais válidas para expedição.`,
+          code: 'INVALID_PRODUCT_SPECS',
+        });
+      }
+
       const itemSubtotal = Number((officialUnitPrice * qty).toFixed(2));
 
       validatedItems.push({
@@ -7849,10 +8010,10 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         price: Number(officialUnitPrice.toFixed(2)),
         quantity: qty,
         subtotal: itemSubtotal,
-        weight: dbProduct.weight,
-        height: dbProduct.height,
-        width: dbProduct.width,
-        length: dbProduct.length,
+        weight: itemWeight,
+        height: itemHeight,
+        width: itemWidth,
+        length: itemLength,
       });
     }
 
@@ -7966,10 +8127,27 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
 
       preferenceQuoteData = quoteData;
       validatedShippingFee = isFreeShipping ? 0 : Number(quoteData.price.toFixed(2));
-    } else if (isFreeShipping) {
-      validatedShippingFee = 0;
     } else {
-      return res.status(400).json({ error: 'Cotação de frete obrigatória para compras abaixo de R$ 399,00. Por favor, calcule o frete para prosseguir.' });
+      return res.status(400).json({
+        error: 'Cotação real de frete obrigatória para todos os pedidos, inclusive quando a loja oferece frete grátis ao cliente.',
+        code: 'SHIPPING_QUOTE_REQUIRED',
+      });
+    }
+
+    const requiredAddressFields = ['street', 'number', 'neighborhood', 'city', 'state'] as const;
+    if (!shippingAddress || requiredAddressFields.some((field) => !String(shippingAddress[field] || '').trim())) {
+      return res.status(400).json({ error: 'Endereço de entrega incompleto.', code: 'INCOMPLETE_DEST_ADDRESS' });
+    }
+
+    const recipientName = String(shippingAddress.recipientName || payer?.name || authUserName || '').trim();
+    const customerEmail = String(payer?.email || authUserEmail || '').trim().toLowerCase();
+    const customerPhone = String(payer?.phone || req.body?.payerPhone || '').replace(/\D/g, '');
+    const customerCpf = cleanCpf(payer?.cpf || req.body?.payerCpf || req.body?.customerCpf || (shippingAddress as any)?.cpf || '');
+    if (!recipientName || !/^\S+@\S+\.\S+$/.test(customerEmail) || customerPhone.length < 10 || customerPhone.length > 11 || !isValidCpf(customerCpf)) {
+      return res.status(400).json({
+        error: 'Nome, e-mail, telefone e CPF válidos do destinatário são obrigatórios para a emissão real do frete.',
+        code: 'INCOMPLETE_RECIPIENT_DATA',
+      });
     }
 
     // 6. Calculate official total
@@ -8013,36 +8191,55 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     const newOrder: Order = {
       id: orderId,
       userId: orderUserId || existingOrder?.userId || undefined,
-      customerName: payer?.name || req.body?.payerName || shippingAddress?.recipientName || (req as any).user?.name || existingOrder?.customerName || 'Cliente Marmot',
-      customerEmail: payer?.email || req.body?.payerEmail || (req as any).user?.email || existingOrder?.customerEmail || 'contato@marmot.com.br',
-      customerPhone: payer?.phone || req.body?.payerPhone || existingOrder?.customerPhone || '',
-      customerCpf: cleanCpf(payer?.cpf || req.body?.payerCpf || req.body?.customerCpf || (shippingAddress as any)?.cpf || (req as any).user?.cpf || existingOrder?.customerCpf || ''),
+      customerName: recipientName,
+      customerEmail,
+      customerPhone,
+      customerCpf,
       date: existingOrder?.date || new Date().toLocaleDateString('pt-BR'),
       status: 'Aguardando Pagamento',
       paymentStatus: 'Pendente',
-      shippingStatus: existingOrder?.shippingStatus || 'Aguardando preparação',
+      shippingStatus: 'Aguardando preparação',
+      shipmentPurchaseStatus: 'not_started',
+      labelGenerationStatus: 'not_started',
       items: validatedItems,
       subtotal,
       discount,
       shippingFee: validatedShippingFee,
       total,
       paymentMethod: (paymentMethod as any) || existingOrder?.paymentMethod || 'Cartão de Crédito',
-      shippingAddress: shippingAddress || existingOrder?.shippingAddress || {
-        id: 'addr-1',
-        recipientName: payer?.name || 'Cliente',
-        cep: '03806-010',
-        street: 'Rua das Flores',
-        number: '100',
-        city: 'São Paulo',
-        state: 'SP',
+      shippingAddress,
+      shippingQuoteId: preferenceQuoteData.id,
+      shippingOption: {
+        quoteId: preferenceQuoteData.id,
+        serviceId: preferenceQuoteData.service_id,
+        companyId: preferenceQuoteData.company_id || undefined,
+        carrier: preferenceQuoteData.carrier,
+        company: preferenceQuoteData.carrier,
+        name: preferenceQuoteData.service_name,
+        serviceName: preferenceQuoteData.service_name,
+        quotedPrice: Number(preferenceQuoteData.price),
+        customerPrice: validatedShippingFee,
+        originalPrice: Number(preferenceQuoteData.original_price || preferenceQuoteData.price),
+        deliveryTime: Number(preferenceQuoteData.delivery_time),
+        currency: preferenceQuoteData.currency || 'BRL',
+        originPostalCode: preferenceQuoteData.origin_postal_code,
+        destinationPostalCode: preferenceQuoteData.destination_postal_code,
+        environment: preferenceQuoteData.environment,
       },
-      shippingCarrier: shippingCarrier || existingOrder?.shippingCarrier || 'Melhor Envio',
-      shippingService: shippingService || existingOrder?.shippingService || 'Transportadora Padrão',
-      shippingServiceId: (preferenceQuoteData && preferenceQuoteData.service_id !== undefined && preferenceQuoteData.service_id !== null)
-        ? String(preferenceQuoteData.service_id)
-        : (shippingServiceId ? String(shippingServiceId) : existingOrder?.shippingServiceId),
-      shippingDeliveryTime: shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5,
-      estimatedDelivery: `${shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5} a ${(shippingDeliveryTime || existingOrder?.shippingDeliveryTime || 5) + 2} dias úteis`,
+      shippingDetails: {
+        source: 'melhor_envio_api',
+        quoteId: preferenceQuoteData.id,
+        quotedAt: preferenceQuoteData.created_at,
+        quoteExpiresAt: preferenceQuoteData.expires_at,
+        destination: shippingAddress,
+      },
+      shippingProvider: 'Melhor Envio',
+      shippingCarrier: preferenceQuoteData.carrier,
+      shippingService: preferenceQuoteData.service_name,
+      shippingServiceId: String(preferenceQuoteData.service_id),
+      shippingPrice: Number(preferenceQuoteData.price),
+      shippingDeliveryTime: Number(preferenceQuoteData.delivery_time),
+      estimatedDelivery: `${Number(preferenceQuoteData.delivery_time)} dias úteis`,
       trackingCode: existingOrder?.trackingCode || undefined,
       melhorEnvioShipmentId: existingOrder?.melhorEnvioShipmentId || undefined,
       shippingLabelUrl: existingOrder?.shippingLabelUrl || undefined,
@@ -8095,21 +8292,6 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     // 8. Construct Mercado Pago Preference payload with dynamic items & prices
     let mpItems: any[] = buildMercadoPagoProductItems(validatedItems, subtotal, discount, mercadoPagoAssetBaseUrl);
 
-    // Include shipping fee as an explicit line item in the preference so Checkout Pro transaction_amount reflects total including freight
-    if (validatedShippingFee > 0) {
-      const shippingPictureUrl = resolveMercadoPagoPictureUrl('/assets/shipping-box.png', mercadoPagoAssetBaseUrl);
-      mpItems.push({
-        id: `shipping-${shippingServiceId || 'fee'}`,
-        title: `Frete — ${shippingCarrier || 'Entrega'} ${shippingService ? `(${shippingService})` : ''}`.trim(),
-        description: `Envio para ${shippingAddress?.city || ''} - ${shippingAddress?.state || ''} (CEP: ${shippingAddress?.cep || ''}, Prazo: ${shippingDeliveryTime || 5} dias úteis)`,
-        ...(shippingPictureUrl ? { picture_url: shippingPictureUrl } : {}),
-        category_id: 'shipping',
-        quantity: 1,
-        currency_id: 'BRL',
-        unit_price: Number(validatedShippingFee.toFixed(2)),
-      });
-    }
-
     const isSandbox = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'sandbox';
     const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, newOrder.id);
 
@@ -8124,10 +8306,10 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
     const preferencePayload: any = {
       items: mpItems,
       payer: {
-        name: payer?.name || shippingAddress?.recipientName || 'Cliente',
-        email: payer?.email || 'contato@marmot.com.br',
-        phone: buildMercadoPagoPhone(payer?.phone),
-        identification: payer?.cpf ? { type: 'CPF', number: payer.cpf.replace(/\D/g, '') } : undefined,
+        name: recipientName,
+        email: customerEmail,
+        phone: buildMercadoPagoPhone(customerPhone),
+        identification: { type: 'CPF', number: customerCpf },
         address: shippingAddress ? {
           zip_code: (shippingAddress.cep || '').replace(/\D/g, ''),
           street_name: shippingAddress.street || '',
@@ -8135,6 +8317,10 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
         } : undefined,
       },
       ...callbackFields,
+      shipments: {
+        cost: Number(validatedShippingFee.toFixed(2)),
+        mode: 'not_specified',
+      },
       external_reference: newOrder.id,
       statement_descriptor: 'MARMOT STORE',
       metadata: {
@@ -8372,14 +8558,6 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
       return order;
     }
 
-    const nowIso = new Date().toISOString();
-    order.status = 'Em Separação';
-    order.paymentStatus = 'Pago';
-    order.shippingStatus = 'Preparando';
-    order.paidAt = paymentData.date_approved || order.paidAt || nowIso;
-    order.separationStartedAt = order.separationStartedAt || nowIso;
-    order.paymentDetails.paidAt = paymentData.date_approved || nowIso;
-
     // Call PostgreSQL atomic payment effect & stock deduction registrar
     const effectResult = await db.processApprovedOrderAtomic(
       order.id,
@@ -8392,17 +8570,28 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
       order.items || []
     );
 
-    if (!wasAlreadyApproved && !effectResult.alreadyProcessed) {
-      if (Array.isArray(order.items)) {
-        for (const item of order.items) {
-          try {
-            await db.deductStockAtomic(item.productId, item.quantity, order.id, 'Venda Aprovada (Mercado Pago)');
-          } catch (stockErr) {
-            console.error('[Stock Atomic Deduction Error]:', stockErr);
-          }
-        }
-      }
+    if (!effectResult.success) {
+      throw createPaymentVerificationError(
+        effectResult.error || 'A liquidação atômica do pagamento foi recusada pelo banco de dados.',
+        409,
+        'PAYMENT_EFFECT_REJECTED',
+      );
+    }
 
+    const nowIso = new Date().toISOString();
+    order.status = 'Em Separação';
+    order.paymentStatus = 'Pago';
+    order.shippingStatus = order.shipmentPurchaseStatus === 'purchased'
+      ? (order.shippingStatus || 'Frete comprado')
+      : 'Aguardando compra de frete';
+    order.shipmentPurchaseStatus = order.shipmentPurchaseStatus === 'purchased' ? 'purchased' : 'not_started';
+    order.labelGenerationStatus = order.labelGenerationStatus || 'not_started';
+    order.shipmentLastError = undefined;
+    order.paidAt = paymentData.date_approved || order.paidAt || nowIso;
+    order.separationStartedAt = order.separationStartedAt || nowIso;
+    order.paymentDetails.paidAt = paymentData.date_approved || nowIso;
+
+    if (!wasAlreadyApproved && !effectResult.alreadyProcessed) {
       order.history.push({
         id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
         orderId: order.id,
@@ -8413,7 +8602,7 @@ async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): P
         externalEventId: String(paymentData.id),
         timestamp: new Date().toLocaleString('pt-BR'),
         occurredAt: paymentData.date_approved || nowIso,
-        description: `Pagamento de R$ ${transactionAmount > 0 ? transactionAmount.toFixed(2) : order.total.toFixed(2)} aprovado no Mercado Pago (${paymentData.payment_method_id || 'Mercado Pago'}). Pedido encaminhado automaticamente para separação e conferência no estoque.`,
+        description: `Pagamento de R$ ${transactionAmount > 0 ? transactionAmount.toFixed(2) : order.total.toFixed(2)} aprovado no Mercado Pago (${paymentData.payment_method_id || 'Mercado Pago'}). Pedido em separação; compra do frete registrada como uma etapa independente.`,
       });
 
       if (order.customerEmail) {
@@ -8601,9 +8790,15 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
     const hasWebhookSecret = Boolean(webhookSecret && webhookSecret.trim().length > 0);
     const mpEnv = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase();
 
-    const topic = req.query.topic || req.query.type || req.body?.type || req.body?.action || req.body?.topic;
-    const paymentId = req.query['data.id'] || req.query.id || req.body?.data?.id || req.body?.id;
-    const eventKey = paymentId ? String(paymentId) : `evt-${Date.now()}`;
+    const topic = String(req.query.topic || req.query.type || req.body?.type || req.body?.action || req.body?.topic || 'payment');
+    // In Webhooks v2 the top-level body.id identifies the notification, while
+    // body.data.id identifies the payment that must be fetched from Mercado Pago.
+    const paymentId = req.query['data.id'] || req.body?.data?.id || req.query.id;
+    const notificationId = req.body?.id || req.query.notification_id;
+    const notificationCreatedAt = req.body?.date_created || req.body?.date || '';
+    const eventKey = notificationId
+      ? `${topic}:${String(notificationId)}`
+      : `${topic}:${String(paymentId || 'unknown')}:${String(notificationCreatedAt || 'legacy')}`;
 
     console.log(`[Mercado Pago Webhook Received]: Topic=${topic || 'payment'}, PaymentId=${paymentId || 'N/A'}, hasAccessToken=${hasAccessToken}, hasWebhookSecret=${hasWebhookSecret}, mercadoPagoEnvironment=${mpEnv}`);
 
@@ -8618,7 +8813,9 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
       console.log('[Mercado Pago Webhook]: Webhook signature validated');
     }
 
-    if (paymentId && (topic === 'payment' || topic === 'payment.updated' || topic === 'payment.created' || !topic)) {
+    let fulfillmentOrderId: string | undefined;
+
+    if (paymentId && (topic === 'payment' || topic === 'payment.updated' || topic === 'payment.created')) {
       // Persistent distributed claim check (PostgreSQL UNIQUE constraint + state table)
       const claim = await db.claimWebhookEvent('mercadopago', eventKey, String(topic || 'payment'), req.body || req.query);
       if (!claim.shouldProcess) {
@@ -8651,6 +8848,8 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
             procError = fetchErr.message;
             console.error('[Mercado Pago Webhook Payment Fetch Error]:', fetchErr);
           }
+        } else {
+          throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado no servidor.');
         }
 
         if (paymentData) {
@@ -8662,27 +8861,49 @@ app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks
             const order = await db.getOrderById(orderIdFound);
             if (order) {
               console.log(`[Mercado Pago Webhook]: Order #${order.id} found`);
-              await applyMercadoPagoPaymentToOrder(order, paymentData);
-              if (order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago') {
+              const updatedOrder = await applyMercadoPagoPaymentToOrder(order, paymentData);
+              if (updatedOrder.paymentStatus === 'Pago') {
+                fulfillmentOrderId = updatedOrder.id;
                 console.log(`[Mercado Pago Webhook]: Payment approved`);
-                console.log(`[Mercado Pago Webhook]: Order #${order.id} updated to status "${order.status}" / "${order.paymentStatus}".`);
+                console.log(`[Mercado Pago Webhook]: Order #${updatedOrder.id} updated to status "${updatedOrder.status}" / "${updatedOrder.paymentStatus}". Freight queued independently.`);
               } else {
-                console.log(`[Mercado Pago Webhook]: Order #${order.id} updated with payment status "${order.paymentStatus}".`);
+                console.log(`[Mercado Pago Webhook]: Order #${updatedOrder.id} updated with payment status "${updatedOrder.paymentStatus}".`);
               }
+            } else {
+              throw new Error(`Pedido ${orderIdFound} informado no pagamento não foi encontrado.`);
             }
+          } else {
+            throw new Error('Pagamento sem external_reference/order_id válido.');
           }
+        } else if (procError) {
+          throw new Error(procError);
+        } else {
+          throw new Error('Mercado Pago não retornou os dados do pagamento notificado.');
         }
       } catch (err: any) {
         procError = err.message;
       } finally {
         await db.completeWebhookEvent('mercadopago', eventKey, orderIdFound, procError);
       }
+      if (procError) {
+        throw new Error(procError);
+      }
     }
 
-    return res.status(200).json({ success: true, message: 'Webhook processado com sucesso.' });
+    if (fulfillmentOrderId) {
+      // Fast best-effort dispatch for long-lived/local servers. The cron worker
+      // below is the durable recovery path for serverless runtimes.
+      setImmediate(() => {
+        processMelhorEnvioShipment(fulfillmentOrderId!, { source: 'webhook' }).catch((error: any) => {
+          console.error('[ME_SHIPMENT_ASYNC_ERROR]', { orderId: fulfillmentOrderId, code: error?.code, step: error?.step });
+        });
+      });
+    }
+
+    return res.status(200).json({ success: true, message: 'Webhook processado com sucesso.', freightQueued: Boolean(fulfillmentOrderId) });
   } catch (error: any) {
     console.error('[Mercado Pago Webhook Global Error]:', error);
-    return res.status(200).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: 'Falha temporária ao processar o webhook.' });
   }
 });
 
@@ -8986,18 +9207,18 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
     let sender = saved.sender;
     if (!sender) {
       sender = {
-        name: 'Marmot Confecções',
+        name: '',
         document: '',
-        stateRegister: 'ISENTO',
-        phone: '11988421092',
-        email: 'contato@marmot.com.br',
-        street: 'Avenida Celso Garcia',
-        number: '1200',
+        stateRegister: '',
+        phone: '',
+        email: '',
+        street: '',
+        number: '',
         complement: '',
-        neighborhood: 'Brás',
-        city: 'São Paulo',
-        state: 'SP',
-        cep: originPostalCode.length === 8 ? originPostalCode : '03806010',
+        neighborhood: '',
+        city: '',
+        state: '',
+        cep: originPostalCode,
       };
     }
 
@@ -9008,7 +9229,8 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
       appEmail,
       clientId,
       isTokenConfigured: Boolean(config.token && config.token.length >= 10),
-      tokenMasked: config.token && config.token.length >= 10 ? `${config.token.slice(0, 8)}...${config.token.slice(-6)} (Ativo via Vercel Env)` : '',
+      tokenMasked: config.token && config.token.length >= 10 ? 'Configurado no servidor' : '',
+      documentMode: saved.documentMode || '',
       sender,
       defaultWeight: Number(saved.defaultWeight || 0.35),
       defaultHeight: Number(saved.defaultHeight || 4),
@@ -9022,7 +9244,7 @@ app.get('/api/admin/shipping/settings', requireAdmin, async (req, res) => {
 
 app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
   try {
-    const { originPostalCode, environment, clientId, clientSecret, appName, appEmail, sender, defaultWeight, defaultHeight, defaultWidth, defaultLength } = req.body;
+    const { originPostalCode, environment, clientId, clientSecret, appName, appEmail, sender, documentMode, defaultWeight, defaultHeight, defaultWidth, defaultLength } = req.body;
     const current = await db.getShippingSettings();
 
     const updated = {
@@ -9034,6 +9256,9 @@ app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
       clientId: clientId !== undefined ? String(clientId).trim() : current.clientId,
       clientSecret: clientSecret !== undefined && clientSecret ? String(clientSecret).trim() : current.clientSecret,
       sender: sender ? { ...current.sender, ...sender } : current.sender,
+      documentMode: documentMode === 'commercial_invoice' || documentMode === 'content_declaration'
+        ? documentMode
+        : current.documentMode || '',
       defaultWeight: Number(defaultWeight || current.defaultWeight || 0.35),
       defaultHeight: Number(defaultHeight || current.defaultHeight || 4),
       defaultWidth: Number(defaultWidth || current.defaultWidth || 20),
@@ -9060,6 +9285,7 @@ app.put('/api/admin/shipping/settings', requireAdmin, async (req: any, res) => {
       environment: updated.environment,
       isTokenConfigured: Boolean(config.token && config.token.length >= 10),
       sender: updated.sender,
+      documentMode: updated.documentMode,
     });
   } catch (err: any) {
     res.status(500).json({ error: 'Erro ao salvar configurações de frete.' });
@@ -9192,6 +9418,560 @@ app.get('/api/admin/melhor-envio/auth-url', requireAdmin, async (req, res) => {
   }
 });
 
+type ShipmentDocumentMode = 'commercial_invoice' | 'content_declaration';
+
+interface ShipmentProcessingResult {
+  order: Order;
+  shipmentId: string;
+  trackingCode?: string;
+  printUrl: string;
+  reused: boolean;
+}
+
+class ShipmentProcessingError extends Error {
+  statusCode: number;
+  code: string;
+  step: string;
+  shipmentId?: string;
+  trackingCode?: string;
+
+  constructor(message: string, statusCode: number, code: string, step: string, shipmentId?: string, trackingCode?: string) {
+    super(message);
+    this.name = 'ShipmentProcessingError';
+    this.statusCode = statusCode;
+    this.code = code;
+    this.step = step;
+    this.shipmentId = shipmentId;
+    this.trackingCode = trackingCode;
+  }
+}
+
+function shipmentProcessingError(message: string, statusCode: number, code: string, step: string, shipmentId?: string, trackingCode?: string): ShipmentProcessingError {
+  return new ShipmentProcessingError(message, statusCode, code, step, shipmentId, trackingCode);
+}
+
+function getMelhorEnvioErrorMessage(rawBody: string, fallback: string): string {
+  try {
+    const parsed = JSON.parse(rawBody || '{}');
+    const details = parsed?.errors && typeof parsed.errors === 'object'
+      ? Object.entries(parsed.errors)
+          .map(([field, value]) => `${field}: ${Array.isArray(value) ? value.join(', ') : String(value)}`)
+          .join('; ')
+      : '';
+    return [parsed?.message || parsed?.error || fallback, details].filter(Boolean).join(' — ').slice(0, 1000);
+  } catch {
+    return rawBody ? `${fallback}: ${rawBody.slice(0, 500)}` : fallback;
+  }
+}
+
+function isValidShipmentEmail(value: unknown): boolean {
+  return /^\S+@\S+\.\S+$/.test(String(value || '').trim());
+}
+
+function isPaidOrderForFulfillment(order: Order): boolean {
+  return order.paymentStatus === 'Pago' && Boolean(order.paymentDetails?.mercadoPagoPaymentId || (order as any).mercado_pago_payment_id);
+}
+
+async function processMelhorEnvioShipment(
+  orderId: string,
+  actor?: { source: 'webhook' | 'cron' | 'admin'; email?: string; name?: string },
+): Promise<ShipmentProcessingResult> {
+  const startTime = Date.now();
+  let order = await db.getOrderById(orderId);
+  let shipmentId = '';
+  let trackingCode = '';
+  let printUrl = '';
+  let lockToken: string | undefined;
+  let purchaseConfirmed = false;
+  let labelGenerated = false;
+  let currentStep = 'order_lookup';
+
+  if (!order) {
+    throw shipmentProcessingError('Pedido não encontrado no sistema.', 404, 'ORDER_NOT_FOUND', currentStep);
+  }
+
+  if (!isPaidOrderForFulfillment(order)) {
+    throw shipmentProcessingError(
+      'O envio só pode ser comprado após confirmação real do pagamento pelo Mercado Pago.',
+      409,
+      'PAYMENT_NOT_CONFIRMED',
+      'payment_check',
+    );
+  }
+
+  if (
+    order.shipmentPurchaseStatus === 'purchased' &&
+    order.labelGenerationStatus === 'generated' &&
+    order.melhorEnvioShipmentId &&
+    order.shippingLabelUrl
+  ) {
+    return {
+      order,
+      shipmentId: order.melhorEnvioShipmentId,
+      trackingCode: order.trackingCode || undefined,
+      printUrl: order.shippingLabelUrl,
+      reused: true,
+    };
+  }
+
+  const claim = await db.claimShipmentGeneration(orderId);
+  if (!claim.shouldProcess) {
+    const existing = claim.existing || {};
+    if (existing.status === 'completed' && (existing.print_url || existing.label_url) && (existing.shipment_id || existing.melhor_envio_shipment_id)) {
+      order.melhorEnvioShipmentId = existing.shipment_id || existing.melhor_envio_shipment_id;
+      order.trackingCode = existing.tracking_code || order.trackingCode;
+      order.shippingLabelUrl = existing.print_url || existing.label_url;
+      order.shipmentPurchaseStatus = 'purchased';
+      order.labelGenerationStatus = 'generated';
+      order.shippingStatus = 'Pronto para envio';
+      await db.saveOrder(order);
+      return {
+        order,
+        shipmentId: order.melhorEnvioShipmentId,
+        trackingCode: order.trackingCode || undefined,
+        printUrl: order.shippingLabelUrl,
+        reused: true,
+      };
+    }
+    throw shipmentProcessingError(
+      'Uma operação de expedição já está em andamento para este pedido.',
+      409,
+      'SHIPMENT_IN_PROGRESS',
+      existing.current_step || 'processing',
+      existing.shipment_id || existing.melhor_envio_shipment_id,
+    );
+  }
+
+  lockToken = claim.lockToken;
+  const existingOperation = claim.existing || {};
+  shipmentId = String(
+    existingOperation.shipment_id ||
+    existingOperation.melhor_envio_shipment_id ||
+    order.melhorEnvioShipmentId ||
+    '',
+  );
+  purchaseConfirmed = Boolean(existingOperation.purchased_at || order.shipmentPurchaseStatus === 'purchased');
+  labelGenerated = Boolean(existingOperation.label_generated_at || order.labelGenerationStatus === 'generated');
+
+  try {
+    currentStep = 'validating';
+    await db.updateShipmentStep(orderId, currentStep, shipmentId || undefined, lockToken);
+    order.shipmentPurchaseStatus = purchaseConfirmed ? 'purchased' : 'processing';
+    order.labelGenerationStatus = labelGenerated ? 'generated' : 'not_started';
+    order.shipmentLastError = undefined;
+    if (!purchaseConfirmed) order.shippingStatus = 'Aguardando compra de frete';
+    await db.saveOrder(order);
+
+    const config = getMelhorEnvioConfig();
+    if (!config.token || config.token.length < 10) {
+      throw shipmentProcessingError('Token do Melhor Envio não configurado no servidor.', 503, 'MISSING_TOKEN', currentStep, shipmentId || undefined);
+    }
+    if (config.originPostalCode.length !== 8) {
+      throw shipmentProcessingError('CEP de origem do Melhor Envio não configurado corretamente.', 503, 'MISSING_ORIGIN_CEP', currentStep, shipmentId || undefined);
+    }
+    const mercadoPagoEnvironment = String(process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'production' ? 'production' : 'sandbox';
+    if (mercadoPagoEnvironment !== config.environment) {
+      throw shipmentProcessingError(
+        'Ambientes do Mercado Pago e Melhor Envio são diferentes; a compra automática do frete foi bloqueada.',
+        409,
+        'PAYMENT_SHIPPING_ENVIRONMENT_MISMATCH',
+        currentStep,
+        shipmentId || undefined,
+      );
+    }
+
+    const quoteId = String(order.shippingQuoteId || order.shippingOption?.quoteId || order.shippingDetails?.quoteId || '').trim();
+    if (!quoteId) {
+      throw shipmentProcessingError('Pedido sem vínculo com a cotação oficial selecionada.', 409, 'MISSING_SHIPPING_QUOTE', currentStep, shipmentId || undefined);
+    }
+    const quote = await db.getShippingQuote(quoteId);
+    if (!quote) {
+      throw shipmentProcessingError('Cotação oficial vinculada ao pedido não foi encontrada.', 409, 'SHIPPING_QUOTE_NOT_FOUND', currentStep, shipmentId || undefined);
+    }
+
+    const destinationPostalCode = normalizeCep(order.shippingAddress?.cep || (order.shippingAddress as any)?.postalCode || '');
+    if (
+      !quote.user_id || quote.user_id !== order.userId ||
+      quote.destination_postal_code !== destinationPostalCode ||
+      Number(quote.service_id) !== Number(order.shippingServiceId) ||
+      String(quote.carrier) !== String(order.shippingCarrier) ||
+      String(quote.service_name) !== String(order.shippingService)
+    ) {
+      throw shipmentProcessingError('Os dados de frete do pedido divergem da cotação oficial selecionada.', 409, 'SHIPPING_QUOTE_MISMATCH', currentStep, shipmentId || undefined);
+    }
+    if (quote.environment && String(quote.environment) !== config.environment) {
+      throw shipmentProcessingError('A cotação pertence a outro ambiente do Melhor Envio.', 409, 'SHIPPING_QUOTE_ENVIRONMENT_MISMATCH', currentStep, shipmentId || undefined);
+    }
+
+    const quotedPrice = Number(quote.price);
+    const expectedCustomerShipping = Number(order.subtotal) >= 399 ? 0 : quotedPrice;
+    const expectedTotal = Number((Number(order.subtotal) - Number(order.discount || 0) + expectedCustomerShipping).toFixed(2));
+    if (
+      !Number.isFinite(quotedPrice) || quotedPrice <= 0 ||
+      Math.abs(Number(order.shippingPrice ?? quotedPrice) - quotedPrice) > 0.01 ||
+      Math.abs(Number(order.shippingFee) - expectedCustomerShipping) > 0.01 ||
+      Math.abs(Number(order.total) - expectedTotal) > 0.05
+    ) {
+      throw shipmentProcessingError('Valores de frete ou total do pedido não correspondem à cotação oficial.', 409, 'SHIPPING_AMOUNT_MISMATCH', currentStep, shipmentId || undefined);
+    }
+
+    const settings = await db.getShippingSettings();
+    const sender = settings?.sender || null;
+    const documentMode = String(settings?.documentMode || '') as ShipmentDocumentMode;
+    if (!sender) {
+      throw shipmentProcessingError('Dados do remetente não configurados no banco.', 409, 'MISSING_SENDER_DATA', currentStep, shipmentId || undefined);
+    }
+
+    const senderDocument = validateSenderDocument(sender.document);
+    const senderPhone = String(sender.phone || '').replace(/\D/g, '');
+    const senderPostalCode = normalizeCep(sender.cep || '');
+    const requiredSender = [sender.name, sender.street, sender.number, sender.neighborhood, sender.city, sender.state];
+    if (
+      !senderDocument.valid || !senderDocument.digits ||
+      senderPhone.length < 10 || senderPhone.length > 11 ||
+      senderPostalCode.length !== 8 || !isValidShipmentEmail(sender.email) ||
+      requiredSender.some((value) => !String(value || '').trim())
+    ) {
+      throw shipmentProcessingError('Cadastro do remetente incompleto ou inválido nas Configurações de Frete.', 409, 'INVALID_SENDER_DATA', currentStep, shipmentId || undefined);
+    }
+    if (senderPostalCode !== String(quote.origin_postal_code || config.originPostalCode)) {
+      throw shipmentProcessingError('CEP do remetente diverge do CEP de origem usado na cotação.', 409, 'SHIPPING_ORIGIN_MISMATCH', currentStep, shipmentId || undefined);
+    }
+
+    const recipientName = String(order.shippingAddress?.recipientName || order.customerName || '').trim();
+    const recipientPhone = String(order.customerPhone || (order.shippingAddress as any)?.phone || '').replace(/\D/g, '');
+    const recipientCpf = cleanCpf(order.customerCpf || (order.shippingAddress as any)?.cpf || '');
+    const requiredRecipient = [order.shippingAddress?.street, order.shippingAddress?.number, order.shippingAddress?.neighborhood, order.shippingAddress?.city, order.shippingAddress?.state];
+    if (
+      !recipientName || !isValidShipmentEmail(order.customerEmail) ||
+      recipientPhone.length < 10 || recipientPhone.length > 11 ||
+      !isValidCpf(recipientCpf) || destinationPostalCode.length !== 8 ||
+      requiredRecipient.some((value) => !String(value || '').trim())
+    ) {
+      throw shipmentProcessingError('Dados do destinatário incompletos ou inválidos para emissão do frete.', 409, 'INVALID_RECIPIENT_DATA', currentStep, shipmentId || undefined);
+    }
+
+    const products = (order.items || []).map((item) => {
+      const weight = Number(item.weight);
+      const height = Number(item.height);
+      const width = Number(item.width);
+      const length = Number(item.length);
+      const quantity = Number(item.quantity);
+      const unitaryValue = Number(item.price);
+      const name = String(item.title || item.productTitle || '').trim();
+      if (
+        !name || !Number.isInteger(quantity) || quantity <= 0 ||
+        ![weight, height, width, length, unitaryValue].every((value) => Number.isFinite(value) && value > 0)
+      ) {
+        throw shipmentProcessingError('Item do pedido sem dados físicos ou financeiros válidos para expedição.', 409, 'INVALID_SHIPMENT_ITEM', currentStep, shipmentId || undefined);
+      }
+      return { name, quantity, unitary_value: Number(unitaryValue.toFixed(2)), weight, height, width, length };
+    });
+    if (products.length === 0) {
+      throw shipmentProcessingError('Pedido sem itens para expedição.', 409, 'EMPTY_SHIPMENT', currentStep, shipmentId || undefined);
+    }
+
+    const quotePackages = Array.isArray(quote.raw_quote?.packages)
+      ? quote.raw_quote.packages
+      : (Array.isArray(quote.raw_quote?.volumes) ? quote.raw_quote.volumes : []);
+    let volumes = quotePackages.map((pkg: any) => ({
+      height: Number(pkg.height || pkg.dimensions?.height),
+      width: Number(pkg.width || pkg.dimensions?.width),
+      length: Number(pkg.length || pkg.dimensions?.length),
+      weight: Number(pkg.weight),
+    })).filter((pkg: any) => [pkg.height, pkg.width, pkg.length, pkg.weight].every((value: number) => Number.isFinite(value) && value > 0));
+
+    if (volumes.length === 0) {
+      volumes = [{
+        height: Math.ceil(products.reduce((sum, product) => sum + product.height * product.quantity, 0)),
+        width: Math.ceil(Math.max(...products.map((product) => product.width))),
+        length: Math.ceil(Math.max(...products.map((product) => product.length))),
+        weight: Number(products.reduce((sum, product) => sum + product.weight * product.quantity, 0).toFixed(3)),
+      }];
+    }
+
+    const invoiceKey = String(order.shippingDetails?.invoiceKey || (order as any).invoiceKey || '').replace(/\D/g, '');
+    if (documentMode !== 'commercial_invoice' && documentMode !== 'content_declaration') {
+      throw shipmentProcessingError('Defina o modo fiscal do envio nas Configurações de Frete.', 409, 'MISSING_SHIPMENT_DOCUMENT_MODE', currentStep, shipmentId || undefined);
+    }
+    if (documentMode === 'commercial_invoice' && invoiceKey.length !== 44) {
+      throw shipmentProcessingError('Envio comercial exige chave de NF-e válida com 44 dígitos no pedido.', 409, 'MISSING_INVOICE_KEY', currentStep, shipmentId || undefined);
+    }
+    if (documentMode === 'content_declaration' && senderDocument.type === 'cnpj' && !['', 'ISENTO'].includes(String(sender.stateRegister || '').trim().toUpperCase())) {
+      throw shipmentProcessingError('Declaração de conteúdo exige inscrição estadual vazia ou ISENTO.', 409, 'INVALID_CONTENT_DECLARATION_SENDER', currentStep, shipmentId || undefined);
+    }
+
+    const fromPayload: any = {
+      name: String(sender.name).trim(),
+      phone: senderPhone,
+      email: String(sender.email).trim(),
+      address: String(sender.street).trim(),
+      number: String(sender.number).trim(),
+      complement: String(sender.complement || '').trim(),
+      district: String(sender.neighborhood).trim(),
+      city: String(sender.city).trim(),
+      state_abbr: String(sender.state).trim().toUpperCase(),
+      country_id: 'BR',
+      postal_code: senderPostalCode,
+    };
+    if (senderDocument.type === 'cpf') {
+      fromPayload.document = senderDocument.digits;
+    } else {
+      fromPayload.company_document = senderDocument.digits;
+      fromPayload.state_register = documentMode === 'content_declaration'
+        ? String(sender.stateRegister || '').trim().toUpperCase()
+        : String(sender.stateRegister || '').trim();
+    }
+
+    const cartPayload: any = {
+      service: Number(quote.service_id),
+      from: fromPayload,
+      to: {
+        name: recipientName,
+        phone: recipientPhone,
+        email: String(order.customerEmail).trim().toLowerCase(),
+        document: recipientCpf,
+        address: String(order.shippingAddress.street).trim(),
+        number: String(order.shippingAddress.number).trim(),
+        complement: String(order.shippingAddress.complement || '').trim(),
+        district: String(order.shippingAddress.neighborhood).trim(),
+        city: String(order.shippingAddress.city).trim(),
+        state_abbr: String(order.shippingAddress.state).trim().toUpperCase(),
+        country_id: 'BR',
+        postal_code: destinationPostalCode,
+      },
+      products: products.map(({ name, quantity, unitary_value }) => ({ name, quantity, unitary_value })),
+      volumes,
+      options: {
+        platform: config.appName,
+        tags: [{ tag: order.id, url: null }],
+        insurance_value: Number(Number(order.subtotal).toFixed(2)),
+        receipt: Boolean(settings?.receipt),
+        own_hand: Boolean(settings?.ownHand),
+        reverse: false,
+        non_commercial: documentMode === 'content_declaration',
+        ...(documentMode === 'commercial_invoice' ? { invoice: { key: invoiceKey } } : {}),
+      },
+    };
+
+    const headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${config.token}`,
+      'User-Agent': config.userAgent,
+    };
+
+    if (!shipmentId) {
+      currentStep = 'creating_cart';
+      await db.updateShipmentStep(orderId, currentStep, undefined, lockToken);
+      const cartResponse = await fetchWithTimeout(`${config.baseUrl}/me/cart`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(cartPayload),
+      }, 20000);
+      const cartText = await cartResponse.text();
+      if (!cartResponse.ok) {
+        throw shipmentProcessingError(getMelhorEnvioErrorMessage(cartText, 'Falha ao criar o envio no carrinho do Melhor Envio.'), 502, 'CART_ERROR', currentStep);
+      }
+      const cartData = JSON.parse(cartText || '{}');
+      shipmentId = String(cartData.id || cartData.protocol || '').trim();
+      if (!shipmentId) {
+        throw shipmentProcessingError('Melhor Envio não retornou o ID da remessa.', 502, 'MISSING_SHIPMENT_ID', currentStep);
+      }
+
+      // Persist before checkout: every retry reuses this exact external shipment.
+      order.melhorEnvioShipmentId = shipmentId;
+      order.melhorEnvioProtocol = String(cartData.protocol || shipmentId);
+      await db.updateShipmentStep(orderId, 'cart_created', shipmentId, lockToken);
+      await db.saveOrder(order);
+    }
+
+    if (!purchaseConfirmed) {
+      currentStep = 'checking_out';
+      await db.updateShipmentStep(orderId, currentStep, shipmentId, lockToken);
+      const checkoutResponse = await fetchWithTimeout(`${config.baseUrl}/me/shipment/checkout`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ orders: [shipmentId] }),
+      }, 30000);
+      const checkoutText = await checkoutResponse.text();
+      if (!checkoutResponse.ok) {
+        const lower = checkoutText.toLowerCase();
+        const alreadyPurchased = lower.includes('já foi pago') || lower.includes('already paid') || lower.includes('already purchased');
+        if (!alreadyPurchased) {
+          const insufficientBalance = lower.includes('saldo') || lower.includes('balance') || lower.includes('carteira');
+          throw shipmentProcessingError(
+            getMelhorEnvioErrorMessage(checkoutText, insufficientBalance ? 'Saldo insuficiente na carteira do Melhor Envio.' : 'Falha ao comprar o frete no Melhor Envio.'),
+            insufficientBalance ? 402 : 502,
+            insufficientBalance ? 'INSUFFICIENT_BALANCE' : 'CHECKOUT_FAILED',
+            currentStep,
+            shipmentId,
+          );
+        }
+      }
+
+      purchaseConfirmed = true;
+      const purchasedAt = new Date().toISOString();
+      await db.updateShipmentStep(orderId, 'checkout_completed', shipmentId, lockToken, { purchasedAt });
+      order.shipmentPurchaseStatus = 'purchased';
+      order.shipmentPurchasedAt = order.shipmentPurchasedAt || purchasedAt;
+      order.shippingStatus = 'Frete comprado';
+      order.shipmentLastError = undefined;
+      await db.saveOrder(order);
+    }
+
+    if (!labelGenerated) {
+      currentStep = 'generating_label';
+      order.labelGenerationStatus = 'processing';
+      await db.saveOrder(order);
+      await db.updateShipmentStep(orderId, currentStep, shipmentId, lockToken);
+      const generateResponse = await fetchWithTimeout(`${config.baseUrl}/me/shipment/generate`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ orders: [shipmentId] }),
+      }, 30000);
+      const generateText = await generateResponse.text();
+      if (!generateResponse.ok) {
+        const lower = generateText.toLowerCase();
+        const alreadyGenerated = lower.includes('already') || lower.includes('já foi gerada') || lower.includes('gerada anteriormente');
+        if (!alreadyGenerated) {
+          throw shipmentProcessingError(getMelhorEnvioErrorMessage(generateText, 'Falha ao gerar a etiqueta no Melhor Envio.'), 502, 'GENERATE_FAILED', currentStep, shipmentId);
+        }
+      }
+      labelGenerated = true;
+      const labelGeneratedAt = new Date().toISOString();
+      await db.updateShipmentStep(orderId, 'label_generated', shipmentId, lockToken, { labelGeneratedAt });
+      order.labelGenerationStatus = 'generated';
+      order.labelGeneratedAt = order.labelGeneratedAt || labelGeneratedAt;
+      order.shippingStatus = 'Etiqueta gerada';
+      await db.saveOrder(order);
+    }
+
+    currentStep = 'getting_print_url';
+    await db.updateShipmentStep(orderId, currentStep, shipmentId, lockToken);
+    const printResponse = await fetchWithTimeout(`${config.baseUrl}/me/shipment/print`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ mode: 'public', orders: [shipmentId] }),
+    }, 20000);
+    const printText = await printResponse.text();
+    if (!printResponse.ok) {
+      throw shipmentProcessingError(getMelhorEnvioErrorMessage(printText, 'Falha ao obter a etiqueta para impressão.'), 502, 'PRINT_URL_FAILED', currentStep, shipmentId);
+    }
+    const printData = JSON.parse(printText || '{}');
+    printUrl = String(printData.url || printData.orders?.[0]?.url || '').trim();
+    if (!printUrl) {
+      throw shipmentProcessingError('Melhor Envio não retornou a URL de impressão da etiqueta.', 502, 'PRINT_URL_FAILED', currentStep, shipmentId);
+    }
+
+    currentStep = 'fetching_tracking';
+    await db.updateShipmentStep(orderId, currentStep, shipmentId, lockToken);
+    try {
+      const trackingResponse = await fetchWithTimeout(`${config.baseUrl}/me/shipment/tracking`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ orders: [shipmentId] }),
+      }, 15000);
+      if (trackingResponse.ok) {
+        const trackingData: any = await trackingResponse.json();
+        trackingCode = String(
+          trackingData?.[shipmentId]?.tracking ||
+          trackingData?.[shipmentId]?.tracking_code ||
+          trackingData?.orders?.[0]?.tracking ||
+          '',
+        ).trim();
+      }
+    } catch (trackingError: any) {
+      console.warn('[ME_SHIPMENT_TRACKING_PENDING]', { orderId, shipmentId, message: trackingError?.message || 'tracking unavailable' });
+    }
+
+    order.melhorEnvioShipmentId = shipmentId;
+    order.shippingLabelUrl = printUrl;
+    order.melhorEnvioLabelUrl = printUrl;
+    order.melhorEnvioStatus = 'label_generated';
+    if (trackingCode) order.trackingCode = trackingCode;
+    order.shipmentPurchaseStatus = 'purchased';
+    order.labelGenerationStatus = 'generated';
+    order.shippingStatus = 'Pronto para envio';
+    order.status = 'Pronto para Envio';
+    order.shipmentLastError = undefined;
+
+    const alreadyHasSuccessHistory = order.history.some((event) => event.source === 'melhor_envio' && event.externalEventId === shipmentId && event.status === 'Pronto para Envio');
+    if (!alreadyHasSuccessHistory) {
+      order.history.push({
+        status: 'Pronto para Envio',
+        source: 'melhor_envio',
+        externalEventId: shipmentId,
+        timestamp: new Date().toLocaleString('pt-BR'),
+        occurredAt: new Date().toISOString(),
+        description: trackingCode
+          ? `Frete comprado e etiqueta gerada no Melhor Envio. Código de rastreio: ${trackingCode}.`
+          : 'Frete comprado e etiqueta gerada no Melhor Envio. Código de rastreio aguardando disponibilização da transportadora.',
+      });
+    }
+
+    await db.saveOrder(order);
+    await db.completeShipmentGeneration(orderId, shipmentId, trackingCode || undefined, printUrl, undefined, 'completed', lockToken);
+
+    if (actor?.source === 'admin') {
+      await db.logAdminAction(
+        actor.email || 'admin@marmot.com',
+        actor.name || 'Admin',
+        'generate_shipment',
+        'shipping',
+        order.id,
+        `Envio comprado e etiqueta gerada no Melhor Envio (ID: ${shipmentId}).`,
+        { shipmentId, trackingCode: trackingCode || undefined, printUrl },
+      );
+    }
+
+    console.log('[ME_SHIPMENT_SUCCESS]', { orderId, shipmentId, source: actor?.source || 'system', durationMs: Date.now() - startTime });
+    return { order, shipmentId, trackingCode: trackingCode || undefined, printUrl, reused: false };
+  } catch (error: any) {
+    const normalized = error instanceof ShipmentProcessingError
+      ? error
+      : shipmentProcessingError(error?.message || 'Erro interno ao processar a expedição.', 500, 'SHIPMENT_PROCESSING_FAILED', currentStep, shipmentId || undefined, trackingCode || undefined);
+    const failureStep = normalized.step || currentStep;
+
+    order = (await db.getOrderById(orderId)) || order;
+    if (order) {
+      order.melhorEnvioShipmentId = shipmentId || order.melhorEnvioShipmentId;
+      order.shipmentPurchaseStatus = purchaseConfirmed ? 'purchased' : 'failed';
+      order.labelGenerationStatus = purchaseConfirmed ? 'failed' : (order.labelGenerationStatus || 'not_started');
+      order.shippingStatus = 'Problema no envio';
+      order.shipmentLastError = `${normalized.code}: ${normalized.message}`.slice(0, 1000);
+      const duplicateFailure = order.history.some((event) => event.status === 'Problema no envio' && event.description?.includes(normalized.code));
+      if (!duplicateFailure) {
+        order.history.push({
+          status: 'Problema no envio',
+          source: 'melhor_envio',
+          externalEventId: shipmentId || undefined,
+          timestamp: new Date().toLocaleString('pt-BR'),
+          occurredAt: new Date().toISOString(),
+          description: `${normalized.code}: ${normalized.message}`,
+        });
+      }
+      await db.saveOrder(order);
+    }
+
+    try {
+      await db.completeShipmentGeneration(
+        orderId,
+        shipmentId || normalized.shipmentId,
+        trackingCode || normalized.trackingCode,
+        printUrl || undefined,
+        normalized.message,
+        failureStep,
+        lockToken,
+      );
+    } catch (stateError: any) {
+      console.error('[ME_SHIPMENT_STATE_PERSISTENCE_ERROR]', { orderId, message: stateError?.message || stateError });
+    }
+    console.error('[ME_SHIPMENT_ERROR]', { orderId, code: normalized.code, step: failureStep, source: actor?.source || 'system', durationMs: Date.now() - startTime });
+    throw normalized;
+  }
+}
+
 // --- ADMIN: GERAR ENVIO REAL NO MELHOR ENVIO COM MÁQUINA DE ESTADOS E VALIDAÇÕES RIGOROSAS ---
 app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, async (req: any, res) => {
   const orderId = req.params.id;
@@ -9199,528 +9979,30 @@ app.post('/api/admin/orders/:id/generate-melhor-envio-shipment', requireAdmin, a
   console.log(`[ME_SHIPMENT_START] orderId: ${orderId}`);
 
   try {
-    const order = await db.getOrderById(orderId);
-    if (!order) {
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=order_lookup httpStatus=404 errorCode=ORDER_NOT_FOUND durationMs: ${Date.now() - startTime}`);
-      return res.status(404).json({ error: 'Pedido não encontrado no sistema.', code: 'ORDER_NOT_FOUND' });
-    }
-
-    const isApproved =
-      order.status === 'Pagamento Aprovado' ||
-      order.paymentStatus === 'Pago' ||
-      order.status === 'Pedido Confirmado' ||
-      order.status === 'Em Separação' ||
-      order.status === 'Pronto para Envio';
-
-    if (!isApproved) {
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=payment_check httpStatus=400 errorCode=PAYMENT_NOT_CONFIRMED durationMs: ${Date.now() - startTime}`);
-      return res.status(400).json({
-        error: 'A etiqueta e o envio só podem ser gerados após a confirmação do pagamento.',
-        code: 'PAYMENT_NOT_CONFIRMED',
-      });
-    }
-
-    // 1. Se já possui etiqueta válida e ID de remessa real, retornar imediatamente
-    if (order.shippingLabelUrl && order.melhorEnvioShipmentId && !order.trackingCode?.startsWith('BR-SIMULATED-')) {
-      console.log(`[ME_SHIPMENT_SUCCESS] orderId: ${orderId} shipmentId: ${order.melhorEnvioShipmentId} (cached) durationMs: ${Date.now() - startTime}`);
-      return res.json({
-        success: true,
-        message: 'Etiqueta já emitida anteriormente.',
-        shipmentId: order.melhorEnvioShipmentId,
-        trackingCode: order.trackingCode,
-        printUrl: order.shippingLabelUrl,
-        order,
-      });
-    }
-
-    // 2. Lock Atômico Distribuído & Idempotência
-    const claim = await db.claimShipmentGeneration(orderId);
-    if (!claim.shouldProcess) {
-      if (claim.existing?.status === 'completed' && claim.existing?.print_url) {
-        order.melhorEnvioShipmentId = claim.existing.shipment_id || order.melhorEnvioShipmentId;
-        order.trackingCode = claim.existing.tracking_code || order.trackingCode;
-        order.shippingLabelUrl = claim.existing.print_url || order.shippingLabelUrl;
-        console.log(`[ME_SHIPMENT_SUCCESS] orderId: ${orderId} shipmentId: ${order.melhorEnvioShipmentId} (recovered from DB) durationMs: ${Date.now() - startTime}`);
-        return res.json({
-          success: true,
-          message: 'Etiqueta recuperada de operação já concluída.',
-          shipmentId: order.melhorEnvioShipmentId,
-          trackingCode: order.trackingCode,
-          printUrl: order.shippingLabelUrl,
-          order,
-        });
-      }
-      if (claim.isLocked || claim.existing?.status === 'processing') {
-        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=lock httpStatus=409 errorCode=GENERATION_IN_PROGRESS durationMs: ${Date.now() - startTime}`);
-        return res.status(409).json({
-          error: 'Geração de etiqueta já está em andamento para este pedido.',
-          code: 'GENERATION_IN_PROGRESS',
-          step: claim.existing?.current_step || 'processing',
-        });
-      }
-    }
-
-    // STEP 1: VALIDATION
-    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=validation`);
-    await db.updateShipmentStep(orderId, 'validating');
-
-    const config = getMelhorEnvioConfig();
-    const token = config.token;
-    if (!token || token.length < 10) {
-      await db.completeShipmentGeneration(orderId, '', '', '', 'Token do Melhor Envio ausente', 'failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=503 errorCode=MISSING_TOKEN durationMs: ${Date.now() - startTime}`);
-      return res.status(503).json({
-        error: 'Token do Melhor Envio não configurado no servidor. Configure a variável MELHOR_ENVIO_TOKEN nas variáveis de ambiente da Vercel (escopo Production).',
-        code: 'MISSING_TOKEN',
-        step: 'validation',
-      });
-    }
-
-    let savedSettings: any;
-    try {
-      savedSettings = await db.getShippingSettings();
-    } catch (settingsErr: any) {
-      await db.completeShipmentGeneration(orderId, '', '', '', settingsErr.message, 'failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=500 errorCode=SETTINGS_ERROR durationMs: ${Date.now() - startTime}`);
-      return res.status(500).json({
-        error: settingsErr.message || 'Erro ao carregar configurações de frete no banco de dados.',
-        code: 'SETTINGS_ERROR',
-        step: 'validation',
-      });
-    }
-
-    const baseUrl = config.baseUrl;
-    const userAgent = config.userAgent;
-    const appEmail = config.appEmail;
-    const senderConfig = savedSettings.sender;
-
-    if (!senderConfig || !senderConfig.document) {
-      const errMsg = 'Documento do remetente não configurado nas Configurações de Frete.';
-      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=MISSING_SENDER_DOCUMENT durationMs: ${Date.now() - startTime}`);
-      return res.status(400).json({
-        error: errMsg,
-        code: 'MISSING_SENDER_DOCUMENT',
-        step: 'validation',
-      });
-    }
-
-    // Validação estrita de dígitos verificadores do documento do remetente (CPF ou CNPJ)
-    const senderDocValidation = validateSenderDocument(senderConfig.document);
-    if (!senderDocValidation.valid) {
-      const errMsg = senderDocValidation.error || 'Documento do remetente inválido.';
-      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=INVALID_SENDER_DOCUMENT durationMs: ${Date.now() - startTime}`);
-      return res.status(400).json({
-        error: errMsg,
-        code: 'INVALID_SENDER_DOCUMENT',
-        step: 'validation',
-      });
-    }
-
-    const cleanOrigin = (senderConfig.cep || config.originPostalCode || '03806010').replace(/\D/g, '');
-    const cleanDest = (order.shippingAddress?.cep || '').replace(/\D/g, '');
-    const customerCpf = cleanCpf(order.customerCpf || (order.shippingAddress as any)?.cpf || '');
-
-    if (cleanDest.length !== 8) {
-      const errMsg = 'CEP de entrega do destinatário inválido.';
-      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=INVALID_DEST_CEP durationMs: ${Date.now() - startTime}`);
-      return res.status(400).json({ error: errMsg, code: 'INVALID_DEST_CEP', step: 'validation' });
-    }
-
-    if (!customerCpf || !isValidCpf(customerCpf)) {
-      const errMsg = 'CPF do destinatário obrigatório e válido para emissão de frete pelo Melhor Envio. Adicione ou edite o CPF do cliente neste pedido antes de gerar a etiqueta.';
-      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=validation httpStatus=400 errorCode=INVALID_CUSTOMER_CPF durationMs: ${Date.now() - startTime}`);
-      return res.status(400).json({
-        error: errMsg,
-        code: 'INVALID_CUSTOMER_CPF',
-        step: 'validation',
-      });
-    }
-
-    const productsStore = await db.getAllProducts();
-    const meProducts: any[] = [];
-    for (const item of order.items) {
-      const prod = productsStore.find((p) => String(p.id) === String(item.productId) || String(p.slug) === String(item.productId));
-      const weight = Math.max(0.05, Number(prod?.weight || item.weight || savedSettings.defaultWeight || 0.35));
-      const height = Math.max(2, Number(prod?.height || item.height || savedSettings.defaultHeight || 4));
-      const width = Math.max(11, Number(prod?.width || item.width || savedSettings.defaultWidth || 20));
-      const length = Math.max(16, Number(prod?.length || item.length || savedSettings.defaultLength || 25));
-
-      meProducts.push({
-        name: item.title || item.productTitle || 'Peça Marmot',
-        quantity: Math.max(1, Number(item.quantity) || 1),
-        unitary_value: Number(Number(item.price || 0).toFixed(2)),
-        weight: Number(weight.toFixed(2)),
-        height: Math.ceil(height),
-        width: Math.ceil(width),
-        length: Math.ceil(length),
-      });
-    }
-
-    if (!order.shippingAddress?.street || !order.shippingAddress?.city || !order.shippingAddress?.state) {
-      const errMsg = 'Endereço de entrega incompleto no pedido (rua, cidade e UF são obrigatórios).';
-      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-      return res.status(400).json({ error: errMsg, code: 'INCOMPLETE_DEST_ADDRESS', step: 'validation' });
-    }
-
-    if (!senderConfig.street || !senderConfig.city || !senderConfig.state || !senderDocValidation?.valid || !senderDocValidation.digits) {
-      const errMsg = 'Endereço ou documento do remetente incompleto nas configurações de frete.';
-      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-      return res.status(400).json({ error: errMsg, code: 'INCOMPLETE_SENDER_DATA', step: 'validation' });
-    }
-
-    const resolvedServiceId = Number(order.shippingServiceId);
-    if (!resolvedServiceId || isNaN(resolvedServiceId) || resolvedServiceId <= 0) {
-      const errMsg = 'Identificador de serviço de frete (shippingServiceId) ausente no pedido. Não é permitido inferir serviço sem contrato explícito.';
-      await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-      return res.status(400).json({ error: errMsg, code: 'MISSING_SERVICE_ID', step: 'validation' });
-    }
-
-    const senderDocClean = senderDocValidation.digits;
-    const senderPhone = (senderConfig.phone || '').replace(/\D/g, '');
-
-    // Construção do payload do remetente sem misturar document e company_document
-    const fromPayload: any = {
-      name: senderConfig.name || 'Marmot Confecções',
-      phone: senderPhone || '11988421092',
-      email: senderConfig.email || appEmail,
-      address: senderConfig.street,
-      number: senderConfig.number || 'S/N',
-      complement: senderConfig.complement || '',
-      district: senderConfig.neighborhood || 'Centro',
-      city: senderConfig.city,
-      state_abbr: senderConfig.state.toUpperCase(),
-      country_id: 'BR',
-      postal_code: cleanOrigin,
-    };
-
-    if (senderDocValidation.type === 'cpf') {
-      fromPayload.document = senderDocClean;
-    } else {
-      fromPayload.company_document = senderDocClean;
-      fromPayload.state_register = senderConfig.stateRegister || 'ISENTO';
-    }
-
-    const cartPayload = {
-      service: resolvedServiceId,
-      from: fromPayload,
-      to: {
-        name: order.shippingAddress?.recipientName || order.customerName || 'Destinatário',
-        phone: (order.customerPhone || (order.shippingAddress as any)?.phone || '11988421092').replace(/\D/g, ''),
-        email: order.customerEmail || 'contato@marmot.com.br',
-        document: customerCpf,
-        address: order.shippingAddress.street,
-        number: order.shippingAddress.number || 'S/N',
-        complement: order.shippingAddress.complement || '',
-        district: order.shippingAddress.neighborhood || '',
-        city: order.shippingAddress.city,
-        state_abbr: order.shippingAddress.state.toUpperCase(),
-        country_id: 'BR',
-        postal_code: cleanDest,
-      },
-      products: meProducts,
-      volumes: [
-        {
-          height: Math.max(4, Math.max(...meProducts.map((p) => p.height))),
-          width: Math.max(15, Math.max(...meProducts.map((p) => p.width))),
-          length: Math.max(20, Math.max(...meProducts.map((p) => p.length))),
-          weight: Number(meProducts.reduce((acc, p) => acc + p.weight * p.quantity, 0).toFixed(2)),
-        },
-      ],
-      options: {
-        insurance_value: Number(Number(order.subtotal || 0).toFixed(2)),
-        receipt: false,
-        own_hand: false,
-        reverse: false,
-        non_commercial: false,
-      },
-    };
-
-    let shipmentId = claim.existing?.shipment_id || order.melhorEnvioShipmentId || '';
-    let printUrl = '';
-    let realTracking = '';
-
-    // STEP 2: CART (Adicionar ao carrinho)
-    if (!shipmentId) {
-      console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=cart`);
-      await db.updateShipmentStep(orderId, 'creating_cart');
-
-      let cartRes: Response;
-      try {
-        cartRes = await fetchWithTimeout(`${baseUrl}/me/cart`, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-            'User-Agent': userAgent,
-          },
-          body: JSON.stringify(cartPayload),
-        }, 15000);
-      } catch (timeoutErr: any) {
-        await db.completeShipmentGeneration(orderId, '', '', '', timeoutErr.message, 'failed');
-        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=cart httpStatus=504 errorCode=TIMEOUT durationMs: ${Date.now() - startTime}`);
-        return res.status(504).json({ error: timeoutErr.message, code: 'TIMEOUT', step: 'cart' });
-      }
-
-      if (!cartRes.ok) {
-        const cartErrText = await cartRes.text().catch(() => '');
-        console.error('[Melhor Envio Cart Error]:', cartRes.status, cartErrText);
-        let msg = `Erro no Melhor Envio ao registrar envio no carrinho (HTTP ${cartRes.status})`;
-        try {
-          const j = JSON.parse(cartErrText);
-          if (j.message) msg += `: ${j.message}`;
-          else if (j.error) msg += `: ${j.error}`;
-          if (j.errors) {
-            const errDetails = Object.entries(j.errors).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`).join('; ');
-            msg += ` (${errDetails})`;
-          }
-        } catch {
-          if (cartErrText) msg += `: ${cartErrText.slice(0, 150)}`;
-        }
-        await db.completeShipmentGeneration(orderId, '', '', '', msg, 'failed');
-        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=cart httpStatus=${cartRes.status} errorCode=CART_ERROR durationMs: ${Date.now() - startTime}`);
-        return res.status(400).json({ error: msg, code: 'CART_ERROR', step: 'cart' });
-      }
-
-      const cartData: any = await cartRes.json();
-      shipmentId = String(cartData.id || cartData.protocol);
-
-      if (!shipmentId) {
-        const errMsg = 'ID de remessa não retornado pelo Melhor Envio.';
-        await db.completeShipmentGeneration(orderId, '', '', '', errMsg, 'failed');
-        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=cart httpStatus=502 errorCode=MISSING_SHIPMENT_ID durationMs: ${Date.now() - startTime}`);
-        return res.status(502).json({ error: errMsg, code: 'MISSING_SHIPMENT_ID', step: 'cart' });
-      }
-
-      // Persiste o shipmentId IMEDIATAMENTE no banco para evitar duplicação em caso de retry
-      order.melhorEnvioShipmentId = shipmentId;
-      await db.saveOrder(order);
-      await db.updateShipmentStep(orderId, 'cart_created', shipmentId);
-      console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=cart_created shipmentId: ${shipmentId}`);
-    } else {
-      console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=cart_reused shipmentId: ${shipmentId}`);
-    }
-
-    // STEP 3: CHECKOUT (Compra do frete com saldo)
-    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=checkout shipmentId: ${shipmentId}`);
-    await db.updateShipmentStep(orderId, 'checking_out', shipmentId);
-
-    let checkoutRes: Response;
-    try {
-      checkoutRes = await fetchWithTimeout(`${baseUrl}/me/shipment/checkout`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-          'User-Agent': userAgent,
-        },
-        body: JSON.stringify({ orders: [shipmentId] }),
-      }, 20000);
-    } catch (timeoutErr: any) {
-      await db.completeShipmentGeneration(orderId, shipmentId, '', '', timeoutErr.message, 'checking_out');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=checkout httpStatus=504 errorCode=TIMEOUT durationMs: ${Date.now() - startTime}`);
-      return res.status(504).json({ error: timeoutErr.message, code: 'TIMEOUT', step: 'checkout', shipmentId });
-    }
-
-    if (!checkoutRes.ok) {
-      const chkErrText = await checkoutRes.text().catch(() => '');
-      console.warn('[Melhor Envio Checkout Notice]:', checkoutRes.status, chkErrText);
-      let isInsufficientBalance = false;
-      let isAlreadyPaid = false;
-
-      try {
-        const chkJ = JSON.parse(chkErrText);
-        const combined = `${chkJ.message || ''} ${chkJ.error || ''}`.toLowerCase();
-        if (combined.includes('saldo') || combined.includes('balance') || combined.includes('carteira')) {
-          isInsufficientBalance = true;
-        }
-        if (combined.includes('já foi pago') || combined.includes('already') || combined.includes('pago')) {
-          isAlreadyPaid = true;
-        }
-      } catch {}
-
-      if (isInsufficientBalance) {
-        const errMsg = 'Saldo insuficiente na sua carteira do Melhor Envio para comprar este envio. Adicione créditos no painel do Melhor Envio e tente novamente.';
-        await db.completeShipmentGeneration(orderId, shipmentId, '', '', errMsg, 'checkout_failed_balance');
-        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=checkout httpStatus=402 errorCode=INSUFFICIENT_BALANCE durationMs: ${Date.now() - startTime}`);
-        return res.status(402).json({
-          error: errMsg,
-          code: 'INSUFFICIENT_BALANCE',
-          step: 'checkout',
-          shipmentId,
-        });
-      }
-
-      if (!isAlreadyPaid && checkoutRes.status !== 200 && checkoutRes.status !== 201) {
-        const errMsg = `Falha ao realizar checkout da etiqueta no Melhor Envio (HTTP ${checkoutRes.status}). Detalhes: ${chkErrText.substring(0, 200)}`;
-        await db.completeShipmentGeneration(orderId, shipmentId, '', '', errMsg, 'checkout_failed');
-        console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=checkout httpStatus=${checkoutRes.status} errorCode=CHECKOUT_FAILED durationMs: ${Date.now() - startTime}`);
-        return res.status(502).json({
-          error: errMsg,
-          code: 'CHECKOUT_FAILED',
-          step: 'checkout',
-          shipmentId,
-        });
-      }
-    }
-
-    await db.updateShipmentStep(orderId, 'checkout_completed', shipmentId);
-
-    // STEP 4: GENERATE (Geração da etiqueta)
-    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=generate shipmentId: ${shipmentId}`);
-    await db.updateShipmentStep(orderId, 'generating_label', shipmentId);
-
-    let genOk = false;
-    let genErrDetails = '';
-    try {
-      const genRes = await fetchWithTimeout(`${baseUrl}/me/shipment/generate`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-          'User-Agent': userAgent,
-        },
-        body: JSON.stringify({ orders: [shipmentId] }),
-      }, 20000);
-
-      if (genRes.ok) {
-        genOk = true;
-      } else {
-        const genErrText = await genRes.text().catch(() => '');
-        genErrDetails = genErrText.substring(0, 200);
-        console.warn('[Melhor Envio Generate Notice]:', genRes.status, genErrText);
-        // Check if label was already generated
-        if (genErrText.toLowerCase().includes('already') || genErrText.toLowerCase().includes('gerada')) {
-          genOk = true;
-        }
-      }
-    } catch (genErr: any) {
-      genErrDetails = genErr.message;
-      console.warn('[Melhor Envio Generate Exception]:', genErr.message);
-    }
-
-    if (!genOk) {
-      const errMsg = `Falha ao solicitar geração da etiqueta no Melhor Envio. Detalhes: ${genErrDetails || 'Erro desconhecido'}`;
-      await db.completeShipmentGeneration(orderId, shipmentId, '', '', errMsg, 'generate_failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=generate httpStatus=502 errorCode=GENERATE_FAILED durationMs: ${Date.now() - startTime}`);
-      return res.status(502).json({
-        error: errMsg,
-        code: 'GENERATE_FAILED',
-        step: 'generate',
-        shipmentId,
-      });
-    }
-
-    await db.updateShipmentStep(orderId, 'label_generated', shipmentId);
-
-    // STEP 5: PRINT (Obtenção da URL pública de impressão)
-    console.log(`[ME_SHIPMENT_STEP] orderId: ${orderId} step=print shipmentId: ${shipmentId}`);
-    await db.updateShipmentStep(orderId, 'getting_print_url', shipmentId);
-
-    try {
-      const printRes = await fetchWithTimeout(`${baseUrl}/me/shipment/print`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-          'User-Agent': userAgent,
-        },
-        body: JSON.stringify({ mode: 'public', orders: [shipmentId] }),
-      }, 15000);
-
-      if (printRes.ok) {
-        const printData: any = await printRes.json();
-        printUrl = printData.url || (printData.orders && printData.orders[0]?.url) || '';
-      }
-    } catch (printErr: any) {
-      console.warn('[Melhor Envio Print Exception]:', printErr.message);
-    }
-
-    // STEP 6: TRACKING (Obtenção do rastreio oficial)
-    try {
-      const trackRes = await fetchWithTimeout(`${baseUrl}/me/shipment/tracking`, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-          'User-Agent': userAgent,
-        },
-        body: JSON.stringify({ orders: [shipmentId] }),
-      }, 10000);
-
-      if (trackRes.ok) {
-        const trackData: any = await trackRes.json();
-        if (trackData && trackData[shipmentId]) {
-          realTracking = trackData[shipmentId].tracking || '';
-        }
-      }
-    } catch {}
-
-    if (!printUrl) {
-      const errMsg = 'A remessa foi gerada e paga no Melhor Envio, mas a URL de impressão da etiqueta não foi retornada pela transportadora. Tente imprimir novamente pelo painel administrativo.';
-      await db.completeShipmentGeneration(orderId, shipmentId, realTracking || undefined, '', errMsg, 'print_failed');
-      console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=print httpStatus=502 errorCode=PRINT_URL_FAILED durationMs: ${Date.now() - startTime}`);
-      return res.status(502).json({
-        error: errMsg,
-        code: 'PRINT_URL_FAILED',
-        step: 'print',
-        shipmentId,
-        trackingCode: realTracking || undefined,
-      });
-    }
-
-    // STEP 7: COMPLETE (Finalização com sucesso e persistência)
-    order.melhorEnvioShipmentId = shipmentId;
-    if (realTracking) {
-      order.trackingCode = realTracking;
-    }
-    order.shippingLabelUrl = printUrl;
-    order.shippingStatus = 'Pronto para envio';
-    order.status = 'Pronto para Envio';
-
-    const now = new Date();
-    order.history.push({
-      status: 'Pronto para Envio',
-      timestamp: now.toLocaleString('pt-BR'),
-      description: `Remessa oficial #${shipmentId} gerada no Melhor Envio.${realTracking ? ` Código de Rastreio Oficial: ${realTracking}.` : ' Etiqueta pronta para impressão.'}`,
+    const result = await processMelhorEnvioShipment(orderId, {
+      source: 'admin',
+      email: req.user?.email,
+      name: req.user?.name,
     });
-
-    await db.saveOrder(order);
-    await db.completeShipmentGeneration(order.id, shipmentId, realTracking || undefined, printUrl, undefined, 'completed');
-
-    await db.logAdminAction(
-      req.user?.email || 'admin@marmot.com',
-      req.user?.name || 'Admin',
-      'generate_shipment',
-      'shipping',
-      order.id,
-      `Envio gerado no Melhor Envio (ID: ${shipmentId}${realTracking ? `, Rastreio: ${realTracking}` : ''})`,
-      { shipmentId, trackingCode: realTracking || undefined, printUrl }
-    );
-
-    console.log(`[ME_SHIPMENT_SUCCESS] orderId: ${orderId} shipmentId: ${shipmentId} durationMs: ${Date.now() - startTime}`);
-
     return res.json({
       success: true,
-      order,
-      labelUrl: printUrl,
-      trackingCode: realTracking || undefined,
-      shipmentId,
+      order: result.order,
+      labelUrl: result.printUrl,
+      trackingCode: result.trackingCode,
+      shipmentId: result.shipmentId,
+      reused: result.reused,
     });
-  } catch (err: any) {
-    console.error('[Generate Shipment Fatal Error]:', err);
-    await db.completeShipmentGeneration(orderId, '', '', '', err.message, 'failed');
-    console.log(`[ME_SHIPMENT_ERROR] orderId: ${orderId} step=fatal httpStatus=500 errorCode=INTERNAL_ERROR durationMs: ${Date.now() - startTime}`);
-    return res.status(500).json({ error: err.message || 'Erro ao gerar envio no Melhor Envio.', code: 'INTERNAL_ERROR' });
+  } catch (error: any) {
+    return res.status(error?.statusCode || 500).json({
+      success: false,
+      error: error?.message || 'Erro ao processar envio no Melhor Envio.',
+      code: error?.code || 'SHIPMENT_PROCESSING_FAILED',
+      step: error?.step,
+      shipmentId: error?.shipmentId,
+      trackingCode: error?.trackingCode,
+    });
   }
+
 });
 
 app.get('/api/admin/orders/:id/print-label', requireAdmin, async (req: any, res) => {
@@ -10215,6 +10497,13 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
       return res.status(400).json({ error: 'Este pedido já está pago e confirmado.' });
     }
 
+    if (!order.shippingQuoteId || order.shippingDetails?.source !== 'melhor_envio_api') {
+      return res.status(409).json({
+        code: 'SHIPPING_QUOTE_REQUIRED',
+        error: 'Este pedido não possui uma cotação real de frete persistida. Volte ao checkout e recalcule o frete.',
+      });
+    }
+
     // Ownership check if order belongs to a registered user
     if (order.userId) {
       const token = extractToken(req);
@@ -10253,20 +10542,6 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
       mercadoPagoAssetBaseUrl,
     );
 
-    if (order.shippingFee && order.shippingFee > 0) {
-      const shippingPictureUrl = resolveMercadoPagoPictureUrl('/assets/shipping-box.png', mercadoPagoAssetBaseUrl);
-      mpItems.push({
-        id: `shipping-${order.shippingServiceId || 'fee'}`,
-        title: `Frete — ${order.shippingCarrier || 'Entrega'} ${order.shippingService ? `(${order.shippingService})` : ''}`.trim(),
-        description: `Envio para ${order.shippingAddress?.city || ''} - ${order.shippingAddress?.state || ''} (CEP: ${order.shippingAddress?.cep || ''})`,
-        ...(shippingPictureUrl ? { picture_url: shippingPictureUrl } : {}),
-        category_id: 'shipping',
-        quantity: 1,
-        currency_id: 'BRL',
-        unit_price: Number(order.shippingFee.toFixed(2)),
-      });
-    }
-
     const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, order.id);
     if (!callbackFields.back_urls) {
       console.warn('[MP_CALLBACKS_DISABLED]', JSON.stringify({
@@ -10279,8 +10554,8 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
     const preferencePayload: any = {
       items: mpItems,
       payer: {
-        name: order.shippingAddress?.recipientName || order.customerName || 'Cliente',
-        email: order.customerEmail || 'contato@marmot.com.br',
+        name: order.shippingAddress?.recipientName || order.customerName,
+        email: order.customerEmail,
         phone: buildMercadoPagoPhone(order.customerPhone),
         address: order.shippingAddress ? {
           zip_code: (order.shippingAddress.cep || '').replace(/\D/g, ''),
@@ -10289,6 +10564,10 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pa
         } : undefined,
       },
       ...callbackFields,
+      shipments: {
+        cost: Number(Number(order.shippingFee || 0).toFixed(2)),
+        mode: 'not_specified',
+      },
       external_reference: order.id,
       statement_descriptor: 'MARMOT STORE',
       metadata: {
@@ -11181,10 +11460,9 @@ async function syncActiveOrdersTrackingServer(): Promise<{ totalActive: number; 
   }
 
   if (token && token.length >= 10) {
-    const baseUrl = 'https://melhorenvio.com.br/api/v2';
-    const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confeccoes';
-    const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
-    const userAgent = `${appName} (${appEmail})`;
+    const config = getMelhorEnvioConfig();
+    const baseUrl = config.baseUrl;
+    const userAgent = config.userAgent;
 
     const shipmentIds = activeOrders.map((o) => o.melhorEnvioShipmentId || o.trackingCode).filter(Boolean) as string[];
 
@@ -11235,6 +11513,34 @@ async function syncActiveOrdersTrackingServer(): Promise<{ totalActive: number; 
   };
 }
 
+async function processPendingPaidShipments(limit = 3): Promise<{ queued: number; completed: number; locked: number; failed: number }> {
+  const orders = await db.getOrders();
+  const candidates = orders
+    .filter((order) =>
+      isPaidOrderForFulfillment(order) &&
+      order.status !== 'Cancelado' &&
+      order.paymentStatus !== 'Reembolsado' &&
+      (order.shipmentPurchaseStatus !== 'purchased' || order.labelGenerationStatus !== 'generated' || !order.shippingLabelUrl)
+    )
+    .sort((a, b) => new Date(a.paidAt || a.createdAt || 0).getTime() - new Date(b.paidAt || b.createdAt || 0).getTime())
+    .slice(0, Math.max(1, Math.min(limit, 10)));
+
+  let completed = 0;
+  let locked = 0;
+  let failed = 0;
+  for (const order of candidates) {
+    try {
+      await processMelhorEnvioShipment(order.id, { source: 'cron' });
+      completed += 1;
+    } catch (error: any) {
+      if (error?.code === 'SHIPMENT_IN_PROGRESS') locked += 1;
+      else failed += 1;
+    }
+  }
+
+  return { queued: candidates.length, completed, locked, failed };
+}
+
 // Background recurring sync (only in persistent node process, avoided in serverless/tests)
 if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   const syncInterval = setInterval(() => {
@@ -11254,10 +11560,12 @@ app.get(['/api/cron/tracking-sync', '/api/cron/sync-tracking'], async (req, res)
       return res.status(401).json({ error: 'Não autorizado para execução do cron de sincronização.' });
     }
 
+    const fulfillment = await processPendingPaidShipments(3);
     const stats = await syncActiveOrdersTrackingServer();
     res.json({
       success: true,
       timestamp: new Date().toISOString(),
+      fulfillment,
       stats,
     });
   } catch (err: any) {
@@ -11296,10 +11604,9 @@ app.post(['/api/webhooks/melhor-envio', '/api/melhorenvio/webhook', '/api/webhoo
       console.warn('[TRACKING_WEBHOOK_UNVERIFIED] Webhook secret ausente ou inválido. Consultando API oficial da transportadora.');
       const token = getMelhorEnvioTokenServer();
       if (token && token.length >= 10) {
-        const baseUrl = 'https://melhorenvio.com.br/api/v2';
-        const appName = process.env.MELHOR_ENVIO_APP_NAME || 'Marmot Confeccoes';
-        const appEmail = process.env.MELHOR_ENVIO_APP_EMAIL || 'contato@marmot.com.br';
-        const userAgent = `${appName} (${appEmail})`;
+        const config = getMelhorEnvioConfig();
+        const baseUrl = config.baseUrl;
+        const userAgent = config.userAgent;
 
         try {
           const trackRes = await fetch(`${baseUrl}/me/shipment/tracking`, {

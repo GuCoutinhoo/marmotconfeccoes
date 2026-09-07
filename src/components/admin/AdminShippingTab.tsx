@@ -48,6 +48,7 @@ interface ShippingSettings {
   clientId?: string;
   redirectUri?: string;
   sender?: SenderAddress;
+  documentMode?: '' | 'commercial_invoice' | 'content_declaration';
   defaultWeight: number;
   defaultHeight: number;
   defaultWidth: number;
@@ -74,19 +75,20 @@ export const AdminShippingTab: React.FC = () => {
     tokenMasked: '',
     appName: 'Marmot Confecções',
     appEmail: 'contato@marmot.com.br',
+    documentMode: '',
     sender: {
-      name: 'Marmot Confecções',
+      name: '',
       document: '',
-      stateRegister: 'ISENTO',
-      phone: '11988421092',
-      email: 'contato@marmot.com.br',
-      street: 'Avenida Celso Garcia',
-      number: '1200',
+      stateRegister: '',
+      phone: '',
+      email: '',
+      street: '',
+      number: '',
       complement: '',
-      neighborhood: 'Brás',
-      city: 'São Paulo',
-      state: 'SP',
-      cep: '03806-010',
+      neighborhood: '',
+      city: '',
+      state: '',
+      cep: '',
     },
     defaultWeight: 0.35,
     defaultHeight: 4,
@@ -102,18 +104,18 @@ export const AdminShippingTab: React.FC = () => {
   
   // Sender form state
   const [senderForm, setSenderForm] = useState<SenderAddress>({
-    name: 'Marmot Confecções',
+    name: '',
     document: '',
-    stateRegister: 'ISENTO',
-    phone: '11988421092',
-    email: 'contato@marmot.com.br',
-    street: 'Avenida Celso Garcia',
-    number: '1200',
+    stateRegister: '',
+    phone: '',
+    email: '',
+    street: '',
+    number: '',
     complement: '',
-    neighborhood: 'Brás',
-    city: 'São Paulo',
-    state: 'SP',
-    cep: '03806-010',
+    neighborhood: '',
+    city: '',
+    state: '',
+    cep: '',
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -142,7 +144,7 @@ export const AdminShippingTab: React.FC = () => {
           setSenderForm({
             name: data.sender.name || '',
             document: data.sender.document || '',
-            stateRegister: data.sender.stateRegister || 'ISENTO',
+            stateRegister: data.sender.stateRegister || '',
             phone: data.sender.phone || '',
             email: data.sender.email || '',
             street: data.sender.street || '',
@@ -150,7 +152,7 @@ export const AdminShippingTab: React.FC = () => {
             complement: data.sender.complement || '',
             neighborhood: data.sender.neighborhood || '',
             city: data.sender.city || '',
-            state: data.sender.state || 'SP',
+            state: data.sender.state || '',
             cep: data.sender.cep || '',
           });
         }
@@ -223,12 +225,19 @@ export const AdminShippingTab: React.FC = () => {
       return;
     }
 
+    if (!settings.documentMode) {
+      showToast('Modo Fiscal Obrigatório', 'Selecione Nota Fiscal ou Declaração de Conteúdo antes de ativar a compra automática de frete.', 'error');
+      setIsSaving(false);
+      return;
+    }
+
     try {
       const payload: any = {
         originPostalCode: cleanOrigin,
         environment: environmentInput,
         clientId: clientIdInput.trim() || undefined,
         clientSecret: clientSecretInput.trim() || undefined,
+        documentMode: settings.documentMode,
         sender: {
           ...senderForm,
           document: formatDocument(docValidation.digits),
@@ -479,6 +488,28 @@ export const AdminShippingTab: React.FC = () => {
             <span className="text-xs text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-md">
               Exigido pela ANTT & Transportadoras
             </span>
+          </div>
+
+          <div className="mb-5 max-w-2xl">
+            <label className="block text-sm font-medium text-stone-700 mb-1">
+              Documento fiscal usado na emissão do frete *
+            </label>
+            <select
+              required
+              value={settings.documentMode || ''}
+              onChange={(event) => setSettings({
+                ...settings,
+                documentMode: event.target.value as ShippingSettings['documentMode'],
+              })}
+              className="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-300 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none"
+            >
+              <option value="" disabled>Selecione o modo fiscal</option>
+              <option value="commercial_invoice">Venda comercial com NF-e</option>
+              <option value="content_declaration">Declaração de conteúdo (somente envio não comercial)</option>
+            </select>
+            <p className="text-xs text-stone-500 mt-2">
+              O Melhor Envio exige chave de NF-e para vendas comerciais. A declaração de conteúdo deve ser usada apenas quando a operação for legalmente não comercial.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

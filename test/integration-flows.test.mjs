@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const sqlPath = path.resolve(process.cwd(), 'supabase-complete-production-migration.sql');
+const fulfillmentSqlPath = path.resolve(process.cwd(), 'supabase/migrations/20260907140252_complete_shipping_fulfillment.sql');
 const apiPath = path.resolve(process.cwd(), 'api/index.ts');
 const checkoutPath = path.resolve(process.cwd(), 'src/pages/CheckoutPage.tsx');
 const cartContextPath = path.resolve(process.cwd(), 'src/context/CartContext.tsx');
@@ -14,6 +15,7 @@ const mercadoPagoServicePath = path.resolve(process.cwd(), 'src/services/mercado
 
 test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
   const sql = fs.readFileSync(sqlPath, 'utf8');
+  const fulfillmentSql = fs.readFileSync(fulfillmentSqlPath, 'utf8');
   const api = fs.readFileSync(apiPath, 'utf8');
   const checkout = fs.readFileSync(checkoutPath, 'utf8');
   const cartContext = fs.readFileSync(cartContextPath, 'utf8');
@@ -55,9 +57,13 @@ test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
   await t.test('5. Fail-Closed shipping quote validation without fallback to client shippingFee', () => {
     // In order creation
     assert.ok(!api.includes('validatedShippingFee = Math.max(0, Number(body.shippingFee) || 0)'), 'Must not fallback to body.shippingFee');
-    assert.ok(api.includes('Cotação de frete obrigatória para pedidos com subtotal inferior a R$ 399,00'), 'Must reject if quote is missing under 399');
+    assert.ok(api.includes('Cotação de frete inválida ou não encontrada. Por favor, recalcule o frete para continuar.'), 'Must reject if the real quote is missing');
     // In MP preference
-    assert.ok(api.includes('Cotação de frete obrigatória para compras abaixo de R$ 399,00'), 'Must reject in MP preference if quote missing');
+    assert.equal(
+      api.split('Cotação de frete inválida ou não encontrada. Por favor, recalcule o frete para continuar.').length - 1,
+      2,
+      'Both order creation and the Mercado Pago preference must require the real quote, including free shipping'
+    );
   });
 
   await t.test('6. POST /api/returns requires authentication and validates ownership', () => {
@@ -66,10 +72,10 @@ test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
   });
 
   await t.test('7. Melhor Envio label generation is fail-closed on service ID, addresses, and print URL', () => {
-    assert.ok(api.includes("code: 'MISSING_SERVICE_ID'"), 'Must reject missing service ID');
-    assert.ok(api.includes("code: 'INCOMPLETE_DEST_ADDRESS'"), 'Must reject incomplete destination address');
-    assert.ok(api.includes("code: 'INCOMPLETE_SENDER_DATA'"), 'Must reject incomplete sender address');
-    assert.ok(api.includes("code: 'PRINT_URL_FAILED'"), 'Must fail closed if printUrl is not returned');
+    assert.ok(api.includes("'SHIPPING_QUOTE_MISMATCH'"), 'Must reject a service that differs from the selected quote');
+    assert.ok(api.includes("'INVALID_RECIPIENT_DATA'"), 'Must reject incomplete destination data');
+    assert.ok(api.includes("'INVALID_SENDER_DATA'"), 'Must reject incomplete sender data');
+    assert.ok(api.includes("'PRINT_URL_FAILED'"), 'Must fail closed if printUrl is not returned');
   });
 
   await t.test('8. Tracking webhooks prevent status spoofing by validating secret or re-verifying with carrier API', () => {
@@ -205,5 +211,69 @@ test('Integration & Audit Verification: P0 Production Hardening', async (t) => {
       !checkout.includes('Fallback to fetch current order state from DB'),
       'A failed return verification must never be converted into a confirmation from URL/database fallback'
     );
+  });
+
+  await t.test('20. Shipping is charged through the Mercado Pago shipment field', () => {
+    assert.ok(api.includes("cost: Number(validatedShippingFee.toFixed(2))"));
+    assert.ok(api.includes("cost: Number(Number(order.shippingFee || 0).toFixed(2))"));
+    assert.ok(api.split("mode: 'not_specified'").length - 1 >= 2);
+    assert.ok(!api.includes("title: `Frete - ${validatedShippingOption.carrier}`"), 'Shipping must not be represented as a synthetic product');
+  });
+
+  await t.test('21. Payment, freight purchase and label generation are distinct durable states', () => {
+    assert.ok(fulfillmentSql.includes('shipment_purchase_status'));
+    assert.ok(fulfillmentSql.includes('label_generation_status'));
+    assert.ok(fulfillmentSql.includes("NEW.shipping_status := 'Aguardando compra de frete'"));
+    assert.ok(api.includes("order.shippingStatus = 'Frete comprado'"));
+    assert.ok(api.includes("order.shippingStatus = 'Etiqueta gerada'"));
+  });
+
+  await t.test('22. Shipment purchase uses an atomic lease and reuses the persisted external shipment', () => {
+    const claimStart = fulfillmentSql.indexOf('CREATE OR REPLACE FUNCTION public.claim_shipment_operation');
+    const claimBody = fulfillmentSql.slice(claimStart, claimStart + 4500);
+    assert.ok(claimStart > 0);
+    assert.ok(claimBody.includes('ON CONFLICT (order_id) DO NOTHING'));
+    assert.ok(claimBody.includes('FOR UPDATE'));
+    assert.ok(claimBody.includes('lock_token'));
+    assert.ok(api.includes('Persist before checkout: every retry reuses this exact external shipment.'));
+    assert.ok(api.includes("existingOperation.shipment_id"));
+  });
+
+  await t.test('23. Approved webhook schedules fulfillment and cron retries incomplete paid orders', () => {
+    const webhookStart = api.indexOf("app.all(['/api/mercado-pago/webhook'");
+    const webhookBody = api.slice(webhookStart, webhookStart + 18000);
+    assert.ok(webhookBody.includes("processMelhorEnvioShipment(fulfillmentOrderId!, { source: 'webhook' })"));
+    assert.ok(api.includes('async function processPendingPaidShipments'));
+    assert.ok(api.includes('await processPendingPaidShipments(3)'));
+  });
+
+  await t.test('24. Webhook idempotency is notification-based and database-atomic', () => {
+    assert.ok(api.includes('const notificationId = req.body?.id'));
+    assert.ok(api.includes("req.body?.data?.id || req.query.id"));
+    assert.ok(api.includes('notificationId\n      ?'));
+    assert.ok(fulfillmentSql.includes('ON CONFLICT (gateway, event_key) DO NOTHING'));
+    assert.ok(fulfillmentSql.includes('FOR UPDATE'));
+  });
+
+  await t.test('25. Atomic payment settlement is not followed by a second stock debit', () => {
+    const applyStart = api.indexOf('async function applyMercadoPagoPaymentToOrder');
+    const applyEnd = api.indexOf("app.all(['/api/mercado-pago/webhook'", applyStart);
+    const settlement = api.slice(applyStart, applyEnd);
+    assert.ok(settlement.includes('db.processApprovedOrderAtomic('));
+    assert.ok(!settlement.includes('deductStockAtomic('));
+    assert.ok(api.includes("rpc('process_approved_order_atomic'"));
+  });
+
+  await t.test('26. Shipment creation is fail-closed without real fiscal, sender, recipient and quote data', () => {
+    const processorStart = api.indexOf('async function processMelhorEnvioShipment');
+    const processorEnd = api.indexOf('// --- ADMIN: GERAR ENVIO REAL', processorStart);
+    const processor = api.slice(processorStart, processorEnd);
+    assert.ok(processor.includes("code: 'MISSING_SHIPPING_QUOTE'") || processor.includes("'MISSING_SHIPPING_QUOTE'"));
+    assert.ok(processor.includes("'INVALID_SENDER_DATA'"));
+    assert.ok(processor.includes("'INVALID_RECIPIENT_DATA'"));
+    assert.ok(processor.includes("'MISSING_SHIPMENT_DOCUMENT_MODE'"));
+    assert.ok(processor.includes("'MISSING_INVOICE_KEY'"));
+    assert.ok(!processor.includes("'11988421092'"));
+    assert.ok(!processor.includes("'contato@marmot.com.br'"));
   });
 });

@@ -72,10 +72,13 @@ export const AdminOrdersTab: React.FC = () => {
   const [isEditingCpf, setIsEditingCpf] = useState(false);
   const [editingCpfValue, setEditingCpfValue] = useState('');
   const [isSavingCpf, setIsSavingCpf] = useState(false);
+  const [invoiceKeyValue, setInvoiceKeyValue] = useState('');
+  const [isSavingInvoiceKey, setIsSavingInvoiceKey] = useState(false);
 
   useEffect(() => {
     if (selectedOrder) {
       setEditingCpfValue(selectedOrder.customerCpf ? formatCpf(selectedOrder.customerCpf) : '');
+      setInvoiceKeyValue(String(selectedOrder.shippingDetails?.invoiceKey || ''));
       setIsEditingCpf(!selectedOrder.customerCpf || !isValidCpf(selectedOrder.customerCpf));
     }
   }, [selectedOrder?.id]);
@@ -117,12 +120,40 @@ export const AdminOrdersTab: React.FC = () => {
     }
   };
 
+  const handleSaveInvoiceKey = async () => {
+    if (!selectedOrder) return;
+    const invoiceKey = invoiceKeyValue.replace(/\D/g, '');
+    if (invoiceKey.length !== 44) {
+      showToast('Chave de NF-e inválida', 'Informe os 44 dígitos da chave de acesso da NF-e.', 'error');
+      return;
+    }
+
+    setIsSavingInvoiceKey(true);
+    try {
+      const response = await fetch(`/api/admin/orders/${selectedOrder.id}/invoice-key`, {
+        method: 'PUT',
+        headers: getAdminHeaders(),
+        body: JSON.stringify({ invoiceKey }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Erro ao registrar a chave da NF-e.');
+      if (data.order) setSelectedOrder(data.order);
+      setInvoiceKeyValue(invoiceKey);
+      showToast('NF-e vinculada', 'A chave fiscal foi vinculada ao pedido. O frete já pode ser processado.', 'success');
+      await refreshAllAdminOrders();
+    } catch (error: any) {
+      showToast('Erro ao salvar NF-e', error.message, 'error');
+    } finally {
+      setIsSavingInvoiceKey(false);
+    }
+  };
+
   const handleSyncTracking = async () => {
     setIsSyncingTracking(true);
     try {
       const res = await fetch('/api/admin/tracking/sync-active', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAdminHeaders(),
       });
       const data = await res.json();
       if (data.success) {
@@ -749,6 +780,35 @@ export const AdminOrdersTab: React.FC = () => {
 
             {/* Tracking & Shipping Integration Section */}
             <div className="bg-[#F9F9F7] border border-[#E5E5E1] p-4 rounded-xl space-y-3">
+              <div className="border-b border-[#E5E5E1] pb-3">
+                <label htmlFor="shipping-invoice-key" className="block text-xs font-bold text-[#171717] mb-1.5">
+                  Chave da NF-e para envio comercial
+                </label>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <input
+                    id="shipping-invoice-key"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    value={invoiceKeyValue}
+                    onChange={(event) => setInvoiceKeyValue(event.target.value.replace(/\D/g, '').slice(0, 44))}
+                    placeholder="44 dígitos da chave de acesso"
+                    aria-describedby="shipping-invoice-help"
+                    className="min-w-0 flex-1 bg-white border border-[#D4D4D0] px-3 py-2 rounded-lg text-xs font-mono text-[#171717] focus:outline-none focus:border-[#B45309]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveInvoiceKey}
+                    disabled={isSavingInvoiceKey || invoiceKeyValue.replace(/\D/g, '').length !== 44}
+                    className="px-3 py-2 bg-[#171717] text-white text-xs font-bold uppercase rounded-lg transition-colors hover:bg-black disabled:bg-zinc-300 flex items-center justify-center gap-1.5"
+                  >
+                    {isSavingInvoiceKey ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileCheck className="w-3.5 h-3.5" />}
+                    Salvar NF-e
+                  </button>
+                </div>
+                <p id="shipping-invoice-help" className="mt-1.5 text-[10px] leading-relaxed text-[#6B6B66]">
+                  Obrigatória quando as Configurações de Frete usam venda comercial. A chave não é simulada nem gerada pela Marmot.
+                </p>
+              </div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-bold text-[#171717] flex items-center gap-1.5">

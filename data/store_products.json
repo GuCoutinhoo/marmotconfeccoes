@@ -1154,27 +1154,28 @@
       {
         "color": "preto",
         "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "/uploads/products/prod-cal-001/e565d68ec2c714a6.webp",
-        "featuredImage": "/uploads/products/prod-cal-001/e565d68ec2c714a6.webp",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
         "images": [
-          "/uploads/products/prod-cal-001/e565d68ec2c714a6.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png"
         ]
       },
       {
         "color": "marrom",
         "colorName": "Marrom",
-        "colorHex": "#402921",
-        "image": "/uploads/products/prod-cal-001/7b4fad804d247cf6.webp",
-        "featuredImage": "/uploads/products/prod-cal-001/7b4fad804d247cf6.webp",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png",
         "images": [
-          "/uploads/products/prod-cal-001/7b4fad804d247cf6.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png"
         ]
       }
     ],
-    "image": "/uploads/products/prod-cal-001/a5803ca205a9736d.webp",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
     "images": [
-      "/uploads/products/prod-cal-001/a5803ca205a9736d.webp"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png"
     ],
     "details": [
       "Volume amplo no quadril e nas coxas",
@@ -1232,31 +1233,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
         "images": [
-          "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
     "images": [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png"
     ],
     "details": [
       "Modelagem ampla e solta",
@@ -1314,31 +1314,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "grafite",
+        "colorName": "Grafite",
+        "colorHex": "#4B4F52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png",
         "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
     "images": [
-      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png"
     ],
     "details": [
       "Grande quantidade de bolsos",
@@ -1394,29 +1393,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png",
         "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
     "images": [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png"
     ],
     "details": [
       "Modelagem reta ou levemente ampla",
@@ -1472,29 +1472,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
         "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
     "images": [
-      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png"
     ],
     "details": [
       "Tecido de veludo cotelê",
@@ -1550,29 +1551,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto-lavado",
+        "colorName": "Preto Lavado",
+        "colorHex": "#303236",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "azul",
+        "colorName": "Azul",
+        "colorHex": "#355C8A",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
     "images": [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png"
     ],
     "details": [
       "Jeans com áreas desgastadas",
@@ -1629,27 +1631,28 @@
       {
         "color": "bege",
         "colorName": "Bege",
-        "colorHex": "#D4B996",
-        "image": "/uploads/products/prod-cal-007/ca77cb12d57eeec8.jpg",
-        "featuredImage": "/uploads/products/prod-cal-007/ca77cb12d57eeec8.jpg",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
         "images": [
-          "/uploads/products/prod-cal-007/ca77cb12d57eeec8.jpg"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png"
         ]
       },
       {
         "color": "preto",
         "colorName": "Preto",
-        "colorHex": "#000000",
-        "image": "/uploads/products/prod-cal-007/3139d96a02601678.jpg",
-        "featuredImage": "/uploads/products/prod-cal-007/3139d96a02601678.jpg",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png",
         "images": [
-          "/uploads/products/prod-cal-007/3139d96a02601678.jpg"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png"
         ]
       }
     ],
-    "image": "/uploads/products/prod-cal-007/4ffbdebde59f3cd8.jpg",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
     "images": [
-      "/uploads/products/prod-cal-007/4ffbdebde59f3cd8.jpg"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png"
     ],
     "details": [
       "Reforço duplo na região dos joelhos",
@@ -1706,27 +1709,28 @@
       {
         "color": "cinza",
         "colorName": "Cinza",
-        "colorHex": "#71717A",
-        "image": "/uploads/products/prod-cal-008/1bca2a1cbc7162d2.jpg",
-        "featuredImage": "/uploads/products/prod-cal-008/1bca2a1cbc7162d2.jpg",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
         "images": [
-          "/uploads/products/prod-cal-008/1bca2a1cbc7162d2.jpg"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png"
         ]
       },
       {
         "color": "preto",
         "colorName": "Preto",
-        "colorHex": "#1C1917",
-        "image": "/uploads/products/prod-cal-008/a4730b41e71c7acf.jpg",
-        "featuredImage": "/uploads/products/prod-cal-008/a4730b41e71c7acf.jpg",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png",
         "images": [
-          "/uploads/products/prod-cal-008/a4730b41e71c7acf.jpg"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png"
         ]
       }
     ],
-    "image": "/uploads/products/prod-cal-008/fdcf5f1ec19829e9.jpg",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
     "images": [
-      "/uploads/products/prod-cal-008/fdcf5f1ec19829e9.jpg"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png"
     ],
     "details": [
       "Nylon leve e técnico",
@@ -1782,29 +1786,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png",
         "images": [
-          "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
     "images": [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png"
     ],
     "details": [
       "Recortes geométricos nas pernas",
@@ -1860,29 +1865,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
         "images": [
-          "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "chumbo",
+        "colorName": "Chumbo",
+        "colorHex": "#4A4E52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
     "images": [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png"
     ],
     "details": [
       "Modelagem extremamente ampla",
@@ -1938,29 +1944,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto-e-cinza",
+        "colorName": "Preto e Cinza",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom-e-bege",
+        "colorName": "Marrom e Bege",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png",
         "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
     "images": [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png"
     ],
     "details": [
       "Painéis de tecidos diferentes",
@@ -2016,29 +2023,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
         "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "grafite",
+        "colorName": "Grafite",
+        "colorHex": "#4B4F52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
     "images": [
-      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png"
     ],
     "details": [
       "Pregas frontais na cintura",
@@ -2094,29 +2102,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
     "images": [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png"
     ],
     "details": [
       "Costuras propositalmente aparentes",
@@ -2172,29 +2181,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+        "color": "chumbo",
+        "colorName": "Chumbo",
+        "colorHex": "#4A4E52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png",
         "images": [
-          "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
     "images": [
-      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png"
     ],
     "details": [
       "Bolsos funcionais",
@@ -2250,29 +2260,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png",
         "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
     "images": [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png"
     ],
     "details": [
       "Inspiração esportiva",
@@ -2328,29 +2339,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
     "images": [
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png"
     ],
     "details": [
       "Lavagem envelhecida",
@@ -2406,29 +2418,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
         "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png",
         "images": [
-          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
     "images": [
-      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png"
     ],
     "details": [
       "Pernas largas do quadril até a barra",
@@ -2484,29 +2497,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
         "images": [
-          "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png"
         ]
       },
       {
-        "color": "khaki",
-        "colorName": "Desert Khaki / Raw Denim",
-        "colorHex": "#8C7A6B",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png",
         "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
     "images": [
-      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png"
     ],
     "details": [
       "Zíper horizontal nas pernas",
@@ -3946,31 +3960,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde-militar",
+        "colorName": "Verde Militar",
+        "colorHex": "#4B5320",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
     "images": [
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
     ],
     "details": [
       "Meio zíper frontal",
@@ -4027,31 +4040,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
     "images": [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
     ],
     "details": [
       "Modelagem ampla e volumosa",
@@ -4109,27 +4121,28 @@
       {
         "color": "bege",
         "colorName": "Bege",
-        "colorHex": "#D4B996",
-        "image": "/uploads/products/prod-jaq-003/1d13aa82e4fcb288.webp",
-        "featuredImage": "/uploads/products/prod-jaq-003/1d13aa82e4fcb288.webp",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
         "images": [
-          "/uploads/products/prod-jaq-003/1d13aa82e4fcb288.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png"
         ]
       },
       {
         "color": "preto",
         "colorName": "Preto",
-        "colorHex": "#000000",
-        "image": "/uploads/products/prod-jaq-003/7e7abafc3bdd22fb.webp",
-        "featuredImage": "/uploads/products/prod-jaq-003/7e7abafc3bdd22fb.webp",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png",
         "images": [
-          "/uploads/products/prod-jaq-003/7e7abafc3bdd22fb.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png"
         ]
       }
     ],
-    "image": "/uploads/products/prod-jaq-003/d9a19d4bbb1a3ed3.webp",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
     "images": [
-      "/uploads/products/prod-jaq-003/d9a19d4bbb1a3ed3.webp"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png"
     ],
     "details": [
       "Bolsos cargo grandes",
@@ -4186,29 +4199,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
     "images": [
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
     ],
     "details": [
       "Gola simples dobrável",
@@ -4265,29 +4279,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
     "images": [
-      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
     ],
     "details": [
       "Comprimento mais curto",
@@ -4344,29 +4359,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
         "images": [
-          "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "azul",
+        "colorName": "Azul",
+        "colorHex": "#355C8A",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
     "images": [
-      "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
     ],
     "details": [
       "Jeans pesado",
@@ -4423,29 +4439,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
         "images": [
-          "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "azul",
+        "colorName": "Azul",
+        "colorHex": "#355C8A",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
     "images": [
-      "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
     ],
     "details": [
       "Jeans encorpado",
@@ -4502,29 +4519,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
     "images": [
-      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
     ],
     "details": [
       "Comprimento curto",
@@ -4581,29 +4599,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
     "images": [
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
     ],
     "details": [
       "Nylon de aparência técnica",
@@ -4658,29 +4677,30 @@
     ],
     "colors": [
       {
-        "color": "bege-branco",
-        "colorName": "Bege + Branco",
-        "colorHex": "#D4B996",
-        "image": "/uploads/products/prod-jaq-010/e851ac01d9c48275.webp",
-        "featuredImage": "/uploads/products/prod-jaq-010/e851ac01d9c48275.webp",
+        "color": "bege-e-marrom",
+        "colorName": "Bege e Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
         "images": [
-          "/uploads/products/prod-jaq-010/e851ac01d9c48275.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png"
         ]
       },
       {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#44403C",
-        "image": "/uploads/products/prod-jaq-010/03e1fc74994e575b.webp",
-        "featuredImage": "/uploads/products/prod-jaq-010/03e1fc74994e575b.webp",
+        "color": "bege-preto",
+        "colorName": "Bege Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png",
         "images": [
-          "/uploads/products/prod-jaq-010/03e1fc74994e575b.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png"
         ]
       }
     ],
-    "image": "/uploads/products/prod-jaq-010/e43e597856e70d95.webp",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
     "images": [
-      "/uploads/products/prod-jaq-010/e43e597856e70d95.webp"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png"
     ],
     "details": [
       "Recortes geométricos",
@@ -4735,29 +4755,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "/uploads/products/prod-jaq-011/1b263a63e9df5f56.webp",
-        "featuredImage": "/uploads/products/prod-jaq-011/1b263a63e9df5f56.webp",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
         "images": [
-          "/uploads/products/prod-jaq-011/1b263a63e9df5f56.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#B0B4B7",
-        "image": "/uploads/products/prod-jaq-011/ee5275c5b78acb54.webp",
-        "featuredImage": "/uploads/products/prod-jaq-011/ee5275c5b78acb54.webp",
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
         "images": [
-          "/uploads/products/prod-jaq-011/ee5275c5b78acb54.webp"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
         ]
       }
     ],
-    "image": "/uploads/products/prod-jaq-011/4eb93abfae50268f.webp",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
     "images": [
-      "/uploads/products/prod-jaq-011/4eb93abfae50268f.webp"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
     ],
     "details": [
       "Construção fortemente acolchoada",
@@ -4814,29 +4835,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom-e-bege",
+        "colorName": "Marrom e Bege",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
     "images": [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
     ],
     "details": [
       "Forro ou painéis em sherpa",
@@ -4893,29 +4915,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "chumbo",
+        "colorName": "Chumbo",
+        "colorHex": "#4A4E52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
     "images": [
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
     ],
     "details": [
       "Bolsos modulares",
@@ -4972,29 +4995,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
     "images": [
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
     ],
     "details": [
       "Inspiração esportiva",
@@ -5051,29 +5075,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
     "images": [
-      "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
     ],
     "details": [
       "Combinação de duas cores",
@@ -5130,29 +5155,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
     "images": [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
     ],
     "details": [
       "Vários bolsos funcionais",
@@ -5209,29 +5235,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
     "images": [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
     ],
     "details": [
       "Inspiração universitária",
@@ -5288,29 +5315,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
         "images": [
-          "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "grafite-e-verde",
+        "colorName": "Grafite e Verde",
+        "colorHex": "#4B4F52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
     "images": [
-      "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
     ],
     "details": [
       "Tecido leve e técnico",
@@ -5367,29 +5395,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
         "images": [
-          "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png"
         ]
       },
       {
-        "color": "olive",
-        "colorName": "Military Olive",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
         "images": [
-          "https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
     "images": [
-      "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
     ],
     "details": [
       "Corte boxy",

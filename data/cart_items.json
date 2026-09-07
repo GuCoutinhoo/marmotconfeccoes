@@ -1,17 +1,17 @@
 [
   {
-    "id": "cart-1788662884072-1ecit",
+    "id": "cart-1788745182917-e4mcy",
     "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "productId": "prod-cam-002",
+    "productId": "prod-cam-001",
     "selectedSize": "P",
     "selectedColor": {
-      "color": "bege-marrom",
-      "colorName": "Bege + Marrom",
-      "colorHex": "#6c5145",
-      "image": "/uploads/products/prod-cam-002/a5522548598423d7.webp"
+      "color": "black",
+      "colorName": "Preto",
+      "colorHex": "#121212",
+      "image": "/uploads/products/prod-cam-001/8badc748448e13dc.webp"
     },
     "quantity": 1,
-    "createdAt": "2026-09-06T02:48:04.072Z",
-    "updatedAt": "2026-09-06T02:48:04.072Z"
+    "createdAt": "2026-09-07T01:39:42.917Z",
+    "updatedAt": "2026-09-07T01:39:42.917Z"
   }
 ]

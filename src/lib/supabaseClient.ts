@@ -1109,9 +1109,15 @@ export function mapSupabaseRowToOrder(row: any): Order {
     subtotal,
     discount,
     shippingFee,
+    shippingPrice: typeof row.shipping_price === 'number'
+      ? row.shipping_price
+      : parseFloat(row.shipping_price || d.shippingPrice || shippingFee || 0),
     total,
     paymentMethod: row.payment_method || d.paymentMethod || 'Cartão de Crédito',
     shippingAddress,
+    shippingQuoteId: row.shipping_quote_id || d.shippingQuoteId,
+    shippingOption: row.shipping_option || d.shippingOption,
+    shippingDetails: row.shipping_details || d.shippingDetails,
     shippingCarrier: row.shipping_company || row.shipping_carrier || d.shippingCarrier || 'Melhor Envio',
     shippingService: row.shipping_service_name || row.shipping_service || d.shippingService || 'SEDEX Expresso',
     shippingServiceId: row.shipping_service_id || d.shippingServiceId,
@@ -1134,6 +1140,11 @@ export function mapSupabaseRowToOrder(row: any): Order {
     melhorEnvioProtocol: row.melhor_envio_protocol || d.melhorEnvioProtocol,
     melhorEnvioLabelUrl: row.melhor_envio_label_url || d.melhorEnvioLabelUrl,
     shippingLabelUrl: row.shipping_label_url || d.shippingLabelUrl,
+    shipmentPurchaseStatus: row.shipment_purchase_status || d.shipmentPurchaseStatus || 'not_started',
+    labelGenerationStatus: row.label_generation_status || d.labelGenerationStatus || 'not_started',
+    shipmentPurchasedAt: row.shipment_purchased_at || d.shipmentPurchasedAt,
+    labelGeneratedAt: row.label_generated_at || d.labelGeneratedAt,
+    shipmentLastError: row.shipment_last_error || d.shipmentLastError,
     notes: row.notes || d.notes,
     createdAt: row.created_at || d.createdAt || new Date().toISOString(),
   };

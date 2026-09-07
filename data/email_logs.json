@@ -1,5 +1,25 @@
 [
   {
+    "id": "sim-1788745206756-758r",
+    "recipient": "cliente@marmot.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-205629-8577 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-205629-8577",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "createdAt": "2026-09-07T01:40:06.756Z"
+  },
+  {
+    "id": "sim-1788745058803-8hqb",
+    "recipient": "cliente@marmot.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-057744-8797 Gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-057744-8797",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "createdAt": "2026-09-07T01:37:38.803Z"
+  },
+  {
     "id": "sim-1788665542128-sumo",
     "recipient": "cliente@marmot.com",
     "template": "order_created",
