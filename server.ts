@@ -21,6 +21,9 @@ import { app } from './api/index';
 const PORT = 3000;
 
 async function startServer() {
+  const publicPath = path.join(process.cwd(), 'public');
+  app.use(express.static(publicPath));
+
   // Vite middleware for local development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

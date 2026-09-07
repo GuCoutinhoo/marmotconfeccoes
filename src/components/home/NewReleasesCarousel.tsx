@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react';
+import { motion, useReducedMotion } from 'motion/react';
 import { Product } from '../../types';
 import { useWishlist } from '../../context/WishlistContext';
 import { useToast } from '../../context/ToastContext';
@@ -115,20 +115,8 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { showToast } = useToast();
 
-  // Scroll progress para a transição de opacidade do fundo
-  // Inicia quando o topo da seção encosta no fim da tela ('start end')
-  // Conclui suavemente conforme o usuário se aproxima e centraliza a seção ('start 20%')
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start end', 'start 20%'],
-  });
-
-  // Transição suave de opacity acompanhando o scroll (branco -> imagem começa a aparecer -> imagem totalmente visível)
-  const bgOpacity = useTransform(scrollYProgress, [0, 1], [0, 1], {
-    ease: (t) => t * t * (3 - 2 * t),
-  });
-
   // Monitora a rolagem para disparar a animação APENAS quando o usuário descer (de cima do hero para baixo).
+  // Quando estiver perto, a animação suave transiciona o fundo de branco para a imagem.
   // Quando rolar de baixo para cima, a seção e seus elementos permanecem visíveis sem re-animar.
   useEffect(() => {
     const el = sectionRef.current;
@@ -156,8 +144,8 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         return;
       }
 
-      // 2. Disparo da animação: Apenas ao rolar para BAIXO quando o topo da seção entra na viewport
-      if (isScrollingDown && rect.top <= windowHeight * 0.85 && rect.bottom >= 0) {
+      // 2. Disparo da animação: Apenas ao rolar para BAIXO quando o topo da seção estiver perto da viewport
+      if (isScrollingDown && rect.top <= windowHeight * 0.98 && rect.bottom >= 0) {
         setHasEntered(true);
         return;
       }
@@ -265,17 +253,26 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     <section
       ref={sectionRef}
       id="ultimos-lancamentos-drop"
-      className="relative w-full overflow-hidden pt-8 sm:pt-10 md:pt-12 pb-7 sm:pb-8 md:pb-9 select-none bg-white"
+      className="relative w-full overflow-hidden py-4 sm:py-5 lg:py-6 select-none bg-[#09090B]"
     >
       {/* =========================================================================
-          CAMADA 1 & 2: TRANSIÇÃO SUAVE DE FUNDO BASEADA NO SCROLL
-          A seção começa com fundo branco/normal e conforme o usuário rola para baixo,
-          a imagem e a atmosfera escura aparecem suavemente sem troca brusca:
-          branco -> imagem começa a aparecer -> imagem totalmente visível na seção.
+          BACKGROUND ART: Imagem mantida em proporção normal (sem zoom, sem aumento,
+          sem distorção), com enquadramento superior limpo.
          ========================================================================= */}
       <motion.div
-        style={{ opacity: shouldReduceMotion ? 1 : bgOpacity }}
-        className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#080808]"
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+        animate={
+          hasEntered
+            ? { opacity: 1 }
+            : shouldReduceMotion
+            ? { opacity: 1 }
+            : { opacity: 0 }
+        }
+        transition={{
+          duration: 1.2,
+          ease: [0.25, 0.1, 0.25, 1],
+        }}
+        className="absolute inset-0 z-0 pointer-events-none overflow-hidden bg-[#09090B]"
         aria-hidden="true"
       >
         <img
@@ -296,217 +293,226 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           }}
           className="w-full h-full object-cover object-top select-none"
         />
+
+        {/* Suave véu no topo para que os textos do cabeçalho e controles fiquem super legíveis */}
+        <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-black/55 via-black/25 to-transparent pointer-events-none" />
+
+        {/* Leve sombra suave atrás da área dos cards para destacá-los das montanhas */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_50%_at_50%_52%,rgba(9,9,11,0.45)_0%,rgba(9,9,11,0.12)_70%,transparent_100%)] pointer-events-none" />
       </motion.div>
 
       {/* =========================================================================
-          CAMADA 3: CONTEÚDO DA SEÇÃO
+          CONTEÚDO DA SEÇÃO (COMPACTO E PROPORCIONAL PARA CABER NA TELA)
          ========================================================================= */}
-      <div className="relative z-10 w-full max-w-[1640px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-14">
-        {/* CABEÇALHO REFINADO COM COMPOSIÇÃO EQUILIBRADA */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-5 mb-5 sm:mb-6">
-          <div className="max-w-2xl">
-            {/* Tag DIRETO DO ATELIÊ com estrela técnica */}
+      <div className="relative z-10 w-full max-w-[1740px] mx-auto px-3 sm:px-5 md:px-6 lg:px-7 xl:px-8">
+        {/* CABEÇALHO EDITORIAL: Compacto, alinhado e refinado */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-3 sm:gap-4 mb-3.5 sm:mb-4 lg:mb-4.5">
+          <div className="max-w-xl">
+            {/* Tag DIRETO DO ATELIÊ com ícone refinado */}
             <motion.div
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-              transition={{ duration: 0.45, ease: 'easeOut' }}
-              className="flex items-center gap-2 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.24em] text-[#FF6B00] mb-1.5"
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
+              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+              className="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.22em] text-[#FF6B00] mb-1"
             >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF6B00] shrink-0">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" className="text-[#FF6B00] shrink-0">
                 <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
               </svg>
               <span>DIRETO DO ATELIÊ</span>
             </motion.div>
 
-            {/* Título Principal */}
+            {/* Título Principal Compacto */}
             <motion.h2
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
               animate={
                 hasEntered
-                  ? {
-                      opacity: 1,
-                      y: [12, -2, 0],
-                    }
+                  ? { opacity: 1, y: 0 }
                   : shouldReduceMotion
                   ? { opacity: 1 }
-                  : { opacity: 0, y: 12 }
+                  : { opacity: 0, y: 8 }
               }
               transition={{
-                duration: 0.55,
-                delay: 0.1,
-                times: [0, 0.65, 1],
+                duration: 0.5,
+                delay: 0.06,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-[38px] xl:text-[42px] font-black uppercase tracking-[-0.02em] text-white leading-none whitespace-nowrap drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-[30px] font-black uppercase tracking-[-0.02em] text-white leading-none whitespace-nowrap drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]"
             >
               ÚLTIMOS LANÇAMENTOS
             </motion.h2>
 
-            {/* Subtítulo com tipografia editorial */}
+            {/* Subtítulo Editorial */}
             <motion.p
-              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 8 }}
-              transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
-              className="text-zinc-400 text-xs sm:text-sm font-normal tracking-wide mt-2 max-w-lg leading-relaxed drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)]"
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
+              animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 6 }}
+              transition={{ duration: 0.45, delay: 0.12, ease: 'easeOut' }}
+              className="text-zinc-300 text-xs sm:text-[12.5px] font-normal tracking-wide mt-1 max-w-lg leading-snug drop-shadow-[0_1px_5px_rgba(0,0,0,0.8)]"
             >
-              Peças recém-saídas da confecção com estoques limitados e tiragem exclusiva.
+              Novas peças. Tiragem limitada. Feitas para não passar despercebidas.
             </motion.p>
           </div>
 
-          {/* Bloco à direita: DROP / 003, Linha, VER TODOS e Navegação */}
+          {/* DROP / 003 ───── VER TODOS ↗ + Setas de Navegação Compactas */}
           <motion.div
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 16 }}
-            animate={hasEntered ? { opacity: 1, x: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 16 }}
-            transition={{ duration: 0.5, delay: 0.25, ease: 'easeOut' }}
-            className="flex items-center self-start lg:self-end gap-3 sm:gap-4 flex-wrap pb-1"
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 10 }}
+            animate={hasEntered ? { opacity: 1, x: 0 } : shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 10 }}
+            transition={{ duration: 0.45, delay: 0.15, ease: 'easeOut' }}
+            className="flex items-center self-start lg:self-end gap-2.5 sm:gap-3 flex-wrap pb-0.5"
           >
-            <div className="flex items-center">
-              <span className="font-mono text-[11px] sm:text-xs font-bold tracking-[0.22em] text-zinc-300">
+            <div className="flex items-center bg-black/40 backdrop-blur-md px-3 py-1.2 rounded-[2px] border border-white/10">
+              <span className="font-mono text-[10.5px] sm:text-[11px] font-semibold tracking-[0.22em] text-zinc-300">
                 DROP / 003
               </span>
-              <span className="w-5 sm:w-8 h-px mx-3 sm:mx-4 inline-block bg-white/25" />
+              <span className="w-4 sm:w-6 h-px mx-2.5 inline-block bg-white/25" />
               <button
                 type="button"
                 onClick={() => onNavigate('shop')}
-                className="text-[#FF6B00] hover:text-[#FFA040] font-black text-xs sm:text-[13px] tracking-[0.16em] uppercase flex items-center gap-1.5 transition-colors cursor-pointer group"
+                className="text-[#FF6B00] hover:text-[#FFA040] font-bold text-[11px] sm:text-xs tracking-[0.15em] uppercase flex items-center gap-1 transition-colors cursor-pointer group"
               >
                 <span>VER TODOS</span>
-                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
               </button>
             </div>
 
-            {/* Setas de Navegação */}
-            <div className="flex items-center gap-2 ml-1 sm:ml-2">
+            {/* Setas de Navegação Compactas 34x34px */}
+            <div className="flex items-center gap-1 ml-0.5">
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="w-9 h-9 sm:w-9.5 sm:h-9.5 rounded-none bg-black/70 hover:bg-black text-zinc-300 hover:text-white border border-white/20 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-md backdrop-blur-sm"
+                className="w-8.5 h-8.5 rounded-[2px] bg-black/75 hover:bg-black text-zinc-300 hover:text-white border border-white/15 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm backdrop-blur-md"
                 aria-label="Anterior"
               >
-                <ChevronLeft className="w-4.5 h-4.5 stroke-[2]" />
+                <ChevronLeft className="w-3.5 h-3.5 stroke-[2]" />
               </button>
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="w-9 h-9 sm:w-9.5 sm:h-9.5 rounded-none bg-black/70 hover:bg-black text-zinc-300 hover:text-white border border-white/20 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-md backdrop-blur-sm"
+                className="w-8.5 h-8.5 rounded-[2px] bg-black/75 hover:bg-black text-zinc-300 hover:text-white border border-white/15 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm backdrop-blur-md"
                 aria-label="Próximo"
               >
-                <ChevronRight className="w-4.5 h-4.5 stroke-[2]" />
+                <ChevronRight className="w-3.5 h-3.5 stroke-[2]" />
               </button>
             </div>
           </motion.div>
         </div>
 
         {/* =========================================================================
-            CAROUSEL ROW: 3 CARDS COMPLETOS + PEEK INTENCIONAL DO PRÓXIMO CARD
+            CARROSSEL COMPACTO: Cards redimensionados com altura controlada
+            para caber perfeitamente na tela sem empurrar a página
            ========================================================================= */}
         <div
           ref={scrollRef}
-          className="flex gap-5 sm:gap-6 md:gap-6 overflow-x-auto scrollbar-none pb-3 pt-1 scroll-smooth snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
+          className="flex gap-3.5 sm:gap-4 lg:gap-4.5 overflow-x-auto scrollbar-none pb-2 pt-0.5 scroll-smooth snap-x snap-mandatory -mx-3 px-3 sm:mx-0 sm:px-0"
         >
           {CANONICAL_DROP_ITEMS.map((item, index) => {
             const isFav = isInWishlist(item.id);
+            const isAccessory = item.categoryName === 'ACESSÓRIOS';
+
             return (
               <motion.article
                 key={item.id}
                 initial={
                   shouldReduceMotion
                     ? { opacity: 1 }
-                    : { opacity: 0, y: 20, scale: 0.985 }
+                    : { opacity: 0, y: 14, x: -4 }
                 }
                 animate={
                   hasEntered
-                    ? { opacity: 1, y: 0, scale: 1 }
+                    ? { opacity: 1, y: 0, x: 0 }
                     : shouldReduceMotion
                     ? { opacity: 1 }
-                    : { opacity: 0, y: 20, scale: 0.985 }
+                    : { opacity: 0, y: 14, x: -4 }
                 }
                 transition={{
-                  duration: 0.5,
-                  delay: 0.25 + index * 0.05,
-                  ease: [0.25, 1, 0.5, 1],
+                  duration: 0.45,
+                  delay: 0.12 + index * 0.05,
+                  ease: [0.22, 1, 0.36, 1],
                 }}
-                className="group relative w-[285px] sm:w-[325px] md:w-[355px] lg:w-[370px] xl:w-[385px] shrink-0 snap-start bg-white rounded-none overflow-hidden shadow-[0_12px_32px_rgba(0,0,0,0.35)] border border-zinc-200/90 flex flex-col justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_22px_48px_rgba(0,0,0,0.5)] cursor-pointer"
+                className="group relative w-[205px] sm:w-[230px] md:w-[245px] lg:w-[calc((100%-3*1.125rem)/3.65)] xl:w-[calc((100%-3.5*1.125rem)/4.15)] max-w-[275px] shrink-0 snap-start bg-[#F6F5F0] rounded-[3px] overflow-hidden shadow-[0_12px_30px_rgba(0,0,0,0.45)] border border-[#E4E1D8] flex flex-col justify-between transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(0,0,0,0.6)] cursor-pointer"
                 onClick={() => handleCardClick(item)}
               >
-                {/* Área da Fotografia do Produto */}
-                <div className="relative aspect-[4/4.1] w-full bg-[#F3F4F6] overflow-hidden">
+                {/* ÁREA VISUAL DA FOTO: Proporção compacta (1/1.04) para caber na tela */}
+                <div className="relative aspect-[1/1.04] w-full bg-[#EAE7DF] overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}
                     loading="lazy"
                     decoding="async"
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                    className={`w-full h-full object-cover object-center transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                      isAccessory
+                        ? 'scale-[1.05] group-hover:scale-[1.08]'
+                        : 'scale-100 group-hover:scale-[1.025]'
+                    }`}
                   />
 
-                  {/* NOVO DROP Badge refinado */}
-                  <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                    <span className="bg-black/90 backdrop-blur-md text-white text-[9px] sm:text-[9.5px] font-mono font-bold uppercase tracking-[0.2em] px-2.5 py-1 rounded-none shadow-sm inline-block border border-white/10">
-                      NOVO DROP
+                  {/* Badge Refinado NOVO / 003 */}
+                  <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+                    <span className="bg-[#111113]/88 backdrop-blur-md text-[#F5F4F0] text-[8px] sm:text-[8.5px] font-mono font-medium uppercase tracking-[0.22em] px-2 py-0.5 rounded-[1px] shadow-xs inline-block border border-white/12">
+                      NOVO / 003
                     </span>
                   </div>
 
-                  {/* Botão de Favorito Minimalista */}
+                  {/* Botão de Favorito Discreto */}
                   <button
                     type="button"
                     onClick={(e) => handleWishlistClick(e, item)}
-                    className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/95 backdrop-blur-md shadow-sm border border-black/5 flex items-center justify-center text-zinc-700 hover:text-red-500 hover:scale-110 active:scale-95 transition-all cursor-pointer"
+                    className="absolute top-2.5 right-2.5 z-20 w-6.5 h-6.5 rounded-full bg-[#F6F5F0]/92 backdrop-blur-md shadow-2xs border border-black/8 hover:border-black/20 flex items-center justify-center text-[#2C2B28] hover:text-[#FF6B00] active:scale-95 transition-all cursor-pointer"
                     aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
                   >
                     <Heart
-                      className={`w-3.5 h-3.5 transition-colors ${
-                        isFav ? 'fill-red-500 text-red-500' : 'text-zinc-700 stroke-[2]'
+                      className={`w-3 h-3 transition-colors ${
+                        isFav ? 'fill-red-500 text-red-500' : 'text-[#2C2B28] stroke-[1.5]'
                       }`}
                     />
                   </button>
                 </div>
 
-                {/* Corpo do Card com Espaçamento e Respiro */}
-                <div className="p-4 sm:p-5 flex flex-col justify-between bg-white text-zinc-900 flex-1">
+                {/* ÁREA DE INFORMAÇÕES: Compacta, nítida e proporcional */}
+                <div className="px-3.5 py-3 sm:px-4 sm:py-3.5 flex flex-col justify-between bg-[#F6F5F0] text-[#141312] flex-1">
                   <div>
                     {/* Categoria */}
-                    <span className="block text-[10px] font-mono font-bold uppercase tracking-[0.22em] text-zinc-400 mb-1">
+                    <span className="block text-[8.5px] sm:text-[9px] font-mono font-semibold uppercase tracking-[0.2em] text-[#7A7871] mb-0.5">
                       {item.categoryName}
                     </span>
 
                     {/* Título do Produto */}
-                    <h3 className="text-[15px] sm:text-[16px] font-black text-zinc-950 tracking-[-0.01em] leading-snug line-clamp-1 group-hover:text-[#FF6B00] transition-colors">
+                    <h3 className="text-[13px] sm:text-[13.5px] font-semibold text-[#141312] tracking-[-0.015em] leading-snug line-clamp-1 group-hover:text-black transition-colors">
                       {item.title}
                     </h3>
 
-                    {/* Divisor Delicado com Acento Laranja */}
-                    <div className="relative w-full h-px bg-zinc-200/80 my-3">
-                      <span className="absolute left-0 top-0 h-px w-8 bg-[#FF6B00] transition-all duration-300 group-hover:w-16" />
+                    {/* Divisor sutil no card */}
+                    <div className="relative w-full h-px bg-[#E4E1D8] my-1.5">
+                      <span className="absolute left-0 top-0 h-px w-5 bg-[#FF6B00] transition-all duration-350 ease-out group-hover:w-10" />
                     </div>
 
                     {/* Bloco de Preços */}
                     <div className="flex flex-col gap-0.5">
-                      <div className="text-[17px] sm:text-[18px] font-black text-zinc-950 tracking-tight">
+                      <div className="text-[15px] sm:text-[16px] font-bold text-[#141312] tracking-tight leading-tight">
                         R$ {item.price.toFixed(2).replace('.', ',')}
                       </div>
-                      <div className="text-[11px] sm:text-[11.5px] text-zinc-500 font-medium">
+                      <div className="text-[10px] text-[#6E6C65] font-normal leading-tight">
                         {item.installments}
                       </div>
-                      <div className="text-[11px] sm:text-[11.5px] font-black text-[#E65100]">
+                      <div className="text-[10.5px] font-bold text-[#E65100] leading-tight">
                         {item.pixPrice}
                       </div>
                     </div>
                   </div>
 
-                  {/* Cores e Contagem */}
-                  <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-zinc-100">
-                    <div className="flex items-center gap-1.5">
+                  {/* Cores e Contagem com respiro compacto */}
+                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-[#E4E1D8]">
+                    <div className="flex items-center gap-1.2">
                       {item.colors.map((c, i) => (
                         <span
                           key={i}
                           style={{ backgroundColor: c.hex }}
-                          className="w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs inline-block"
+                          className="w-2.2 h-2.2 rounded-full border border-black/15 shadow-2xs inline-block"
                           title={c.name}
                         />
                       ))}
                     </div>
-                    <span className="text-[10.5px] sm:text-[11px] text-zinc-400 font-mono font-medium">
+                    <span className="text-[9.5px] sm:text-[10px] text-[#7A7871] font-mono font-medium">
                       {item.colorCountText}
                     </span>
                   </div>
@@ -516,26 +522,27 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           })}
         </div>
 
-        {/* =========================================================================
-            RODAPÉ VISUAL COMPACTO DA SEÇÃO
-           ========================================================================= */}
-        <div className="relative pt-4 sm:pt-5 mt-2">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/15 pt-3 sm:pt-4">
-            {/* Bottom-Left Branding: MARMOT EST. 2018 */}
-            <div className="flex flex-col text-left">
-              <span className="font-black tracking-[0.25em] text-xs uppercase text-zinc-300">
+        {/* PARTE INFERIOR: Barra sutil e compacta */}
+        <div className="relative pt-2 sm:pt-2.5 mt-0.5">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-1.5 border-t border-white/10 pt-2 sm:pt-2.5">
+            {/* MARMOT / EST. 2018 */}
+            <div className="flex items-center gap-2 text-left">
+              <span className="font-black tracking-[0.24em] text-[10px] uppercase text-zinc-300">
                 MARMOT
               </span>
-              <span className="text-zinc-500 font-mono text-[10px] tracking-widest uppercase">
+              <span className="text-zinc-600 font-mono text-[8.5px]">•</span>
+              <span className="text-zinc-500 font-mono text-[8.5px] tracking-wider uppercase">
                 EST. 2018
               </span>
             </div>
 
-            {/* Bottom-Right Motto: —— EXPLORAR   VESTIR   PERTENCER */}
-            <div className="flex items-center gap-3 text-[10px] sm:text-xs tracking-[0.25em] font-mono uppercase text-zinc-400">
-              <span className="w-8 sm:w-12 h-px bg-zinc-500/50 inline-block" />
+            {/* EXPLORAR • VESTIR • PERTENCER */}
+            <div className="flex items-center gap-2 text-[9px] tracking-[0.22em] font-mono uppercase text-zinc-400/80">
+              <span className="w-5 sm:w-8 h-px bg-zinc-600/40 inline-block" />
               <span>EXPLORAR</span>
+              <span className="text-zinc-600">•</span>
               <span>VESTIR</span>
+              <span className="text-zinc-600">•</span>
               <span>PERTENCER</span>
             </div>
           </div>

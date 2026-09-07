@@ -1,123 +1,166 @@
 import React from 'react';
-import { BookOpen, ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import drop3Webp from '../../assets/drop-3.webp';
+import drop3Png from '../../assets/drop-3.png';
+import look1Webp from '../../assets/look-1.webp';
+import look1Png from '../../assets/look-1.png';
+import look2Webp from '../../assets/look-2.webp';
+import look2Png from '../../assets/look-2.png';
 
 interface EditorialMagazineJournalProps {
   onNavigate: (page: string, param?: string) => void;
 }
 
 export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> = ({ onNavigate }) => {
-  const articles = [
-    {
-      id: 'art-1',
-      category: 'ESTILO & CAIMENTO',
-      title: 'Guia Definitivo do Caimento Boxy & Malha Heavyweight',
-      excerpt: 'Entenda como a gramatura densa do algodão e a gola de 3cm redefinem a estrutura e a durabilidade do visual.',
-      readTime: '4 min de leitura',
-      image: 'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=1000&q=80',
-      tag: 'GUIA DE FIT',
-    },
-    {
-      id: 'art-2',
-      category: 'STYLING URBANO',
-      title: 'Como Combinar Calças Cargo Táticas no Cotidiano',
-      excerpt: 'Dicas práticas de proporção para sobrepor calças cargo ripstop com tênis chunky e moletons sem exageros.',
-      readTime: '5 min de leitura',
-      image: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
-      tag: 'STYLING CARGO',
-    },
-    {
-      id: 'art-3',
-      category: 'MATÉRIA-PRIMA',
-      title: 'A Importância da Fibra Longa no Algodão Penteado',
-      excerpt: 'Por que o algodão nacional de alta densidade não forma bolinhas e mantém a textura aveludada por anos.',
-      readTime: '6 min de leitura',
-      image: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=1000&q=80',
-      tag: 'QUALIDADE',
-    },
-    {
-      id: 'art-4',
-      category: 'BASTIDORES DE CONFECÇÃO',
-      title: 'Do Fio à Peça Pronta: Nosso Ateliê em São Paulo',
-      excerpt: 'Conheça o processo de corte manual, costura reforçada e lavagem estonada pré-encolhida de cada lote.',
-      readTime: '3 min de leitura',
-      image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80',
-      tag: 'PRODUÇÃO',
-    },
-  ];
-
   return (
-    <section className="py-12 sm:py-14 lg:py-16 bg-white border-b border-[#E4E4E7]">
-      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 border-b border-[#E4E4E7] pb-6">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>MARMOT JOURNAL</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#18181B]">
-              CONTEÚDO & GUIAS DE ESTILO
-            </h2>
-            <p className="text-xs sm:text-sm text-[#52525B] mt-1 max-w-lg">
-              Guias de caimento, referências de styling e os bastidores de confecção do nosso ateliê paulista.
-            </p>
-          </div>
+    <section
+      id="editorial-lookbook"
+      className="py-6 sm:py-10 lg:py-14 bg-[#ffffff] select-none"
+    >
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 space-y-4 sm:space-y-6">
+        {/* =========================================================================
+            1. BANNER PRINCIPAL: DROP 03 (BUILT FOR THE STREETS)
+           ========================================================================= */}
+        <div
+          onClick={() => onNavigate('shop')}
+          className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1916/821] w-full min-h-[220px] sm:min-h-[340px] md:min-h-[460px] lg:min-h-[560px] transition-all duration-300 shadow-sm hover:shadow-md"
+        >
+          <picture className="w-full h-full block">
+            <source srcSet={drop3Webp} type="image/webp" />
+            <source srcSet="/drop-3.webp" type="image/webp" />
+            <img
+              src={drop3Png}
+              alt="Drop 03 - Built for the Streets"
+              loading="eager"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.dataset.triedFallback1) {
+                  target.dataset.triedFallback1 = 'true';
+                  target.src = '/drop-3.png';
+                } else if (!target.dataset.triedFallback2) {
+                  target.dataset.triedFallback2 = 'true';
+                  target.src = '/drop 3.png';
+                }
+              }}
+              className="w-full h-full object-cover object-center block select-none group-hover:scale-[1.006] transition-transform duration-500"
+            />
+          </picture>
 
-          <span className="text-xs font-mono font-bold text-[#B45309] uppercase border border-[#DCDCE0] bg-[#F8F9FA] px-4 py-2 rounded-[2px]">
-            EDITION // 2026
-          </span>
+          {/* Botão EXPLORAR O DROP - posicionado precisamente abaixo do texto conforme drop modelo.png */}
+          <div
+            className="absolute left-[7.8%] top-[61.5%] z-10"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNavigate('shop');
+            }}
+          >
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-6 md:px-8 py-1.5 sm:py-2.5 md:py-3.5 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
+            >
+              <span>EXPLORAR O DROP</span>
+              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
+            </button>
+          </div>
         </div>
 
-        {/* Magazine Editorial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-6">
-          {articles.map((art, idx) => (
+        {/* =========================================================================
+            2. GRID INFERIOR: LOOK 01 & LOOK 02
+           ========================================================================= */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          {/* LOOK 01: OVERSIZED ESSENTIALS */}
+          <div
+            onClick={() => onNavigate('shop')}
+            className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1672/941] w-full min-h-[190px] sm:min-h-[260px] md:min-h-[320px] transition-all duration-300 shadow-sm hover:shadow-md"
+          >
+            <picture className="w-full h-full block">
+              <source srcSet={look1Webp} type="image/webp" />
+              <source srcSet="/look-1.webp" type="image/webp" />
+              <img
+                src={look1Png}
+                alt="Look 01 - Oversized Essentials"
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.dataset.triedFallback1) {
+                    target.dataset.triedFallback1 = 'true';
+                    target.src = '/look-1.png';
+                  } else if (!target.dataset.triedFallback2) {
+                    target.dataset.triedFallback2 = 'true';
+                    target.src = '/look 1.png';
+                  }
+                }}
+                className="w-full h-full object-cover object-center block select-none group-hover:scale-[1.006] transition-transform duration-500"
+              />
+            </picture>
+
+            {/* Botão EXPLORAR - posicionado precisamente abaixo do texto de Look 01 */}
             <div
-              key={art.id}
-              onClick={() => onNavigate('shop')}
-              className={`group relative bg-white border border-[#DCDCE0] hover:border-[#18181B] rounded-[2px] overflow-hidden cursor-pointer transition-[border-color,box-shadow] duration-200 hover:shadow-[0_12px_30px_rgba(24,24,27,0.06)] flex flex-col justify-between ${idx % 4 === 0 || idx % 4 === 3 ? 'md:col-span-7' : 'md:col-span-5'}`}
+              className="absolute left-[6.3%] top-[76%] z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                onNavigate('shop');
+              }}
             >
-              {/* Image Header */}
-              <div className="relative h-64 sm:h-72 lg:h-80 overflow-hidden bg-[#F4F4F5]">
-                <img
-                  src={art.image}
-                  alt={art.title}
-                  loading="lazy"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 brightness-95 group-hover:brightness-100"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-                <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                  <span className="bg-[#18181B] text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-[2px]">
-                    {art.tag}
-                  </span>
-                </div>
-
-                <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between text-[11px] text-[#E4E4E7] font-mono">
-                  <span>{art.category}</span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-[#F4C400]" /> {art.readTime}
-                  </span>
-                </div>
-              </div>
-
-              {/* Text Body */}
-              <div className="p-6 sm:p-7 space-y-3 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="text-xl font-black text-[#18181B] uppercase tracking-tight group-hover:text-[#B45309] transition-colors leading-snug">
-                    {art.title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#52525B] mt-2 leading-relaxed">
-                    {art.excerpt}
-                  </p>
-                </div>
-
-                <div className="pt-4 border-t border-[#E4E4E7] flex items-center gap-1.5 text-xs font-bold text-[#18181B] group-hover:text-[#B45309] group-hover:translate-x-1 transition-all">
-                  LER ARTIGO & EXPLORAR PEÇAS <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-5 md:px-7 py-1.5 sm:py-2.5 md:py-3 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
+              >
+                <span>EXPLORAR</span>
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
+              </button>
             </div>
-          ))}
+          </div>
+
+          {/* LOOK 02: UTILITY SERIES */}
+          <div
+            onClick={() => onNavigate('shop')}
+            className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1672/941] w-full min-h-[190px] sm:min-h-[260px] md:min-h-[320px] transition-all duration-300 shadow-sm hover:shadow-md"
+          >
+            <picture className="w-full h-full block">
+              <source srcSet={look2Webp} type="image/webp" />
+              <source srcSet="/look-2.webp" type="image/webp" />
+              <img
+                src={look2Png}
+                alt="Look 02 - Utility Series"
+                loading="lazy"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.dataset.triedFallback1) {
+                    target.dataset.triedFallback1 = 'true';
+                    target.src = '/look-2.png';
+                  } else if (!target.dataset.triedFallback2) {
+                    target.dataset.triedFallback2 = 'true';
+                    target.src = '/look 2.png';
+                  }
+                }}
+                className="w-full h-full object-cover object-center block select-none group-hover:scale-[1.006] transition-transform duration-500"
+              />
+            </picture>
+
+            {/* Botão EXPLORAR - posicionado precisamente abaixo do texto de Look 02 */}
+            <div
+              className="absolute left-[6.0%] top-[76%] z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                onNavigate('shop');
+              }}
+            >
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-5 md:px-7 py-1.5 sm:py-2.5 md:py-3 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
+              >
+                <span>EXPLORAR</span>
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
