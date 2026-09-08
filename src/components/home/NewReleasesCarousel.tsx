@@ -458,14 +458,14 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
               animate={hasEntered ? { opacity: 1, y: 0 } : shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.22em] text-[#FF6B00] mb-1"
+              className="flex items-center gap-1.5 text-[9.5px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.22em] text-[#F4C400] mb-1"
             >
               <motion.svg
                 width="11"
                 height="11"
                 viewBox="0 0 24 24"
                 fill="currentColor"
-                className="text-[#FF6B00] shrink-0"
+                className="text-[#F4C400] shrink-0"
                 initial={shouldReduceMotion ? { scale: 1 } : { scale: 0.7 }}
                 animate={
                   hasEntered
@@ -527,7 +527,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                   ease: [0.16, 1, 0.3, 1],
                 }}
                 style={{ originX: 0 }}
-                className="h-[1.5px] w-28 sm:w-40 md:w-48 bg-gradient-to-r from-[#FF6B00] via-[#FF6B00] to-[#FF6B00]/25 rounded-full shadow-[0_0_8px_rgba(255,107,0,0.55)]"
+                className="h-[1.5px] w-28 sm:w-40 md:w-48 bg-gradient-to-r from-[#F4C400] via-[#F4C400] to-[#F4C400]/25 rounded-full shadow-[0_0_8px_rgba(244,196,0,0.55)]"
               />
             </div>
 
@@ -557,7 +557,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               <button
                 type="button"
                 onClick={() => onNavigate('shop')}
-                className="text-[#FF6B00] hover:text-[#FFA040] font-bold text-[11px] sm:text-xs tracking-[0.15em] uppercase flex items-center gap-1 transition-colors cursor-pointer group"
+                className="text-[#F4C400] hover:text-[#ffd21a] font-bold text-[11px] sm:text-xs tracking-[0.15em] uppercase flex items-center gap-1 transition-colors cursor-pointer group"
               >
                 <span>VER TODOS</span>
                 <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
@@ -569,7 +569,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="w-8.5 h-8.5 rounded-[2px] bg-black/75 hover:bg-black text-zinc-300 hover:text-white border border-white/15 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm backdrop-blur-md"
+                className="w-8.5 h-8.5 rounded-[2px] bg-black/75 hover:bg-black text-zinc-300 hover:text-white border border-white/15 hover:border-[#F4C400]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm backdrop-blur-md"
                 aria-label="Anterior"
               >
                 <ChevronLeft className="w-3.5 h-3.5 stroke-[2]" />
@@ -577,7 +577,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="w-8.5 h-8.5 rounded-[2px] bg-black/75 hover:bg-black text-zinc-300 hover:text-white border border-white/15 hover:border-[#FF6B00]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm backdrop-blur-md"
+                className="w-8.5 h-8.5 rounded-[2px] bg-black/75 hover:bg-black text-zinc-300 hover:text-white border border-white/15 hover:border-[#F4C400]/70 active:scale-95 transition-all flex items-center justify-center cursor-pointer shadow-sm backdrop-blur-md"
                 aria-label="Próximo"
               >
                 <ChevronRight className="w-3.5 h-3.5 stroke-[2]" />
@@ -667,7 +667,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                   <button
                     type="button"
                     onClick={(e) => handleWishlistClick(e, item)}
-                    className="absolute top-2.5 right-2.5 z-20 w-6.5 h-6.5 rounded-full bg-[#F6F5F0]/92 backdrop-blur-md shadow-2xs border border-black/8 hover:border-black/20 flex items-center justify-center text-[#2C2B28] hover:text-[#FF6B00] active:scale-95 transition-all cursor-pointer"
+                    className="absolute top-2.5 right-2.5 z-20 w-6.5 h-6.5 rounded-full bg-[#F6F5F0]/92 backdrop-blur-md shadow-2xs border border-black/8 hover:border-black/20 flex items-center justify-center text-[#2C2B28] hover:text-[#F4C400] active:scale-95 transition-all cursor-pointer"
                     aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
                   >
                     <Heart
@@ -693,7 +693,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
                     {/* Divisor sutil no card */}
                     <div className="relative w-full h-px bg-[#E4E1D8] my-1.5">
-                      <span className="absolute left-0 top-0 h-px w-5 bg-[#FF6B00] transition-all duration-350 ease-out group-hover:w-10" />
+                      <span className="absolute left-0 top-0 h-px w-5 bg-[#F4C400] transition-all duration-350 ease-out group-hover:w-10" />
                     </div>
 
                     {/* Bloco de Preços */}
@@ -704,7 +704,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                       <div className="text-[10px] text-[#6E6C65] font-normal leading-tight">
                         {item.installments}
                       </div>
-                      <div className="text-[10.5px] font-bold text-[#E65100] leading-tight">
+                      <div className="text-[10.5px] font-bold text-[#CA8A04] leading-tight">
                         {item.pixPrice}
                       </div>
                     </div>

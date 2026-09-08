@@ -1,70 +1,124 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, ChevronLeft, ChevronRight, Compass } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
-import { INITIAL_8_CATEGORIES } from '../../data/categories';
-import { handleProductImageError } from '../../utils/imageUtils';
 import {
   getStoredCategoryImage,
   ensureCategoryImagesStoredInLocalStorage,
-  DEFAULT_CATEGORY_IMAGE_URLS,
 } from '../../utils/categoryImageStorage';
 
 interface CategoryNavigationGridProps {
   onNavigate: (page: string, param?: string) => void;
 }
 
-// Curated high-fashion streetwear editorial imagery with cache-busted latest project assets
-const CATEGORY_EDITORIAL_ASSETS: Record<
-  string,
+interface CategoryEditorialItem {
+  id: string;
+  slug: string;
+  number: string;
+  name: string;
+  tagline: string;
+  subcategoriesText: string;
+  image: string;
+  fallbackImage: string;
+  objectPosition: string;
+}
+
+const CATEGORY_EDITORIAL_ITEMS: CategoryEditorialItem[] = [
   {
-    image: string;
-    subheading: string;
-  }
-> = {
-  camisetas: {
+    id: 'camisetas',
+    slug: 'camisetas',
+    number: '01',
+    name: 'CAMISETAS',
+    tagline: 'Heavyweight 260g & Boxy Fit',
+    subcategoriesText: 'Graphic Tees • Basic Essential • Acid Wash',
     image: '/categories/categoria-camisetas.png?v=20260907_v4_ultrahd',
-    subheading: 'Heavyweight 260g & Boxy Fit',
+    fallbackImage: '/categoria camiseta.png',
+    objectPosition: 'center 8%',
   },
-  moletons: {
+  {
+    id: 'moletons',
+    slug: 'moletons',
+    number: '02',
+    name: 'MOLETONS',
+    tagline: 'Hoodies Densos 400g/m²',
+    subcategoriesText: 'Hoodies • Zip Hoodie • Crewneck',
     image: '/categories/categoria-moletons.png?v=20260907_v4_ultrahd',
-    subheading: 'Hoodies Densos 400g/m²',
+    fallbackImage: '/categoria moletom.png',
+    objectPosition: 'center 2%',
   },
-  jaquetas: {
+  {
+    id: 'jaquetas',
+    slug: 'jaquetas',
+    number: '03',
+    name: 'JAQUETAS',
+    tagline: 'Puffers & Varsity Outerwear',
+    subcategoriesText: 'Puffers • Windbreakers • Work Jacket',
     image: '/categories/categoria-jaquetas.png?v=20260907_v4_ultrahd',
-    subheading: 'Puffers & Varsity Outerwear',
+    fallbackImage: '/categoria jaqueta.png',
+    objectPosition: 'center 4%',
   },
-  calcas: {
+  {
+    id: 'calcas',
+    slug: 'calcas',
+    number: '04',
+    name: 'CALÇAS',
+    tagline: 'Baggy Denim & Wide Leg',
+    subcategoriesText: 'Baggy • Wide Leg • Cargo • Track Pants',
     image: '/categories/categoria-calcas.png?v=20260907_v4_ultrahd',
-    subheading: 'Baggy Denim & Wide Leg',
+    fallbackImage: '/categoria calca.png',
+    objectPosition: 'center 30%',
   },
-  shorts: {
+  {
+    id: 'shorts',
+    slug: 'shorts',
+    number: '05',
+    name: 'SHORTS',
+    tagline: 'Mesh Basketball & Sweat Shorts',
+    subcategoriesText: 'Cargo • Denim • Esportivos',
     image: '/categories/categoria-shorts.png?v=20260907_v4_ultrahd',
-    subheading: 'Mesh Basketball & Sweat Shorts',
+    fallbackImage: '/categoria shorts.png',
+    objectPosition: 'center 3%',
   },
-  tenis: {
+  {
+    id: 'tenis',
+    slug: 'tenis',
+    number: '06',
+    name: 'TÊNIS',
+    tagline: 'Sneakers Chunky & Solados Tratorados',
+    subcategoriesText: 'Chunky Platform • Retro Runner • Chunky Slides',
     image: '/categories/categoria-tenis.png?v=20260907_v4_ultrahd',
-    subheading: 'Sneakers Chunky & Solados Tratorados',
+    fallbackImage: '/categoria tenis.png',
+    objectPosition: 'center 62%',
   },
-  acessorios: {
+  {
+    id: 'acessorios',
+    slug: 'acessorios',
+    number: '07',
+    name: 'ACESSÓRIOS',
+    tagline: 'Bags Táticas, Correntes & EDC',
+    subcategoriesText: 'Bags Táticas • Correntes • Headwear',
     image: '/categories/categoria-acessorios.png?v=20260907_v4_ultrahd',
-    subheading: 'Bags Táticas, Correntes & EDC',
+    fallbackImage: '/categoria acessorios.png',
+    objectPosition: 'center 18%',
   },
-};
+];
 
 export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ onNavigate }) => {
   const { categories } = useStore();
   const sectionRef = useRef<HTMLElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const [activeSlideIndex, setActiveSlideIndex] = useState(0);
+  const [activeOffset, setActiveOffset] = useState(0);
   const [isSectionInView, setIsSectionInView] = useState(false);
 
-  // Monitora a rolagem para disparar a animação APENAS quando o usuário descer (de cima do hero para baixo).
-  // Quando rolar de baixo para cima, a seção permanece estável e visível sem re-animar.
+  // Garante sincronização de imagens em localStorage
+  useEffect(() => {
+    ensureCategoryImagesStoredInLocalStorage().catch((err) => {
+      console.warn('Erro ao sincronizar imagens com localStorage:', err);
+    });
+  }, []);
+
+  // Monitora rolagem para disparar animação de entrada
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -75,8 +129,6 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     const handleScroll = () => {
       const currentScrollY = window.scrollY || window.pageYOffset || 0;
       const diff = currentScrollY - lastScrollY;
-
-      // Detecta direção com margem para evitar falso-positivo em micro-movimentos
       if (Math.abs(diff) > 2) {
         isScrollingDown = diff > 0;
       }
@@ -85,29 +137,21 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
       const rect = el.getBoundingClientRect();
       const windowHeight = window.innerHeight || document.documentElement.clientHeight;
 
-      // 1. Reset silencioso: Se o usuário estiver no topo (Hero) e a seção estiver
-      // completamente abaixo da viewport (fora do campo visual), reseta o estado
-      // permitindo nova animação caso o usuário volte a rolar para baixo.
       if (rect.top >= windowHeight) {
         setIsSectionInView(false);
         return;
       }
 
-      // 2. Disparo da animação: Apenas ao rolar para BAIXO quando o topo da seção entra na viewport
       if (isScrollingDown && rect.top <= windowHeight * 0.88 && rect.bottom >= 0) {
         setIsSectionInView(true);
         return;
       }
 
-      // 3. Ao rolar para CIMA (de baixo para cima):
-      // A seção NUNCA deve ser escondida ou re-animada.
-      // Se ela estiver na viewport ou acima dela, mantém-se visível no seu estado final.
       if (!isScrollingDown && rect.bottom >= 0 && rect.top < windowHeight) {
         setIsSectionInView(true);
       }
     };
 
-    // Verificação inicial no carregamento da página
     const initialScrollY = window.scrollY || window.pageYOffset || 0;
     const initialRect = el.getBoundingClientRect();
     const initialWindowHeight = window.innerHeight || document.documentElement.clientHeight;
@@ -125,116 +169,46 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     };
   }, []);
 
-  // Mouse drag-to-scroll state
-  const isDraggingRef = useRef(false);
-  const startXRef = useRef(0);
-  const scrollLeftRef = useRef(0);
-  const hasDraggedRef = useRef(false);
+  const totalCategories = CATEGORY_EDITORIAL_ITEMS.length;
 
-  // Ensure streetwear categories excluding Cargos as requested
-  const baseCategories = categories && categories.length > 0 ? categories : INITIAL_8_CATEGORIES;
-  const displayCategories = baseCategories.filter(
-    (cat) => cat.slug?.toLowerCase() !== 'cargos' && cat.id?.toLowerCase() !== 'cargos'
-  );
-
-  // Ensure all category images are saved in browser localStorage
-  useEffect(() => {
-    ensureCategoryImagesStoredInLocalStorage().catch((err) => {
-      console.warn('Erro ao sincronizar imagens com localStorage:', err);
-    });
-  }, []);
-
-  // Track scroll limits & active slide
-  const handleScrollUpdate = useCallback(() => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    const { scrollLeft, scrollWidth, clientWidth } = el;
-    const maxScroll = scrollWidth - clientWidth;
-
-    setCanScrollLeft(scrollLeft > 12);
-    setCanScrollRight(scrollLeft < maxScroll - 12);
-
-    // Calculate approximate active slide
-    const firstCard = el.querySelector<HTMLElement>('[data-category-card]');
-    if (firstCard) {
-      const cardWidth = firstCard.offsetWidth + 24;
-      const index = Math.round(scrollLeft / cardWidth);
-      setActiveSlideIndex(Math.min(index, displayCategories.length - 1));
-    }
-  }, [displayCategories.length]);
-
-  useEffect(() => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    handleScrollUpdate();
-    el.addEventListener('scroll', handleScrollUpdate, { passive: true });
-    window.addEventListener('resize', handleScrollUpdate);
-
-    return () => {
-      el.removeEventListener('scroll', handleScrollUpdate);
-      window.removeEventListener('resize', handleScrollUpdate);
-    };
-  }, [handleScrollUpdate]);
-
-  // Scroll smoothly by exact card width + gap
-  const scrollByDirection = (direction: 'left' | 'right') => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    const firstCard = el.querySelector<HTMLElement>('[data-category-card]');
-    const step = firstCard ? firstCard.offsetWidth + 24 : el.clientWidth * 0.8;
-
-    el.scrollBy({
-      left: direction === 'left' ? -step : step,
-      behavior: 'smooth',
-    });
+  const handlePrev = () => {
+    setActiveOffset((prev) => (prev - 1 + totalCategories) % totalCategories);
   };
 
-  // Mouse drag handlers for fluid interaction
-  const handleMouseDown = (e: React.MouseEvent) => {
-    const el = scrollContainerRef.current;
-    if (!el) return;
-
-    isDraggingRef.current = true;
-    hasDraggedRef.current = false;
-    startXRef.current = e.pageX - el.offsetLeft;
-    scrollLeftRef.current = el.scrollLeft;
+  const handleNext = () => {
+    setActiveOffset((prev) => (prev + 1) % totalCategories);
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingRef.current) return;
-    const el = scrollContainerRef.current;
-    if (!el) return;
+  // Obter imagem preferencial (localStorage ou asset de alta definição)
+  const getCardImage = (item: CategoryEditorialItem) => {
+    const stored = getStoredCategoryImage(item.slug);
+    if (stored) return stored;
 
-    const x = e.pageX - el.offsetLeft;
-    const walk = (x - startXRef.current) * 1.35;
-
-    if (Math.abs(walk) > 6) {
-      hasDraggedRef.current = true;
+    // Se no store houver imagem customizada válida
+    const matchedStoreCat = categories?.find((c) => c.slug?.toLowerCase() === item.slug);
+    if (matchedStoreCat?.image && !matchedStoreCat.image.includes('unsplash.com')) {
+      return matchedStoreCat.image;
     }
 
-    el.scrollLeft = scrollLeftRef.current - walk;
+    return item.image;
   };
 
-  const handleMouseUpOrLeave = () => {
-    isDraggingRef.current = false;
-  };
+  // Card em destaque à esquerda (1 grande)
+  const featuredItem = CATEGORY_EDITORIAL_ITEMS[activeOffset % totalCategories];
 
-  const handleCardClick = (slug: string) => {
-    if (hasDraggedRef.current) {
-      hasDraggedRef.current = false;
-      return;
-    }
-    onNavigate('shop', slug);
-  };
+  // 4 cards da grade à direita (2x2)
+  const gridItems = [
+    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 1) % totalCategories],
+    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 2) % totalCategories],
+    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 3) % totalCategories],
+    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 4) % totalCategories],
+  ];
 
   return (
     <section
       id="category-showcase-section"
       ref={sectionRef}
-      className="py-12 sm:py-16 lg:py-20 xl:py-24 bg-white border-b border-[#E4E4E7] select-none overflow-hidden relative"
+      className="pt-6 sm:pt-8 lg:pt-9 pb-8 sm:pb-10 lg:pb-12 bg-[#F6F5F2] border-b border-[#E4E1D8] select-none overflow-hidden relative"
     >
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* ========================================================= */}
@@ -249,205 +223,263 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               ? { opacity: 1 }
               : { opacity: 0, y: 14 }
           }
-          transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-5 sm:mb-6"
+          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-5 sm:mb-6"
         >
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-1.5 h-1.5 bg-[#B45309] rounded-full inline-block animate-pulse" />
-              <span className="text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#B45309]">
-                SILHUETAS STREETWEAR // MARMOT ARCHIVE
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-[42px] font-black uppercase tracking-tight text-[#0B0B0E] leading-none">
-              COMPRE POR CATEGORIA
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-500 mt-2 max-w-xl font-normal leading-relaxed">
-              Modelagens autorais desenvolvidas para caimento estruturado, tecidos pesados e acabamento de ateliê.
-            </p>
+          {/* Eyebrow tag com bullet amarelo */}
+          <div className="flex items-center gap-2 mb-2 sm:mb-2.5">
+            <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
+            <span className="text-[10.5px] sm:text-[11.5px] font-mono font-bold uppercase tracking-[0.2em] text-[#CA8A04]">
+              SILHUETAS STREETWEAR // MARMOT ARCHIVE
+            </span>
           </div>
 
-          {/* Canto superior direito: Link limpo + Indicador de slide + Setas refinadas */}
-          <div className="flex items-center gap-4 sm:gap-6 shrink-0 self-start md:self-end">
-            <button
-              onClick={() => onNavigate('shop')}
-              className="text-xs sm:text-sm font-bold uppercase tracking-wider text-zinc-800 hover:text-black hover:underline inline-flex items-center gap-1.5 cursor-pointer transition-colors group"
-            >
-              <span>VER TODO O CATÁLOGO</span>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all" />
-            </button>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+            {/* Bloco Título + Divisor Vertical + Descrição */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 lg:gap-8">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] xl:text-[54px] font-black uppercase tracking-[-0.03em] text-[#0B0B0E] leading-[0.88] whitespace-pre-line">
+                {'COMPRE POR\nCATEGORIA'}
+              </h2>
 
-            {/* Slide Index Badge */}
-            <div className="hidden sm:flex items-center gap-1 text-[11px] font-mono font-bold text-zinc-400 px-2.5 py-1 bg-zinc-100 rounded-[2px] border border-zinc-200">
-              <span className="text-black font-extrabold">{String(activeSlideIndex + 1).padStart(2, '0')}</span>
-              <span>/</span>
-              <span>{String(displayCategories.length).padStart(2, '0')}</span>
+              <div className="hidden sm:block w-px h-12 sm:h-14 lg:h-16 bg-zinc-300 shrink-0" />
+
+              <p className="text-xs sm:text-[13.5px] lg:text-[14.5px] text-zinc-600 font-normal leading-relaxed max-w-[340px]">
+                Modelagens autorais desenvolvidas para caimento estruturado, tecidos pesados e acabamento de ateliê.
+              </p>
             </div>
 
-            {/* Seta de navegação suave e visível */}
-            <div className="flex items-center gap-2 pl-3 border-l border-zinc-200">
+            {/* Canto direito: Ver todo o catálogo + Contador 01 / 07 + Controles < > */}
+            <div className="flex items-center gap-4 sm:gap-6 shrink-0 self-start lg:self-center">
               <button
                 type="button"
-                onClick={() => scrollByDirection('left')}
-                disabled={!canScrollLeft}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-[2px] border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-900 disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-                title="Categorias anteriores"
-                aria-label="Ver categorias anteriores"
+                onClick={() => onNavigate('shop')}
+                className="text-xs sm:text-[13px] font-bold uppercase tracking-wider text-black hover:text-zinc-700 inline-flex items-center gap-1.5 cursor-pointer transition-colors underline underline-offset-4 decoration-zinc-400 group"
               >
-                <ChevronLeft className="w-5 h-5 stroke-[2.2]" />
+                <span>VER TODO O CATÁLOGO</span>
+                <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
               </button>
 
-              <button
-                type="button"
-                onClick={() => scrollByDirection('right')}
-                disabled={!canScrollRight}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-[2px] bg-[#0B0B0E] hover:bg-zinc-800 text-white disabled:opacity-20 disabled:cursor-not-allowed flex items-center justify-center transition-all cursor-pointer shadow-xs active:scale-95"
-                title="Próximas categorias"
-                aria-label="Ver próximas categorias"
-              >
-                <ChevronRight className="w-5 h-5 stroke-[2.2]" />
-              </button>
+              {/* Contador de categorias: 01 / 07 */}
+              <div className="flex items-center text-xs sm:text-sm font-mono pl-1 sm:pl-2">
+                <span className="font-bold text-black text-sm sm:text-base">
+                  {featuredItem.number}
+                </span>
+                <span className="text-zinc-400 mx-1">/</span>
+                <span className="text-zinc-400 font-medium">07</span>
+              </div>
+
+              {/* Botões < e > */}
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-[3px] border border-zinc-300 bg-white/80 hover:bg-zinc-100 text-zinc-800 flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-2xs"
+                  aria-label="Categoria anterior"
+                  title="Categoria anterior"
+                >
+                  <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-[3px] bg-[#0B0B0E] hover:bg-zinc-800 text-white flex items-center justify-center transition-all cursor-pointer active:scale-95 shadow-2xs"
+                  aria-label="Próxima categoria"
+                  title="Próxima categoria"
+                >
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>
 
         {/* ========================================================================= */}
-        {/* CARROSSEL HORIZONTAL DE CATEGORIAS: 3 CARDS COMPLETOS + 4º CARD CORTADO   */}
+        {/* GRADE BENTO EXATA: 1 CARD DESTAQUE (ESQUERDA) + GRADE 2x2 (DIREITA)       */}
         {/* ========================================================================= */}
-        <div className="relative group/carousel">
-          {/* Floating Left Action Arrow (Desktop) */}
-          {canScrollLeft && (
-            <button
-              type="button"
-              onClick={() => scrollByDirection('left')}
-              className="hidden lg:flex absolute -left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-[2px] bg-black/85 hover:bg-black text-white backdrop-blur-md border border-white/20 items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer"
-              aria-label="Deslizar para a esquerda"
-            >
-              <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-            </button>
-          )}
-
-          {/* Floating Right Action Arrow (Desktop) */}
-          {canScrollRight && (
-            <button
-              type="button"
-              onClick={() => scrollByDirection('right')}
-              className="hidden lg:flex absolute -right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 rounded-[2px] bg-black/85 hover:bg-black text-white backdrop-blur-md border border-white/20 items-center justify-center shadow-2xl transition-all hover:scale-105 active:scale-95 cursor-pointer animate-pulse"
-              aria-label="Deslizar para a direita"
-            >
-              <ChevronRight className="w-6 h-6 stroke-[2.5]" />
-            </button>
-          )}
-
-          {/* Track Horizontal com matemática precisa:
-              - Mobile (< md): 1 card completo + corte sutil do 2º (w-[80vw])
-              - Tablet (md): 2 cards completos + corte do 3º (calc((100% - 20px)/2.25))
-              - Desktop (lg & xl): 3 cards completos + ~28% do 4º card cortado (calc((100% - 3*24px)/3.28))
-          */}
-          <div
-            ref={scrollContainerRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUpOrLeave}
-            onMouseLeave={handleMouseUpOrLeave}
-            className="flex items-stretch gap-5 sm:gap-6 overflow-x-auto scrollbar-none snap-x snap-mandatory py-2 cursor-grab active:cursor-grabbing"
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+          {/* ======================================================================= */}
+          {/* CARD 1: DESTAQUE PRINCIPAL (ESQUERDA - CAMISETAS OU ATIVA)              */}
+          {/* ======================================================================= */}
+          <motion.article
+            key={`featured-${featuredItem.id}-${featuredItem.number}`}
+            onClick={() => onNavigate('shop', featuredItem.slug)}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 28, scale: 0.98 }}
+            animate={
+              isSectionInView
+                ? { opacity: 1, y: 0, scale: 1 }
+                : shouldReduceMotion
+                ? { opacity: 1 }
+                : { opacity: 0, y: 28, scale: 0.98 }
+            }
+            transition={{
+              duration: 0.52,
+              delay: 0.08,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="group relative lg:col-span-5 w-full h-[520px] sm:h-[580px] lg:h-auto min-h-[520px] lg:min-h-[680px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col justify-between"
           >
-            {displayCategories.map((cat, index) => {
-              const slugKey = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
-              const asset = CATEGORY_EDITORIAL_ASSETS[slugKey];
-              const storedImg = getStoredCategoryImage(slugKey);
+            {/* Foto Editorial de Fundo */}
+            <img
+              src={getCardImage(featuredItem)}
+              alt={featuredItem.name}
+              loading="eager"
+              decoding="async"
+              referrerPolicy="no-referrer"
+              draggable={false}
+              style={{
+                objectPosition: featuredItem.objectPosition || 'center 8%',
+                transformOrigin: 'center 15%',
+              }}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.98] contrast-[1.03] saturate-[1.05] select-none"
+              onError={(e) => {
+                if (e.currentTarget.src !== featuredItem.fallbackImage) {
+                  e.currentTarget.src = featuredItem.fallbackImage;
+                }
+              }}
+            />
 
-              // Priority: 1. Stored image in browser localStorage 2. Explicit category image 3. Editorial asset 4. Default versioned URL
-              const cardImage =
-                storedImg ||
-                (cat.image && !cat.image.includes('unsplash.com') ? cat.image : null) ||
-                asset?.image ||
-                DEFAULT_CATEGORY_IMAGE_URLS[slugKey] ||
-                `/categories/categoria-${slugKey}.png?v=20260907_v4_ultrahd`;
-              const cardSubheading = cat.tagline || cat.description || asset?.subheading;
+            {/* Gradientes Superior e Inferior para Legibilidade Editorial */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent h-24 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-35% to-transparent pointer-events-none" />
 
-              return (
-                <motion.article
-                  key={cat.id || cat.slug || index}
-                  data-category-card
-                  onClick={() => handleCardClick(cat.slug)}
-                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 36, scale: 0.96 }}
-                  animate={
-                    isSectionInView
-                      ? { opacity: 1, y: 0, scale: 1 }
-                      : shouldReduceMotion
-                      ? { opacity: 1 }
-                      : { opacity: 0, y: 36, scale: 0.96 }
-                  }
-                  transition={{
-                    duration: 0.52,
-                    delay: shouldReduceMotion ? 0 : Math.min(index * 0.08, 0.48),
-                    ease: [0.22, 1, 0.36, 1],
+            {/* Top-Left: Badge Número Sequencial (ex: 01 / 07 com sublinhado amarelo) */}
+            <div className="relative z-20 p-5 sm:p-6 lg:p-7">
+              <div className="flex flex-col items-start pointer-events-none">
+                <div className="font-mono text-xs sm:text-[13px] tracking-wider leading-none">
+                  <span className="font-bold text-[#F4C400]">{featuredItem.number}</span>
+                  <span className="text-zinc-400 font-normal"> / 07</span>
+                </div>
+                <div className="w-8 h-[2px] bg-[#F4C400] mt-1.5" />
+              </div>
+            </div>
+
+            {/* Bottom Content: Traço Amarelo + Título + Heavyweight + Tags + VER CATEGORIA e Seta */}
+            <div className="relative z-20 p-5 sm:p-7 lg:p-8">
+              {/* Traço Amarelo Assinatura */}
+              <div className="w-12 h-[3.5px] bg-[#F4C400] rounded-full mb-3" />
+
+              {/* Nome da Categoria em Tipografia Imponente */}
+              <h3 className="text-3xl sm:text-4xl lg:text-[44px] xl:text-[48px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md">
+                {featuredItem.name}
+              </h3>
+
+              {/* Tagline / Especificação de Fit */}
+              {featuredItem.tagline && (
+                <p className="text-xs sm:text-sm font-semibold text-white/95 mt-2.5 drop-shadow-sm leading-snug">
+                  {featuredItem.tagline}
+                </p>
+              )}
+
+              {/* Subcategorias */}
+              {featuredItem.subcategoriesText && (
+                <p className="text-[11px] sm:text-xs font-mono text-zinc-300 mt-1 tracking-wide drop-shadow-xs">
+                  {featuredItem.subcategoriesText}
+                </p>
+              )}
+
+              {/* Linha Inferior: VER CATEGORIA ─────── ( ↗ ) */}
+              <div className="flex items-center justify-between mt-5 pt-3.5 border-t border-white/20 text-white">
+                <div className="flex items-center gap-3 flex-1 mr-4">
+                  <span className="text-xs font-mono font-bold uppercase tracking-[0.16em] text-white/90 whitespace-nowrap">
+                    VER CATEGORIA
+                  </span>
+                  <div className="h-px bg-white/30 flex-1 max-w-[170px]" />
+                </div>
+
+                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0">
+                  <ArrowUpRight className="w-5 h-5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </div>
+              </div>
+            </div>
+          </motion.article>
+
+          {/* ======================================================================= */}
+          {/* GRADE 2x2 (DIREITA): 4 CARDS EDITORIAIS                                  */}
+          {/* ======================================================================= */}
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+            {gridItems.map((item, idx) => (
+              <motion.article
+                key={`grid-${item.id}-${item.number}-${idx}`}
+                onClick={() => onNavigate('shop', item.slug)}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 28, scale: 0.98 }}
+                animate={
+                  isSectionInView
+                    ? { opacity: 1, y: 0, scale: 1 }
+                    : shouldReduceMotion
+                    ? { opacity: 1 }
+                    : { opacity: 0, y: 28, scale: 0.98 }
+                }
+                transition={{
+                  duration: 0.52,
+                  delay: 0.14 + idx * 0.07,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="group relative h-[290px] sm:h-[315px] lg:h-[330px] xl:h-[340px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_16px_32px_rgba(0,0,0,0.16)] transition-all duration-300 flex flex-col justify-between"
+              >
+                {/* Foto Editorial de Fundo */}
+                <img
+                  src={getCardImage(item)}
+                  alt={item.name}
+                  loading="lazy"
+                  decoding="async"
+                  referrerPolicy="no-referrer"
+                  draggable={false}
+                  style={{
+                    objectPosition: item.objectPosition || 'center top',
+                    transformOrigin: 'center 15%',
                   }}
-                  className="group relative h-[460px] sm:h-[500px] lg:h-[550px] xl:h-[600px] w-[82vw] sm:w-[calc((100%-20px)/2.2)] md:w-[calc((100%-40px)/2.8)] lg:w-[calc((100%-60px)/3.35)] xl:w-[calc((100%-72px)/4.25)] shrink-0 snap-start rounded-[2px] overflow-hidden bg-[#121214] border border-zinc-200/90 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)]"
-                >
-                  {/* Foto editorial de alta definição padronizada */}
-                  <img
-                    src={cardImage}
-                    alt={cat.name}
-                    loading={index < 4 ? 'eager' : 'lazy'}
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                    draggable={false}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out brightness-100 contrast-[1.03] saturate-[1.05] select-none"
-                    onError={(e) => {
-                      const fallback = DEFAULT_CATEGORY_IMAGE_URLS[slugKey] || `/categories/categoria-${slugKey}.png`;
-                      if (e.currentTarget.src !== fallback) {
-                        e.currentTarget.src = fallback;
-                      } else {
-                        handleProductImageError(e, cat.slug, `cat-${index}`);
-                      }
-                    }}
-                  />
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.98] contrast-[1.03] saturate-[1.05] select-none"
+                  onError={(e) => {
+                    if (e.currentTarget.src !== item.fallbackImage) {
+                      e.currentTarget.src = item.fallbackImage;
+                    }
+                  }}
+                />
 
-                  {/* Gradiente Inferior Refinado que protege o texto sem escurecer a foto */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 via-22% to-transparent p-5 sm:p-7 lg:p-8 flex flex-col justify-end z-20 pointer-events-none">
-                    <div className="space-y-1.5 transform transition-transform duration-300 group-hover:-translate-y-1">
-                      {/* Título de Categoria em Destaque Imponente */}
-                      <h3 className="text-xl sm:text-2xl lg:text-[28px] font-black text-white uppercase tracking-tight leading-none group-hover:text-[#F4C400] transition-colors">
-                        {cat.name}
-                      </h3>
+                {/* Gradientes Superior e Inferior */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent h-20 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 via-35% to-transparent pointer-events-none" />
 
-                      {/* Subtítulo / Descrição de Caimento */}
-                      <p className="text-xs sm:text-[13px] text-zinc-300 font-medium line-clamp-1 pt-0.5 leading-snug">
-                        {cardSubheading}
-                      </p>
-
-                      {/* Subcategorias em chips discretos */}
-                      {cat.subcategories && cat.subcategories.length > 0 && (
-                        <p className="text-[11px] font-mono text-zinc-400/90 line-clamp-1 pt-1 tracking-wide">
-                          {cat.subcategories.slice(0, 3).join(' • ')}
-                        </p>
-                      )}
+                {/* Top-Left: Badge Número Sequencial (ex: 02 / 07, 03 / 07, etc.) */}
+                <div className="relative z-20 p-4 sm:p-5">
+                  <div className="flex flex-col items-start pointer-events-none">
+                    <div className="font-mono text-[11px] sm:text-xs tracking-wider leading-none">
+                      <span className="font-bold text-[#F4C400]">{item.number}</span>
+                      <span className="text-zinc-400 font-normal"> / 07</span>
                     </div>
-
-                    {/* Botão de Ação / Barra Explorar */}
-                    <div className="mt-3.5 pt-2.5 border-t border-white/15 flex items-center justify-between text-white group-hover:text-[#F4C400] transition-colors">
-                      <span className="text-[10.5px] sm:text-xs font-mono font-bold uppercase tracking-[0.14em]">
-                        EXPLORAR COLEÇÃO
-                      </span>
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 group-hover:bg-[#F4C400] group-hover:text-black flex items-center justify-center transition-all duration-300 group-hover:translate-x-1 shadow-sm">
-                        <ArrowRight className="w-3.5 h-3.5 stroke-[2.5]" />
-                      </div>
-                    </div>
+                    <div className="w-7 h-[2px] bg-[#F4C400] mt-1.5" />
                   </div>
-                </motion.article>
-              );
-            })}
-          </div>
-        </div>
+                </div>
 
-        {/* Indicador de Deslizar em Telas Menores */}
-        <div className="mt-4 sm:hidden flex items-center justify-center gap-1 text-[11px] font-mono text-zinc-400">
-          <Compass className="w-3.5 h-3.5 text-[#B45309]" />
-          <span>Deslize para ver todas as silhuetas</span>
+                {/* Bottom Content: Traço Amarelo + Título + Subcategorias + Botão Circular com Seta */}
+                <div className="relative z-20 p-4 sm:p-5 lg:p-6 flex items-end justify-between gap-3">
+                  <div className="space-y-1 min-w-0 flex-1">
+                    {/* Traço Amarelo */}
+                    <div className="w-8 h-[3px] bg-[#F4C400] rounded-full mb-2" />
+
+                    {/* Nome da Categoria */}
+                    <h3 className="text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md truncate">
+                      {item.name}
+                    </h3>
+
+                    {/* Subcategorias / Descrição */}
+                    <p className="text-[11px] sm:text-xs font-mono text-zinc-300 tracking-wide drop-shadow-xs line-clamp-1">
+                      {item.subcategoriesText}
+                    </p>
+                  </div>
+
+                  {/* Botão Circular com Seta Editorial */}
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0 self-end">
+                    <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   );
 };
+
