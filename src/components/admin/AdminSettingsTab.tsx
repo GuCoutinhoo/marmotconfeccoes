@@ -248,14 +248,14 @@ export const AdminSettingsTab: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
-            {/* Mercado Pago */}
+            {/* Stripe */}
             <div className="p-3 bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl flex items-center justify-between">
               <div>
-                <p className="font-bold text-[#171717]">Mercado Pago</p>
+                <p className="font-bold text-[#171717]">Stripe</p>
                 <p className="text-[10px] text-[#6B6B66]">Gateway & Webhooks</p>
               </div>
               {(() => {
-                const st = healthData?.components?.mercadoPago?.status || 'NOT_CONFIGURED';
+                const st = healthData?.components?.stripe?.status || 'NOT_CONFIGURED';
                 if (st === 'OK') {
                   return <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-full font-bold uppercase">OK</span>;
                 }

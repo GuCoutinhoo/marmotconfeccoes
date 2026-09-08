@@ -64,6 +64,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const { addToCart, openMiniCart } = useCart();
   const { showToast } = useToast();
   const [isSyncingOrders, setIsSyncingOrders] = useState(false);
+  const payNowInFlightRef = useRef<Set<string>>(new Set());
 
   const handleManualSync = async () => {
     setIsSyncingOrders(true);
@@ -509,8 +510,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   };
 
   const handlePayNow = async (orderId: string) => {
+    if (payNowInFlightRef.current.has(orderId)) return;
+    payNowInFlightRef.current.add(orderId);
     try {
-      showToast('Conectando ao Mercado Pago...', 'Gerando link de pagamento para o pedido.', 'info');
+      showToast('Conectando à Stripe...', 'Gerando um checkout seguro para o pedido.', 'info');
       const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
       const res = await fetch(`/api/orders/${orderId}/pay-now`, {
         method: 'POST',
@@ -518,16 +521,19 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
           'Content-Type': 'application/json',
           ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
         },
+        body: JSON.stringify({ checkoutAttemptId: crypto.randomUUID() }),
       });
       const data = await res.json();
-      if (res.ok && (data.init_point || data.targetUrl || data.sandbox_init_point)) {
-        const redirectUrl = data.sandbox_init_point || data.init_point || data.targetUrl;
+      if (res.ok && (data.checkoutUrl || data.targetUrl)) {
+        const redirectUrl = data.checkoutUrl || data.targetUrl;
         window.location.href = redirectUrl;
       } else {
         showToast('Erro', data.error || 'Não foi possível reabrir o pagamento.', 'error');
       }
     } catch {
       showToast('Erro', 'Falha ao conectar com o serviço de pagamento.', 'error');
+    } finally {
+      payNowInFlightRef.current.delete(orderId);
     }
   };
 

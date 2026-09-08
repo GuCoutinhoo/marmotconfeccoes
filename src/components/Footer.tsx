@@ -141,7 +141,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#71717A]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-1.5 text-[#52525B] font-medium">
-            <Lock className="w-3.5 h-3.5 text-[#B45309]" /> Checkout Seguro <strong className="text-[#18181B]">Mercado Pago</strong>
+            <Lock className="w-3.5 h-3.5 text-[#B45309]" /> Checkout Seguro <strong className="text-[#18181B]">Stripe</strong>
           </span>
           <span className="flex items-center gap-1.5 text-[#52525B] font-medium">
             <Truck className="w-3.5 h-3.5 text-[#B45309]" /> Envios via <strong className="text-[#18181B]">Melhor Envio / Correios</strong>

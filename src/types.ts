@@ -118,17 +118,6 @@ export interface ShippingSettings {
   appEmail?: string;
 }
 
-export interface MercadoPagoAdminSettings {
-  environment: 'sandbox' | 'production';
-  isPublicKeyConfigured: boolean;
-  isAccessTokenConfigured: boolean;
-  isWebhookSecretConfigured: boolean;
-  publicKeyMasked: string;
-  accessTokenMasked: string;
-  webhookSecretMasked: string;
-  webhookUrl: string;
-}
-
 export interface Address {
   id: string;
   recipientName: string;
@@ -240,7 +229,7 @@ export interface OrderStatusHistoryItem {
   status: string;
   previousStatus?: string;
   newStatus?: string;
-  source?: 'mercado_pago' | 'melhor_envio' | 'carrier' | 'tracking' | 'tracking_sync' | 'admin' | 'system';
+  source?: 'stripe' | 'melhor_envio' | 'carrier' | 'tracking' | 'tracking_sync' | 'admin' | 'system';
   externalEventId?: string;
   timestamp: string;
   occurredAt?: string;
@@ -281,17 +270,20 @@ export interface Order {
     barcode?: string;
     transactionId?: string;
     gateway?: string;
+    sessionId?: string;
+    statusDetail?: string;
     paidAt?: string;
     refundedAt?: string;
     refundedAmount?: number;
-    // Mercado Pago Fields
-    mercadoPagoPaymentId?: string;
-    mercadoPagoPreferenceId?: string;
-    mercadoPagoStatus?: string;
-    mercadoPagoStatusDetail?: string;
-    mercadoPagoInitPoint?: string;
-    ticketUrl?: string;
   };
+  paymentProvider?: string;
+  paymentProviderPaymentId?: string;
+  paymentProviderSessionId?: string;
+  checkoutAttemptKey?: string;
+  checkoutExpiresAt?: string;
+  couponCode?: string;
+  couponDiscount?: number;
+  paymentMethodDiscount?: number;
   shippingAddress: Address;
   shippingCarrier: string;
   shippingProvider?: string;
@@ -395,9 +387,8 @@ export interface PaymentTransaction {
   status: PaymentStatus;
   date: string;
   transactionId?: string;
-  mercadoPagoPaymentId?: string;
-  preferenceId?: string;
-  merchantOrderId?: string;
+  paymentProvider?: string;
+  paymentSessionId?: string;
   statusDetail?: string;
   refundedAmount?: number;
   refundReason?: string;
@@ -482,9 +473,8 @@ export interface PaymentRecord {
   status: PaymentStatus;
   date: string;
   transactionId?: string;
-  mercadoPagoPaymentId?: string;
-  preferenceId?: string;
-  merchantOrderId?: string;
+  paymentProvider?: string;
+  paymentSessionId?: string;
   statusDetail?: string;
   refundedAmount?: number;
   refundReason?: string;

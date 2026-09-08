@@ -67,8 +67,7 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
           $5::text,
           $6::text,
           $7::timestamptz,
-          $8::jsonb,
-          $9::jsonb
+          $8::jsonb
         ) AS result;
       `;
       const values = [
@@ -76,11 +75,10 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
         params.p_payment_id,
         params.p_amount || 100,
         params.p_currency || 'BRL',
-        params.p_gateway || 'mercadopago',
-        params.p_payment_method || 'credit_card',
+        params.p_gateway || 'stripe',
+        params.p_payment_method || 'Cartão de Crédito',
         params.p_date_approved || new Date().toISOString(),
         JSON.stringify(params.p_items || []),
-        JSON.stringify(params.p_raw_payload || {}),
       ];
       try {
         const res = await pool.query(sql, values);
@@ -255,7 +253,7 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
       total: 100,
       status: 'Pendente',
       payment_status: 'Pendente',
-      payment_method: 'mercadopago',
+      payment_method: 'Stripe Checkout',
       shipping_address: { city: 'São Paulo', state: 'SP', cep: '01001-000' },
       items: [{ id: TEST_PROD_A, quantity: 1, price: 100, title: 'Item Teste A' }],
       created_at: new Date().toISOString(),
@@ -267,8 +265,8 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
         p_payment_id: TEST_PAY_A,
         p_amount: 100,
         p_currency: 'BRL',
-        p_gateway: 'mercadopago',
-        p_payment_method: 'credit_card',
+        p_gateway: 'stripe',
+        p_payment_method: 'Cartão de Crédito',
         p_date_approved: new Date().toISOString(),
         p_items: [{ id: TEST_PROD_A, quantity: 1 }],
       })
@@ -318,7 +316,7 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
       total: 150,
       status: 'Pendente',
       payment_status: 'Pendente',
-      payment_method: 'mercadopago',
+      payment_method: 'Stripe Checkout',
       shipping_address: { city: 'São Paulo', state: 'SP', cep: '01001-000' },
       items: [{ id: TEST_PROD_B, quantity: 1, price: 150 }],
       created_at: new Date().toISOString(),
@@ -331,7 +329,7 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
       total: 150,
       status: 'Pendente',
       payment_status: 'Pendente',
-      payment_method: 'mercadopago',
+      payment_method: 'Stripe Checkout',
       shipping_address: { city: 'São Paulo', state: 'SP', cep: '01001-000' },
       items: [{ id: TEST_PROD_B, quantity: 1, price: 150 }],
       created_at: new Date().toISOString(),
@@ -343,8 +341,8 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
         p_payment_id: TEST_PAY_B1,
         p_amount: 150,
         p_currency: 'BRL',
-        p_gateway: 'mercadopago',
-        p_payment_method: 'credit_card',
+        p_gateway: 'stripe',
+        p_payment_method: 'Cartão de Crédito',
         p_items: [{ id: TEST_PROD_B, quantity: 1 }],
       }),
       callProcessApprovedOrderAtomic({
@@ -352,8 +350,8 @@ test('Integration Suite: Financial Concurrency & Atomic Liquidation', async (t) 
         p_payment_id: TEST_PAY_B2,
         p_amount: 150,
         p_currency: 'BRL',
-        p_gateway: 'mercadopago',
-        p_payment_method: 'credit_card',
+        p_gateway: 'stripe',
+        p_payment_method: 'Cartão de Crédito',
         p_items: [{ id: TEST_PROD_B, quantity: 1 }],
       }),
     ]);

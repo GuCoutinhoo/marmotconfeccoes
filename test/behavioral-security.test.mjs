@@ -66,22 +66,21 @@ test('Behavioral Security Suite: P0 & P1 Enforcement Verification', async (t) =>
   await t.test('P0 1: Order Overwrite & IDOR Protection in backend routes', () => {
     // Check in POST /api/orders
     assert.ok(apiCode.includes('SHIPPING_QUOTE_FORBIDDEN'), 'Must reject quotes belonging to other users with SHIPPING_QUOTE_FORBIDDEN');
-    assert.ok(apiCode.includes('found.userId && found.userId !== authUser.id'), 'Must validate order ownership against authenticated user');
-    assert.ok(apiCode.includes("found.status !== 'Aguardando Pagamento' && found.paymentStatus !== 'Pendente'"), 'Must prevent reusing already paid/processed orders');
+    assert.ok(apiCode.includes('existingOrder.userId !== orderUserId'), 'Must validate order ownership against authenticated user');
+    assert.ok(apiCode.includes("existingOrder.paymentStatus !== 'Pendente'"), 'Must prevent reusing already paid/processed orders');
     assert.ok(apiCode.includes('MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}'), 'Must generate server-authoritative order ID');
 
-    // Check in createPreference
-    assert.ok(apiCode.includes('CHECKOUT_ORDER_MISMATCH'), 'Must log checkout order mismatch warning on IDOR attempt');
-    assert.ok(apiCode.includes("found.status !== 'Aguardando Pagamento' && found.paymentStatus !== 'Pendente'"), 'Must check pending status in createPreference');
+    // Check in Stripe Checkout Session creation
+    assert.ok(apiCode.includes('claimPaymentSessionCreation('), 'Must serialize Checkout Session creation');
+    assert.ok(apiCode.includes('canAuthenticatedUserAccessOrder(req, order)'), 'Must check ownership when resuming payment');
   });
 
   await t.test('P0 2: Shipping Quote Binding to User and Cart Hash', () => {
     // Check cart_hash verification
     assert.ok(apiCode.includes('generateCanonicalCartHash'), 'Canonical cart hash generation must be in codebase');
-    assert.ok(apiCode.includes('quoteData.cart_hash !== serverCartHash'), 'Must compare stored cart_hash with freshly computed serverCartHash');
-    assert.ok(apiCode.includes('quoteData.user_id !== authUser.id'), 'Must enforce quote ownership in order checkout');
-    assert.ok(apiCode.includes('quoteData.user_id !== orderUserId'), 'Must enforce quote ownership in payment preference');
-    assert.ok(apiCode.includes('new Date(quoteData.expires_at).getTime() < Date.now()'), 'Must enforce quote expiration timestamp');
+    assert.ok(apiCode.includes('quote.cart_hash !== generateCanonicalCartHash(destinationCep, validatedItems)'), 'Must compare stored cart_hash with freshly computed server hash');
+    assert.ok(apiCode.includes('quote.user_id !== orderUserId'), 'Must enforce quote ownership in checkout');
+    assert.ok(apiCode.includes('new Date(quote.expires_at).getTime() < Date.now()'), 'Must enforce quote expiration timestamp');
   });
 
   await t.test('P0 3: Tracking Webhook Fail-Closed verification', () => {

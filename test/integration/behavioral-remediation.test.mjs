@@ -116,19 +116,20 @@ test('Integration Suite: Behavioral Remediation & Security Enforcement', async (
     assert.equal(res.status, 401, 'Legacy signed token must return HTTP 401 on /api/auth/me');
   });
 
-  await t.test('Security P0: Token signed with legacy secret is strictly rejected with 401 on /api/mercadopago/create-preference', async () => {
-    const res = await fetch(`${BASE_URL}/api/mercadopago/create-preference`, {
+  await t.test('Security P0: Token signed with legacy secret is strictly rejected with 401 on Stripe checkout', async () => {
+    const res = await fetch(`${BASE_URL}/api/stripe/checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${legacyToken}`,
       },
       body: JSON.stringify({
-        items: [{ id: 'prod-mol-016', title: 'Camiseta', quantity: 1, unit_price: 150 }],
+        items: [{ productId: 'prod-mol-016', quantity: 1, size: 'M', color: 'black' }],
         shippingQuoteId: 'some-quote-id',
+        checkoutAttemptId: crypto.randomUUID(),
       }),
     });
-    assert.equal(res.status, 401, 'Legacy signed token must return HTTP 401 on create-preference');
+    assert.equal(res.status, 401, 'Legacy signed token must return HTTP 401 on Stripe checkout');
   });
 
   // --------------------------------------------------------------------------
@@ -200,19 +201,20 @@ test('Integration Suite: Behavioral Remediation & Security Enforcement', async (
     assert.ok(data.error, 'Must provide error message');
   });
 
-  await t.test('Fail-Closed: Mercado Pago with invalid token returns 401', async () => {
-    const res = await fetch(`${BASE_URL}/api/mercadopago/create-preference`, {
+  await t.test('Fail-Closed: Stripe checkout with invalid token returns 401', async () => {
+    const res = await fetch(`${BASE_URL}/api/stripe/checkout-session`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer invalid.token.payload',
       },
       body: JSON.stringify({
-        items: [{ id: 'prod-mol-016', title: 'Camiseta', quantity: 1, unit_price: 150 }],
+        items: [{ productId: 'prod-mol-016', quantity: 1, size: 'M', color: 'black' }],
         shippingQuoteId: 'some-quote-id',
+        checkoutAttemptId: crypto.randomUUID(),
       }),
     });
-    assert.equal(res.status, 401, 'Invalid bearer token must return HTTP 401 on Mercado Pago preference');
+    assert.equal(res.status, 401, 'Invalid bearer token must return HTTP 401 on Stripe checkout');
   });
 
   // --------------------------------------------------------------------------

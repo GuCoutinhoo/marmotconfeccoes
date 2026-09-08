@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { PaymentRecord } from '../../types';
 import {
   DollarSign,
   Search,
   CreditCard,
-  CheckCircle2,
-  Clock,
   RotateCcw,
-  AlertCircle,
   QrCode,
-  FileText,
   RefreshCw,
   X,
   Loader2,
-  ChevronRight,
-  ShieldCheck,
   TrendingUp,
-  Receipt
 } from 'lucide-react';
+
+const getAdminAuthToken = () =>
+  localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
 
 export const AdminPaymentsTab: React.FC = () => {
   const { showToast } = useToast();
@@ -34,12 +29,14 @@ export const AdminPaymentsTab: React.FC = () => {
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
   const [isProcessingRefund, setIsProcessingRefund] = useState(false);
+  const [refundOperationId, setRefundOperationId] = useState(() => crypto.randomUUID());
+  const [syncingPaymentId, setSyncingPaymentId] = useState<string | null>(null);
 
   const fetchPayments = async () => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/admin/payments', {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
+        headers: { 'x-auth-token': getAdminAuthToken() },
       });
       if (res.ok) {
         const data = await res.json();
@@ -62,9 +59,9 @@ export const AdminPaymentsTab: React.FC = () => {
       !term ||
       p.id.toLowerCase().includes(term) ||
       p.orderId.toLowerCase().includes(term) ||
-      (p.payerEmail && p.payerEmail.toLowerCase().includes(term)) ||
-      (p.payerName && p.payerName.toLowerCase().includes(term)) ||
-      (p.gatewayPaymentId && p.gatewayPaymentId.toLowerCase().includes(term));
+      p.customerEmail.toLowerCase().includes(term) ||
+      p.customerName.toLowerCase().includes(term) ||
+      (p.transactionId && p.transactionId.toLowerCase().includes(term));
 
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     const matchesMethod = methodFilter === 'all' || p.method === methodFilter;
@@ -73,21 +70,21 @@ export const AdminPaymentsTab: React.FC = () => {
   });
 
   const totalVolume = payments
-    .filter((p) => p.status === 'approved')
+    .filter((p) => p.status === 'Aprovado')
     .reduce((sum, p) => sum + p.amount, 0);
 
   const totalRefunded = payments
-    .filter((p) => p.status === 'refunded')
-    .reduce((sum, p) => sum + (p.refundedAmount || p.amount), 0);
+    .reduce((sum, p) => sum + (p.refundedAmount || 0), 0);
 
   const handleRefund = async () => {
-    if (!refundModalPayment) return;
+    if (!refundModalPayment || isProcessingRefund) return;
     const numAmount = parseFloat(refundAmount);
     if (isNaN(numAmount) || numAmount <= 0) {
       showToast('Valor Inválido', 'Informe um valor válido para estorno.', 'error');
       return;
     }
-    if (numAmount > refundModalPayment.amount) {
+    const refundableBalance = Math.max(0, refundModalPayment.amount - (refundModalPayment.refundedAmount || 0));
+    if (numAmount > refundableBalance) {
       showToast('Valor Excedido', 'O valor de estorno não pode exceder o valor pago.', 'error');
       return;
     }
@@ -98,30 +95,57 @@ export const AdminPaymentsTab: React.FC = () => {
 
     setIsProcessingRefund(true);
     try {
-      const res = await fetch(`/api/admin/payments/${refundModalPayment.id}/refund`, {
+      const res = await fetch(`/api/admin/orders/${refundModalPayment.orderId}/refund`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-auth-token': localStorage.getItem('marmot_auth_token') || '',
+          'x-auth-token': getAdminAuthToken(),
         },
         body: JSON.stringify({
           amount: numAmount,
           reason: refundReason.trim(),
+          refundOperationId,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Falha ao processar estorno.');
 
-      showToast('Estorno Concluído!', `Estorno de R$ ${numAmount.toFixed(2)} registrado com sucesso.`, 'success');
+      showToast(
+        data.refundStatus === 'succeeded' ? 'Estorno concluído' : 'Estorno solicitado',
+        data.refundStatus === 'succeeded'
+          ? `A Stripe confirmou o estorno de R$ ${numAmount.toFixed(2)}.`
+          : 'A solicitação foi aceita e será atualizada pelo webhook da Stripe.',
+        'success',
+      );
       setRefundModalPayment(null);
       setRefundAmount('');
       setRefundReason('');
+      setRefundOperationId(crypto.randomUUID());
       await fetchPayments();
     } catch (err: any) {
       showToast('Erro no Estorno', err.message, 'error');
     } finally {
       setIsProcessingRefund(false);
+    }
+  };
+
+  const handleSyncPayment = async (payment: PaymentRecord) => {
+    if (syncingPaymentId) return;
+    setSyncingPaymentId(payment.id);
+    try {
+      const response = await fetch(`/api/admin/orders/${payment.orderId}/sync-payment`, {
+        method: 'POST',
+        headers: { 'x-auth-token': getAdminAuthToken() },
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Falha ao sincronizar pagamento.');
+      showToast('Pagamento sincronizado', data.changed ? 'O pedido foi reconciliado com a Stripe.' : 'O pedido já estava consistente.', 'success');
+      await fetchPayments();
+    } catch (error: any) {
+      showToast('Erro na sincronização', error?.message || 'Não foi possível consultar a Stripe.', 'error');
+    } finally {
+      setSyncingPaymentId(null);
     }
   };
 
@@ -158,7 +182,7 @@ export const AdminPaymentsTab: React.FC = () => {
           </div>
           <p className="text-2xl font-black text-[#B45309] mt-2">
             {payments.length > 0
-              ? `${((payments.filter((p) => p.status === 'approved').length / payments.length) * 100).toFixed(1)}%`
+              ? `${((payments.filter((p) => p.status === 'Aprovado').length / payments.length) * 100).toFixed(1)}%`
               : '100%'}
           </p>
           <span className="text-[10px] text-[#6B6B66]">Total de {payments.length} transações</span>
@@ -174,7 +198,7 @@ export const AdminPaymentsTab: React.FC = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar por ID da Transação, Pedido #, E-mail ou Mercado Pago ID..."
+              placeholder="Buscar por transação Stripe, pedido ou e-mail..."
               className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#171717] placeholder-[#6B6B66] focus:outline-none focus:border-[#B45309]"
             />
           </div>
@@ -186,9 +210,9 @@ export const AdminPaymentsTab: React.FC = () => {
               className="bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2.5 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
             >
               <option value="all">Todas as Formas</option>
-              <option value="pix">PIX Instantâneo</option>
-              <option value="credit_card">Cartão de Crédito</option>
-              <option value="boleto">Boleto Bancário</option>
+              <option value="PIX">PIX Instantâneo</option>
+              <option value="Cartão de Crédito">Cartão de Crédito</option>
+              <option value="Boleto Bancário">Boleto Bancário</option>
             </select>
 
             <button
@@ -214,34 +238,34 @@ export const AdminPaymentsTab: React.FC = () => {
             Todos ({payments.length})
           </button>
           <button
-            onClick={() => setStatusFilter('approved')}
+            onClick={() => setStatusFilter('Aprovado')}
             className={`px-3 py-1.5 rounded-lg font-bold uppercase transition-all ${
-              statusFilter === 'approved'
+              statusFilter === 'Aprovado'
                 ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
                 : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] hover:border-[#B45309]'
             }`}
           >
-            Aprovados ({payments.filter((p) => p.status === 'approved').length})
+            Aprovados ({payments.filter((p) => p.status === 'Aprovado').length})
           </button>
           <button
-            onClick={() => setStatusFilter('pending')}
+            onClick={() => setStatusFilter('Pendente')}
             className={`px-3 py-1.5 rounded-lg font-bold uppercase transition-all ${
-              statusFilter === 'pending'
+              statusFilter === 'Pendente'
                 ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
                 : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] hover:border-[#B45309]'
             }`}
           >
-            Pendentes ({payments.filter((p) => p.status === 'pending').length})
+            Pendentes ({payments.filter((p) => p.status === 'Pendente').length})
           </button>
           <button
-            onClick={() => setStatusFilter('refunded')}
+            onClick={() => setStatusFilter('Reembolsado')}
             className={`px-3 py-1.5 rounded-lg font-bold uppercase transition-all ${
-              statusFilter === 'refunded'
+              statusFilter === 'Reembolsado'
                 ? 'bg-[#F0C84B] text-black shadow-xs font-extrabold'
                 : 'bg-[#F9F9F7] border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] hover:border-[#B45309]'
             }`}
           >
-            Estornados ({payments.filter((p) => p.status === 'refunded').length})
+            Estornados ({payments.filter((p) => p.status === 'Reembolsado').length})
           </button>
         </div>
       </div>
@@ -262,9 +286,9 @@ export const AdminPaymentsTab: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-[#E5E5E1]">
               {filteredPayments.map((pay) => {
-                const isApproved = pay.status === 'approved';
-                const isRefunded = pay.status === 'refunded';
-                const isPending = pay.status === 'pending';
+                const isApproved = pay.status === 'Aprovado';
+                const isRefunded = pay.status === 'Reembolsado';
+                const isPending = pay.status === 'Pendente';
 
                 return (
                   <tr key={pay.id} className="hover:bg-[#F9F9F7] transition-colors">
@@ -273,7 +297,7 @@ export const AdminPaymentsTab: React.FC = () => {
                         #{pay.id.slice(-8).toUpperCase()}
                       </p>
                       <p className="text-[10px] text-[#6B6B66] mt-0.5">
-                        {new Date(pay.createdAt).toLocaleDateString('pt-BR')} {new Date(pay.createdAt).toLocaleTimeString('pt-BR')}
+                        {new Date(pay.date).toLocaleDateString('pt-BR')} {new Date(pay.date).toLocaleTimeString('pt-BR')}
                       </p>
                     </td>
 
@@ -282,13 +306,13 @@ export const AdminPaymentsTab: React.FC = () => {
                         Pedido #{pay.orderId.slice(-8).toUpperCase()}
                       </p>
                       <p className="text-[11px] text-[#6B6B66] truncate max-w-[180px]">
-                        {pay.payerName || pay.payerEmail || 'Cliente'}
+                        {pay.customerName || pay.customerEmail || 'Cliente'}
                       </p>
                     </td>
 
                     <td className="p-4">
                       <div className="flex items-center gap-1.5 font-bold uppercase text-[#171717]">
-                        {pay.method === 'pix' ? (
+                        {pay.method === 'PIX' ? (
                           <>
                             <QrCode className="w-3.5 h-3.5 text-emerald-600" /> PIX
                           </>
@@ -299,7 +323,7 @@ export const AdminPaymentsTab: React.FC = () => {
                         )}
                       </div>
                       <p className="text-[10px] text-[#6B6B66] font-mono">
-                        {pay.installments ? `${pay.installments}x sem juros` : 'À vista'}
+                        Via {pay.paymentProvider || 'provedor legado'}
                       </p>
                     </td>
 
@@ -307,9 +331,9 @@ export const AdminPaymentsTab: React.FC = () => {
                       <p className="font-bold text-[#171717]">
                         R$ {pay.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
-                      {pay.netAmount && (
+                      {Boolean(pay.refundedAmount) && (
                         <p className="text-[10px] text-[#6B6B66]">
-                          Líquido: R$ {pay.netAmount.toFixed(2)}
+                          Reembolsado: R$ {Number(pay.refundedAmount).toFixed(2)}
                         </p>
                       )}
                     </td>
@@ -326,22 +350,34 @@ export const AdminPaymentsTab: React.FC = () => {
                             : 'bg-red-50 text-red-700 border-red-200'
                         }`}
                       >
-                        {pay.status === 'approved' ? 'Aprovado' : pay.status === 'refunded' ? 'Estornado' : pay.status === 'pending' ? 'Pendente' : 'Recusado'}
+                        {pay.status}
                       </span>
                     </td>
 
                     <td className="p-4 text-right">
-                      {isApproved && (
+                      <div className="flex items-center justify-end gap-2">
+                        {pay.paymentProvider === 'stripe' && (
+                          <button
+                            onClick={() => handleSyncPayment(pay)}
+                            disabled={syncingPaymentId === pay.id}
+                            className="px-2.5 py-1.5 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] rounded-lg text-[#171717] text-xs font-bold uppercase transition-all flex items-center gap-1 disabled:opacity-50"
+                          >
+                            <RefreshCw className={`w-3 h-3 ${syncingPaymentId === pay.id ? 'animate-spin' : ''}`} /> Sincronizar
+                          </button>
+                        )}
+                      {isApproved && pay.paymentProvider === 'stripe' && (
                         <button
                           onClick={() => {
                             setRefundModalPayment(pay);
-                            setRefundAmount(String(pay.amount));
+                            setRefundAmount(String(Math.max(0, pay.amount - (pay.refundedAmount || 0))));
+                            setRefundOperationId(crypto.randomUUID());
                           }}
                           className="px-2.5 py-1.5 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] hover:border-amber-300 rounded-lg text-amber-700 text-xs font-bold uppercase transition-all flex items-center gap-1 ml-auto shadow-xs"
                         >
                           <RotateCcw className="w-3 h-3" /> Estornar
                         </button>
                       )}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -373,6 +409,8 @@ export const AdminPaymentsTab: React.FC = () => {
                 </p>
               </div>
               <button
+                type="button"
+                aria-label="Fechar janela de estorno"
                 onClick={() => setRefundModalPayment(null)}
                 className="text-[#6B6B66] hover:text-[#171717]"
               >
@@ -386,7 +424,7 @@ export const AdminPaymentsTab: React.FC = () => {
                 <input
                   type="number"
                   step="0.01"
-                  max={refundModalPayment.amount}
+                  max={Math.max(0, refundModalPayment.amount - (refundModalPayment.refundedAmount || 0))}
                   value={refundAmount}
                   onChange={(e) => setRefundAmount(e.target.value)}
                   className="w-full bg-[#F9F9F7] border border-[#E5E5E1] rounded-xl px-3 py-2 text-xs text-[#171717] focus:outline-none focus:border-[#B45309]"
@@ -407,12 +445,14 @@ export const AdminPaymentsTab: React.FC = () => {
 
             <div className="flex justify-end gap-2 pt-2">
               <button
+                type="button"
                 onClick={() => setRefundModalPayment(null)}
                 className="px-4 py-2 bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-xs font-bold uppercase text-[#6B6B66] rounded-xl shadow-xs"
               >
                 Cancelar
               </button>
               <button
+                type="button"
                 onClick={handleRefund}
                 disabled={isProcessingRefund || !refundReason.trim()}
                 className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-black text-xs font-extrabold uppercase rounded-xl transition-all shadow-xs disabled:opacity-40 flex items-center gap-2"

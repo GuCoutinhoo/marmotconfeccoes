@@ -62,9 +62,9 @@ test('Unit Tests: Core Business Logic & Sanitization', async (t) => {
   });
 
   await t.test('Idempotency Key & Webhook Event Key Formatting', () => {
-    const gateway = 'mercadopago';
-    const eventId = 'pay_987654321';
+    const gateway = 'stripe';
+    const eventId = 'evt_987654321';
     const key = `${gateway}:${eventId}`;
-    assert.equal(key, 'mercadopago:pay_987654321');
+    assert.equal(key, 'stripe:evt_987654321');
   });
 });

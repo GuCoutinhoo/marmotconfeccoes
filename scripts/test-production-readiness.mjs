@@ -182,10 +182,10 @@ test('Rejeitar processamento duplicado de Webhook já concluído', () => {
     return { shouldProcess: true, status: 'processing' };
   }
 
-  const firstClaim = claimEvent('mercadopago', 'pay-998877');
+  const firstClaim = claimEvent('stripe', 'evt-998877');
   assert.strictEqual(firstClaim.shouldProcess, true);
 
-  const duplicateClaim = claimEvent('mercadopago', 'pay-998877');
+  const duplicateClaim = claimEvent('stripe', 'evt-998877');
   assert.strictEqual(duplicateClaim.shouldProcess, false);
 });
 

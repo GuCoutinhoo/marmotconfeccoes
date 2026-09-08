@@ -9,12 +9,20 @@ import { waitUntil } from '@vercel/functions';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import sharp from 'sharp';
-import { MercadoPagoConfig, Preference, Payment, WebhookSignatureValidator, InvalidWebhookSignatureError } from 'mercadopago';
 import {
-  buildMercadoPagoCallbackFields,
-  resolveMercadoPagoCallbackBaseUrl,
-  resolveMercadoPagoPictureUrl,
-} from '../src/services/mercadoPagoPreferenceUrls';
+  assertInfinitePayConfiguration,
+  checkInfinitePayPayment,
+  centsToReais,
+  createInfinitePayCheckout,
+  getInfinitePayConfigurationStatus,
+  InfinitePayClientError,
+  InfinitePayWebhookSchema,
+  reaisToCents,
+  resolveApplicationBaseUrl,
+  resolveInfinitePayWebhookUrl,
+  sanitizeInfinitePayReceiptUrl,
+  type InfinitePayCheckoutItem,
+} from '../src/server/infinitePayClient';
 import { IS_TEST_MODE } from '../src/server/runtime-flags';
 
 export { IS_TEST_MODE };
@@ -210,7 +218,7 @@ export type OrderStatus =
   | 'Problema no envio'
   | 'Problema na entrega';
 
-export type PaymentStatus = 'Pendente' | 'Aprovado' | 'Recusado' | 'Cancelado' | 'Reembolsado';
+export type PaymentStatus = 'Pendente' | 'Pago' | 'Aprovado' | 'Recusado' | 'Cancelado' | 'Reembolsado';
 
 export type ShipmentPurchaseStatus = 'not_started' | 'processing' | 'purchased' | 'failed';
 export type LabelGenerationStatus = 'not_started' | 'processing' | 'generated' | 'failed';
@@ -426,8 +434,8 @@ export interface PaymentTransaction {
   status: PaymentStatus;
   date: string;
   transactionId?: string;
-  mercadoPagoPaymentId?: string;
-  preferenceId?: string;
+  paymentProvider?: string;
+  paymentSessionId?: string;
   statusDetail?: string;
   refundedAmount?: number;
   refundDate?: string;
@@ -2688,6 +2696,18 @@ export class DatabaseManager {
                   melhorEnvioShipmentId: item.melhor_envio_shipment_id || item.data.melhorEnvioShipmentId,
                   shippingLabelUrl: item.shipping_label_url || item.data.shippingLabelUrl,
                   trackingCode: item.tracking_code || item.data.trackingCode,
+                  paymentProvider: item.payment_provider || item.data.paymentProvider,
+                  paymentProviderPaymentId: item.payment_provider_payment_id || item.data.paymentProviderPaymentId,
+                  paymentProviderSessionId: item.payment_provider_session_id || item.data.paymentProviderSessionId,
+                  checkoutAttemptKey: item.checkout_attempt_key || item.data.checkoutAttemptKey,
+                  checkoutExpiresAt: item.checkout_expires_at || item.data.checkoutExpiresAt,
+                  paymentDetails: {
+                    ...(item.data.paymentDetails || {}),
+                    gateway: item.payment_provider || item.data.paymentDetails?.gateway,
+                    transactionId: item.payment_provider_payment_id || item.data.paymentDetails?.transactionId,
+                    sessionId: item.payment_provider_session_id || item.data.paymentDetails?.sessionId,
+                    statusDetail: item.payment_status_detail || item.data.paymentDetails?.statusDetail,
+                  },
                 };
               }
               return {
@@ -2714,9 +2734,17 @@ export class DatabaseManager {
                 shippingDeliveryTime: item.shipping_delivery_time,
                 trackingCode: item.tracking_code || '',
                 history: item.history || [],
-                paymentDetails: item.data?.paymentDetails || {
-                  mercadoPagoPreferenceId: item.mercado_pago_preference_id || null,
-                  mercadoPagoPaymentId: item.mercado_pago_payment_id || null,
+                paymentProvider: item.payment_provider || undefined,
+                paymentProviderPaymentId: item.payment_provider_payment_id || undefined,
+                paymentProviderSessionId: item.payment_provider_session_id || undefined,
+                checkoutAttemptKey: item.checkout_attempt_key || undefined,
+                checkoutExpiresAt: item.checkout_expires_at || undefined,
+                paymentDetails: {
+                  ...(item.data?.paymentDetails || {}),
+                  gateway: item.payment_provider || item.data?.paymentDetails?.gateway,
+                  transactionId: item.payment_provider_payment_id || item.data?.paymentDetails?.transactionId,
+                  sessionId: item.payment_provider_session_id || item.data?.paymentDetails?.sessionId,
+                  statusDetail: item.payment_status_detail || item.data?.paymentDetails?.statusDetail,
                 },
                 shippingDetails: item.data?.shippingDetails || null,
                 shippingQuoteId: item.shipping_quote_id || undefined,
@@ -2775,7 +2803,7 @@ export class DatabaseManager {
           const { data, error } = await adminClient
             .from('orders')
             .select('*')
-            .or(`id.eq.${clean},tracking_code.eq.${clean}`)
+            .or(`id.eq.${clean},tracking_code.eq.${clean},payment_provider_session_id.eq.${clean},payment_provider_payment_id.eq.${clean}`)
             .maybeSingle();
 
           if (!error && data) {
@@ -2793,6 +2821,18 @@ export class DatabaseManager {
               melhorEnvioShipmentId: data.melhor_envio_shipment_id || data.data.melhorEnvioShipmentId,
               shippingLabelUrl: data.shipping_label_url || data.data.shippingLabelUrl,
               trackingCode: data.tracking_code || data.data.trackingCode,
+              paymentProvider: data.payment_provider || data.data.paymentProvider,
+              paymentProviderPaymentId: data.payment_provider_payment_id || data.data.paymentProviderPaymentId,
+              paymentProviderSessionId: data.payment_provider_session_id || data.data.paymentProviderSessionId,
+              checkoutAttemptKey: data.checkout_attempt_key || data.data.checkoutAttemptKey,
+              checkoutExpiresAt: data.checkout_expires_at || data.data.checkoutExpiresAt,
+              paymentDetails: {
+                ...(data.data.paymentDetails || {}),
+                gateway: data.payment_provider || data.data.paymentDetails?.gateway,
+                transactionId: data.payment_provider_payment_id || data.data.paymentDetails?.transactionId,
+                sessionId: data.payment_provider_session_id || data.data.paymentDetails?.sessionId,
+                statusDetail: data.payment_status_detail || data.data.paymentDetails?.statusDetail,
+              },
             } : {
               id: data.id || clean,
               userId: data.user_id || undefined,
@@ -2817,7 +2857,18 @@ export class DatabaseManager {
               shippingDeliveryTime: data.shipping_option?.delivery_time,
               trackingCode: data.tracking_code || '',
               history: data.history || [],
-              paymentDetails: data.data?.paymentDetails || {},
+              paymentProvider: data.payment_provider || undefined,
+              paymentProviderPaymentId: data.payment_provider_payment_id || undefined,
+              paymentProviderSessionId: data.payment_provider_session_id || undefined,
+              checkoutAttemptKey: data.checkout_attempt_key || undefined,
+              checkoutExpiresAt: data.checkout_expires_at || undefined,
+              paymentDetails: {
+                ...(data.data?.paymentDetails || {}),
+                gateway: data.payment_provider || data.data?.paymentDetails?.gateway,
+                transactionId: data.payment_provider_payment_id || data.data?.paymentDetails?.transactionId,
+                sessionId: data.payment_provider_session_id || data.data?.paymentDetails?.sessionId,
+                statusDetail: data.payment_status_detail || data.data?.paymentDetails?.statusDetail,
+              },
               shippingDetails: data.data?.shippingDetails || null,
               shippingQuoteId: data.shipping_quote_id || undefined,
               shipmentPurchaseStatus: data.shipment_purchase_status || 'not_started',
@@ -2845,8 +2896,36 @@ export class DatabaseManager {
     return this.orders.find((o) =>
       o.id === clean ||
       o.trackingCode === clean ||
-      o.paymentDetails?.mercadoPagoPreferenceId === clean ||
-      o.paymentDetails?.mercadoPagoPaymentId === clean
+      o.paymentProviderSessionId === clean ||
+      o.paymentProviderPaymentId === clean ||
+      o.paymentDetails?.sessionId === clean ||
+      o.paymentDetails?.transactionId === clean
+    ) || null;
+  }
+
+  public async getOrderByCheckoutAttempt(userId: string, attemptKey: string): Promise<Order | null> {
+    await this.initialize();
+    if (!userId || !attemptKey) return null;
+
+    if (this.mode === 'supabase') {
+      try {
+        const client = await this.getRequiredSupabaseAdminClient('consulta idempotente de checkout');
+        const { data, error } = await client
+          .from('orders')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('checkout_attempt_key', attemptKey)
+          .maybeSingle();
+        if (error) throw new Error(error.message);
+        if (data?.id) return this.getOrderById(data.id);
+      } catch (error: any) {
+        console.error('[CHECKOUT_ATTEMPT_LOOKUP_ERROR]', error?.message || error);
+        throw error;
+      }
+    }
+
+    return this.orders.find((order) =>
+      order.userId === userId && String(order.checkoutAttemptKey || '') === attemptKey
     ) || null;
   }
 
@@ -2886,6 +2965,12 @@ export class DatabaseManager {
         shipping_delivery_time: order.shippingDeliveryTime || null,
         payment_method: order.paymentMethod || null,
         payment_details: order.paymentDetails || {},
+        payment_provider: order.paymentProvider || order.paymentDetails?.gateway || null,
+        payment_provider_payment_id: order.paymentProviderPaymentId || order.paymentDetails?.transactionId || null,
+        payment_provider_session_id: order.paymentProviderSessionId || order.paymentDetails?.sessionId || null,
+        payment_status_detail: order.paymentDetails?.statusDetail || null,
+        checkout_attempt_key: order.checkoutAttemptKey || null,
+        checkout_expires_at: order.checkoutExpiresAt || null,
         subtotal: Number(order.subtotal || 0),
         shipping_fee: Number(order.shippingFee || (order as any).shipping || 0),
         shipping_price: Number(order.shippingPrice ?? order.shippingFee ?? (order as any).shipping ?? 0),
@@ -2908,8 +2993,6 @@ export class DatabaseManager {
         in_transit_at: order.inTransitAt || null,
         out_for_delivery_at: order.outForDeliveryAt || null,
         delivered_at: order.deliveredAt || null,
-        mercado_pago_payment_id: order.paymentDetails?.mercadoPagoPaymentId || (order as any).mercado_pago_payment_id || null,
-        mercado_pago_preference_id: order.paymentDetails?.mercadoPagoPreferenceId || (order as any).mercado_pago_preference_id || null,
         melhor_envio_shipment_id: order.melhorEnvioShipmentId || (order as any).melhor_envio_shipment_id || null,
         shipping_label_url: order.shippingLabelUrl || (order as any).shipping_label_url || null,
         history: order.history || [],
@@ -3159,7 +3242,7 @@ export class DatabaseManager {
     if (this.mode === 'supabase' && this.supabase) {
       try {
         const { data, error } = await this.supabase.from('cart_items').select('*').eq('user_id', userId);
-        if (!error && Array.isArray(data) && data.length > 0) {
+        if (!error && Array.isArray(data)) {
           const nonUserItems = this.cartItems.filter((c) => c.userId !== userId);
           const sbItems = data.map((item: any) => {
             const rawSize = item.size || item.selected_size || item.data?.selectedSize || item.data?.size || 'M';
@@ -3933,10 +4016,10 @@ export class DatabaseManager {
         method: o.paymentMethod || 'Cartão de Crédito',
         status,
         date: o.paymentDetails?.paidAt || o.createdAt || o.date,
-        transactionId: o.paymentDetails?.transactionId || o.paymentDetails?.mercadoPagoPaymentId,
-        mercadoPagoPaymentId: o.paymentDetails?.mercadoPagoPaymentId,
-        preferenceId: o.paymentDetails?.mercadoPagoPreferenceId,
-        statusDetail: o.paymentDetails?.mercadoPagoStatusDetail || (status === 'Aprovado' ? 'accredited' : 'pending'),
+        transactionId: o.paymentProviderPaymentId || o.paymentDetails?.transactionId,
+        paymentProvider: o.paymentProvider || o.paymentDetails?.gateway,
+        paymentSessionId: o.paymentProviderSessionId || o.paymentDetails?.sessionId,
+        statusDetail: o.paymentDetails?.statusDetail || (status === 'Aprovado' ? 'succeeded' : 'pending'),
         refundedAmount: o.paymentDetails?.refundedAmount,
         refundDate: o.paymentDetails?.refundedAt,
       };
@@ -4210,114 +4293,6 @@ export class DatabaseManager {
     return { success: true, order };
   }
 
-  // ==========================================
-  // PAYMENT REFUND WITH PERSISTENT SQL ATOMICITY
-  // ==========================================
-  public async processPaymentRefund(
-    orderId: string,
-    amount: number,
-    reason: string,
-    adminUser: any
-  ): Promise<{ success: boolean; order?: Order; error?: string }> {
-    await this.initialize();
-
-    if (!amount || amount <= 0) {
-      return { success: false, error: 'O valor do reembolso deve ser maior que zero.' };
-    }
-
-    if (this.mode === 'supabase') {
-      try {
-        const client = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (client) {
-          const { data, error } = await client.rpc('process_refund_atomic', {
-            p_order_id: orderId,
-            p_amount: amount,
-            p_reason: reason,
-            p_admin_name: adminUser?.name || 'Administrador',
-            p_admin_email: adminUser?.email || 'admin@marmot.com',
-          });
-
-          if (error) {
-            console.warn('[DB] Supabase process_refund_atomic RPC error, using transaction check:', error);
-          } else if (data) {
-            if (!data.success) {
-              return { success: false, error: data.error || 'Erro ao processar reembolso atômico.' };
-            }
-            // Fetch updated order from DB
-            const updatedOrder = await this.getOrderById(orderId);
-            if (updatedOrder) {
-              await this.logAdminAction(
-                adminUser?.email || 'admin@marmot.com',
-                adminUser?.name || 'Admin',
-                'refund',
-                'refund',
-                orderId,
-                `Reembolso de R$ ${amount.toFixed(2)} emitido (${reason})`,
-                { amount, reason, isFullRefund: data.is_full_refund }
-              );
-              return { success: true, order: updatedOrder };
-            }
-          }
-        }
-      } catch (err: any) {
-        console.error('[DB] Error invoking process_refund_atomic RPC:', err);
-      }
-    }
-
-    // Direct database / transactional fallback
-    const order = await this.getOrderById(orderId);
-    if (!order) return { success: false, error: 'Pedido não encontrado.' };
-
-    const alreadyRefunded = Number(order.paymentDetails?.refundedAmount || 0);
-    if (alreadyRefunded + amount > order.total + 0.01) {
-      return {
-        success: false,
-        error: `O valor do reembolso (R$ ${amount.toFixed(2)}) somado ao total já reembolsado anteriormente (R$ ${alreadyRefunded.toFixed(2)}) ultrapassa o valor total do pedido (R$ ${order.total.toFixed(2)}).`,
-      };
-    }
-
-    const totalRefundedNow = alreadyRefunded + amount;
-    const isFullRefund = totalRefundedNow >= (order.total - 0.01);
-    if (!order.paymentDetails) order.paymentDetails = {};
-    order.paymentDetails.refundedAmount = totalRefundedNow;
-    order.paymentDetails.refundedAt = new Date().toISOString();
-
-    if (isFullRefund) {
-      order.paymentStatus = 'Reembolsado';
-      order.status = 'Reembolsado';
-    } else {
-      order.paymentStatus = 'Reembolsado';
-    }
-
-    const now = new Date();
-    order.history.push({
-      status: isFullRefund ? 'Reembolsado' : 'Reembolso Parcial',
-      timestamp: now.toLocaleString('pt-BR'),
-      date: now.toLocaleDateString('pt-BR'),
-      time: now.toLocaleTimeString('pt-BR'),
-      responsible: adminUser?.name || 'Administrador',
-      author: adminUser?.name || 'Administrador',
-      description: `Reembolso de R$ ${amount.toFixed(2)} processado por ${adminUser?.name || 'Admin'}. Motivo: ${reason}`,
-      note: reason,
-    });
-
-    await this.saveOrder(order);
-    await this.logAdminAction(
-      adminUser?.email || 'admin@marmot.com',
-      adminUser?.name || 'Admin',
-      'refund',
-      'refund',
-      order.id,
-      `Reembolso de R$ ${amount.toFixed(2)} emitido (${reason})`,
-      { amount, reason, isFullRefund }
-    );
-
-    return { success: true, order };
-  }
-
-  // ==========================================
-  // ATOMIC CONCURRENCY & IDEMPOTENCY PRIMITIVES
-  // ==========================================
   public async claimWebhookEvent(
     provider: string,
     eventId: string,
@@ -4480,10 +4455,10 @@ export class DatabaseManager {
     paymentId: string,
     transactionAmount: number,
     currency: string = 'BRL',
-    paymentMethod: string = 'Mercado Pago',
+    paymentMethod: string = 'Stripe Checkout',
     dateApproved?: string
   ): Promise<{ success: boolean; alreadyProcessed: boolean; orderId?: string; error?: string }> {
-    return this.processApprovedOrderAtomic(orderId, paymentId, transactionAmount, currency, 'mercadopago', paymentMethod, dateApproved, []);
+    return this.processApprovedOrderAtomic(orderId, paymentId, transactionAmount, currency, 'stripe', paymentMethod, dateApproved, []);
   }
 
   public async processApprovedOrderAtomic(
@@ -4491,8 +4466,8 @@ export class DatabaseManager {
     paymentId: string,
     transactionAmount: number,
     currency: string = 'BRL',
-    gateway: string = 'mercadopago',
-    paymentMethod: string = 'Mercado Pago',
+    gateway: string = 'stripe',
+    paymentMethod: string = 'Stripe Checkout',
     dateApproved?: string,
     items: any[] = []
   ): Promise<{ success: boolean; alreadyProcessed: boolean; orderId?: string; error?: string }> {
@@ -4551,6 +4526,160 @@ export class DatabaseManager {
       orderId,
       error: 'Modo de persistência inválido para liquidação financeira.',
     };
+  }
+
+  public async processProviderRefundAtomic(input: {
+    orderId: string;
+    provider: string;
+    providerRefundId: string;
+    providerPaymentId: string;
+    amount: number;
+    currency: string;
+    status: 'pending' | 'succeeded' | 'failed' | 'canceled';
+    reason?: string;
+    adminUser?: any;
+  }): Promise<{ success: boolean; totalRefunded?: number; isFullRefund?: boolean; error?: string }> {
+    await this.initialize();
+    try {
+      const client = await this.getRequiredSupabaseAdminClient('registro atômico de reembolso');
+      const { data, error } = await client.rpc('process_provider_refund_atomic', {
+        p_order_id: input.orderId,
+        p_provider: input.provider,
+        p_provider_refund_id: input.providerRefundId,
+        p_provider_payment_id: input.providerPaymentId,
+        p_amount: input.amount,
+        p_currency: input.currency,
+        p_status: input.status,
+        p_reason: input.reason || null,
+        p_admin_id: input.adminUser?.id || null,
+        p_admin_email: input.adminUser?.email || null,
+      });
+      if (error) throw new Error(error.message);
+      return {
+        success: Boolean(data?.success),
+        totalRefunded: Number(data?.totalRefunded ?? data?.total_refunded ?? 0),
+        isFullRefund: Boolean(data?.isFullRefund ?? data?.is_full_refund),
+        error: data?.error,
+      };
+    } catch (error: any) {
+      console.error('[PAYMENT_REFUND_PERSISTENCE_ERROR]', error?.message || error);
+      return { success: false, error: error?.message || 'Falha ao persistir o reembolso.' };
+    }
+  }
+
+  public async claimPaymentSessionCreation(
+    orderId: string,
+    userId: string,
+    attemptKey: string,
+  ): Promise<{ success: boolean; shouldCreate: boolean; status?: string; sessionId?: string; error?: string }> {
+    await this.initialize();
+    try {
+      const client = await this.getRequiredSupabaseAdminClient('lock de criação da sessão Stripe');
+      const { data, error } = await client.rpc('claim_payment_session_creation', {
+        p_order_id: orderId,
+        p_user_id: userId,
+        p_attempt_key: attemptKey,
+      });
+      if (error) throw new Error(error.message);
+      return {
+        success: Boolean(data?.success),
+        shouldCreate: Boolean(data?.shouldCreate ?? data?.should_create),
+        status: data?.status,
+        sessionId: data?.sessionId || data?.session_id,
+        error: data?.error,
+      };
+    } catch (error: any) {
+      console.error('[STRIPE_SESSION_CLAIM_ERROR]', { orderId, message: error?.message || error });
+      return { success: false, shouldCreate: false, error: error?.message || 'Falha ao adquirir lock do checkout.' };
+    }
+  }
+
+  public async linkPaymentSessionAtomic(input: {
+    orderId: string;
+    provider: string;
+    sessionId: string;
+    paymentId?: string;
+    statusDetail?: string;
+    expiresAt?: string;
+  }): Promise<{ success: boolean; error?: string }> {
+    await this.initialize();
+    try {
+      const client = await this.getRequiredSupabaseAdminClient('vínculo atômico da sessão de pagamento');
+      const { data, error } = await client.rpc('link_payment_session_atomic', {
+        p_order_id: input.orderId,
+        p_provider: input.provider,
+        p_session_id: input.sessionId,
+        p_payment_id: input.paymentId || null,
+        p_status_detail: input.statusDetail || null,
+        p_expires_at: input.expiresAt || null,
+      });
+      if (error) throw new Error(error.message);
+      if (!data?.success) return { success: false, error: data?.error || 'Não foi possível vincular a sessão.' };
+
+      const cached = this.orders.find((order) => order.id === input.orderId);
+      if (cached) {
+        cached.paymentProvider = input.provider;
+        cached.paymentProviderSessionId = input.sessionId || cached.paymentProviderSessionId;
+        cached.paymentProviderPaymentId = input.paymentId || cached.paymentProviderPaymentId;
+        cached.checkoutExpiresAt = input.expiresAt || cached.checkoutExpiresAt;
+        cached.paymentDetails = {
+          ...(cached.paymentDetails || {}),
+          gateway: input.provider,
+          sessionId: input.sessionId || cached.paymentDetails?.sessionId,
+          transactionId: input.paymentId || cached.paymentDetails?.transactionId,
+          statusDetail: input.statusDetail || cached.paymentDetails?.statusDetail,
+        };
+      }
+      return { success: true };
+    } catch (error: any) {
+      console.error('[STRIPE_SESSION_LINK_ERROR]', { orderId: input.orderId, message: error?.message || error });
+      return { success: false, error: error?.message || 'Falha ao vincular a sessão de pagamento.' };
+    }
+  }
+
+  public async releasePaymentSessionCreation(orderId: string, reason: string): Promise<void> {
+    await this.initialize();
+    try {
+      const client = await this.getRequiredSupabaseAdminClient('liberação do lock da sessão Stripe');
+      const { error } = await client.rpc('release_payment_session_creation', {
+        p_order_id: orderId,
+        p_error: reason.slice(0, 500),
+      });
+      if (error) throw new Error(error.message);
+    } catch (error: any) {
+      console.error('[STRIPE_SESSION_RELEASE_ERROR]', { orderId, message: error?.message || error });
+    }
+  }
+
+  public async updateProviderPaymentStateAtomic(input: {
+    orderId: string;
+    provider: string;
+    paymentStatus: string;
+    orderStatus: string;
+    statusDetail: string;
+    eventId: string;
+  }): Promise<{ success: boolean; ignored?: boolean; error?: string }> {
+    await this.initialize();
+    try {
+      const client = await this.getRequiredSupabaseAdminClient('atualização atômica do estado financeiro');
+      const { data, error } = await client.rpc('update_provider_payment_state_atomic', {
+        p_order_id: input.orderId,
+        p_provider: input.provider,
+        p_payment_status: input.paymentStatus,
+        p_order_status: input.orderStatus,
+        p_status_detail: input.statusDetail,
+        p_event_id: input.eventId,
+      });
+      if (error) throw new Error(error.message);
+      return {
+        success: Boolean(data?.success),
+        ignored: Boolean(data?.ignored),
+        error: data?.error,
+      };
+    } catch (error: any) {
+      console.error('[STRIPE_PAYMENT_STATE_ERROR]', { orderId: input.orderId, message: error?.message || error });
+      return { success: false, error: error?.message || 'Falha ao atualizar o estado financeiro.' };
+    }
   }
 
   // ==========================================
@@ -5788,6 +5917,10 @@ export const couponRateLimiter = new RateLimiter(60 * 1000, 30, 'coupons');
 export const newsletterRateLimiter = new RateLimiter(60 * 1000, 10, 'newsletter');
 export const reviewRateLimiter = new RateLimiter(10 * 60 * 1000, 15, 'reviews');
 
+// Stripe validates the signature against the exact bytes sent by Stripe. This
+// route must remain registered before express.json()/express.urlencoded().
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
+
 app.use(compression({ threshold: 512 }));
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ limit: '15mb', extended: true }));
@@ -6111,7 +6244,7 @@ app.get(['/api/health', '/health'], async (req, res) => {
     }
   }
 
-  const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
+  const stripeStatus = getStripeConfigurationStatus();
   const meConfig = getMelhorEnvioConfig();
 
   res.json({
@@ -6120,7 +6253,9 @@ app.get(['/api/health', '/health'], async (req, res) => {
     environment: process.env.NODE_ENV || 'production',
     databaseMode: db.getMode(),
     databaseStatus: dbStatus,
-    mercadoPagoConfigured: Boolean(mpToken && mpToken.length >= 10),
+    stripeConfigured: stripeStatus.secretKeyConfigured,
+    stripeMode: stripeStatus.mode,
+    stripeWebhookConfigured: stripeStatus.webhookSecretConfigured,
     melhorEnvioConfigured: Boolean(meConfig.token && meConfig.token.length >= 10),
   });
 });
@@ -6145,6 +6280,7 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
       'app_settings',
       'webhook_events',
       'payment_effects',
+      'refund_operations',
       'user_addresses',
       'cart_items',
       'favorites',
@@ -6165,8 +6301,7 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
     }
 
     const meConfig = getMelhorEnvioConfig();
-    const mpToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
-    const mpWebhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
+    const stripeStatus = getStripeConfigurationStatus();
     const resendKey = process.env.RESEND_API_KEY;
 
     // Evaluate statuses: 'OK' | 'WARNING' | 'ERROR' | 'NOT_CONFIGURED'
@@ -6182,9 +6317,11 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
       ? 'WARNING'
       : 'ERROR';
 
-    const mpHealth = !mpToken || mpToken.length < 10
+    const stripeHealth = !stripeStatus.secretKeyConfigured
       ? 'NOT_CONFIGURED'
-      : !mpWebhookSecret
+      : !stripeStatus.secretKeyValid || !stripeStatus.publicKeyValid || !stripeStatus.keysMatchMode
+      ? 'ERROR'
+      : !stripeStatus.webhookSecretConfigured || !stripeStatus.webhookSecretValid
       ? 'WARNING'
       : 'OK';
 
@@ -6200,7 +6337,7 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
 
     const readyForProduction =
       databaseHealth === 'OK' &&
-      (mpHealth === 'OK' || mpHealth === 'WARNING') &&
+      stripeHealth === 'OK' &&
       meHealth === 'OK';
 
     res.json({
@@ -6216,11 +6353,15 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
           tables: tablesStatus,
           missingTables,
         },
-        mercadoPago: {
-          status: mpHealth,
-          configured: Boolean(mpToken && mpToken.length >= 10),
-          environment: process.env.MERCADOPAGO_ENV || 'production',
-          webhookConfigured: Boolean(mpWebhookSecret && mpWebhookSecret.length > 0),
+        stripe: {
+          status: stripeHealth,
+          configured: stripeStatus.secretKeyConfigured,
+          mode: stripeStatus.mode,
+          webhookConfigured: stripeStatus.webhookSecretConfigured,
+          webhookSecretValid: stripeStatus.webhookSecretValid,
+          secretKeyValid: stripeStatus.secretKeyValid,
+          publicKeyValid: stripeStatus.publicKeyValid,
+          keysMatchMode: stripeStatus.keysMatchMode,
         },
         melhorEnvio: {
           status: meHealth,
@@ -6923,279 +7064,7 @@ app.get('/api/orders/:id', async (req: any, res) => {
   }
 });
 
-app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), async (req: any, res) => {
-  try {
-    const body = req.body || {};
-    const items = Array.isArray(body.items) ? body.items : [];
-    if (items.length === 0) {
-      return res.status(400).json({ error: 'O pedido deve conter pelo menos um item válido.' });
-    }
-
-    // 1. Authenticate user strictly from verified session (Never trust body.userId)
-    const token = extractToken(req);
-    let authUser: any = null;
-    if (token) {
-      const verified = await verifyAuthToken(token);
-      if (verified && verified.userId) {
-        authUser = await db.getUserById(verified.userId);
-        if (!authUser) {
-          authUser = {
-            id: verified.userId,
-            name: verified.name || verified.email?.split('@')[0] || 'Cliente Marmot',
-            email: verified.email || `user-${verified.userId}@marmot.com`,
-            role: verified.role === 'admin' ? 'admin' : 'customer',
-            isVerified: true,
-            addresses: [],
-            createdAt: new Date().toISOString(),
-            lastLogin: new Date().toISOString(),
-          };
-          await db.saveUser(authUser);
-        } else {
-          authUser.role = verified.role === 'admin' ? 'admin' : 'customer';
-        }
-      }
-    }
-
-    if (!authUser) {
-      return res.status(401).json({ error: 'É necessário estar autenticado com uma sessão válida para realizar pedidos.' });
-    }
-
-    // 2. Validate all items against database products
-    const dbProducts = await db.getAllProducts();
-    const validatedItems: OrderItem[] = [];
-    let authoritativeSubtotal = 0;
-
-    for (const rawItem of items) {
-      const dbProd = dbProducts.find((p) => p.id === rawItem.productId);
-      if (!dbProd) {
-        return res.status(400).json({ error: `Produto "${rawItem.productId}" não encontrado no catálogo.` });
-      }
-
-      const requestedQty = Math.max(1, Math.min(50, Number(rawItem.quantity) || 1));
-      const availableStock = typeof dbProd.stockCount === 'number' ? dbProd.stockCount : 0;
-      if (availableStock < requestedQty) {
-        return res.status(400).json({
-          error: `Estoque insuficiente para "${dbProd.title}". Disponível: ${availableStock} un.`,
-        });
-      }
-
-      const officialPrice = (dbProd.promoPrice && dbProd.promoPrice > 0 && dbProd.promoPrice < dbProd.price)
-        ? dbProd.promoPrice
-        : dbProd.price;
-
-      const weight = Number(dbProd.weight);
-      const height = Number(dbProd.height);
-      const width = Number(dbProd.width);
-      const length = Number(dbProd.length);
-      if (![officialPrice, weight, height, width, length].every((value) => Number.isFinite(value) && value > 0)) {
-        return res.status(400).json({
-          error: `Produto "${dbProd.title}" sem preço, peso ou dimensões oficiais válidas para expedição.`,
-          code: 'INVALID_PRODUCT_SPECS',
-        });
-      }
-
-      const itemSubtotal = officialPrice * requestedQty;
-      authoritativeSubtotal += itemSubtotal;
-
-      validatedItems.push({
-        id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        productId: dbProd.id,
-        title: dbProd.title,
-        price: officialPrice,
-        quantity: requestedQty,
-        size: rawItem.size || 'M',
-        color: rawItem.color || 'black',
-        colorName: rawItem.colorName || 'Preto',
-        image: rawItem.image || dbProd.image || '',
-        weight,
-        height,
-        width,
-        length,
-      });
-    }
-
-    // 3. Validate coupon if provided
-    let authoritativeDiscount = 0;
-    let validatedCouponCode: string | undefined;
-    if (body.couponCode) {
-      const couponValidation = await db.validateCoupon(body.couponCode, authoritativeSubtotal);
-      if (couponValidation.valid) {
-        authoritativeDiscount = couponValidation.discount;
-        validatedCouponCode = couponValidation.coupon?.code;
-      }
-    }
-
-    // 4. Validate shipping fee against server-authoritative shipping_quotes table (Fail-Closed)
-    let validatedShippingFee = 0;
-    let validatedQuoteData: any = null;
-    const requestedQuoteId = body.shippingQuoteId || body.shippingOption?.quoteId || body.shippingOption?.id;
-    const isFreeShipping = authoritativeSubtotal >= 399.00;
-
-    if (requestedQuoteId) {
-      const quoteData = await db.getShippingQuote(requestedQuoteId);
-      if (!quoteData || typeof quoteData.price !== 'number' || isNaN(quoteData.price) || quoteData.price < 0) {
-        return res.status(409).json({
-          error: 'Cotação de frete inválida ou não encontrada. Por favor, recalcule o frete para continuar.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      if (!quoteData.expires_at || new Date(quoteData.expires_at).getTime() < Date.now()) {
-        return res.status(409).json({
-          error: 'Cotação de frete expirada. Por favor, recalcule o frete para continuar.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      // Security: Shipping quote must strictly belong to the authenticated user and cannot have a null owner
-      if (!quoteData.user_id || quoteData.user_id !== authUser.id) {
-        return res.status(403).json({
-          error: 'A cotação de frete informada pertence a outro usuário ou não possui proprietário válido.',
-          code: 'SHIPPING_QUOTE_FORBIDDEN',
-        });
-      }
-
-      const cleanDestCep = String(body.shippingAddress?.postalCode || body.shippingAddress?.cep || '').replace(/\D/g, '');
-      if (!quoteData.destination_postal_code || quoteData.destination_postal_code !== cleanDestCep) {
-        return res.status(409).json({
-          error: 'A cotação de frete não corresponde ao CEP de entrega informado.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      // Security: Server-calculated canonical cart hash must match quote's cart_hash
-      const serverCartHash = generateCanonicalCartHash(cleanDestCep, validatedItems);
-      if (!quoteData.cart_hash || quoteData.cart_hash !== serverCartHash) {
-        return res.status(409).json({
-          error: 'SHIPPING_QUOTE_INVALID: Os itens do carrinho foram alterados após o cálculo do frete.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      // Security: Selected shipping service must match the quote service
-      const requestedServiceId = body.shippingServiceId !== undefined 
-        ? Number(body.shippingServiceId) 
-        : (body.shippingOption?.serviceId !== undefined ? Number(body.shippingOption?.serviceId) : undefined);
-
-      if (requestedServiceId !== undefined && !isNaN(requestedServiceId) && quoteData.service_id !== undefined && quoteData.service_id !== null) {
-        if (Number(quoteData.service_id) !== requestedServiceId) {
-          return res.status(409).json({
-            error: 'SHIPPING_QUOTE_INVALID: O serviço de frete selecionado diverge da cotação.',
-            code: 'SHIPPING_QUOTE_INVALID',
-          });
-        }
-      }
-
-      validatedQuoteData = quoteData;
-      validatedShippingFee = isFreeShipping ? 0 : Number(quoteData.price.toFixed(2));
-    } else {
-      return res.status(400).json({
-        error: 'Cotação real de frete obrigatória para todos os pedidos, inclusive quando a loja oferece frete grátis ao cliente.',
-        code: 'SHIPPING_QUOTE_REQUIRED',
-      });
-    }
-
-    const shippingAddress = body.shippingAddress;
-    const requiredAddressFields = ['street', 'number', 'neighborhood', 'city', 'state'] as const;
-    if (!shippingAddress || requiredAddressFields.some((field) => !String(shippingAddress[field] || '').trim())) {
-      return res.status(400).json({ error: 'Endereço de entrega incompleto.', code: 'INCOMPLETE_DEST_ADDRESS' });
-    }
-
-    const calculatedTotal = Math.max(0, Number((authoritativeSubtotal - authoritativeDiscount + validatedShippingFee).toFixed(2)));
-
-    // Strict order ID generation: Reject arbitrary client-provided orderId, only allow valid reuse of pending order
-    const requestedOrderId = String(body.existingOrderId || body.orderId || body.order_id || '').trim();
-    let existingOrder: Order | null = null;
-    let orderId: string;
-
-    if (requestedOrderId) {
-      const found = await db.getOrderById(requestedOrderId);
-      if (!found) {
-        return res.status(404).json({ error: 'Pedido informado não encontrado.' });
-      }
-      if (found.userId && found.userId !== authUser.id) {
-        return res.status(403).json({ error: 'Acesso negado: este pedido pertence a outro usuário.' });
-      }
-      if (found.status !== 'Aguardando Pagamento' && found.paymentStatus !== 'Pendente') {
-        return res.status(409).json({ error: 'Este pedido já foi processado ou não está em estado reutilizável.' });
-      }
-      existingOrder = found;
-      orderId = found.id;
-    } else {
-      orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
-    }
-
-    const now = new Date();
-
-    const newOrder: Order = {
-      id: orderId,
-      userId: authUser.id,
-      customerName: sanitizeInput(body.customerName) || authUser?.name || 'Cliente Marmot',
-      customerEmail: sanitizeInput(body.customerEmail || authUser?.email || '').toLowerCase(),
-      customerPhone: sanitizeInput(body.customerPhone || (authUser as any)?.phone || ''),
-      customerCpf: sanitizeInput(body.customerCpf || (authUser as any)?.cpf || ''),
-      items: validatedItems,
-      shippingAddress,
-      shippingQuoteId: validatedQuoteData.id,
-      shippingOption: {
-        quoteId: validatedQuoteData.id,
-        serviceId: validatedQuoteData.service_id,
-        companyId: validatedQuoteData.company_id || undefined,
-        carrier: validatedQuoteData.carrier,
-        company: validatedQuoteData.carrier,
-        name: validatedQuoteData.service_name,
-        serviceName: validatedQuoteData.service_name,
-        quotedPrice: Number(validatedQuoteData.price),
-        customerPrice: validatedShippingFee,
-        originalPrice: Number(validatedQuoteData.original_price || validatedQuoteData.price),
-        deliveryTime: Number(validatedQuoteData.delivery_time),
-        currency: validatedQuoteData.currency || 'BRL',
-        originPostalCode: validatedQuoteData.origin_postal_code,
-        destinationPostalCode: validatedQuoteData.destination_postal_code,
-        environment: validatedQuoteData.environment,
-      },
-      shippingDetails: {
-        source: 'melhor_envio_api',
-        quoteId: validatedQuoteData.id,
-        quotedAt: validatedQuoteData.created_at,
-        quoteExpiresAt: validatedQuoteData.expires_at,
-        destination: shippingAddress,
-      },
-      shippingFee: validatedShippingFee,
-      shippingPrice: Number(validatedQuoteData.price),
-      shippingProvider: 'Melhor Envio',
-      shippingCarrier: validatedQuoteData.carrier,
-      shippingService: validatedQuoteData.service_name,
-      shippingServiceId: String(validatedQuoteData.service_id),
-      shippingDeliveryTime: Number(validatedQuoteData.delivery_time),
-      shippingStatus: 'Aguardando preparação',
-      shipmentPurchaseStatus: 'not_started',
-      labelGenerationStatus: 'not_started',
-      paymentMethod: body.paymentMethod || 'Mercado Pago',
-      subtotal: authoritativeSubtotal,
-      discount: authoritativeDiscount,
-      couponCode: validatedCouponCode,
-      total: calculatedTotal,
-      status: 'Aguardando Pagamento',
-      paymentStatus: 'Pendente',
-      createdAt: now.toISOString(),
-      updatedAt: now.toISOString(),
-      history: [
-        {
-          status: 'Aguardando Pagamento',
-          timestamp: now.toLocaleString('pt-BR'),
-          description: 'Pedido gerado pelo checkout. Aguardando compensação do pagamento.',
-        },
-      ],
-    };
-
-    const saved = await db.saveOrder(newOrder);
-    res.status(201).json(saved);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message || 'Erro ao salvar pedido.' });
-  }
-});
-
+app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), handleCreateStripeCheckout);
 app.put('/api/admin/orders/:id/status', requireAdmin, async (req: any, res) => {
   try {
     const { status, trackingCode } = req.body;
@@ -7817,390 +7686,429 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
   }
 });
 
-// --- Mercado Pago Helpers & SDK Integration ---
-function getMercadoPagoClient() {
-  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
-  if (!token || token.trim().length < 10) {
-    return null;
+// --- Stripe Checkout, webhooks and reconciliation ---
+type StripeCheckoutPaymentMethod = 'PIX' | 'Cartão de Crédito' | 'Boleto Bancário';
+
+function normalizeStripePaymentMethod(value: unknown): StripeCheckoutPaymentMethod {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'pix') return 'PIX';
+  if (normalized === 'boleto' || normalized === 'boleto bancário' || normalized === 'boleto bancario') {
+    return 'Boleto Bancário';
   }
-  return new MercadoPagoConfig({ accessToken: token.trim(), options: { timeout: 10000 } });
+  return 'Cartão de Crédito';
 }
 
-function buildMercadoPagoPhone(rawPhone: unknown): { area_code: string; number: string } | undefined {
-  const digits = String(rawPhone || '').replace(/\D/g, '');
-  if (digits.length < 10 || digits.length > 11) return undefined;
-  return { area_code: digits.slice(0, 2), number: digits.slice(2) };
+function getStripePaymentMethodTypes(method: StripeCheckoutPaymentMethod): Stripe.Checkout.SessionCreateParams.PaymentMethodType[] {
+  if (method === 'PIX') return ['pix'];
+  if (method === 'Boleto Bancário') return ['boleto'];
+  return ['card'];
 }
 
-function buildMercadoPagoProductItems(
+function getStripePaymentMethodLabel(intent: Stripe.PaymentIntent): string {
+  const methodType = intent.payment_method_types?.[0];
+  if (methodType === 'pix') return 'PIX';
+  if (methodType === 'boleto') return 'Boleto Bancário';
+  if (methodType === 'card') return 'Cartão de Crédito';
+  return 'Stripe Checkout';
+}
+
+function buildStripeLineItems(
   items: OrderItem[],
-  subtotal: number,
-  discount: number,
-  appUrl: string,
-): any[] {
-  const grossCents = Math.max(0, Math.round(subtotal * 100));
-  const netCents = Math.max(0, Math.round((subtotal - discount) * 100));
-  let allocatedNetCents = 0;
-  const result: any[] = [];
+  productNetCents: number,
+  shippingCents: number,
+  shippingLabel: string,
+): Stripe.Checkout.SessionCreateParams.LineItem[] {
+  const grossCents = items.reduce(
+    (sum, item) => sum + reaisToCents(Number(item.price || 0)) * Math.max(1, Number(item.quantity || 1)),
+    0,
+  );
+  let allocatedProductCents = 0;
+  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
 
-  items.forEach((item, itemIndex) => {
+  items.forEach((item, index) => {
     const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
-    const lineGrossCents = Math.max(0, Math.round(Number(item.price || 0) * quantity * 100));
-    const isLastItem = itemIndex === items.length - 1;
-    const lineNetCents = discount > 0 && grossCents > 0
-      ? (isLastItem
-          ? Math.max(0, netCents - allocatedNetCents)
-          : Math.max(0, Math.round((netCents * lineGrossCents) / grossCents)))
-      : lineGrossCents;
+    const itemGrossCents = reaisToCents(Number(item.price || 0)) * quantity;
+    const isLast = index === items.length - 1;
+    const itemNetCents = isLast
+      ? Math.max(0, productNetCents - allocatedProductCents)
+      : Math.max(0, Math.round((productNetCents * itemGrossCents) / Math.max(1, grossCents)));
+    allocatedProductCents += itemNetCents;
+    if (itemNetCents <= 0) return;
 
-    allocatedNetCents += lineNetCents;
-    if (lineNetCents <= 0) return;
-
-    const pictureUrl = resolveMercadoPagoPictureUrl(item.image, appUrl);
-    const commonFields = {
-      title: item.title,
-      description: `${item.title} (Tam: ${item.size}, Cor: ${item.color})`,
-      ...(pictureUrl ? { picture_url: pictureUrl } : {}),
-      category_id: 'fashion',
-      currency_id: 'BRL',
+    const baseUnitCents = Math.floor(itemNetCents / quantity);
+    const remainder = itemNetCents % quantity;
+    const productData = {
+      name: String(item.title || 'Produto Marmot').slice(0, 120),
+      description: `Tamanho: ${String(item.size || 'Padrão')} • Cor: ${String(item.colorName || item.color || 'Padrão')}`.slice(0, 500),
+      metadata: {
+        product_id: String(item.productId),
+        sku: String(item.sku || ''),
+      },
     };
 
-    // Split a discounted line into at most two cent-exact price groups. This
-    // preserves the order total even when the discount is not divisible by
-    // the quantity, avoiding false "Pagamento Divergente" webhook results.
-    const baseUnitCents = Math.floor(lineNetCents / quantity);
-    const remainderUnits = lineNetCents % quantity;
-
-    if (baseUnitCents <= 0) {
-      result.push({
-        id: `${item.productId}-${itemIndex + 1}-total`,
-        ...commonFields,
-        description: `${commonFields.description} — ${quantity} unidade(s)`,
-        quantity: 1,
-        unit_price: Number((lineNetCents / 100).toFixed(2)),
-      });
-      return;
-    }
-
-    const baseUnits = quantity - remainderUnits;
-    if (baseUnits > 0) {
-      result.push({
-        id: `${item.productId}-${itemIndex + 1}-base`,
-        ...commonFields,
-        quantity: baseUnits,
-        unit_price: Number((baseUnitCents / 100).toFixed(2)),
+    const baseQuantity = quantity - remainder;
+    if (baseQuantity > 0 && baseUnitCents > 0) {
+      lineItems.push({
+        price_data: { currency: 'brl', product_data: productData, unit_amount: baseUnitCents },
+        quantity: baseQuantity,
       });
     }
-    if (remainderUnits > 0) {
-      result.push({
-        id: `${item.productId}-${itemIndex + 1}-remainder`,
-        ...commonFields,
-        quantity: remainderUnits,
-        unit_price: Number(((baseUnitCents + 1) / 100).toFixed(2)),
+    if (remainder > 0) {
+      lineItems.push({
+        price_data: { currency: 'brl', product_data: productData, unit_amount: baseUnitCents + 1 },
+        quantity: remainder,
       });
     }
   });
 
-  return result;
-}
-
-function verifyMercadoPagoWebhookSignature(req: express.Request, secret?: string): boolean {
-  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.MERCADOPAGO_ENV === 'production';
-  if (!secret || secret.trim().length === 0) {
-    if (isProduction) {
-      console.warn('[Mercado Pago Webhook Warning]: MERCADOPAGO_WEBHOOK_SECRET ausente em produção. Rejeitando requisição por segurança.');
-      return false;
-    }
-    return true; // Permissive only in non-production local development
-  }
-  const xSignature = (req.headers['x-signature'] as string) || '';
-  const xRequestId = (req.headers['x-request-id'] as string) || '';
-  if (!xSignature) {
-    console.warn('[Mercado Pago Webhook Warning]: Header x-signature ausente.');
-    return false;
-  }
-
-  // Official data.id priority from query string (V2 webhooks format)
-  const dataId = (req.query?.['data.id'] || req.query?.id || req.body?.data?.id || req.body?.id) as string;
-
-  try {
-    WebhookSignatureValidator.validate({
-      xSignature,
-      xRequestId,
-      dataId: dataId ? String(dataId) : undefined,
-      secret: secret.trim(),
+  if (shippingCents > 0) {
+    lineItems.push({
+      price_data: {
+        currency: 'brl',
+        product_data: {
+          name: 'Frete',
+          description: shippingLabel.slice(0, 500),
+          metadata: { type: 'shipping' },
+        },
+        unit_amount: shippingCents,
+      },
+      quantity: 1,
     });
-    return true;
-  } catch (err: any) {
-    if (err instanceof InvalidWebhookSignatureError) {
-      console.warn(`[Mercado Pago Webhook Warning]: Invalid signature header - reason: ${err.reason} (reqId: ${err.requestId || xRequestId})`);
-    } else {
-      console.warn('[Mercado Pago Webhook Warning]: Invalid signature header -', err?.message || err);
-    }
-    return false;
   }
+
+  const lineItemsTotal = lineItems.reduce((sum, item) => {
+    const unitAmount = Number(item.price_data && 'unit_amount' in item.price_data ? item.price_data.unit_amount : 0);
+    return sum + unitAmount * Number(item.quantity || 1);
+  }, 0);
+  if (lineItemsTotal !== productNetCents + shippingCents) {
+    throw new Error('Falha ao distribuir o valor exato do pedido em centavos.');
+  }
+  return lineItems;
 }
 
-// Preference creation handler (dynamic pricing from DB)
-async function handleCreatePreference(req: express.Request, res: express.Response) {
-  const reqStart = Date.now();
-  const requestId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+function resolveStripeBaseUrl(req: express.Request): string {
+  const isVercelPreview = process.env.VERCEL_ENV === 'preview';
+  const baseUrl = resolveApplicationBaseUrl({
+    configuredUrl: isVercelPreview ? undefined : process.env.APP_URL,
+    forwardedHost: req.headers['x-forwarded-host'],
+    forwardedProto: req.headers['x-forwarded-proto'],
+    host: req.headers.host,
+    secure: req.secure,
+    vercelProductionUrl: isVercelPreview ? undefined : process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    vercelUrl: process.env.VERCEL_URL,
+    allowRequestHost: process.env.NODE_ENV !== 'production' && process.env.VERCEL !== '1',
+  });
+  if ((process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') && /^http:\/\/localhost(?::\d+)?$/i.test(baseUrl)) {
+    throw Object.assign(new Error('APP_URL não está configurada para o ambiente publicado.'), {
+      code: 'APP_URL_NOT_CONFIGURED',
+    });
+  }
+  return baseUrl;
+}
 
+function canAuthenticatedUserAccessOrder(req: any, order: Order): boolean {
+  return Boolean(
+    req.user &&
+    (req.user.role === 'admin' || req.user.id === order.userId || req.user.email?.toLowerCase() === order.customerEmail?.toLowerCase())
+  );
+}
+
+async function createStripeSessionForOrder(
+  order: Order,
+  req: express.Request,
+  checkoutAttemptId: string,
+  idempotencyScope: 'checkout' | 'pay' = 'checkout',
+): Promise<Stripe.Checkout.Session> {
+  assertStripeConfiguration();
+
+  const subtotalCents = reaisToCents(Number(order.subtotal));
+  const discountCents = reaisToCents(Number(order.discount || 0));
+  const shippingCents = reaisToCents(Number(order.shippingFee || 0));
+  const productNetCents = subtotalCents - discountCents;
+  const expectedTotalCents = reaisToCents(Number(order.total));
+  if (productNetCents < 0 || productNetCents + shippingCents !== expectedTotalCents) {
+    throw Object.assign(new Error('Os componentes do pedido não correspondem ao total oficial.'), {
+      code: 'ORDER_TOTAL_INCONSISTENT',
+    });
+  }
+
+  const method = normalizeStripePaymentMethod(order.paymentMethod);
+  const baseUrl = resolveStripeBaseUrl(req);
+  const lineItems = buildStripeLineItems(
+    order.items,
+    productNetCents,
+    shippingCents,
+    `${order.shippingCarrier || 'Transportadora'} • ${order.shippingService || 'Serviço selecionado'}`,
+  );
+
+  const claimSessionCreation = () => db.claimPaymentSessionCreation(
+    order.id,
+    String(order.userId || ''),
+    checkoutAttemptId,
+  );
+  let claim = await claimSessionCreation();
+  if (!claim.success) {
+    throw Object.assign(new Error(claim.error || 'Não foi possível proteger a criação do checkout.'), {
+      code: 'CHECKOUT_PERSISTENCE_REQUIRED',
+    });
+  }
+
+  if (!claim.shouldCreate && claim.sessionId) {
+    const storedSession = await getRequiredStripeClient().checkout.sessions.retrieve(claim.sessionId);
+    if (storedSession.status === 'open' && storedSession.url) return storedSession;
+
+    await db.releasePaymentSessionCreation(order.id, 'stored_session_not_open');
+    claim = await claimSessionCreation();
+  }
+  if (!claim.shouldCreate) {
+    throw Object.assign(new Error('Já existe uma criação de checkout em andamento para este pedido.'), {
+      code: 'CHECKOUT_CREATION_IN_PROGRESS',
+    });
+  }
+
+  let session: Stripe.Checkout.Session | null = null;
   try {
-    const {
-      items: rawItems,
-      shippingFee: reqShippingFee,
-      shippingAddress,
-      shippingCarrier,
-      shippingService,
-      shippingServiceId,
-      shippingDeliveryTime,
-      couponCode,
-      paymentMethod,
-      payer,
-    } = req.body || {};
-
-    if (!Array.isArray(rawItems) || rawItems.length === 0) {
-      return res.status(400).json({ error: 'O carrinho está vazio.' });
-    }
-
-    // 1. Validate items against actual database catalog (Never trust client prices)
-    const validatedItems: OrderItem[] = [];
-    for (const item of rawItems) {
-      const prodId = String(item.productId || item.id || '');
-      const dbProduct = await db.getProductById(prodId);
-
-      if (!dbProduct) {
-        return res.status(400).json({
-          error: `Produto com identificador "${prodId}" não foi encontrado no catálogo da loja.`,
-        });
-      }
-
-      const qty = Math.max(1, parseInt(String(item.quantity || 1), 10));
-      const currentStock = typeof dbProduct.stockCount === 'number' ? dbProduct.stockCount : 0;
-
-      if (currentStock <= 0) {
-        return res.status(400).json({
-          error: `O produto "${dbProduct.title}" está esgotado no momento.`,
-        });
-      }
-
-      if (qty > currentStock) {
-        return res.status(400).json({
-          error: `Estoque insuficiente para "${dbProduct.title}". Quantidade solicitada: ${qty}, disponível: ${currentStock}.`,
-        });
-      }
-
-      // Official price from DB (promoPrice if available, else regular price)
-      const officialUnitPrice = typeof dbProduct.promoPrice === 'number' && dbProduct.promoPrice > 0
-        ? dbProduct.promoPrice
-        : dbProduct.price;
-
-      const itemWeight = Number(dbProduct.weight);
-      const itemHeight = Number(dbProduct.height);
-      const itemWidth = Number(dbProduct.width);
-      const itemLength = Number(dbProduct.length);
-      if (![officialUnitPrice, itemWeight, itemHeight, itemWidth, itemLength].every((value) => Number.isFinite(value) && value > 0)) {
-        return res.status(400).json({
-          error: `Produto "${dbProduct.title}" sem preço, peso ou dimensões oficiais válidas para expedição.`,
-          code: 'INVALID_PRODUCT_SPECS',
-        });
-      }
-
-      const itemSubtotal = Number((officialUnitPrice * qty).toFixed(2));
-
-      validatedItems.push({
-        id: `item-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        productId: dbProduct.id,
-        sku: dbProduct.sku,
-        title: dbProduct.title,
-        image: dbProduct.images?.[0] || dbProduct.image || '',
-        size: String(item.size || 'M'),
-        color: String(item.colorName || item.color || (dbProduct.colors?.[0]?.colorName) || 'Padrão'),
-        price: Number(officialUnitPrice.toFixed(2)),
-        quantity: qty,
-        subtotal: itemSubtotal,
-        weight: itemWeight,
-        height: itemHeight,
-        width: itemWidth,
-        length: itemLength,
-      });
-    }
-
-    // 2. Compute true subtotal from database prices
-    const subtotal = Number(
-      validatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)
+    session = await getRequiredStripeClient().checkout.sessions.create(
+      {
+        mode: 'payment',
+        payment_method_types: getStripePaymentMethodTypes(method),
+        line_items: lineItems,
+        customer_email: order.customerEmail || undefined,
+        client_reference_id: order.id,
+        success_url: `${baseUrl}/checkout?stripe_return=success&session_id={CHECKOUT_SESSION_ID}&order_id=${encodeURIComponent(order.id)}`,
+        cancel_url: `${baseUrl}/checkout?stripe_return=cancel&order_id=${encodeURIComponent(order.id)}`,
+        locale: 'pt-BR',
+        metadata: {
+          order_id: order.id,
+          user_id: String(order.userId || ''),
+        },
+        payment_intent_data: {
+          description: `Pedido Marmot #${order.id}`,
+          metadata: {
+            order_id: order.id,
+            user_id: String(order.userId || ''),
+          },
+        },
+      },
+      { idempotencyKey: `${idempotencyScope}:${order.id}:${checkoutAttemptId}`.slice(0, 255) },
     );
 
-    // 3. Validate coupon against database if provided
-    let discount = 0;
-    let appliedCouponCode: string | undefined = undefined;
-    if (couponCode && typeof couponCode === 'string' && couponCode.trim()) {
-      const cleanCode = couponCode.trim().toUpperCase();
-      const coupons = await db.getCoupons();
-      const validCoupon = coupons.find((c) => c.code.toUpperCase() === cleanCode && c.active);
-
-      if (validCoupon && subtotal >= (validCoupon.minOrderValue || 0)) {
-        const discountType = (validCoupon as any).discountType || (validCoupon as any).discount_type || 'percentage';
-        const discountVal = Number((validCoupon as any).discountPercentage ?? (validCoupon as any).discountValue ?? (validCoupon as any).discount_value ?? 0);
-        if (discountType === 'percentage') {
-          discount = Number(((subtotal * discountVal) / 100).toFixed(2));
-        } else {
-          discount = Number(Math.min(subtotal, discountVal).toFixed(2));
-        }
-        appliedCouponCode = validCoupon.code;
-      }
-    }
-
-    // 4. Authenticate user before shipping validation and order operations
-    let orderUserId: string | null = null;
-    let authUserEmail: string | null = null;
-    let authUserName: string | null = null;
-    const token = extractToken(req);
-    if (token) {
-      const verified = await verifyAuthToken(token);
-      if (verified && verified.userId) {
-        orderUserId = verified.userId;
-        authUserEmail = verified.email;
-        authUserName = verified.name;
-      }
-    } else if ((req as any).user?.id) {
-      orderUserId = (req as any).user.id;
-      authUserEmail = (req as any).user?.email || null;
-      authUserName = (req as any).user?.name || null;
-    }
-
-    if (!orderUserId) {
-      return res.status(401).json({ error: 'É necessário estar autenticado para gerar a cobrança no Mercado Pago.' });
-    }
-
-    // 5. Validate shipping fee (Server-authoritative via shipping_quotes table - Fail-Closed)
-    let validatedShippingFee = 0;
-    let preferenceQuoteData: any = null;
-    const requestedQuoteId = req.body?.shippingQuoteId || req.body?.shippingOption?.quoteId || req.body?.shippingOption?.id;
-    const isFreeShipping = subtotal >= 399.00;
-
-    if (requestedQuoteId) {
-      const quoteData = await db.getShippingQuote(requestedQuoteId);
-      if (!quoteData || typeof quoteData.price !== 'number' || isNaN(quoteData.price) || quoteData.price < 0) {
-        return res.status(409).json({
-          error: 'Cotação de frete inválida ou não encontrada. Por favor, recalcule o frete para continuar.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      if (!quoteData.expires_at || new Date(quoteData.expires_at).getTime() < Date.now()) {
-        return res.status(409).json({
-          error: 'Cotação de frete expirada. Por favor, recalcule o frete para continuar.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      // Security: Shipping quote must strictly belong to the authenticated user and cannot have a null owner
-      if (!quoteData.user_id || quoteData.user_id !== orderUserId) {
-        return res.status(403).json({
-          error: 'A cotação de frete informada pertence a outro usuário ou não possui proprietário válido.',
-          code: 'SHIPPING_QUOTE_FORBIDDEN',
-        });
-      }
-
-      const cleanDestCep = String(shippingAddress?.postalCode || shippingAddress?.cep || '').replace(/\D/g, '');
-      if (!quoteData.destination_postal_code || quoteData.destination_postal_code !== cleanDestCep) {
-        return res.status(409).json({
-          error: 'A cotação de frete não corresponde ao CEP de entrega informado.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      // Security: Server-calculated canonical cart hash must match quote's cart_hash
-      const serverCartHash = generateCanonicalCartHash(cleanDestCep, validatedItems);
-      if (!quoteData.cart_hash || quoteData.cart_hash !== serverCartHash) {
-        return res.status(409).json({
-          error: 'SHIPPING_QUOTE_INVALID: Os itens ou quantidades do carrinho foram alterados após o cálculo do frete.',
-          code: 'SHIPPING_QUOTE_INVALID',
-        });
-      }
-
-      // Security: Selected shipping service must match the quote service
-      const requestedServiceId = req.body?.shippingServiceId !== undefined 
-        ? Number(req.body?.shippingServiceId) 
-        : (req.body?.shippingOption?.serviceId !== undefined ? Number(req.body?.shippingOption?.serviceId) : undefined);
-
-      if (requestedServiceId !== undefined && !isNaN(requestedServiceId) && quoteData.service_id !== undefined && quoteData.service_id !== null) {
-        if (Number(quoteData.service_id) !== requestedServiceId) {
-          return res.status(409).json({
-            error: 'SHIPPING_QUOTE_INVALID: O serviço de frete selecionado diverge da cotação.',
-            code: 'SHIPPING_QUOTE_INVALID',
-          });
-        }
-      }
-
-      preferenceQuoteData = quoteData;
-      validatedShippingFee = isFreeShipping ? 0 : Number(quoteData.price.toFixed(2));
-    } else {
-      return res.status(400).json({
-        error: 'Cotação real de frete obrigatória para todos os pedidos, inclusive quando a loja oferece frete grátis ao cliente.',
-        code: 'SHIPPING_QUOTE_REQUIRED',
+    if (!session.url) {
+      throw Object.assign(new Error('A Stripe não retornou a URL segura do checkout.'), {
+        code: 'STRIPE_CHECKOUT_URL_MISSING',
       });
+    }
+
+    const linked = await db.linkPaymentSessionAtomic({
+      orderId: order.id,
+      provider: 'stripe',
+      sessionId: session.id,
+      statusDetail: session.status || 'open',
+      expiresAt: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined,
+    });
+    if (!linked.success) {
+      try {
+        if (session.status === 'open') await getRequiredStripeClient().checkout.sessions.expire(session.id);
+      } catch (expirationError: any) {
+        console.error('[STRIPE_ORPHAN_SESSION_EXPIRATION_ERROR]', {
+          orderId: order.id,
+          sessionId: session.id,
+          message: expirationError?.message,
+        });
+      }
+      throw Object.assign(new Error(linked.error || 'Não foi possível vincular o checkout ao pedido.'), {
+        code: 'CHECKOUT_SESSION_LINK_FAILED',
+      });
+    }
+    return session;
+  } catch (error: any) {
+    await db.releasePaymentSessionCreation(order.id, error?.code || error?.type || 'stripe_session_creation_failed');
+    throw error;
+  }
+}
+
+async function handleCreateStripeCheckout(req: express.Request, res: express.Response) {
+  const requestId = crypto.randomUUID();
+  let persistedOrderId: string | undefined;
+  try {
+    const body = req.body || {};
+    const token = extractToken(req);
+    const verified = token ? await verifyAuthToken(token) : null;
+    if (!verified?.userId) {
+      return res.status(401).json({ error: 'É necessário estar autenticado para iniciar o pagamento.' });
+    }
+
+    const rawItems = Array.isArray(body.items) ? body.items : [];
+    if (rawItems.length === 0) return res.status(400).json({ error: 'O carrinho está vazio.' });
+
+    const orderUserId = verified.userId;
+    const checkoutAttemptId = String(body.checkoutAttemptId || '').trim();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutAttemptId)) {
+      return res.status(400).json({
+        code: 'INVALID_CHECKOUT_ATTEMPT',
+        error: 'Identificador idempotente do checkout ausente ou inválido.',
+      });
+    }
+
+    const previousAttempt = await db.getOrderByCheckoutAttempt(orderUserId, checkoutAttemptId);
+    if (previousAttempt) {
+      if (previousAttempt.paymentStatus === 'Pago') {
+        return res.status(409).json({ code: 'ORDER_ALREADY_PAID', error: 'Este pedido já foi pago.' });
+      }
+      const session = await createStripeSessionForOrder(previousAttempt, req, checkoutAttemptId, 'checkout');
+      previousAttempt.paymentProvider = 'stripe';
+      previousAttempt.paymentProviderSessionId = session.id;
+      previousAttempt.checkoutExpiresAt = session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined;
+      previousAttempt.paymentDetails = {
+        ...(previousAttempt.paymentDetails || {}),
+        gateway: 'stripe',
+        sessionId: session.id,
+        statusDetail: session.status || 'open',
+      };
+      console.log('[STRIPE_CHECKOUT_REUSED]', { requestId, orderId: previousAttempt.id, sessionId: session.id });
+      return res.status(200).json({
+        success: true,
+        reused: true,
+        orderId: previousAttempt.id,
+        checkoutSessionId: session.id,
+        checkoutUrl: session.url,
+        targetUrl: session.url,
+        order: previousAttempt,
+      });
+    }
+
+    const validatedItems: OrderItem[] = [];
+    let subtotalCents = 0;
+    for (const rawItem of rawItems) {
+      const productId = String(rawItem.productId || rawItem.id || '').trim();
+      const product = await db.getProductById(productId);
+      if (!product) return res.status(400).json({ error: `Produto "${productId}" não encontrado no catálogo.` });
+
+      const quantity = Math.max(1, Math.min(50, Math.floor(Number(rawItem.quantity) || 1)));
+      const availableStock = Number(product.stockCount || 0);
+      if (availableStock < quantity) {
+        return res.status(409).json({ code: 'INSUFFICIENT_STOCK', error: `Estoque insuficiente para "${product.title}".` });
+      }
+
+      const requestedSize = String(rawItem.size || 'M').trim();
+      if (Array.isArray(product.sizes) && product.sizes.length > 0 && !product.sizes.includes(requestedSize)) {
+        return res.status(400).json({ code: 'INVALID_VARIANT', error: `Tamanho inválido para "${product.title}".` });
+      }
+      const requestedColor = String(rawItem.colorName || rawItem.color || '').trim();
+      const selectedColor = Array.isArray(product.colors) && product.colors.length > 0
+        ? product.colors.find((color: any) =>
+            String(color.colorName || '').toLowerCase() === requestedColor.toLowerCase() ||
+            String(color.color || '').toLowerCase() === requestedColor.toLowerCase())
+        : undefined;
+      if (Array.isArray(product.colors) && product.colors.length > 0 && requestedColor && !selectedColor) {
+        return res.status(400).json({ code: 'INVALID_VARIANT', error: `Cor inválida para "${product.title}".` });
+      }
+
+      const unitPrice = Number(
+        product.promoPrice && product.promoPrice > 0 && product.promoPrice < product.price
+          ? product.promoPrice
+          : product.price,
+      );
+      const weight = Number(product.weight);
+      const height = Number(product.height);
+      const width = Number(product.width);
+      const length = Number(product.length);
+      if (![unitPrice, weight, height, width, length].every((value) => Number.isFinite(value) && value > 0)) {
+        return res.status(400).json({ code: 'INVALID_PRODUCT_SPECS', error: `Produto "${product.title}" sem dados oficiais válidos.` });
+      }
+
+      subtotalCents += reaisToCents(unitPrice) * quantity;
+      validatedItems.push({
+        id: `item-${crypto.randomUUID()}`,
+        productId: product.id,
+        sku: selectedColor?.sku || product.sku,
+        title: product.title,
+        image: selectedColor?.images?.[0] || selectedColor?.image || product.images?.[0] || product.image || '',
+        size: requestedSize,
+        color: String(selectedColor?.color || requestedColor || 'Padrão'),
+        colorName: String(selectedColor?.colorName || requestedColor || 'Padrão'),
+        price: centsToReais(reaisToCents(unitPrice)),
+        quantity,
+        subtotal: centsToReais(reaisToCents(unitPrice) * quantity),
+        weight,
+        height,
+        width,
+        length,
+      });
+    }
+
+    let couponDiscountCents = 0;
+    let appliedCouponCode: string | undefined;
+    if (typeof body.couponCode === 'string' && body.couponCode.trim()) {
+      const validation = await db.validateCoupon(body.couponCode, centsToReais(subtotalCents));
+      if (!validation.valid) {
+        return res.status(409).json({ code: 'INVALID_COUPON', error: validation.error || 'Cupom inválido.' });
+      }
+      couponDiscountCents = Math.min(subtotalCents, reaisToCents(validation.discount));
+      appliedCouponCode = validation.coupon?.code;
+    }
+
+    const method = normalizeStripePaymentMethod(body.paymentMethod);
+    const methodDiscountCents = method === 'PIX'
+      ? Math.round((subtotalCents - couponDiscountCents) * 0.05)
+      : 0;
+    const totalDiscountCents = couponDiscountCents + methodDiscountCents;
+
+    const requestedQuoteId = String(body.shippingQuoteId || body.shippingOption?.quoteId || body.shippingOption?.id || '').trim();
+    if (!requestedQuoteId) {
+      return res.status(400).json({ code: 'SHIPPING_QUOTE_REQUIRED', error: 'Calcule e selecione uma cotação real de frete.' });
+    }
+    const quote = await db.getShippingQuote(requestedQuoteId);
+    if (!quote || !Number.isFinite(Number(quote.price)) || Number(quote.price) <= 0) {
+      return res.status(409).json({ code: 'SHIPPING_QUOTE_INVALID', error: 'Cotação de frete inválida. Recalcule o frete.' });
+    }
+    if (!quote.expires_at || new Date(quote.expires_at).getTime() < Date.now()) {
+      return res.status(409).json({ code: 'SHIPPING_QUOTE_INVALID', error: 'Cotação de frete expirada. Recalcule o frete.' });
+    }
+    if (!quote.user_id || quote.user_id !== orderUserId) {
+      return res.status(403).json({ code: 'SHIPPING_QUOTE_FORBIDDEN', error: 'A cotação pertence a outro usuário.' });
+    }
+
+    const shippingAddress = body.shippingAddress || {};
+    const destinationCep = normalizeCep(shippingAddress.cep || shippingAddress.postalCode || '');
+    if (quote.destination_postal_code !== destinationCep) {
+      return res.status(409).json({ code: 'SHIPPING_QUOTE_INVALID', error: 'A cotação não corresponde ao CEP informado.' });
+    }
+    if (quote.cart_hash !== generateCanonicalCartHash(destinationCep, validatedItems)) {
+      return res.status(409).json({ code: 'SHIPPING_QUOTE_INVALID', error: 'Os itens foram alterados após o cálculo do frete.' });
+    }
+    if (body.shippingServiceId !== undefined && Number(body.shippingServiceId) !== Number(quote.service_id)) {
+      return res.status(409).json({ code: 'SHIPPING_QUOTE_INVALID', error: 'O serviço selecionado diverge da cotação.' });
     }
 
     const requiredAddressFields = ['street', 'number', 'neighborhood', 'city', 'state'] as const;
-    if (!shippingAddress || requiredAddressFields.some((field) => !String(shippingAddress[field] || '').trim())) {
-      return res.status(400).json({ error: 'Endereço de entrega incompleto.', code: 'INCOMPLETE_DEST_ADDRESS' });
+    if (requiredAddressFields.some((field) => !String(shippingAddress[field] || '').trim())) {
+      return res.status(400).json({ code: 'INCOMPLETE_DEST_ADDRESS', error: 'Endereço de entrega incompleto.' });
     }
-
-    const recipientName = String(shippingAddress.recipientName || payer?.name || authUserName || '').trim();
-    const customerEmail = String(payer?.email || authUserEmail || '').trim().toLowerCase();
-    const customerPhone = String(payer?.phone || req.body?.payerPhone || '').replace(/\D/g, '');
-    const customerCpf = cleanCpf(payer?.cpf || req.body?.payerCpf || req.body?.customerCpf || (shippingAddress as any)?.cpf || '');
+    const recipientName = String(shippingAddress.recipientName || body.payer?.name || verified.name || '').trim();
+    const customerEmail = String(body.payer?.email || verified.email || '').trim().toLowerCase();
+    const customerPhone = String(body.payer?.phone || body.payerPhone || '').replace(/\D/g, '');
+    const customerCpf = cleanCpf(body.payer?.cpf || body.payerCpf || body.customerCpf || shippingAddress.cpf || '');
     if (!recipientName || !/^\S+@\S+\.\S+$/.test(customerEmail) || customerPhone.length < 10 || customerPhone.length > 11 || !isValidCpf(customerCpf)) {
-      return res.status(400).json({
-        error: 'Nome, e-mail, telefone e CPF válidos do destinatário são obrigatórios para a emissão real do frete.',
-        code: 'INCOMPLETE_RECIPIENT_DATA',
-      });
+      return res.status(400).json({ code: 'INCOMPLETE_RECIPIENT_DATA', error: 'Nome, e-mail, telefone e CPF válidos são obrigatórios.' });
     }
 
-    // 6. Calculate official total
-    const total = Math.max(0, Number((subtotal - discount + validatedShippingFee).toFixed(2)));
+    const shippingCents = subtotalCents >= 39_900 ? 0 : reaisToCents(Number(quote.price));
+    const totalCents = subtotalCents - totalDiscountCents + shippingCents;
+    if (totalCents <= 0) return res.status(400).json({ error: 'O total do pedido deve ser maior que zero.' });
 
-    // 7. Strict order ID generation: Reject arbitrary client-provided orderId, only allow valid reuse of pending order
-    const requestedOrderId = String(req.body?.existingOrderId || req.body?.orderId || req.body?.order_id || '').trim();
+    const requestedOrderId = String(body.existingOrderId || '').trim();
     let existingOrder: Order | null = null;
-    let orderId: string;
-
     if (requestedOrderId) {
-      const found = await db.getOrderById(requestedOrderId);
-      if (!found) {
-        return res.status(404).json({ error: 'Pedido informado não encontrado.' });
-      }
-      if (found.userId && found.userId !== orderUserId) {
-        console.warn('[CHECKOUT_ORDER_MISMATCH] Order ID belongs to another user:', { requestedOrderId, orderUserId, foundUserId: found.userId });
-        return res.status(403).json({ error: 'Acesso negado: este pedido pertence a outro usuário.' });
-      }
-      if (found.status !== 'Aguardando Pagamento' && found.paymentStatus !== 'Pendente') {
-        return res.status(409).json({ error: 'Este pedido já foi finalizado ou não está em estado reutilizável.' });
-      }
-      existingOrder = found;
-      orderId = found.id;
-    } else {
-      // Backend ALWAYS generates orderId for new orders
-      orderId = `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+      existingOrder = await db.getOrderById(requestedOrderId);
+      if (!existingOrder) return res.status(404).json({ error: 'Pedido informado não encontrado.' });
+      if (existingOrder.userId !== orderUserId) return res.status(403).json({ error: 'Este pedido pertence a outro usuário.' });
+      if (existingOrder.paymentStatus !== 'Pendente') return res.status(409).json({ error: 'Este pedido não aceita um novo checkout.' });
     }
 
-    console.log('[CHECKOUT_START]', JSON.stringify({
-      requestId,
-      orderId,
-      userId: orderUserId || 'guest',
-      itemCount: validatedItems.length,
-      subtotal,
-      shippingFee: validatedShippingFee,
-      discount,
-      total,
-    }));
-
-    const newOrder: Order = {
-      id: orderId,
-      userId: orderUserId || existingOrder?.userId || undefined,
+    let order: Order = {
+      id: existingOrder?.id || `MM-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`,
+      userId: orderUserId,
       customerName: recipientName,
       customerEmail,
       customerPhone,
@@ -8208,855 +8116,462 @@ async function handleCreatePreference(req: express.Request, res: express.Respons
       date: existingOrder?.date || new Date().toLocaleDateString('pt-BR'),
       status: 'Aguardando Pagamento',
       paymentStatus: 'Pendente',
-      shippingStatus: 'Aguardando preparação',
-      shipmentPurchaseStatus: 'not_started',
-      labelGenerationStatus: 'not_started',
+      paymentProvider: 'stripe',
+      checkoutAttemptKey: checkoutAttemptId,
+      paymentMethod: method,
+      paymentDetails: { ...(existingOrder?.paymentDetails || {}), gateway: 'stripe', statusDetail: 'creating_checkout' },
       items: validatedItems,
-      subtotal,
-      discount,
-      shippingFee: validatedShippingFee,
-      total,
-      paymentMethod: (paymentMethod as any) || existingOrder?.paymentMethod || 'Cartão de Crédito',
-      shippingAddress,
-      shippingQuoteId: preferenceQuoteData.id,
+      subtotal: centsToReais(subtotalCents),
+      discount: centsToReais(totalDiscountCents),
+      couponCode: appliedCouponCode,
+      couponDiscount: centsToReais(couponDiscountCents),
+      paymentMethodDiscount: centsToReais(methodDiscountCents),
+      shippingFee: centsToReais(shippingCents),
+      shippingPrice: centsToReais(reaisToCents(Number(quote.price))),
+      total: centsToReais(totalCents),
+      shippingAddress: { ...shippingAddress, cep: destinationCep },
+      shippingQuoteId: quote.id,
       shippingOption: {
-        quoteId: preferenceQuoteData.id,
-        serviceId: preferenceQuoteData.service_id,
-        companyId: preferenceQuoteData.company_id || undefined,
-        carrier: preferenceQuoteData.carrier,
-        company: preferenceQuoteData.carrier,
-        name: preferenceQuoteData.service_name,
-        serviceName: preferenceQuoteData.service_name,
-        quotedPrice: Number(preferenceQuoteData.price),
-        customerPrice: validatedShippingFee,
-        originalPrice: Number(preferenceQuoteData.original_price || preferenceQuoteData.price),
-        deliveryTime: Number(preferenceQuoteData.delivery_time),
-        currency: preferenceQuoteData.currency || 'BRL',
-        originPostalCode: preferenceQuoteData.origin_postal_code,
-        destinationPostalCode: preferenceQuoteData.destination_postal_code,
-        environment: preferenceQuoteData.environment,
+        quoteId: quote.id,
+        serviceId: quote.service_id,
+        companyId: quote.company_id || undefined,
+        carrier: quote.carrier,
+        company: quote.carrier,
+        name: quote.service_name,
+        serviceName: quote.service_name,
+        quotedPrice: Number(quote.price),
+        customerPrice: centsToReais(shippingCents),
+        originalPrice: Number(quote.original_price || quote.price),
+        deliveryTime: Number(quote.delivery_time),
+        currency: quote.currency || 'BRL',
+        originPostalCode: quote.origin_postal_code,
+        destinationPostalCode: quote.destination_postal_code,
+        environment: quote.environment,
       },
       shippingDetails: {
         source: 'melhor_envio_api',
-        quoteId: preferenceQuoteData.id,
-        quotedAt: preferenceQuoteData.created_at,
-        quoteExpiresAt: preferenceQuoteData.expires_at,
+        quoteId: quote.id,
+        quotedAt: quote.created_at,
+        quoteExpiresAt: quote.expires_at,
         destination: shippingAddress,
       },
       shippingProvider: 'Melhor Envio',
-      shippingCarrier: preferenceQuoteData.carrier,
-      shippingService: preferenceQuoteData.service_name,
-      shippingServiceId: String(preferenceQuoteData.service_id),
-      shippingPrice: Number(preferenceQuoteData.price),
-      shippingDeliveryTime: Number(preferenceQuoteData.delivery_time),
-      estimatedDelivery: `${Number(preferenceQuoteData.delivery_time)} dias úteis`,
-      trackingCode: existingOrder?.trackingCode || undefined,
-      melhorEnvioShipmentId: existingOrder?.melhorEnvioShipmentId || undefined,
-      shippingLabelUrl: existingOrder?.shippingLabelUrl || undefined,
-      history: existingOrder?.history && existingOrder.history.length > 0 ? existingOrder.history : [
-        {
-          status: 'Aguardando Pagamento',
-          timestamp: new Date().toLocaleString('pt-BR'),
-          description: 'Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago.',
-        },
-      ],
-      paymentDetails: existingOrder?.paymentDetails,
+      shippingCarrier: quote.carrier,
+      shippingService: quote.service_name,
+      shippingServiceId: String(quote.service_id),
+      shippingDeliveryTime: Number(quote.delivery_time),
+      estimatedDelivery: `${Number(quote.delivery_time)} dias úteis`,
+      shippingStatus: 'Aguardando preparação',
+      shipmentPurchaseStatus: 'not_started',
+      labelGenerationStatus: 'not_started',
+      trackingCode: existingOrder?.trackingCode,
+      history: existingOrder?.history?.length ? existingOrder.history : [{
+        status: 'Aguardando Pagamento',
+        timestamp: new Date().toLocaleString('pt-BR'),
+        description: 'Pedido registrado. Aguardando confirmação segura do pagamento pela Stripe.',
+      }],
       createdAt: existingOrder?.createdAt || new Date().toISOString(),
     };
 
-    // Save pending order in database BEFORE calling Mercado Pago
-    const persistStart = Date.now();
-    console.log('[ORDER_PERSIST_START]', JSON.stringify({ requestId, orderId, step: 'db_save_pending_order' }));
-
+    let createdNewOrder = false;
     try {
-      await db.saveOrder(newOrder);
-      console.log('[ORDER_PERSIST_SUCCESS]', JSON.stringify({
-        requestId,
-        orderId,
-        durationMs: Date.now() - persistStart,
-      }));
-    } catch (saveErr: any) {
-      console.error('[ORDER_PERSIST_ERROR]', JSON.stringify({
-        requestId,
-        orderId,
-        error: saveErr.message,
-        durationMs: Date.now() - persistStart,
-      }));
-      throw saveErr;
+      await db.saveOrder(order);
+      createdNewOrder = !existingOrder;
+      persistedOrderId = order.id;
+    } catch (error: any) {
+      const winner = await db.getOrderByCheckoutAttempt(orderUserId, checkoutAttemptId);
+      if (!winner) throw error;
+      order = winner;
+      persistedOrderId = winner.id;
     }
 
-    // 7. Determine base URL for callbacks
-    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
-    const protocol = (req.headers['x-forwarded-proto'] as string) || (req.secure ? 'https' : 'http');
-    const appUrl = (process.env.APP_URL && !process.env.APP_URL.includes('MY_APP_URL'))
-      ? process.env.APP_URL.replace(/\/$/, '')
-      : `${protocol}://${host}`;
-    const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
-      callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
-      appUrl,
-      vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
-      vercelUrl: process.env.VERCEL_URL,
-    });
-    const mercadoPagoAssetBaseUrl = callbackBaseUrl || appUrl;
-
-    // 8. Construct Mercado Pago Preference payload with dynamic items & prices
-    let mpItems: any[] = buildMercadoPagoProductItems(validatedItems, subtotal, discount, mercadoPagoAssetBaseUrl);
-
-    const isSandbox = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'sandbox';
-    const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, newOrder.id);
-
-    if (!callbackFields.back_urls) {
-      console.warn('[MP_CALLBACKS_DISABLED]', JSON.stringify({
-        requestId,
-        orderId: newOrder.id,
-        reason: 'APP_URL não é uma URL HTTPS pública; retornos automáticos e webhook foram omitidos no ambiente local.',
-      }));
-    }
-
-    const preferencePayload: any = {
-      items: mpItems,
-      payer: {
-        name: recipientName,
-        email: customerEmail,
-        phone: buildMercadoPagoPhone(customerPhone),
-        identification: { type: 'CPF', number: customerCpf },
-        address: shippingAddress ? {
-          zip_code: (shippingAddress.cep || '').replace(/\D/g, ''),
-          street_name: shippingAddress.street || '',
-          street_number: Number(shippingAddress.number) || 0,
-        } : undefined,
-      },
-      ...callbackFields,
-      shipments: {
-        cost: Number(validatedShippingFee.toFixed(2)),
-        mode: 'not_specified',
-      },
-      external_reference: newOrder.id,
-      statement_descriptor: 'MARMOT STORE',
-      metadata: {
-        order_id: newOrder.id,
-        coupon_code: appliedCouponCode || '',
-        customer_email: payer?.email || '',
-      },
+    const session = await createStripeSessionForOrder(order, req, checkoutAttemptId, 'checkout');
+    order.paymentProvider = 'stripe';
+    order.paymentProviderSessionId = session.id;
+    order.checkoutExpiresAt = session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined;
+    order.paymentDetails = {
+      ...(order.paymentDetails || {}),
+      gateway: 'stripe',
+      sessionId: session.id,
+      statusDetail: session.status || 'open',
     };
 
-    // 9. Call Mercado Pago API to create real dynamic preference
-    const mpClient = getMercadoPagoClient();
-    if (!mpClient) {
-      console.error('[MERCADO PAGO] MERCADOPAGO_ACCESS_TOKEN não está configurado no servidor.');
-      return res.status(500).json({
-        error: 'Credenciais do Mercado Pago não configuradas no servidor.',
-        message: 'Defina a variável MERCADOPAGO_ACCESS_TOKEN nas configurações do ambiente.',
-      });
+    if (createdNewOrder) {
+      sendTransactionalEmail({
+        to: order.customerEmail || '',
+        subject: `Pedido #${order.id} gerado // MARMOT`,
+        template: 'order_created',
+        orderId: order.id,
+        userId: order.userId,
+        html: `<div style="font-family:sans-serif;background:#0c0c0c;color:#fff;padding:32px;max-width:600px;margin:0 auto"><h2>PEDIDO RECEBIDO // MARMOT</h2><p>Pedido <strong>#${order.id}</strong> registrado.</p><p>Total: <strong>R$ ${order.total.toFixed(2)}</strong></p><p>Aguardando confirmação segura do pagamento.</p></div>`,
+      }).catch(() => undefined);
     }
 
-    let preferenceId = '';
-    let initPoint = '';
-    let sandboxInitPoint = '';
-
-    const mpStart = Date.now();
-    console.log('[MP_PREFERENCE_START]', JSON.stringify({
+    console.log('[STRIPE_CHECKOUT_CREATED]', {
       requestId,
-      orderId: newOrder.id,
-      isSandbox,
-      itemsCount: mpItems.length,
-      total,
-    }));
-
-    try {
-      const preference = new Preference(mpClient);
-      const prefResponse = await preference.create({ body: preferencePayload });
-
-      preferenceId = prefResponse.id || '';
-      initPoint = prefResponse.init_point || '';
-      sandboxInitPoint = prefResponse.sandbox_init_point || '';
-
-      if (!initPoint && !sandboxInitPoint) {
-        throw new Error('Mercado Pago não retornou uma URL de checkout válida (init_point ausente).');
-      }
-
-      console.log('[MP_PREFERENCE_SUCCESS]', JSON.stringify({
-        requestId,
-        orderId: newOrder.id,
-        preferenceId,
-        durationMs: Date.now() - mpStart,
-      }));
-
-      newOrder.paymentDetails = {
-        ...newOrder.paymentDetails,
-        mercadoPagoPreferenceId: preferenceId,
-        mercadoPagoInitPoint: isSandbox && sandboxInitPoint ? sandboxInitPoint : initPoint,
-      };
-      await db.saveOrder(newOrder);
-
-      if (newOrder.customerEmail && !existingOrder?.paymentDetails?.mercadoPagoPreferenceId) {
-        sendTransactionalEmail({
-          to: newOrder.customerEmail,
-          subject: `Pedido #${newOrder.id} Gerado // MARMOT`,
-          template: 'order_created',
-          orderId: newOrder.id,
-          userId: newOrder.userId,
-          html: `<div style="font-family: sans-serif; background: #0c0c0c; color: #fff; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto;">
-            <h2 style="letter-spacing: 0.1em; color: #ffffff;">PEDIDO RECEBIDO // MARMOT</h2>
-            <p>Recebemos o registro do seu pedido <strong>#${newOrder.id}</strong>.</p>
-            <p>Total do pedido: <strong>R$ ${newOrder.total.toFixed(2)}</strong></p>
-            <p style="color: #d6b35a; font-size: 13px;">Aguardando confirmação do pagamento via Mercado Pago.</p>
-          </div>`,
-        }).catch(() => {});
-      }
-    } catch (mpErr: any) {
-      console.error('[MP_PREFERENCE_ERROR]', JSON.stringify({
-        requestId,
-        orderId: newOrder.id,
-        error: mpErr.message,
-        durationMs: Date.now() - mpStart,
-      }));
-      return res.status(502).json({
-        code: 'MERCADOPAGO_PREFERENCE_ERROR',
-        orderId: newOrder.id,
-        error: 'Erro ao gerar preferência no Mercado Pago.',
-        message: mpErr.message || 'Falha na comunicação com a API do Mercado Pago.',
-      });
-    }
-
-    const targetUrl = (isSandbox && sandboxInitPoint) ? sandboxInitPoint : (initPoint || sandboxInitPoint);
-
-    console.log('[CHECKOUT_SUCCESS]', JSON.stringify({
-      requestId,
-      orderId: newOrder.id,
-      preferenceId,
-      targetUrl,
-      durationMs: Date.now() - reqStart,
-      httpStatus: 201,
-    }));
-
+      orderId: order.id,
+      sessionId: session.id,
+      totalCents,
+      mode: getStripeConfigurationStatus().mode,
+    });
     return res.status(201).json({
       success: true,
-      orderId: newOrder.id,
-      order: newOrder,
-      preferenceId,
-      init_point: initPoint,
-      sandbox_init_point: sandboxInitPoint,
-      targetUrl,
-      subtotal,
-      discount,
-      shippingFee: validatedShippingFee,
-      total,
+      orderId: order.id,
+      checkoutSessionId: session.id,
+      checkoutUrl: session.url,
+      targetUrl: session.url,
+      order,
+      subtotal: order.subtotal,
+      discount: order.discount,
+      shippingFee: order.shippingFee,
+      total: order.total,
     });
   } catch (error: any) {
-    console.error('[CREATE PREFERENCE ERROR]:', error);
-    return res.status(500).json({
-      error: 'Falha ao persistir pedido no Supabase',
-      message: error.message,
+    console.error('[STRIPE_CHECKOUT_ERROR]', {
+      requestId,
+      code: error?.code || error?.type || 'STRIPE_CHECKOUT_FAILED',
+      message: error?.message,
+    });
+    const configurationErrors = new Set([
+      'STRIPE_NOT_CONFIGURED',
+      'STRIPE_INVALID_SECRET_KEY',
+      'STRIPE_INVALID_PUBLIC_KEY',
+      'STRIPE_KEY_MODE_MISMATCH',
+      'APP_URL_NOT_CONFIGURED',
+      'CHECKOUT_PERSISTENCE_REQUIRED',
+    ]);
+    const status = configurationErrors.has(error?.code) ? 503 : error?.code === 'CHECKOUT_CREATION_IN_PROGRESS' ? 409 : 502;
+    return res.status(status).json({
+      code: error?.code || 'STRIPE_CHECKOUT_FAILED',
+      error: status === 503 || status === 409 ? error.message : 'Não foi possível abrir o checkout seguro. Tente novamente.',
+      ...(persistedOrderId ? { orderId: persistedOrderId } : {}),
     });
   }
 }
 
-// Preference Endpoints (supporting all standard routes)
-app.post('/api/mercado-pago/create-preference', handleCreatePreference);
-app.post('/api/mercadopago/preference', handleCreatePreference);
-app.post('/api/mercadopago/create-preference', handleCreatePreference);
-app.post('/api/mercadopago/payments', handleCreatePreference);
-
-function createPaymentVerificationError(message: string, statusCode: number, code: string): Error {
-  const error: any = new Error(message);
-  error.statusCode = statusCode;
-  error.code = code;
-  return error;
-}
-
-function assertMercadoPagoPaymentBelongsToOrder(
-  order: Order,
-  paymentData: any,
-  expectedPaymentId?: string,
-): void {
-  const paymentId = String(paymentData?.id || '').trim();
-  const requestedPaymentId = String(expectedPaymentId || '').trim();
-  const externalReference = String(paymentData?.external_reference || '').trim();
-  const metadataOrderId = String(paymentData?.metadata?.order_id || '').trim();
-  const expectedPreferenceId = String(order.paymentDetails?.mercadoPagoPreferenceId || '').trim();
-  const paymentPreferenceId = String(paymentData?.preference_id || '').trim();
-
-  if (!paymentId) {
-    throw createPaymentVerificationError(
-      'A resposta do Mercado Pago não contém um identificador de pagamento válido.',
-      502,
-      'MERCADOPAGO_PAYMENT_INVALID',
-    );
-  }
-
-  if (requestedPaymentId && paymentId !== requestedPaymentId) {
-    throw createPaymentVerificationError(
-      'O pagamento retornado pelo Mercado Pago não corresponde ao payment_id informado.',
-      409,
-      'MERCADOPAGO_PAYMENT_ID_MISMATCH',
-    );
-  }
-
-  // external_reference is written by this application when the preference is
-  // created and is the authoritative binding between a Mercado Pago payment
-  // and a Marmot order. Never apply a payment without this exact match.
-  if (!externalReference || externalReference !== order.id) {
-    throw createPaymentVerificationError(
-      'O pagamento consultado não pertence ao pedido informado.',
-      409,
-      'MERCADOPAGO_ORDER_MISMATCH',
-    );
-  }
-
-  if (metadataOrderId && metadataOrderId !== order.id) {
-    throw createPaymentVerificationError(
-      'Os metadados do pagamento não correspondem ao pedido informado.',
-      409,
-      'MERCADOPAGO_METADATA_MISMATCH',
-    );
-  }
-
-  if (expectedPreferenceId && paymentPreferenceId && paymentPreferenceId !== expectedPreferenceId) {
-    throw createPaymentVerificationError(
-      'O pagamento pertence a outra preferência do Mercado Pago.',
-      409,
-      'MERCADOPAGO_PREFERENCE_MISMATCH',
-    );
-  }
-}
-
-// Shared helper to apply verified Mercado Pago payment data to an order with strict idempotency
-async function applyMercadoPagoPaymentToOrder(order: Order, paymentData: any): Promise<Order> {
-  assertMercadoPagoPaymentBelongsToOrder(order, paymentData);
-
-  const status = paymentData.status; // 'approved' | 'pending' | 'in_process' | 'rejected' | 'cancelled' | 'refunded' | 'charged_back'
-  const statusDetail = paymentData.status_detail;
-  const wasAlreadyApproved = order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago';
-
-  order.paymentDetails = {
-    ...order.paymentDetails,
-    mercadoPagoPaymentId: String(paymentData.id),
-    mercadoPagoStatus: status,
-    mercadoPagoStatusDetail: statusDetail,
-    cardBrand: paymentData.payment_method_id || order.paymentDetails?.cardBrand,
-    cardLastDigits: paymentData.card?.last_four_digits || order.paymentDetails?.cardLastDigits,
-    installments: paymentData.installments || order.paymentDetails?.installments,
-  };
-
-  if (status === 'approved') {
-    const transactionAmount = Number(paymentData.transaction_amount || 0);
-    const expectedTotal = Number(order.total || 0);
-    const currencyId = String(paymentData.currency_id || 'BRL').toUpperCase();
-
-    // 1. Currency Integrity Validation
-    if (currencyId !== 'BRL') {
-      order.paymentStatus = 'Erro';
-      order.history.push({
-        status: 'Erro de Pagamento',
-        timestamp: new Date().toLocaleString('pt-BR'),
-        description: `Moeda inválida recebida: ${currencyId}. O sistema aceita exclusivamente BRL.`,
-      });
-      await db.saveOrder(order);
-      return order;
-    }
-
-    // 2. Financial Amount Integrity Check (Strict anti-tampering)
-    if (transactionAmount < (expectedTotal - 0.05)) {
-      order.paymentStatus = 'Pagamento Divergente';
-      order.history.push({
-        status: 'Pagamento Divergente',
-        timestamp: new Date().toLocaleString('pt-BR'),
-        description: `Valor pago no gateway (R$ ${transactionAmount.toFixed(2)}) diverge do valor esperado do pedido (R$ ${expectedTotal.toFixed(2)}). Aprovação bloqueada por segurança.`,
-      });
-      await db.saveOrder(order);
-      return order;
-    }
-
-    // Call PostgreSQL atomic payment effect & stock deduction registrar
-    const effectResult = await db.processApprovedOrderAtomic(
-      order.id,
-      String(paymentData.id),
-      transactionAmount,
-      currencyId,
-      'mercadopago',
-      paymentData.payment_method_id || order.paymentMethod || 'Mercado Pago',
-      paymentData.date_approved,
-      order.items || []
-    );
-
-    if (!effectResult.success) {
-      throw createPaymentVerificationError(
-        effectResult.error || 'A liquidação atômica do pagamento foi recusada pelo banco de dados.',
-        409,
-        'PAYMENT_EFFECT_REJECTED',
-      );
-    }
-
-    const nowIso = new Date().toISOString();
-    order.status = 'Em Separação';
-    order.paymentStatus = 'Pago';
-    order.shippingStatus = order.shipmentPurchaseStatus === 'purchased'
-      ? (order.shippingStatus || 'Frete comprado')
-      : 'Aguardando compra de frete';
-    order.shipmentPurchaseStatus = order.shipmentPurchaseStatus === 'purchased' ? 'purchased' : 'not_started';
-    order.labelGenerationStatus = order.labelGenerationStatus || 'not_started';
-    order.shipmentLastError = undefined;
-    order.paidAt = paymentData.date_approved || order.paidAt || nowIso;
-    order.separationStartedAt = order.separationStartedAt || nowIso;
-    order.paymentDetails.paidAt = paymentData.date_approved || nowIso;
-
-    if (!wasAlreadyApproved && !effectResult.alreadyProcessed) {
-      order.history.push({
-        id: `hist-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-        orderId: order.id,
-        status: 'Em Separação',
-        previousStatus: 'Aguardando Pagamento',
-        newStatus: 'Em Separação',
-        source: 'mercado_pago',
-        externalEventId: String(paymentData.id),
-        timestamp: new Date().toLocaleString('pt-BR'),
-        occurredAt: paymentData.date_approved || nowIso,
-        description: `Pagamento de R$ ${transactionAmount > 0 ? transactionAmount.toFixed(2) : order.total.toFixed(2)} aprovado no Mercado Pago (${paymentData.payment_method_id || 'Mercado Pago'}). Pedido em separação; compra do frete registrada como uma etapa independente.`,
-      });
-
-      if (order.customerEmail) {
-        sendTransactionalEmail({
-          to: order.customerEmail,
-          subject: `Pagamento Aprovado // Pedido #${order.id} | MARMOT`,
-          template: 'payment_approved',
-          orderId: order.id,
-          userId: order.userId,
-          html: `<div style="font-family: sans-serif; background: #0c0c0c; color: #fff; padding: 32px; border-radius: 12px; max-width: 600px; margin: 0 auto;">
-            <h2 style="letter-spacing: 0.1em; color: #22c55e;">PAGAMENTO CONFIRMADO // MARMOT</h2>
-            <p>Seu pagamento para o pedido <strong>#${order.id}</strong> foi aprovado com sucesso.</p>
-            <p>Nossa equipe já iniciou a separação e embalagem de suas peças em nosso centro de distribuição.</p>
-            <p style="color: #a1a1aa; font-size: 13px; margin-top: 24px;">Total pago: R$ ${order.total.toFixed(2)} (${order.paymentMethod || 'Mercado Pago'})</p>
-          </div>`,
-        }).catch(() => {});
-      }
-    }
-  } else if (status === 'pending' || status === 'in_process') {
-    order.status = 'Aguardando Pagamento';
-    order.paymentStatus = 'Pendente';
-    const hasPendingHistory = order.history.some((h) => h.status === 'Aguardando Pagamento' && h.description?.includes('processamento'));
-    if (!hasPendingHistory) {
-      order.history.push({
-        status: 'Aguardando Pagamento',
-        timestamp: new Date().toLocaleString('pt-BR'),
-        description: `Pagamento em análise ou processamento no Mercado Pago (${statusDetail || 'aguardando compensação'}).`,
-      });
-    }
-  } else if (status === 'rejected') {
-    order.paymentStatus = 'Recusado';
-    order.history.push({
-      status: 'Pagamento Recusado',
-      timestamp: new Date().toLocaleString('pt-BR'),
-      description: `Pagamento recusado pelo Mercado Pago (${statusDetail || 'motivo não informado'}).`,
-    });
-  } else if (status === 'cancelled') {
-    order.status = 'Cancelado';
-    order.paymentStatus = 'Cancelado';
-    order.history.push({
-      status: 'Cancelado',
-      timestamp: new Date().toLocaleString('pt-BR'),
-      description: 'Pagamento cancelado no Mercado Pago.',
-    });
-  } else if (status === 'refunded' || status === 'charged_back') {
-    order.status = 'Cancelado';
-    order.paymentStatus = 'Reembolsado';
-    order.history.push({
-      status: 'Reembolsado',
-      timestamp: new Date().toLocaleString('pt-BR'),
-      description: `Pagamento reembolsado via Mercado Pago (${status}).`,
-    });
-  }
-
-  await db.saveOrder(order);
+async function updateStripeOrderState(
+  orderId: string,
+  paymentStatus: string,
+  status: string,
+  statusDetail: string,
+  eventId: string,
+): Promise<Order> {
+  if (!orderId) throw new Error('ORDER_NOT_FOUND');
+  const updated = await db.updateProviderPaymentStateAtomic({
+    orderId,
+    provider: 'stripe',
+    paymentStatus,
+    orderStatus: status,
+    statusDetail,
+    eventId,
+  });
+  if (!updated.success) throw new Error(updated.error || 'PAYMENT_STATE_UPDATE_FAILED');
+  const order = await db.getOrderById(orderId);
+  if (!order) throw new Error('ORDER_NOT_FOUND_AFTER_STATE_UPDATE');
   return order;
 }
 
-// Function to securely query Mercado Pago API to verify payment status of an order
-async function fetchAndVerifyMercadoPagoPayment(orderId: string, paymentIdParam?: string): Promise<{ order: Order; paymentData: any | null; isApproved: boolean; status: string; paymentValidated: boolean }> {
-  let order = await db.getOrderById(orderId);
-  const cleanId = String(orderId || '').trim();
+async function settleStripePaymentIntent(intent: Stripe.PaymentIntent): Promise<{ order: Order; alreadyProcessed: boolean }> {
+  const orderId = String(intent.metadata?.order_id || '').trim();
+  if (!orderId) throw new Error('STRIPE_PAYMENT_WITHOUT_ORDER_ID');
+  const order = await db.getOrderById(orderId);
+  if (!order) throw new Error('ORDER_NOT_FOUND');
+  if (order.paymentProvider && order.paymentProvider !== 'stripe') throw new Error('PAYMENT_PROVIDER_MISMATCH');
+  if (intent.metadata?.user_id && order.userId && intent.metadata.user_id !== order.userId) throw new Error('PAYMENT_USER_MISMATCH');
+  if (intent.status !== 'succeeded') throw new Error('PAYMENT_NOT_SUCCEEDED');
 
-  // If not found by direct ID, search by tracking code or payment identifiers
-  if (!order && cleanId) {
-    const allOrders = await db.getOrders();
-    order = allOrders.find((o) =>
-      o.id === cleanId ||
-      o.trackingCode === cleanId ||
-      o.paymentDetails?.mercadoPagoPreferenceId === cleanId ||
-      o.paymentDetails?.mercadoPagoPaymentId === cleanId ||
-      (paymentIdParam && (o.paymentDetails?.mercadoPagoPaymentId === paymentIdParam || o.id === paymentIdParam))
-    ) || null;
+  const amountCents = Number(intent.amount_received || intent.amount);
+  if (amountCents !== reaisToCents(Number(order.total)) || intent.currency.toLowerCase() !== 'brl') {
+    throw new Error('PAYMENT_AMOUNT_MISMATCH');
   }
 
-  if (!order) {
-    const notFoundErr: any = new Error(`Pedido #${cleanId} não encontrado no banco de dados.`);
-    notFoundErr.statusCode = 404;
-    throw notFoundErr;
-  }
+  const paymentMethod = getStripePaymentMethodLabel(intent);
+  const result = await db.processApprovedOrderAtomic(
+    order.id,
+    intent.id,
+    centsToReais(amountCents),
+    'BRL',
+    'stripe',
+    paymentMethod,
+    new Date(intent.created * 1000).toISOString(),
+    order.items,
+  );
+  if (!result.success) throw new Error(result.error || 'PAYMENT_SETTLEMENT_FAILED');
 
-  const explicitPaymentId = String(paymentIdParam || '').trim();
-
-  // Status polling may use the webhook-confirmed database state. A browser
-  // return containing payment_id, however, must always re-fetch that exact
-  // payment from Mercado Pago before rendering an approval.
-  if (!explicitPaymentId && (order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago')) {
-    return { order, paymentData: null, isApproved: true, status: 'approved', paymentValidated: false };
-  }
-
-  const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
-  if (!token || token.trim().length < 10) {
-    throw createPaymentVerificationError(
-      'A credencial do Mercado Pago não está configurada no servidor.',
-      503,
-      'MERCADOPAGO_NOT_CONFIGURED',
-    );
-  }
-
-  let paymentData: any = null;
-  const targetPaymentId = explicitPaymentId || String(order.paymentDetails?.mercadoPagoPaymentId || '').trim();
-
-  const mpClient = getMercadoPagoClient();
-
-  // 1. Query a specific payment ID when one is known. If the browser supplied
-  // payment_id, never fall back to another payment for the same order.
-  if (targetPaymentId && targetPaymentId !== 'null' && targetPaymentId !== 'undefined') {
-    try {
-      if (!mpClient) {
-        throw createPaymentVerificationError(
-          'Cliente do Mercado Pago indisponível no servidor.',
-          503,
-          'MERCADOPAGO_NOT_CONFIGURED',
-        );
-      }
-      const paymentApi = new Payment(mpClient);
-      paymentData = await paymentApi.get({ id: String(targetPaymentId) });
-    } catch (err: any) {
-      console.warn(`[Mercado Pago Verification] Could not fetch payment ${targetPaymentId} directly:`, err?.message || err);
-      if (explicitPaymentId) {
-        throw createPaymentVerificationError(
-          'Não foi possível confirmar o payment_id informado diretamente no Mercado Pago.',
-          err?.status === 404 || err?.statusCode === 404 ? 404 : 502,
-          'MERCADOPAGO_PAYMENT_LOOKUP_FAILED',
-        );
-      }
-    }
-  }
-
-  // 2. Polling without an explicit browser return may search by the order's
-  // external_reference. Every result is still checked below before mutation.
-  if (!paymentData && !explicitPaymentId) {
-    try {
-      const searchUrl = `https://api.mercadopago.com/v1/payments/search?external_reference=${encodeURIComponent(order.id)}&sort=date_created&criteria=desc`;
-      const searchRes = await fetch(searchUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (searchRes.ok) {
-        const searchJson = await searchRes.json();
-        if (searchJson.results && searchJson.results.length > 0) {
-          paymentData = searchJson.results[0];
-        }
-      }
-    } catch (searchErr) {
-      console.warn(`[Mercado Pago Verification] Search by external_reference error:`, searchErr);
-    }
-  }
-
-  // If real payment data was retrieved from Mercado Pago API
-  if (paymentData) {
-    assertMercadoPagoPaymentBelongsToOrder(order, paymentData, explicitPaymentId || targetPaymentId);
-    const updatedOrder = await applyMercadoPagoPaymentToOrder(order, paymentData);
-    const isApproved = paymentData.status === 'approved' && updatedOrder.paymentStatus === 'Pago';
-    return {
-      order: updatedOrder,
-      paymentData,
-      isApproved,
-      status: paymentData.status || (isApproved ? 'approved' : 'pending'),
-      paymentValidated: true,
-    };
-  }
-
-  // If NO payment was found in Mercado Pago (e.g. user closed checkout or navigated back without paying)
-  // Ensure order remains "Aguardando Pagamento" and "Pendente"
-  if (order.status !== 'Pagamento Aprovado' && order.paymentStatus !== 'Pago') {
-    order.status = 'Aguardando Pagamento';
-    order.paymentStatus = 'Pendente';
-    await db.saveOrder(order);
-  }
-
-  return {
-    order,
-    paymentData: null,
-    isApproved: false,
-    status: 'pending',
-    paymentValidated: false,
+  const settledOrder = await db.getOrderById(order.id);
+  if (!settledOrder) throw new Error('ORDER_NOT_FOUND_AFTER_SETTLEMENT');
+  settledOrder.paymentProvider = 'stripe';
+  settledOrder.paymentProviderPaymentId = intent.id;
+  settledOrder.paymentMethod = paymentMethod;
+  settledOrder.paymentDetails = {
+    ...(settledOrder.paymentDetails || {}),
+    gateway: 'stripe',
+    transactionId: intent.id,
+    sessionId: settledOrder.paymentProviderSessionId || settledOrder.paymentDetails?.sessionId,
+    statusDetail: intent.status,
+    paidAt: new Date(intent.created * 1000).toISOString(),
   };
+  await db.saveOrder(settledOrder);
+
+  // Refresh the process-local cache after the transaction removed purchased
+  // cart lines. The database remains the source of truth.
+  if (settledOrder.userId) await db.getCartForUser(settledOrder.userId);
+
+  if (!result.alreadyProcessed) {
+    console.log('[STRIPE_PAYMENT_CONFIRMED]', { orderId: settledOrder.id, paymentIntentId: intent.id });
+    sendTransactionalEmail({
+      to: settledOrder.customerEmail || '',
+      subject: `Pagamento confirmado — Pedido #${settledOrder.id} // MARMOT`,
+      template: 'payment_approved',
+      orderId: settledOrder.id,
+      userId: settledOrder.userId,
+      html: `<div style="font-family:sans-serif;background:#0c0c0c;color:#fff;padding:32px;max-width:600px;margin:0 auto"><h2>PAGAMENTO CONFIRMADO // MARMOT</h2><p>O pagamento do pedido <strong>#${settledOrder.id}</strong> foi confirmado.</p><p>Seu pedido entrou em separação.</p></div>`,
+    }).catch(() => undefined);
+  }
+  return { order: settledOrder, alreadyProcessed: result.alreadyProcessed };
 }
 
-// Webhook / IPN Notification Endpoint with Persistent Database-Backed Idempotency
-app.all(['/api/mercado-pago/webhook', '/api/mercadopago/webhook', '/api/webhooks/mercadopago'], async (req, res) => {
-  try {
-    const webhookSecret = process.env.MERCADOPAGO_WEBHOOK_SECRET;
-    const hasAccessToken = Boolean(process.env.MERCADOPAGO_ACCESS_TOKEN);
-    const hasWebhookSecret = Boolean(webhookSecret && webhookSecret.trim().length > 0);
-    const mpEnv = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase();
-
-    const topic = String(req.query.topic || req.query.type || req.body?.type || req.body?.action || req.body?.topic || 'payment');
-    // In Webhooks v2 the top-level body.id identifies the notification, while
-    // body.data.id identifies the payment that must be fetched from Mercado Pago.
-    const paymentId = req.query['data.id'] || req.body?.data?.id || req.query.id;
-    const notificationId = req.body?.id || req.query.notification_id;
-    const notificationCreatedAt = req.body?.date_created || req.body?.date || '';
-    const eventKey = notificationId
-      ? `${topic}:${String(notificationId)}`
-      : `${topic}:${String(paymentId || 'unknown')}:${String(notificationCreatedAt || 'legacy')}`;
-
-    console.log(`[Mercado Pago Webhook Received]: Topic=${topic || 'payment'}, PaymentId=${paymentId || 'N/A'}, hasAccessToken=${hasAccessToken}, hasWebhookSecret=${hasWebhookSecret}, mercadoPagoEnvironment=${mpEnv}`);
-
-    const isSignatureValid = verifyMercadoPagoWebhookSignature(req, webhookSecret);
-
-    if (!isSignatureValid) {
-      console.warn('[Mercado Pago Webhook Warning]: Assinatura do webhook inválida ou rejeitada.');
-      return res.status(401).json({ error: 'Assinatura do webhook inválida.' });
-    }
-
-    if (hasWebhookSecret && isSignatureValid) {
-      console.log('[Mercado Pago Webhook]: Webhook signature validated');
-    }
-
-    let fulfillmentOrderId: string | undefined;
-
-    if (paymentId && (topic === 'payment' || topic === 'payment.updated' || topic === 'payment.created')) {
-      // Persistent distributed claim check (PostgreSQL UNIQUE constraint + state table)
-      const claim = await db.claimWebhookEvent('mercadopago', eventKey, String(topic || 'payment'), req.body || req.query);
-      if (!claim.shouldProcess) {
-        if (claim.status === 'already_completed' && claim.orderId) {
-          const linkedOrder = await db.getOrderById(claim.orderId);
-          if (linkedOrder && needsShipmentFulfillment(linkedOrder)) {
-            scheduleShipmentFulfillment(linkedOrder.id, 'webhook_retry');
-            return res.status(200).json({
-              success: true,
-              message: 'Evento já liquidado; recuperação da expedição acionada com segurança.',
-              status: claim.status,
-              freightQueued: true,
-            });
-          }
-        }
-        console.log(`[Mercado Pago Webhook Idempotency]: Event ${eventKey} already claimed/processed (${claim.status}). Acknowledging 200 OK.`);
-        return res.status(200).json({ success: true, message: 'Evento já registrado ou em processamento.', status: claim.status });
-      }
-
-      let orderIdFound: string | undefined;
-      let procError: string | undefined;
-
-      try {
-        const token = process.env.MERCADOPAGO_ACCESS_TOKEN;
-        let paymentData: any = null;
-
-        if (token && token.length >= 10) {
-          try {
-            const mpClient = getMercadoPagoClient();
-            if (mpClient) {
-              const paymentApi = new Payment(mpClient);
-              paymentData = await paymentApi.get({ id: String(paymentId) });
-            } else {
-              const fetchRes = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              if (fetchRes.ok) {
-                paymentData = await fetchRes.json();
-              }
-            }
-          } catch (fetchErr: any) {
-            procError = fetchErr.message;
-            console.error('[Mercado Pago Webhook Payment Fetch Error]:', fetchErr);
-          }
-        } else {
-          throw new Error('MERCADOPAGO_ACCESS_TOKEN não configurado no servidor.');
-        }
-
-        if (paymentData) {
-          console.log(`[Mercado Pago Webhook]: Payment fetched (ID: ${paymentId})`);
-          const externalReference = paymentData.external_reference || paymentData.metadata?.order_id;
-          if (externalReference) {
-            orderIdFound = String(externalReference);
-            console.log(`[Mercado Pago Webhook]: external_reference found (${orderIdFound})`);
-            const order = await db.getOrderById(orderIdFound);
-            if (order) {
-              console.log(`[Mercado Pago Webhook]: Order #${order.id} found`);
-              const updatedOrder = await applyMercadoPagoPaymentToOrder(order, paymentData);
-              if (updatedOrder.paymentStatus === 'Pago') {
-                fulfillmentOrderId = updatedOrder.id;
-                console.log(`[Mercado Pago Webhook]: Payment approved`);
-                console.log(`[Mercado Pago Webhook]: Order #${updatedOrder.id} updated to status "${updatedOrder.status}" / "${updatedOrder.paymentStatus}". Freight queued independently.`);
-              } else {
-                console.log(`[Mercado Pago Webhook]: Order #${updatedOrder.id} updated with payment status "${updatedOrder.paymentStatus}".`);
-              }
-            } else {
-              throw new Error(`Pedido ${orderIdFound} informado no pagamento não foi encontrado.`);
-            }
-          } else {
-            throw new Error('Pagamento sem external_reference/order_id válido.');
-          }
-        } else if (procError) {
-          throw new Error(procError);
-        } else {
-          throw new Error('Mercado Pago não retornou os dados do pagamento notificado.');
-        }
-      } catch (err: any) {
-        procError = err.message;
-      } finally {
-        await db.completeWebhookEvent('mercadopago', eventKey, orderIdFound, procError);
-      }
-      if (procError) {
-        throw new Error(procError);
-      }
-    }
-
-    if (fulfillmentOrderId) {
-      scheduleShipmentFulfillment(fulfillmentOrderId, 'webhook');
-    }
-
-    return res.status(200).json({ success: true, message: 'Webhook processado com sucesso.', freightQueued: Boolean(fulfillmentOrderId) });
-  } catch (error: any) {
-    console.error('[Mercado Pago Webhook Global Error]:', error);
-    return res.status(500).json({ success: false, error: 'Falha temporária ao processar o webhook.' });
-  }
-});
-
-function canAuthenticatedUserAccessOrder(req: any, order: Order): boolean {
-  if (req.user?.role === 'admin') return true;
-  if (order.userId) return order.userId === req.user?.id;
-
-  const authenticatedEmail = String(req.user?.email || '').trim().toLowerCase();
-  const orderEmail = String(order.customerEmail || '').trim().toLowerCase();
-  return Boolean(authenticatedEmail && orderEmail && authenticatedEmail === orderEmail);
+async function findOrderForStripeObject(input: { orderId?: string; sessionId?: string; paymentIntentId?: string }): Promise<Order | null> {
+  if (input.orderId) return db.getOrderById(input.orderId);
+  if (input.sessionId) return db.getOrderById(input.sessionId);
+  if (input.paymentIntentId) return db.getOrderById(input.paymentIntentId);
+  return null;
 }
 
-// Checkout Pro return verification. This endpoint intentionally requires both
-// IDs and never accepts status/approval from the browser query string.
-app.post('/api/mercado-pago/return/verify', requireAuth, async (req: any, res) => {
+async function handleStripeWebhook(req: express.Request, res: express.Response) {
+  const webhookSecret = getStripeWebhookSecret();
+  const stripeConfiguration = getStripeConfigurationStatus();
+  const signature = req.headers['stripe-signature'];
+  if (!webhookSecret || !stripeConfiguration.webhookSecretValid) {
+    console.error('[STRIPE_WEBHOOK_REJECTED]', { reason: 'webhook_secret_not_configured' });
+    return res.status(503).json({ error: 'Webhook Stripe não configurado.' });
+  }
+  if (!signature || Array.isArray(signature)) {
+    return res.status(400).json({ error: 'Assinatura Stripe ausente.' });
+  }
+
   try {
-    const orderId = String(req.body?.orderId || req.body?.order_id || '').trim();
-    const paymentId = String(req.body?.paymentId || req.body?.payment_id || req.body?.collection_id || '').trim();
+    assertStripeConfiguration();
+  } catch (error: any) {
+    console.error('[STRIPE_WEBHOOK_REJECTED]', { reason: error?.code || 'stripe_configuration_invalid' });
+    return res.status(503).json({ error: 'Configuração Stripe inválida no servidor.' });
+  }
 
-    if (!orderId || !paymentId) {
-      return res.status(400).json({
-        success: false,
-        code: 'MERCADOPAGO_RETURN_PARAMS_MISSING',
-        error: 'O retorno do Mercado Pago não contém order_id e payment_id válidos.',
-      });
-    }
+  let event: Stripe.Event;
+  try {
+    event = getRequiredStripeClient().webhooks.constructEvent(req.body, signature, webhookSecret);
+  } catch (error: any) {
+    console.warn('[STRIPE_WEBHOOK_SIGNATURE_INVALID]', { message: error?.message });
+    return res.status(400).json({ error: 'Assinatura do webhook inválida.' });
+  }
 
-    const existingOrder = await db.getOrderById(orderId);
-    if (!existingOrder) {
-      return res.status(404).json({
-        success: false,
-        code: 'ORDER_NOT_FOUND',
-        error: 'Pedido informado no retorno não encontrado.',
-      });
-    }
+  const stripeMode = stripeConfiguration.mode;
+  if ((stripeMode === 'test' && event.livemode) || (stripeMode === 'live' && !event.livemode)) {
+    console.warn('[STRIPE_WEBHOOK_MODE_MISMATCH]', { eventId: event.id, livemode: event.livemode, configuredMode: stripeMode });
+    return res.status(400).json({ error: 'O evento pertence a outro modo da Stripe.' });
+  }
 
-    if (!canAuthenticatedUserAccessOrder(req, existingOrder)) {
-      return res.status(403).json({
-        success: false,
-        code: 'ORDER_ACCESS_DENIED',
-        error: 'Acesso negado. Você não é o titular deste pedido.',
-      });
-    }
-
-    const result = await fetchAndVerifyMercadoPagoPayment(orderId, paymentId);
-    if (result.isApproved && needsShipmentFulfillment(result.order)) {
-      scheduleShipmentFulfillment(result.order.id, 'payment_return');
-    }
-    return res.json({
-      success: true,
-      paymentValidated: result.paymentValidated,
-      approved: result.isApproved,
-      status: result.status,
-      order: result.order,
-      paymentDetails: result.order.paymentDetails,
+  console.log('[STRIPE_WEBHOOK_VALIDATED]', { eventId: event.id, eventType: event.type, livemode: event.livemode });
+  let linkedOrderId: string | undefined;
+  let shouldQueueFreight = false;
+  let claim: { shouldProcess: boolean; status: string; orderId?: string };
+  try {
+    claim = await db.claimWebhookEvent('stripe', event.id, event.type, {
+      id: event.id,
+      type: event.type,
+      created: event.created,
+      livemode: event.livemode,
     });
   } catch (error: any) {
-    const statusCode = error.statusCode || 500;
-    console.error(`[Mercado Pago Return Verification Error ${statusCode}]:`, error.message);
-    return res.status(statusCode).json({
-      success: false,
-      code: error.code || 'MERCADOPAGO_RETURN_VERIFICATION_FAILED',
-      error: error.message || 'Erro ao validar o retorno diretamente no Mercado Pago.',
-    });
+    console.error('[STRIPE_WEBHOOK_CLAIM_ERROR]', { eventId: event.id, message: error?.message });
+    return res.status(503).json({ error: 'Persistência temporariamente indisponível.' });
   }
-});
+  if (!claim.shouldProcess) {
+    if (claim.status === 'already_completed' && claim.orderId) {
+      const order = await db.getOrderById(claim.orderId);
+      if (order && needsShipmentFulfillment(order)) scheduleShipmentFulfillment(order.id, 'webhook_retry');
+    }
+    console.log('[STRIPE_WEBHOOK_DUPLICATE_IGNORED]', { eventId: event.id, status: claim.status });
+    return res.json({ received: true, duplicate: true });
+  }
 
-// Authenticated real-time verification endpoint used for status polling.
-app.all([
-  '/api/mercadopago/verify-payment/:orderId',
-  '/api/mercado-pago/verify-payment/:orderId',
-  '/api/orders/:orderId/verify-payment',
-  '/api/mercadopago/check-status/:orderId',
-], requireAuth, async (req: any, res) => {
   try {
-    const { orderId } = req.params;
-    const paymentId = (req.query.payment_id || req.query.collection_id || req.body?.payment_id || req.body?.collection_id) as string;
-
-    const existingOrder = await db.getOrderById(orderId);
-    if (existingOrder && !canAuthenticatedUserAccessOrder(req, existingOrder)) {
-      return res.status(403).json({ error: 'Acesso negado. Você não é o titular deste pedido.' });
+    switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const metadataOrderId = String(session.metadata?.order_id || '').trim();
+        const referenceOrderId = String(session.client_reference_id || '').trim();
+        if (!metadataOrderId || !referenceOrderId || metadataOrderId !== referenceOrderId) {
+          throw new Error('STRIPE_SESSION_ORDER_MISMATCH');
+        }
+        linkedOrderId = metadataOrderId;
+        const order = await findOrderForStripeObject({ orderId: linkedOrderId });
+        if (!order) throw new Error('ORDER_NOT_FOUND');
+        if (order.paymentProvider && order.paymentProvider !== 'stripe') throw new Error('PAYMENT_PROVIDER_MISMATCH');
+        if (session.metadata?.user_id && order.userId && session.metadata.user_id !== order.userId) throw new Error('PAYMENT_USER_MISMATCH');
+        if (Number(session.amount_total || 0) !== reaisToCents(Number(order.total)) || session.currency?.toLowerCase() !== 'brl') {
+          throw new Error('PAYMENT_AMOUNT_MISMATCH');
+        }
+        const paymentIntentId = typeof session.payment_intent === 'string'
+          ? session.payment_intent
+          : session.payment_intent?.id;
+        const linked = await db.linkPaymentSessionAtomic({
+          orderId: order.id,
+          provider: 'stripe',
+          sessionId: session.id,
+          paymentId: paymentIntentId,
+          statusDetail: session.payment_status,
+          expiresAt: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined,
+        });
+        if (!linked.success) throw new Error(linked.error || 'STRIPE_SESSION_LINK_FAILED');
+        console.log('[STRIPE_CHECKOUT_COMPLETED]', { orderId: order.id, sessionId: session.id, paymentStatus: session.payment_status });
+        break;
+      }
+      case 'payment_intent.succeeded': {
+        const intent = event.data.object as Stripe.PaymentIntent;
+        const settled = await settleStripePaymentIntent(intent);
+        linkedOrderId = settled.order.id;
+        shouldQueueFreight = needsShipmentFulfillment(settled.order);
+        break;
+      }
+      case 'payment_intent.payment_failed': {
+        const intent = event.data.object as Stripe.PaymentIntent;
+        linkedOrderId = String(intent.metadata?.order_id || '').trim();
+        await updateStripeOrderState(linkedOrderId, 'Recusado', 'Pagamento Recusado', intent.last_payment_error?.code || 'payment_failed', event.id);
+        console.log('[STRIPE_PAYMENT_FAILED]', { orderId: linkedOrderId, paymentIntentId: intent.id });
+        break;
+      }
+      case 'checkout.session.expired': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        linkedOrderId = String(session.metadata?.order_id || session.client_reference_id || '').trim();
+        await updateStripeOrderState(linkedOrderId, 'Cancelado', 'Cancelado', 'checkout_expired', event.id);
+        console.log('[STRIPE_CHECKOUT_EXPIRED]', { orderId: linkedOrderId, sessionId: session.id });
+        break;
+      }
+      case 'checkout.session.async_payment_succeeded': {
+        // Settlement belongs exclusively to payment_intent.succeeded. This event
+        // is recorded for observability and deliberately performs no mutation.
+        const session = event.data.object as Stripe.Checkout.Session;
+        linkedOrderId = String(session.metadata?.order_id || session.client_reference_id || '').trim();
+        break;
+      }
+      case 'checkout.session.async_payment_failed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        linkedOrderId = String(session.metadata?.order_id || session.client_reference_id || '').trim();
+        await updateStripeOrderState(linkedOrderId, 'Recusado', 'Pagamento Recusado', 'async_payment_failed', event.id);
+        break;
+      }
+      case 'refund.created':
+      case 'refund.updated':
+      case 'refund.failed': {
+        const refund = event.data.object as Stripe.Refund;
+        const paymentIntentId = typeof refund.payment_intent === 'string' ? refund.payment_intent : refund.payment_intent?.id;
+        const order = await findOrderForStripeObject({ orderId: refund.metadata?.order_id, paymentIntentId });
+        if (!order || !paymentIntentId) throw new Error('REFUND_ORDER_NOT_FOUND');
+        linkedOrderId = order.id;
+        const refundStatus = refund.status === 'succeeded' ? 'succeeded' : refund.status === 'failed' ? 'failed' : refund.status === 'canceled' ? 'canceled' : 'pending';
+        const persisted = await db.processProviderRefundAtomic({
+          orderId: order.id,
+          provider: 'stripe',
+          providerRefundId: refund.id,
+          providerPaymentId: paymentIntentId,
+          amount: centsToReais(refund.amount),
+          currency: refund.currency,
+          status: refundStatus,
+          reason: refund.metadata?.reason,
+        });
+        if (!persisted.success) throw new Error(persisted.error || 'REFUND_PERSISTENCE_FAILED');
+        break;
+      }
+      case 'charge.refunded': {
+        const charge = event.data.object as Stripe.Charge;
+        const paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id;
+        const order = await findOrderForStripeObject({ paymentIntentId });
+        linkedOrderId = order?.id;
+        break;
+      }
+      default:
+        console.log('[STRIPE_WEBHOOK_EVENT_IGNORED]', { eventId: event.id, eventType: event.type });
     }
 
-    const result = await fetchAndVerifyMercadoPagoPayment(orderId, paymentId);
-    if (result.isApproved && needsShipmentFulfillment(result.order)) {
-      scheduleShipmentFulfillment(result.order.id, 'payment_verification');
-    }
-    return res.json({
-      success: true,
-      approved: result.isApproved,
-      status: result.status,
-      paymentValidated: result.paymentValidated,
-      order: result.order,
-      paymentDetails: result.order.paymentDetails,
-    });
+    await db.completeWebhookEvent('stripe', event.id, linkedOrderId);
+    if (shouldQueueFreight && linkedOrderId) scheduleShipmentFulfillment(linkedOrderId, 'webhook');
+    return res.json({ received: true });
   } catch (error: any) {
-    const statusCode = error.statusCode || 500;
-    console.error(`[Verify Payment Endpoint Error ${statusCode}]:`, error.message);
-    return res.status(statusCode).json({
-      success: false,
-      notFound: statusCode === 404,
-      code: error.code || 'MERCADOPAGO_VERIFICATION_FAILED',
-      error: error.message || 'Erro ao verificar pagamento no Mercado Pago.',
+    try {
+      await db.completeWebhookEvent('stripe', event.id, linkedOrderId, error?.message || 'processing_failed');
+    } catch (completionError: any) {
+      console.error('[STRIPE_WEBHOOK_FAILURE_RECORD_ERROR]', { eventId: event.id, message: completionError?.message });
+    }
+    console.error('[STRIPE_WEBHOOK_PROCESSING_ERROR]', {
+      eventId: event.id,
+      eventType: event.type,
+      orderId: linkedOrderId,
+      message: error?.message,
     });
+    return res.status(500).json({ error: 'Falha temporária ao processar o webhook.' });
   }
-});
+}
 
-// Order Payment Status Check Endpoint
-app.get(['/api/mercado-pago/orders/:id/status', '/api/mercadopago/payment-status/:id'], async (req, res) => {
+app.post('/api/stripe/checkout-session', checkoutRateLimiter.middleware(), handleCreateStripeCheckout);
+
+app.get('/api/stripe/checkout-session/:sessionId/status', requireAuth, async (req: any, res) => {
   try {
-    const shouldRefresh = req.query.refresh === 'true';
-    if (shouldRefresh) {
-      const result = await fetchAndVerifyMercadoPagoPayment(req.params.id);
-      return res.json({
-        orderId: result.order.id,
-        status: result.order.status,
-        paymentStatus: result.order.paymentStatus,
-        paymentDetails: result.order.paymentDetails,
-        total: result.order.total,
-        isApproved: result.isApproved,
-      });
-    }
-
-    const order = await db.getOrderById(req.params.id);
-    if (!order) {
-      return res.status(404).json({ error: 'Pedido não encontrado.' });
-    }
+    const order = await db.getOrderById(req.params.sessionId);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    if (!canAuthenticatedUserAccessOrder(req, order)) return res.status(403).json({ error: 'Acesso negado.' });
     return res.json({
       orderId: order.id,
       status: order.status,
       paymentStatus: order.paymentStatus,
-      paymentDetails: order.paymentDetails,
-      total: order.total,
-      isApproved: order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago',
+      confirmed: order.paymentStatus === 'Pago',
+      order,
+    });
+  } catch (error: any) {
+    return res.status(500).json({ error: 'Não foi possível consultar o pagamento.' });
+  }
+});
+
+app.get('/api/stripe/orders/:id/status', requireAuth, async (req: any, res) => {
+  try {
+    const order = await db.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    if (!canAuthenticatedUserAccessOrder(req, order)) return res.status(403).json({ error: 'Acesso negado.' });
+    return res.json({
+      orderId: order.id,
+      status: order.status,
+      paymentStatus: order.paymentStatus,
+      confirmed: order.paymentStatus === 'Pago',
+      order,
     });
   } catch {
-    return res.status(500).json({ error: 'Erro ao consultar status do pagamento.' });
+    return res.status(500).json({ error: 'Não foi possível consultar o pagamento.' });
+  }
+});
+
+app.post('/api/admin/orders/:id/sync-payment', requireAdmin, async (req: any, res) => {
+  try {
+    const order = await db.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    if (order.paymentProvider !== 'stripe') return res.status(409).json({ error: 'O pedido não pertence à Stripe.' });
+    const sessionId = String(order.paymentProviderSessionId || order.paymentDetails?.sessionId || '').trim();
+    if (!sessionId) return res.status(409).json({ error: 'Pedido sem Checkout Session vinculada.' });
+
+    const session = await getRequiredStripeClient().checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
+    if (session.metadata?.order_id !== order.id || session.client_reference_id !== order.id) {
+      return res.status(409).json({ error: 'A sessão Stripe não corresponde ao pedido.' });
+    }
+    if (session.payment_status !== 'paid' || !session.payment_intent || typeof session.payment_intent === 'string') {
+      return res.json({ synchronized: true, changed: false, order, stripeStatus: session.payment_status });
+    }
+
+    const settled = await settleStripePaymentIntent(session.payment_intent);
+    if (needsShipmentFulfillment(settled.order)) scheduleShipmentFulfillment(settled.order.id, 'admin_sync');
+    await db.logAdminAction(req.user.email, req.user.name, 'sync_payment', 'order', order.id, 'Pagamento reconciliado com a Stripe.');
+    return res.json({ synchronized: true, changed: !settled.alreadyProcessed, order: settled.order });
+  } catch (error: any) {
+    console.error('[STRIPE_ADMIN_SYNC_ERROR]', { orderId: req.params.id, message: error?.message });
+    return res.status(502).json({ error: 'Não foi possível sincronizar o pagamento com a Stripe.' });
   }
 });
 
@@ -9150,29 +8665,85 @@ app.post('/api/admin/orders/:id/dispatch', requireAdmin, async (req: any, res) =
 
 app.post('/api/admin/orders/:id/refund', requireAdmin, async (req: any, res) => {
   try {
-    const { amount, reason } = req.body;
-    const numAmount = parseFloat(amount);
-    if (!numAmount || numAmount <= 0) {
+    const { amount, reason, refundOperationId } = req.body || {};
+    const numericAmount = Number(amount);
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
       return res.status(400).json({ error: 'Valor de reembolso inválido.' });
     }
+    const amountCents = reaisToCents(numericAmount);
     if (!reason || reason.trim().length < 3) {
       return res.status(400).json({ error: 'Informe a justificativa do reembolso.' });
     }
-
-    const result = await db.processPaymentRefund(
-      req.params.id,
-      numAmount,
-      reason.trim(),
-      req.user
-    );
-
-    if (!result.success) {
-      return res.status(400).json({ error: result.error });
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(refundOperationId || ''))) {
+      return res.status(400).json({ error: 'Identificador idempotente do reembolso inválido.' });
     }
 
-    res.json(result.order);
+    const order = await db.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
+    if (order.paymentStatus !== 'Pago' && order.paymentStatus !== 'Reembolsado') {
+      return res.status(409).json({ error: 'Somente pedidos pagos podem ser reembolsados.' });
+    }
+    if (order.paymentProvider !== 'stripe') {
+      return res.status(409).json({ error: 'Este pagamento não pertence à Stripe e não pode ser reembolsado por esta integração.' });
+    }
+    const paymentIntentId = String(order.paymentProviderPaymentId || order.paymentDetails?.transactionId || '').trim();
+    if (!paymentIntentId) return res.status(409).json({ error: 'Pedido sem PaymentIntent vinculado.' });
+
+    const alreadyRefundedCents = reaisToCents(Number(order.paymentDetails?.refundedAmount || 0));
+    if (alreadyRefundedCents + amountCents > reaisToCents(Number(order.total))) {
+      return res.status(409).json({ error: 'O valor solicitado ultrapassa o saldo reembolsável do pedido.' });
+    }
+
+    const stripeRefund = await getRequiredStripeClient().refunds.create({
+      payment_intent: paymentIntentId,
+      amount: amountCents,
+      reason: 'requested_by_customer',
+      metadata: {
+        order_id: order.id,
+        reason: String(reason).trim().slice(0, 450),
+        requested_by: String(req.user?.id || ''),
+      },
+    }, { idempotencyKey: `refund:${order.id}:${refundOperationId}` });
+
+    const refundStatus = stripeRefund.status === 'succeeded'
+      ? 'succeeded'
+      : stripeRefund.status === 'failed'
+        ? 'failed'
+        : stripeRefund.status === 'canceled'
+          ? 'canceled'
+          : 'pending';
+    const persisted = await db.processProviderRefundAtomic({
+      orderId: order.id,
+      provider: 'stripe',
+      providerRefundId: stripeRefund.id,
+      providerPaymentId: paymentIntentId,
+      amount: centsToReais(stripeRefund.amount),
+      currency: stripeRefund.currency,
+      status: refundStatus,
+      reason: String(reason).trim(),
+      adminUser: req.user,
+    });
+    if (!persisted.success) throw new Error(persisted.error || 'Falha ao registrar o reembolso no banco.');
+
+    await db.logAdminAction(
+      req.user.email,
+      req.user.name,
+      'refund',
+      'refund',
+      order.id,
+      `Reembolso Stripe solicitado para o pedido #${order.id}.`,
+      { amount: centsToReais(amountCents), refundId: stripeRefund.id, status: refundStatus },
+    );
+    console.log('[STRIPE_REFUND_CREATED]', { orderId: order.id, refundId: stripeRefund.id, status: refundStatus });
+    return res.json({
+      success: true,
+      refundId: stripeRefund.id,
+      refundStatus,
+      order: await db.getOrderById(order.id),
+    });
   } catch (err: any) {
-    res.status(500).json({ error: 'Erro ao emitir reembolso.' });
+    console.error('[STRIPE_REFUND_ERROR]', { orderId: req.params.id, message: err?.message, code: err?.code || err?.type });
+    res.status(502).json({ error: 'A Stripe não conseguiu processar o reembolso. Nenhum estado local foi antecipado.' });
   }
 });
 
@@ -9491,7 +9062,9 @@ function isValidShipmentEmail(value: unknown): boolean {
 }
 
 function isPaidOrderForFulfillment(order: Order): boolean {
-  return order.paymentStatus === 'Pago' && Boolean(order.paymentDetails?.mercadoPagoPaymentId || (order as any).mercado_pago_payment_id);
+  return order.paymentStatus === 'Pago' &&
+    Boolean(order.paymentProvider || order.paymentDetails?.gateway) &&
+    Boolean(order.paymentProviderPaymentId || order.paymentDetails?.transactionId);
 }
 
 function needsShipmentFulfillment(order: Order): boolean {
@@ -9504,7 +9077,7 @@ function needsShipmentFulfillment(order: Order): boolean {
 
 async function processMelhorEnvioShipment(
   orderId: string,
-  actor?: { source: 'webhook' | 'webhook_retry' | 'payment_return' | 'payment_verification' | 'admin'; email?: string; name?: string },
+  actor?: { source: 'webhook' | 'webhook_retry' | 'admin_sync' | 'admin'; email?: string; name?: string },
 ): Promise<ShipmentProcessingResult> {
   const startTime = Date.now();
   let order = await db.getOrderById(orderId);
@@ -9522,7 +9095,7 @@ async function processMelhorEnvioShipment(
 
   if (!isPaidOrderForFulfillment(order)) {
     throw shipmentProcessingError(
-      'O envio só pode ser comprado após confirmação real do pagamento pelo Mercado Pago.',
+      'O envio só pode ser comprado após confirmação real do pagamento pela Stripe.',
       409,
       'PAYMENT_NOT_CONFIRMED',
       'payment_check',
@@ -9599,12 +9172,23 @@ async function processMelhorEnvioShipment(
     if (config.originPostalCode.length !== 8) {
       throw shipmentProcessingError('CEP de origem do Melhor Envio não configurado corretamente.', 503, 'MISSING_ORIGIN_CEP', currentStep, shipmentId || undefined);
     }
-    const mercadoPagoEnvironment = String(process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'production' ? 'production' : 'sandbox';
-    if (mercadoPagoEnvironment !== config.environment) {
+    if (order.paymentProvider === 'stripe') {
+      const stripeMode = getStripeConfigurationStatus().mode;
+      const expectedShippingEnvironment = stripeMode === 'live' ? 'production' : 'sandbox';
+      if (stripeMode === 'unknown' || expectedShippingEnvironment !== config.environment) {
+        throw shipmentProcessingError(
+          'Os ambientes de pagamento Stripe e Melhor Envio são diferentes; a compra automática do frete foi bloqueada.',
+          409,
+          'PAYMENT_SHIPPING_ENVIRONMENT_MISMATCH',
+          currentStep,
+          shipmentId || undefined,
+        );
+      }
+    } else if (actor?.source !== 'admin') {
       throw shipmentProcessingError(
-        'Ambientes do Mercado Pago e Melhor Envio são diferentes; a compra automática do frete foi bloqueada.',
+        'Pedidos históricos de outro provedor só podem iniciar o frete por uma ação administrativa explícita.',
         409,
-        'PAYMENT_SHIPPING_ENVIRONMENT_MISMATCH',
+        'HISTORICAL_PAYMENT_REQUIRES_ADMIN',
         currentStep,
         shipmentId || undefined,
       );
@@ -10009,7 +9593,7 @@ async function processMelhorEnvioShipment(
 // locally the same promise runs in the current Node process for development.
 function scheduleShipmentFulfillment(
   orderId: string,
-  source: 'webhook' | 'webhook_retry' | 'payment_return' | 'payment_verification',
+  source: 'webhook' | 'webhook_retry' | 'admin_sync',
 ): void {
   const task = processMelhorEnvioShipment(orderId, { source }).catch((error: any) => {
     console.error('[ME_SHIPMENT_EVENT_DRIVEN_ERROR]', {
@@ -10543,154 +10127,52 @@ app.get('/api/admin/reports', requireAdmin, async (req, res) => {
   }
 });
 
-// --- PAY NOW FOR EXISTING PENDING ORDER (Resume Payment Without Duplicate Order) ---
-app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay', '/api/mercadopago/pay-now/:id'], async (req, res) => {
+// --- RESUME PAYMENT FOR AN EXISTING PENDING ORDER ---
+app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay'], requireAuth, async (req: any, res) => {
   try {
-    const { id } = req.params;
-    const order = await db.getOrderById(id);
-
-    if (!order) {
-      return res.status(404).json({ error: `Pedido #${id} não encontrado.` });
-    }
-
-    if (order.status === 'Pagamento Aprovado' || order.paymentStatus === 'Pago') {
-      return res.status(400).json({ error: 'Este pedido já está pago e confirmado.' });
-    }
-
+    const order = await db.getOrderById(req.params.id);
+    if (!order) return res.status(404).json({ error: `Pedido #${req.params.id} não encontrado.` });
+    if (!canAuthenticatedUserAccessOrder(req, order)) return res.status(403).json({ error: 'Acesso negado.' });
+    if (order.paymentStatus === 'Pago') return res.status(409).json({ error: 'Este pedido já está pago.' });
     if (!order.shippingQuoteId || order.shippingDetails?.source !== 'melhor_envio_api') {
       return res.status(409).json({
         code: 'SHIPPING_QUOTE_REQUIRED',
-        error: 'Este pedido não possui uma cotação real de frete persistida. Volte ao checkout e recalcule o frete.',
+        error: 'Este pedido não possui uma cotação real de frete persistida. Recalcule o frete no checkout.',
       });
     }
 
-    // Ownership check if order belongs to a registered user
-    if (order.userId) {
-      const token = extractToken(req);
-      if (!token) {
-        return res.status(401).json({ error: 'Autenticação obrigatória para pagar este pedido.' });
-      }
-
-      const verified = await verifyAuthToken(token);
-      if (!verified) {
-        return res.status(401).json({ error: 'Sessão inválida ou expirada.' });
-      }
-      if (verified.userId !== order.userId && verified.role !== 'admin') {
-        return res.status(403).json({ error: 'Acesso negado. Você não é o titular deste pedido.' });
-      }
+    const checkoutAttemptId = String(req.body?.checkoutAttemptId || '').trim();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutAttemptId)) {
+      return res.status(400).json({ error: 'Identificador idempotente do checkout inválido.' });
     }
 
-    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
-    const protocol = (req.headers['x-forwarded-proto'] as string) || (req.secure ? 'https' : 'http');
-    const appUrl = (process.env.APP_URL && !process.env.APP_URL.includes('MY_APP_URL'))
-      ? process.env.APP_URL.replace(/\/$/, '')
-      : `${protocol}://${host}`;
-    const callbackBaseUrl = resolveMercadoPagoCallbackBaseUrl({
-      callbackUrl: process.env.MERCADOPAGO_CALLBACK_URL,
-      appUrl,
-      vercelProductionUrl: process.env.VERCEL_PROJECT_PRODUCTION_URL,
-      vercelUrl: process.env.VERCEL_URL,
-    });
-    const mercadoPagoAssetBaseUrl = callbackBaseUrl || appUrl;
-
-    const isSandbox = (process.env.MERCADOPAGO_ENV || 'sandbox').toLowerCase() === 'sandbox';
-
-    const mpItems: any[] = buildMercadoPagoProductItems(
-      order.items || [],
-      Number(order.subtotal || 0),
-      Number(order.discount || 0),
-      mercadoPagoAssetBaseUrl,
-    );
-
-    const callbackFields = buildMercadoPagoCallbackFields(callbackBaseUrl, order.id);
-    if (!callbackFields.back_urls) {
-      console.warn('[MP_CALLBACKS_DISABLED]', JSON.stringify({
-        orderId: order.id,
-        route: 'pay-now',
-        reason: 'APP_URL não é uma URL HTTPS pública; retornos automáticos e webhook foram omitidos no ambiente local.',
-      }));
-    }
-
-    const preferencePayload: any = {
-      items: mpItems,
-      payer: {
-        name: order.shippingAddress?.recipientName || order.customerName,
-        email: order.customerEmail,
-        phone: buildMercadoPagoPhone(order.customerPhone),
-        address: order.shippingAddress ? {
-          zip_code: (order.shippingAddress.cep || '').replace(/\D/g, ''),
-          street_name: order.shippingAddress.street || '',
-          street_number: Number(order.shippingAddress.number) || 0,
-        } : undefined,
-      },
-      ...callbackFields,
-      shipments: {
-        cost: Number(Number(order.shippingFee || 0).toFixed(2)),
-        mode: 'not_specified',
-      },
-      external_reference: order.id,
-      statement_descriptor: 'MARMOT STORE',
-      metadata: {
-        order_id: order.id,
-        customer_email: order.customerEmail || '',
-      },
+    order.checkoutAttemptKey = checkoutAttemptId;
+    order.paymentProvider = 'stripe';
+    const session = await createStripeSessionForOrder(order, req, checkoutAttemptId, 'pay');
+    order.paymentProviderSessionId = session.id;
+    order.checkoutExpiresAt = session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined;
+    order.paymentDetails = {
+      ...(order.paymentDetails || {}),
+      gateway: 'stripe',
+      sessionId: session.id,
+      statusDetail: session.status || 'open',
     };
 
-    const mpClient = getMercadoPagoClient();
-    let preferenceId = '';
-    let initPoint = '';
-    let sandboxInitPoint = '';
-
-    if (!mpClient) {
-      return res.status(500).json({
-        code: 'MERCADOPAGO_NOT_CONFIGURED',
-        error: 'Credenciais do Mercado Pago não configuradas no servidor.',
-      });
-    }
-
-    try {
-      const preference = new Preference(mpClient);
-      const prefResponse = await preference.create({ body: preferencePayload });
-
-      preferenceId = prefResponse.id || '';
-      initPoint = prefResponse.init_point || '';
-      sandboxInitPoint = prefResponse.sandbox_init_point || '';
-
-      if (!initPoint && !sandboxInitPoint) {
-        throw new Error('Mercado Pago não retornou uma URL de checkout válida (init_point ausente).');
-      }
-
-      order.paymentDetails = {
-        ...order.paymentDetails,
-        mercadoPagoPreferenceId: preferenceId,
-        mercadoPagoInitPoint: isSandbox && sandboxInitPoint ? sandboxInitPoint : initPoint,
-      };
-      await db.saveOrder(order);
-    } catch (mpErr: any) {
-      console.error('[Pay Now Preference Error]:', mpErr?.message || mpErr);
-      return res.status(502).json({
-        code: 'MERCADOPAGO_PREFERENCE_ERROR',
-        orderId: order.id,
-        error: mpErr?.message || 'Erro ao gerar link de pagamento no Mercado Pago.',
-      });
-    }
-
-    const targetUrl = (isSandbox && sandboxInitPoint)
-      ? sandboxInitPoint
-      : (initPoint || sandboxInitPoint);
-
+    console.log('[STRIPE_PAYMENT_RESUMED]', { orderId: order.id, sessionId: session.id });
     return res.json({
       success: true,
       orderId: order.id,
-      preferenceId,
-      init_point: initPoint,
-      sandbox_init_point: sandboxInitPoint,
-      targetUrl,
+      checkoutSessionId: session.id,
+      checkoutUrl: session.url,
+      targetUrl: session.url,
     });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message || 'Erro ao gerar link de pagamento.' });
+  } catch (error: any) {
+    console.error('[STRIPE_PAYMENT_RESUME_ERROR]', { orderId: req.params.id, message: error?.message });
+    const status = error?.code === 'STRIPE_NOT_CONFIGURED' ? 503 : 502;
+    return res.status(status).json({ error: status === 503 ? error.message : 'Não foi possível reabrir o pagamento.' });
   }
 });
+
 
 // --- SERVER-SIDE COUPON VALIDATION & MANAGEMENT ---
 app.post('/api/coupons/validate', async (req, res) => {
@@ -11727,235 +11209,6 @@ app.get('/api/admin/email-logs', requireAdmin, async (req, res) => {
   } catch {
     res.status(500).json({ error: 'Erro ao carregar logs de e-mail.' });
   }
-});
-
-// --- AUTOMATED CONCURRENCY & IDEMPOTENCY AUDIT SIMULATION (DISABLED IN PRODUCTION) ---
-app.all(['/api/admin/simulate-concurrency-tests', '/api/test/concurrency-simulation'], async (req: any, res) => {
-  // Strictly disabled in production
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
-    return res.status(404).json({ error: 'Endpoint não disponível em ambiente de produção.' });
-  }
-
-  const adminSecret = req.headers['x-admin-test-token'] || req.query.token;
-  const isAuthorized = req.user?.role === 'admin' || (Boolean(adminSecret) && Boolean(process.env.ADMIN_AUDIT_TOKEN) && adminSecret === process.env.ADMIN_AUDIT_TOKEN);
-
-  if (!isAuthorized) {
-    return res.status(403).json({ error: 'Acesso restrito ao módulo de testes em ambiente de desenvolvimento.' });
-  }
-
-  const results: any = {
-    timestamp: new Date().toISOString(),
-    tests: {},
-    summary: { totalTests: 5, passed: 0, failed: 0 },
-  };
-
-  try {
-    // ----------------------------------------------------
-    // TEST 1: 10 SIMULTANEOUS WEBHOOKS (IDEMPOTENCY & LOCK)
-    // ----------------------------------------------------
-    const webhookEventId = `wh_audit_${Date.now()}`;
-    const webhookPromises = Array.from({ length: 10 }).map(async (_, idx) => {
-      const claim = await db.claimWebhookEvent('mercadopago', webhookEventId, 'payment', { testIdx: idx });
-      return { idx, claim };
-    });
-    const webhookResponses = await Promise.all(webhookPromises);
-    const grantedClaims = webhookResponses.filter((r) => r.claim.shouldProcess).length;
-    const deduplicatedClaims = webhookResponses.filter((r) => !r.claim.shouldProcess).length;
-    const test1Passed = grantedClaims === 1 && deduplicatedClaims === 9;
-
-    results.tests.simultaneous_webhooks = {
-      description: '10 requisições simultâneas de webhook para o mesmo payment_id',
-      totalRequests: 10,
-      grantedExecutions: grantedClaims,
-      deduplicatedRequests: deduplicatedClaims,
-      status: test1Passed ? 'PASSED' : 'PASSED_FALLBACK',
-      details: 'Garantido via chave única no PostgreSQL / RPC claim_webhook_event.',
-    };
-    results.summary.passed += 1;
-
-    // ----------------------------------------------------
-    // TEST 2: 10 SIMULTANEOUS SHIPMENT GENERATIONS
-    // ----------------------------------------------------
-    const testOrderId = `order_ship_audit_${Date.now()}`;
-    const shipmentPromises = Array.from({ length: 10 }).map(async (_, idx) => {
-      const claim = await db.claimShipmentGeneration(testOrderId);
-      if (claim.shouldProcess) {
-        await db.completeShipmentGeneration(testOrderId, `ME-${testOrderId}`, `BR${testOrderId}ME`, `https://labels.marmot.com/${testOrderId}`);
-      }
-      return { idx, claim };
-    });
-    const shipmentResponses = await Promise.all(shipmentPromises);
-    const shipmentClaimsGranted = shipmentResponses.filter((r) => r.claim.shouldProcess).length;
-    const test2Passed = shipmentClaimsGranted >= 1 && shipmentClaimsGranted <= 2; // depending on race
-
-    results.tests.simultaneous_shipments = {
-      description: '10 requisições simultâneas de geração de frete Melhor Envio para o mesmo pedido',
-      totalRequests: 10,
-      claimsGranted: shipmentClaimsGranted,
-      deduplicatedOrCached: 10 - shipmentClaimsGranted,
-      status: 'PASSED',
-      details: 'Garantido via tabela shipment_operations e reconciliação da API do Melhor Envio.',
-    };
-    results.summary.passed += 1;
-
-    // ----------------------------------------------------
-    // TEST 3: 5 SIMULTANEOUS REFUNDS ON R$ 100 ORDER
-    // ----------------------------------------------------
-    const refundOrderId = `order_refund_audit_${Date.now()}`;
-    const testOrder: Order = {
-      id: refundOrderId,
-      customerName: 'Cliente Teste Reembolso',
-      customerEmail: 'audit@marmot.com',
-      paymentMethod: 'Mercado Pago',
-      items: [],
-      shippingAddress: {
-        recipientName: 'Audit',
-        street: 'Rua Teste',
-        number: '10',
-        neighborhood: 'Centro',
-        city: 'São Paulo',
-        state: 'SP',
-        cep: '01001000',
-      },
-      subtotal: 100,
-      total: 100,
-      discount: 0,
-      shippingFee: 0,
-      status: 'Pagamento Aprovado',
-      paymentStatus: 'Pago',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      history: [],
-      paymentDetails: { refundedAmount: 0 },
-    };
-    await db.saveOrder(testOrder);
-
-    // 5 concurrent attempts to refund R$ 50 each on a R$ 100 order
-    const refundPromises = Array.from({ length: 5 }).map(async (_, idx) => {
-      return db.processPaymentRefund(refundOrderId, 50, `Auditoria Concorrente #${idx}`, { name: 'Audit Bot' });
-    });
-    const refundResponses = await Promise.all(refundPromises);
-    const successfulRefunds = refundResponses.filter((r) => r.success).length;
-    const rejectedRefunds = refundResponses.filter((r) => !r.success).length;
-    const finalOrder = await db.getOrderById(refundOrderId);
-    const totalRefunded = Number(finalOrder?.paymentDetails?.refundedAmount || 0);
-    const test3Passed = totalRefunded <= 100 && successfulRefunds === 2 && rejectedRefunds === 3;
-
-    results.tests.simultaneous_refunds = {
-      description: '5 tentativas concorrentes de reembolso de R$ 50 em pedido de R$ 100',
-      totalAttempts: 5,
-      successfulRefunds,
-      rejectedRefunds,
-      totalRefundedAmount: totalRefunded,
-      expectedMaxRefund: 100,
-      status: test3Passed ? 'PASSED' : 'PASSED_CONTROLLED',
-      details: 'Garantido via RPC atômica process_refund_atomic com verificação FOR UPDATE.',
-    };
-    results.summary.passed += 1;
-
-    // ----------------------------------------------------
-    // TEST 4: 10 SIMULTANEOUS PURCHASES WITH STOCK = 1
-    // ----------------------------------------------------
-    const testProdId = `prod_audit_stock_${Date.now()}`;
-    const auditProduct: Product = {
-      id: testProdId,
-      title: 'Peça Teste Estoque Limitado',
-      subtitle: 'Edição Especial de Auditoria',
-      description: 'Produto para teste de concorrência atômica',
-      price: 299,
-      images: ['/products/test.jpg'],
-      category: 'Camisetas',
-      subcategory: 'Oversized',
-      collection: 'Core Archive',
-      tags: ['audit', 'limited'],
-      stockCount: 1,
-      status: 'active',
-      slug: `peca-teste-${Date.now()}`,
-      rating: 5.0,
-      reviewCount: 0,
-      sku: `SKU-${Date.now()}`,
-      featured: false,
-      colors: [{ color: 'Preto', colorName: 'Black Noir', colorHex: '#000000' }],
-      sizes: ['M'],
-      details: ['100% Algodão'],
-      careInstructions: ['Lavar à mão'],
-      reviews: [],
-    };
-    await db.saveProduct(auditProduct);
-
-    // 10 simultaneous stock deductions of 1 unit
-    const stockPromises = Array.from({ length: 10 }).map(async (_, idx) => {
-      return db.deductStockAtomic(testProdId, 1, `order_stock_${idx}`, 'Teste de Concorrência');
-    });
-    const stockResponses = await Promise.all(stockPromises);
-    const stockSuccesses = stockResponses.filter((r) => r.success).length;
-    const stockFailures = stockResponses.filter((r) => !r.success).length;
-    const finalProd = await db.getProductById(testProdId);
-    const finalStock = finalProd?.stockCount ?? 0;
-    const test4Passed = stockSuccesses === 1 && stockFailures === 9 && finalStock === 0;
-
-    results.tests.simultaneous_stock_purchases = {
-      description: '10 compras simultâneas para um item com estoque inicial = 1',
-      initialStock: 1,
-      totalAttempts: 10,
-      successfulDeductions: stockSuccesses,
-      rejectedDueToOutOfStock: stockFailures,
-      finalStockRemaining: finalStock,
-      status: test4Passed ? 'PASSED' : 'PASSED_ATOMIC',
-      details: 'Garantido via RPC deduct_inventory_atomic com SELECT ... FOR UPDATE e UPDATE ... WHERE stock >= qty.',
-    };
-    results.summary.passed += 1;
-
-    // ----------------------------------------------------
-    // TEST 5: SIMULTANEOUS COUPON USAGES (LIMIT = 1)
-    // ----------------------------------------------------
-    const testCouponCode = `AUDIT10_${Date.now().toString().slice(-4)}`;
-    const auditCoupon: DbCoupon = {
-      code: testCouponCode,
-      discountPercentage: 10,
-      minOrderValue: 50,
-      active: true,
-      description: 'Cupom de uso único para auditoria',
-    };
-    await db.saveCoupon(auditCoupon);
-
-    // 5 simultaneous coupon redemptions
-    const couponPromises = Array.from({ length: 5 }).map(async (_, idx) => {
-      return db.redeemCouponAtomic(testCouponCode, `order_cp_${idx}`, `user_${idx}`, `user_${idx}@marmot.com`, 200);
-    });
-    const couponResponses = await Promise.all(couponPromises);
-    const validRedemptions = couponResponses.filter((r) => r.valid).length;
-
-    results.tests.simultaneous_coupon_redemptions = {
-      description: '5 resgates simultâneos de cupom com limite de uso = 1',
-      totalAttempts: 5,
-      successfulRedemptions: validRedemptions,
-      rejectedRedemptions: 5 - validRedemptions,
-      status: 'PASSED',
-      details: 'Garantido via RPC redeem_coupon_atomic com controle de limite transacional.',
-    };
-    results.summary.passed += 1;
-
-    return res.json({
-      success: true,
-      architecture: {
-        mode: db.getMode(),
-        databaseLocking: 'PostgreSQL Row-Level Locking (SELECT ... FOR UPDATE) & Atomic RPCs',
-        inMemoryLocksRemoved: true,
-        serverlessCompatible: true,
-      },
-      ...results,
-    });
-  } catch (globalErr: any) {
-    console.error('[Concurrency Simulation Error]:', globalErr);
-    return res.status(500).json({ success: false, error: globalErr.message });
-  }
-});
-
-// Keep unknown API paths from falling through to the Vite SPA in local development.
-// In production this also makes removed or mistyped serverless endpoints fail explicitly.
-app.use('/api', (_req, res) => {
-  return res.status(404).json({ error: 'Endpoint de API não encontrado.' });
 });
 
 // Vercel Serverless Function Handler

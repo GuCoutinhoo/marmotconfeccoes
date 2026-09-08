@@ -1,17 +1,1 @@
-[
-  {
-    "id": "cart-1788823785753-ltltp",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "productId": "prod-cam-002",
-    "selectedSize": "P",
-    "selectedColor": {
-      "color": "bege-marrom",
-      "colorName": "Bege + Marrom",
-      "colorHex": "#6c5145",
-      "image": "/uploads/products/prod-cam-002/a5522548598423d7.webp"
-    },
-    "quantity": 1,
-    "createdAt": "2026-09-07T23:29:45.753Z",
-    "updatedAt": "2026-09-07T23:29:45.753Z"
-  }
-]
+[]

@@ -40,7 +40,8 @@ test('Security & Architecture Audit Assertions', async (t) => {
     const backend = fs.readFileSync('api/index.ts', 'utf8');
 
     // Webhook fail-closed
-    assert.ok(backend.includes('MERCADOPAGO_WEBHOOK_SECRET ausente em produção'), 'Fail-closed MP webhook signature check missing');
+    assert.ok(backend.includes('webhooks.constructEvent(req.body, signature, webhookSecret)'), 'Fail-closed Stripe webhook signature check missing');
+    assert.ok(backend.includes('STRIPE_WEBHOOK_MODE_MISMATCH'), 'Stripe test/live mode isolation missing');
     assert.ok(backend.includes('RESEND_API_KEY não configurada no ambiente de produção'), 'Fail-closed Resend check missing');
 
     // Server-authoritative checkout & pricing

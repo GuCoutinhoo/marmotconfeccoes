@@ -11,7 +11,6 @@ import {
   Lock,
   ArrowRight,
   Truck,
-  Copy,
   Check,
   Package,
   ShoppingBag,
@@ -180,162 +179,112 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
   // Payment Selection
   const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'Cartão' | 'Boleto'>('PIX');
-  const [cardName, setCardName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvc, setCardCvc] = useState('');
-  const [cardInstallments, setCardInstallments] = useState('1');
+  const checkoutAttemptIdRef = useRef<string>(crypto.randomUUID());
+  const checkoutRequestInFlightRef = useRef(false);
 
   // Completed Order state
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
-  const [copiedPix, setCopiedPix] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [retryOrderId, setRetryOrderId] = useState<string | null>(null);
   const [isVerifyingStatus, setIsVerifyingStatus] = useState(false);
 
-  // Validate a Checkout Pro return using the exact payment_id at the backend.
-  // URL status fields are display hints only and are never trusted as approval.
+// The return page is read-only. It never marks a payment as paid; only the
+  // signed Stripe webhook can do that. A short polling window is used only to
+  // improve the UX while that webhook is being persisted.
+  const fetchPersistedPaymentStatus = async (orderId: string, sessionId?: string): Promise<Order> => {
+    const endpoint = sessionId
+      ? `/api/stripe/checkout-session/${encodeURIComponent(sessionId)}/status`
+      : `/api/stripe/orders/${encodeURIComponent(orderId)}/status`;
+    const response = await fetch(endpoint, { headers: getCheckoutAuthHeaders() });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok || !data.order) throw new Error(data.error || 'Não foi possível consultar o pedido.');
+    return data.order as Order;
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const orderIdParam = params.get('order_id') || params.get('external_reference');
-    const paymentIdParam = params.get('payment_id') || params.get('collection_id');
-    const isMercadoPagoReturn = Boolean(params.get('mp_return') || params.get('preference_id') || paymentIdParam);
+    const returnState = params.get('stripe_return');
+    const orderId = params.get('order_id') || '';
+    const sessionId = params.get('session_id') || undefined;
+    if (!returnState) return;
 
-    if (isMercadoPagoReturn && (!orderIdParam || !paymentIdParam)) {
-      showToast(
-        'Retorno de pagamento incompleto',
-        'O Mercado Pago não informou os identificadores necessários. Consulte o pedido na sua conta.',
-        'error',
-      );
+    if (!orderId || (returnState === 'success' && !sessionId)) {
+      showToast('Retorno incompleto', 'Não foi possível identificar o pedido retornado pela Stripe.', 'error');
       return;
     }
 
-    if (orderIdParam && paymentIdParam) {
-      (async () => {
-        setIsVerifyingStatus(true);
-        try {
-          const res = await fetch('/api/mercado-pago/return/verify', {
-            method: 'POST',
-            headers: getCheckoutAuthHeaders(true),
-            body: JSON.stringify({ orderId: orderIdParam, paymentId: paymentIdParam }),
-          });
+    let cancelled = false;
+    let timer: number | undefined;
+    let attempts = 0;
+    const maxAttempts = returnState === 'success' ? 20 : 1;
 
-          if (res.ok) {
-            const data = await res.json();
-            if (data.paymentValidated !== true) {
-              throw new Error('O backend não confirmou a vinculação do pagamento ao pedido.');
-            }
-
-            const returnedOrder: Order = data.order;
-            setCompletedOrder(returnedOrder);
-            registerOrder(returnedOrder);
-            setStep(3);
-
-            if (data.approved === true && data.status === 'approved' && returnedOrder.paymentStatus === 'Pago') {
-              // Only clear cart upon confirmed payment approval
-              clearCart();
-              showToast('Pagamento Aprovado!', `Seu pedido #${returnedOrder.id} foi confirmado pelo Mercado Pago.`, 'success');
-            } else if (data.status === 'rejected' || returnedOrder.paymentStatus === 'Recusado') {
-              showToast('Pagamento Não Autorizado', 'O pagamento não foi aprovado pelo Mercado Pago. Você pode tentar outro método.', 'error');
-            } else {
-              showToast('Pagamento Pendente', 'Seu pedido foi registrado, mas o pagamento ainda não foi confirmado.', 'info');
-            }
-          } else {
-            const errorData = await res.json().catch(() => ({}));
-            throw new Error(errorData.error || 'Não foi possível validar o pagamento diretamente no Mercado Pago.');
-          }
-        } catch (err: any) {
-          console.error('[Return from MP verification error]', err);
-          showToast(
-            'Pagamento ainda não confirmado',
-            err?.message || 'Consulte o pedido na sua conta antes de tentar novamente.',
-            'error',
-          );
-        } finally {
-          setIsVerifyingStatus(false);
-        }
-      })();
-    }
-  }, []);
-
-  // Automatic real-time status polling when order is pending on Step 3
-  useEffect(() => {
-    if (step !== 3 || !completedOrder) return;
-    const isApproved = completedOrder.status === 'Pagamento Aprovado' || completedOrder.paymentStatus === 'Pago';
-    const isRejected = completedOrder.status === 'Pagamento Recusado' || completedOrder.paymentStatus === 'Recusado' || completedOrder.status === 'Cancelado';
-    if (isApproved || isRejected) return;
-
-    let pollCount = 0;
-    const maxPolls = 20; // 20 polls * 3.5s = 70 seconds total window
-
-    const timer = setInterval(async () => {
-      pollCount += 1;
-      if (pollCount > maxPolls) {
-        clearInterval(timer);
-        return;
-      }
-
+    const refresh = async () => {
       try {
-        const paymentId = completedOrder.paymentDetails?.mercadoPagoPaymentId;
-        const verifyUrl = `/api/mercadopago/verify-payment/${encodeURIComponent(completedOrder.id)}${paymentId ? `?payment_id=${encodeURIComponent(paymentId)}` : ''}`;
-        const res = await fetch(verifyUrl, { headers: getCheckoutAuthHeaders() });
-        if (res.ok) {
-          const data = await res.json();
-          const updatedOrder: Order = data.order;
-          if (data.approved || updatedOrder.status === 'Pagamento Aprovado' || updatedOrder.paymentStatus === 'Pago') {
-            setCompletedOrder(updatedOrder);
-            registerOrder(updatedOrder);
-            clearCart();
-            showToast('Pagamento Confirmado!', `Pedido #${updatedOrder.id} aprovado com sucesso!`, 'success');
-            clearInterval(timer);
-          } else if (updatedOrder.status === 'Pagamento Recusado' || updatedOrder.paymentStatus === 'Recusado') {
-            setCompletedOrder(updatedOrder);
-            registerOrder(updatedOrder);
-            clearInterval(timer);
-          }
-        }
-      } catch (err) {
-        console.warn('[Auto Polling Error]:', err);
-      }
-    }, 3500);
+        setIsVerifyingStatus(true);
+        const order = await fetchPersistedPaymentStatus(orderId, sessionId);
+        if (cancelled) return;
+        setCompletedOrder(order);
+        registerOrder(order);
+        setStep(3);
+        if (order.paymentStatus !== 'Pago') setRetryOrderId(order.id);
 
-    return () => clearInterval(timer);
-  }, [step, completedOrder?.id, completedOrder?.status, completedOrder?.paymentStatus]);
+        if (order.paymentStatus === 'Pago') {
+          clearCart();
+          showToast('Pagamento confirmado!', `Pedido #${order.id} confirmado com segurança.`, 'success');
+          return;
+        }
+        if (order.paymentStatus === 'Recusado' || order.paymentStatus === 'Cancelado') {
+          showToast('Pagamento não concluído', 'Seu carrinho foi preservado para uma nova tentativa.', 'info');
+          return;
+        }
+
+        attempts += 1;
+        if (attempts < maxAttempts && !cancelled) {
+          timer = window.setTimeout(refresh, 2_500);
+        } else if (returnState === 'success') {
+          showToast('Confirmação em processamento', 'A Stripe ainda está processando o pagamento. Você pode acompanhar em Meus Pedidos.', 'info');
+        } else {
+          showToast('Checkout cancelado', 'O pedido não foi marcado como pago e o carrinho continua salvo.', 'info');
+        }
+      } catch (error: any) {
+        if (!cancelled) showToast('Status indisponível', error?.message || 'Consulte novamente em Meus Pedidos.', 'error');
+      } finally {
+        if (!cancelled) setIsVerifyingStatus(false);
+      }
+    };
+
+    refresh();
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, []);
 
   const handleVerifyPaymentNow = async () => {
     if (!completedOrder) return;
     setIsVerifyingStatus(true);
     try {
-      const paymentId = completedOrder.paymentDetails?.mercadoPagoPaymentId;
-      const verifyUrl = `/api/mercadopago/verify-payment/${encodeURIComponent(completedOrder.id)}${paymentId ? `?payment_id=${encodeURIComponent(paymentId)}` : ''}`;
-      const res = await fetch(verifyUrl, { headers: getCheckoutAuthHeaders() });
-
-      if (res.ok) {
-        const data = await res.json();
-        const updatedOrder: Order = data.order;
-        setCompletedOrder(updatedOrder);
-        registerOrder(updatedOrder);
-
-        if (data.approved || updatedOrder.status === 'Pagamento Aprovado' || updatedOrder.paymentStatus === 'Pago') {
-          clearCart();
-          showToast('Pagamento Aprovado!', `Pagamento do pedido #${updatedOrder.id} aprovado com sucesso!`, 'success');
-        } else if (updatedOrder.status === 'Pagamento Recusado' || updatedOrder.paymentStatus === 'Recusado') {
-          showToast('Pagamento Recusado', 'O pagamento foi recusado pelo Mercado Pago.', 'error');
-        } else {
-          showToast('Status Atualizado', 'O pedido permanece com pagamento pendente. Aguardando confirmação.', 'info');
-        }
+      const updatedOrder = await fetchPersistedPaymentStatus(
+        completedOrder.id,
+        completedOrder.paymentProviderSessionId || completedOrder.paymentDetails?.sessionId,
+      );
+      setCompletedOrder(updatedOrder);
+      registerOrder(updatedOrder);
+      if (updatedOrder.paymentStatus === 'Pago') {
+        clearCart();
+        showToast('Pagamento confirmado!', `Pedido #${updatedOrder.id} aprovado.`, 'success');
       } else {
-        showToast('Aviso', 'Não foi possível atualizar o status agora. Tente novamente em instantes.', 'info');
+        showToast('Status atualizado', 'A confirmação pelo webhook da Stripe ainda está pendente.', 'info');
       }
-    } catch (err) {
-      console.error('[Manual Verify Error]:', err);
-      showToast('Erro', 'Falha ao consultar Mercado Pago.', 'error');
+    } catch (error: any) {
+      showToast('Erro', error?.message || 'Não foi possível consultar o pedido.', 'error');
     } finally {
       setIsVerifyingStatus(false);
     }
   };
+
 
   // Calculate live shipping on page load if address CEP is present
   useEffect(() => {
@@ -486,16 +435,18 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       }
     }
 
-    // Directly create preference and redirect to Mercado Pago Checkout
+    // Create the pending order and hosted Stripe Checkout Session.
     await handlePlaceOrder();
   };
 
   const handlePlaceOrder = async () => {
+    if (checkoutRequestInFlightRef.current) return;
     if (cartItems.length === 0) {
       showToast('Carrinho Vazio', 'Adicione produtos antes de finalizar.', 'error');
       return;
     }
 
+    checkoutRequestInFlightRef.current = true;
     setIsPlacingOrder(true);
     setIsRedirecting(true);
 
@@ -508,14 +459,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         ? 'Cartão de Crédito'
         : paymentMethod === 'Boleto'
         ? 'Boleto Bancário'
-        : paymentMethod === 'PIX'
-        ? 'PIX'
-        : 'Mercado Pago Checkout Pro';
+        : 'PIX';
 
       const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
       const orderPayload = {
         ...(retryOrderId ? { existingOrderId: retryOrderId } : {}),
-        userId: user?.id || undefined,
+        checkoutAttemptId: checkoutAttemptIdRef.current,
         items: cartItems.map((item) => ({
           productId: item.product.id,
           quantity: item.quantity,
@@ -524,7 +473,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         })),
         couponCode: appliedCoupon?.code || (couponCodeInput.trim() ? couponCodeInput.trim() : undefined),
         paymentMethod: targetPaymentMethod,
-        shippingFee,
         shippingAddress: {
           ...address,
           cep: cleanCep,
@@ -554,8 +502,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
 
-      // Call backend secure Mercado Pago preference endpoint
-      const res = await fetch('/api/mercado-pago/create-preference', {
+      const res = await fetch('/api/stripe/checkout-session', {
         method: 'POST',
         headers,
         body: JSON.stringify(orderPayload),
@@ -566,14 +513,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         if (typeof errData.orderId === 'string' && errData.orderId.trim()) {
           setRetryOrderId(errData.orderId.trim());
         }
-        throw new Error(errData.message || errData.error || 'Erro ao gerar o checkout do Mercado Pago.');
+        throw new Error(errData.error || 'Erro ao gerar o checkout seguro da Stripe.');
       }
 
       const data = await res.json();
-      const targetCheckoutUrl = data.targetUrl || data.init_point || data.sandbox_init_point || data.initPoint || data.sandboxInitPoint;
+      const targetCheckoutUrl = data.checkoutUrl || data.targetUrl;
 
       if (!targetCheckoutUrl) {
-        throw new Error('Link de pagamento não retornado pelo Mercado Pago.');
+        throw new Error('Link de pagamento não retornado pela Stripe.');
       }
 
       if (data.order) {
@@ -583,26 +530,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       setRetryOrderId(null);
 
       setRedirectUrl(targetCheckoutUrl);
-      // NOTE: Cart is NOT cleared here! Only cleared after verified approval from Mercado Pago.
+      // The cart stays intact until the signed webhook confirms the payment.
 
-      showToast('Redirecionando...', 'Abrindo o Checkout Seguro do Mercado Pago.', 'info');
+      showToast('Redirecionando...', 'Abrindo o Checkout seguro da Stripe.', 'info');
 
-      // Direct redirection to Mercado Pago
       window.location.assign(targetCheckoutUrl);
     } catch (err: any) {
       console.error('[Checkout Place Order Error]', err);
       showToast('Erro ao finalizar pedido', err.message || 'Tente novamente.', 'error');
       setIsRedirecting(false);
       setIsPlacingOrder(false);
-    }
-  };
-
-  const handleCopyPix = () => {
-    if (completedOrder?.paymentDetails?.pixCopiaECola) {
-      navigator.clipboard.writeText(completedOrder.paymentDetails.pixCopiaECola);
-      setCopiedPix(true);
-      showToast('PIX Copiado!', 'Código copia e cola salvo na área de transferência.', 'info');
-      setTimeout(() => setCopiedPix(false), 3000);
+      checkoutRequestInFlightRef.current = false;
     }
   };
 
@@ -612,7 +550,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         {/* Header Steps */}
         <div className="mb-10 text-center">
           <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">
-            CHECKOUT SEGURO • MERCADO PAGO
+            CHECKOUT SEGURO • STRIPE
           </h1>
 
           <div className="flex items-center justify-center gap-4 mt-6 max-w-md mx-auto">
@@ -684,7 +622,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       PAGAMENTO PENDENTE
                     </h2>
                     <p className="text-xs text-[#52525B] mt-2 max-w-lg mx-auto">
-                      Seu pedido foi registrado no sistema, mas o pagamento <strong>ainda não foi confirmado</strong> pelo Mercado Pago.
+                      Seu pedido foi registrado, mas o pagamento <strong>ainda não foi confirmado</strong> pelo webhook da Stripe.
                     </p>
                   </div>
 
@@ -693,7 +631,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       <AlertTriangle className="w-4 h-4" /> Informações sobre o seu pagamento:
                     </div>
                     <p className="text-xs text-[#52525B] leading-relaxed">
-                      Caso já tenha concluído o pagamento via PIX ou Boleto, a compensação pode levar alguns instantes. Se você fechou o checkout antes de pagar, utilize o botão abaixo para concluir o pagamento no Mercado Pago.
+                      PIX e boleto podem levar alguns instantes para confirmar. O pedido será atualizado automaticamente assim que a Stripe notificar a Marmot.
                     </p>
                   </div>
                 </>
@@ -717,46 +655,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       PAGAMENTO NÃO CONCLUÍDO
                     </h2>
                     <p className="text-xs text-[#71717A] mt-2 max-w-lg mx-auto">
-                      A transação não foi aprovada pelo Mercado Pago ou operadora do cartão. Seus itens continuam salvos no carrinho para você tentar novamente.
+                      A transação não foi aprovada pela Stripe ou pela instituição financeira. Seus itens continuam salvos no carrinho para uma nova tentativa.
                     </p>
                   </div>
                 </>
-              )}
-
-              {/* PIX Payment Banner if PIX selected & still pending */}
-              {isPending && completedOrder.paymentMethod === 'PIX' && completedOrder.paymentDetails?.pixQrCode && (
-                <div className="bg-[#F8F9FA] border border-[#B45309] p-6 rounded-xl space-y-4 text-left">
-                  <div className="flex items-center justify-between border-b border-[#E4E4E7] pb-3">
-                    <div className="flex items-center gap-2">
-                      <QrCode className="w-5 h-5 text-[#B45309]" />
-                      <span className="text-xs font-black uppercase text-[#18181B]">Pague via PIX com 5% de Desconto</span>
-                    </div>
-                    <span className="text-xs font-bold text-[#B45309]">R$ {completedOrder.total.toFixed(2).replace('.', ',')}</span>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-6 pt-2">
-                    <img
-                      src={completedOrder.paymentDetails.pixQrCode}
-                      alt="QR Code PIX"
-                      className="w-40 h-40 bg-white p-2 rounded-lg border border-[#E4E4E7] shadow-xs"
-                    />
-                    <div className="space-y-3 flex-1">
-                      <p className="text-xs text-[#52525B]">
-                        Escaneie o QR Code acima pelo app do seu banco ou copie a chave aleatória abaixo:
-                      </p>
-                      <button
-                        onClick={handleCopyPix}
-                        className="w-full bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-extrabold text-xs uppercase py-3 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-                      >
-                        {copiedPix ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                        {copiedPix ? 'CÓDIGO COPIADO!' : 'COPIAR CHAVE PIX COPIA E COLA'}
-                      </button>
-                      <p className="text-[10px] text-[#71717A] text-center sm:text-left">
-                        Aprovação instantânea 24h por dia via Mercado Pago.
-                      </p>
-                    </div>
-                  </div>
-                </div>
               )}
 
               {/* Order Details Summary Card */}
@@ -814,23 +716,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 {isPending && (
                   <div className="space-y-3">
                     <div className="flex flex-col sm:flex-row gap-3">
-                      {completedOrder.paymentDetails?.mercadoPagoInitPoint && (
-                        <a
-                          href={completedOrder.paymentDetails.mercadoPagoInitPoint}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-black text-xs uppercase py-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-                        >
-                          <CreditCard className="w-4 h-4" /> Concluir Pagamento no Mercado Pago <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
                       <button
                         onClick={handleVerifyPaymentNow}
                         disabled={isVerifyingStatus}
                         className="flex-1 bg-[#18181B] text-white hover:bg-black font-bold text-xs uppercase py-4 rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
                       >
                         {isVerifyingStatus ? <Loader2 className="w-4 h-4 animate-spin text-[#F4C400]" /> : <RefreshCw className="w-4 h-4" />}
-                        {isVerifyingStatus ? 'Consultando Mercado Pago...' : 'Verificar Pagamento Agora'}
+                        {isVerifyingStatus ? 'Consultando pedido...' : 'Atualizar Status do Pedido'}
                       </button>
                     </div>
 
@@ -1276,7 +1168,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                     {isRedirecting || isPlacingOrder ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>REDIRECIONANDO PARA O MERCADO PAGO...</span>
+                        <span>REDIRECIONANDO PARA A STRIPE...</span>
                       </>
                     ) : (
                       <>
@@ -1292,7 +1184,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 <div className="bg-white border border-[#E4E4E7] p-6 sm:p-8 rounded-2xl space-y-6 animate-fadeIn shadow-xs">
                   <div className="flex justify-between items-center border-b border-[#E4E4E7] pb-4">
                     <h2 className="text-sm font-black uppercase tracking-wider text-[#18181B] flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-[#B45309]" /> 2. Método de Pagamento (Mercado Pago)
+                      <CreditCard className="w-4 h-4 text-[#B45309]" /> 2. Método de Pagamento (Stripe)
                     </h2>
                     <button
                       onClick={() => setStep(1)}
@@ -1348,75 +1240,22 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                         <Check className="w-4 h-4" /> Desconto de 5% aplicado automaticamente
                       </p>
                       <p className="text-xs text-[#52525B] leading-relaxed">
-                        Ao clicar em "Finalizar Pedido", geraremos o QR Code oficial e a chave copia e cola PIX do Mercado Pago.
+                        O QR Code e o código copia e cola serão exibidos no Checkout hospedado e seguro da Stripe.
                       </p>
                     </div>
                   )}
 
-                  {/* Credit Card Form */}
                   {paymentMethod === 'Cartão' && (
-                    <div className="space-y-4 bg-[#F8F9FA] border border-[#E4E4E7] p-5 rounded-xl">
-                      <div>
-                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">Número do Cartão</label>
-                        <input
-                          type="text"
-                          value={cardNumber}
-                          onChange={(e) => setCardNumber(e.target.value)}
-                          placeholder="4532 •••• •••• 8812"
-                          className="w-full bg-white border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">Nome Impresso no Cartão</label>
-                        <input
-                          type="text"
-                          value={cardName}
-                          onChange={(e) => setCardName(e.target.value)}
-                          placeholder="EX: LUCAS MENDES"
-                          className="w-full bg-white border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-[11px] font-bold text-[#71717A] block mb-1">Validade (MM/AA)</label>
-                          <input
-                            type="text"
-                            value={cardExpiry}
-                            onChange={(e) => setCardExpiry(e.target.value)}
-                            placeholder="08/28"
-                            className="w-full bg-white border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-[11px] font-bold text-[#71717A] block mb-1">CVV</label>
-                          <input
-                            type="text"
-                            value={cardCvc}
-                            onChange={(e) => setCardCvc(e.target.value)}
-                            placeholder="123"
-                            className="w-full bg-white border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">Parcelamento</label>
-                        <select
-                          value={cardInstallments}
-                          onChange={(e) => setCardInstallments(e.target.value)}
-                          className="w-full bg-white border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                        >
-                          <option value="1">1x de R$ {grandTotal.toFixed(2).replace('.', ',')} sem juros</option>
-                          <option value="2">2x de R$ {(grandTotal / 2).toFixed(2).replace('.', ',')} sem juros</option>
-                          <option value="3">3x de R$ {(grandTotal / 3).toFixed(2).replace('.', ',')} sem juros</option>
-                          <option value="6">6x de R$ {(grandTotal / 6).toFixed(2).replace('.', ',')} sem juros</option>
-                          <option value="10">10x de R$ {(grandTotal / 10).toFixed(2).replace('.', ',')} sem juros</option>
-                        </select>
-                      </div>
+                    <div className="bg-[#F8F9FA] border border-[#E4E4E7] p-5 rounded-xl space-y-2">
+                      <p className="text-xs font-bold text-[#18181B] uppercase flex items-center gap-2">
+                        <Lock className="w-4 h-4 text-[#B45309]" /> Dados preenchidos somente na Stripe
+                      </p>
+                      <p className="text-xs text-[#71717A] leading-relaxed">
+                        A Marmot não coleta nem armazena número, validade ou código de segurança do cartão.
+                      </p>
                     </div>
                   )}
+
 
                   {/* Boleto Info */}
                   {paymentMethod === 'Boleto' && (
@@ -1571,7 +1410,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
           </div>
         )}
 
-        {/* Mercado Pago Redirection Overlay Modal */}
+        {/* Stripe Checkout redirection overlay */}
         {isRedirecting && (
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-white border border-[#E4E4E7] rounded-2xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
@@ -1581,13 +1420,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
               <div>
                 <span className="text-[11px] font-mono font-bold text-[#B45309] uppercase tracking-widest block mb-1">
-                  MERCADO PAGO CHECKOUT
+                  STRIPE CHECKOUT
                 </span>
                 <h3 className="text-xl font-black uppercase text-[#18181B]">
                   Redirecionando...
                 </h3>
                 <p className="text-xs text-[#71717A] mt-2 leading-relaxed">
-                  Você está sendo transferido com segurança para o ambiente oficial de pagamentos do Mercado Pago (PIX com 5% OFF, Cartão ou Boleto).
+                  Você está sendo transferido para o Checkout hospedado da Stripe. A Marmot não recebe os dados do seu cartão.
                 </p>
               </div>
 
@@ -1597,7 +1436,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                     href={redirectUrl}
                     className="w-full bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-black text-xs uppercase py-3.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                   >
-                    <span>ABRIR CHECKOUT MERCADO PAGO</span>
+                    <span>ABRIR CHECKOUT STRIPE</span>
                     <ExternalLink className="w-4 h-4" />
                   </a>
                   <p className="text-[10px] text-[#71717A]">

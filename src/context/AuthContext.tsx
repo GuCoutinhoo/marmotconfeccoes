@@ -1283,8 +1283,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // 1. Update local reactive state immediately
     registerOrder(newOrder);
 
-    // 2. Only perform POST /api/user/orders if the order was not already persisted by backend checkout preference flow
-    if (!newOrder.paymentDetails?.mercadoPagoPreferenceId) {
+    // 2. A Checkout Session means the backend already persisted this order.
+    if (!newOrder.paymentProviderSessionId && !newOrder.paymentDetails?.sessionId) {
       try {
         const res = await fetch('/api/user/orders', {
           method: 'POST',

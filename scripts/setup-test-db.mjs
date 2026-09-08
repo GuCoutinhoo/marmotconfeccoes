@@ -26,11 +26,12 @@ CREATE TABLE IF NOT EXISTS public.orders (
   payment_status TEXT DEFAULT 'Pendente',
   shipping_status TEXT DEFAULT 'Pendente',
   payment_method TEXT,
+  payment_provider TEXT,
+  payment_provider_payment_id TEXT,
   shipping_address JSONB DEFAULT '{}'::jsonb,
   items JSONB DEFAULT '[]'::jsonb,
   paid_at TIMESTAMPTZ,
   separation_started_at TIMESTAMPTZ,
-  mercado_pago_payment_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -91,11 +92,10 @@ CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
   p_payment_id TEXT,
   p_amount NUMERIC,
   p_currency TEXT DEFAULT 'BRL',
-  p_gateway TEXT DEFAULT 'mercadopago',
-  p_payment_method TEXT DEFAULT 'Mercado Pago',
+  p_gateway TEXT DEFAULT 'stripe',
+  p_payment_method TEXT DEFAULT 'Stripe Checkout',
   p_date_approved TIMESTAMPTZ DEFAULT NOW(),
-  p_items JSONB DEFAULT '[]'::jsonb,
-  p_raw_payload JSONB DEFAULT '{}'::jsonb
+  p_items JSONB DEFAULT '[]'::jsonb
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -137,8 +137,8 @@ BEGIN
     );
   END IF;
 
-  -- 3. Validate financial amount (Anti-tampering: exact bidirectional balance within R$ 0.05 tolerance)
-  IF (p_amount < (v_order.total - 0.05) OR p_amount > (v_order.total + 0.05)) THEN
+  -- 3. Validate the exact amount in cents.
+  IF ROUND(p_amount * 100) <> ROUND(v_order.total * 100) OR UPPER(p_currency) <> 'BRL' THEN
     UPDATE public.orders
     SET payment_status = 'Pagamento Divergente',
         updated_at = NOW()
@@ -254,9 +254,9 @@ BEGIN
 
   -- 7. Record Financial Ledger Effect (Single Source of Truth)
   INSERT INTO public.payment_effects (
-    gateway, payment_id, order_id, amount, currency, payment_method, status, raw_payload
+    gateway, payment_id, order_id, amount, currency, payment_method, status
   ) VALUES (
-    p_gateway, p_payment_id, p_order_id, p_amount, p_currency, p_payment_method, 'approved', p_raw_payload
+    p_gateway, p_payment_id, p_order_id, p_amount, p_currency, p_payment_method, 'approved'
   )
   ON CONFLICT (gateway, payment_id) DO NOTHING;
 
@@ -264,10 +264,11 @@ BEGIN
   UPDATE public.orders
   SET status = 'Em Separação',
       payment_status = 'Pago',
+      payment_provider = p_gateway,
+      payment_provider_payment_id = p_payment_id,
       shipping_status = 'Preparando',
       paid_at = COALESCE(p_date_approved, NOW()),
       separation_started_at = COALESCE(separation_started_at, NOW()),
-      mercado_pago_payment_id = p_payment_id,
       updated_at = NOW()
   WHERE id = p_order_id;
 
