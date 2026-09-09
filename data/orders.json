@@ -1,54 +1,280 @@
 [
   {
-    "id": "MM-347949-9350",
-    "date": "28/08/2026",
+    "id": "MM-628704-5186",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "customerCpf": "44606992816",
+    "date": "09/09/2026",
+    "status": "Aguardando Pagamento",
+    "paymentStatus": "Pendente",
+    "paymentProvider": "infinitepay",
+    "checkoutAttemptKey": "271c2ec4-0e7c-4bc3-8eed-c335a0e9b495",
+    "paymentMethod": "InfinitePay Checkout",
+    "paymentDetails": {
+      "gateway": "infinitepay",
+      "statusDetail": "creating_checkout"
+    },
     "items": [
       {
-        "id": "item-1787881347949-brpu",
+        "id": "item-5415293a-1e49-49e0-ae3e-5c85a0069213",
+        "productId": "prod-cam-002",
         "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "price": 189.9,
         "title": "Camiseta Double Layer",
-        "width": 25,
-        "height": 4,
-        "length": 30,
-        "weight": 0.35,
+        "image": "/uploads/products/prod-cam-002/a5522548598423d7.webp",
+        "size": "P",
+        "color": "bege-marrom",
+        "colorName": "Bege + Marrom",
+        "price": 189.9,
         "quantity": 1,
         "subtotal": 189.9,
-        "productId": "prod-cam-002"
+        "weight": 1,
+        "height": 4,
+        "width": 12,
+        "length": 17
       }
     ],
+    "subtotal": 189.9,
+    "discount": 0,
+    "couponDiscount": 0,
+    "paymentMethodDiscount": 0,
+    "shippingFee": 15.97,
+    "shippingPrice": 15.97,
     "total": 205.87,
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "phone": "",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingQuoteId": "sq_1788980714923_94mi1h",
+    "shippingOption": {
+      "quoteId": "sq_1788980714923_94mi1h",
+      "serviceId": 2,
+      "companyId": 1,
+      "carrier": "Correios",
+      "company": "Correios",
+      "name": "SEDEX",
+      "serviceName": "SEDEX",
+      "quotedPrice": 15.97,
+      "customerPrice": 15.97,
+      "originalPrice": 15.97,
+      "deliveryTime": 2,
+      "currency": "BRL",
+      "originPostalCode": "03806010",
+      "destinationPostalCode": "01311100",
+      "environment": "production"
+    },
+    "shippingDetails": {
+      "source": "melhor_envio_api",
+      "quoteId": "sq_1788980714923_94mi1h",
+      "quotedAt": "2026-09-09T19:05:15.662049+00:00",
+      "quoteExpiresAt": "2026-09-09T20:05:14.924+00:00",
+      "destination": {
+        "id": "addr-1788638781395-1855",
+        "cep": "01311100",
+        "city": "São Paulo",
+        "phone": "",
+        "state": "SP",
+        "number": "630",
+        "street": "Avenida Paulista",
+        "isDefault": true,
+        "complement": "",
+        "neighborhood": "Bela Vista",
+        "recipientName": "cliente"
+      }
+    },
+    "shippingProvider": "Melhor Envio",
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "estimatedDelivery": "2 dias úteis",
+    "shippingStatus": "Aguardando preparação",
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "09/09/2026, 16:37:08",
+        "description": "Pedido registrado. Aguardando confirmação segura do pagamento pela InfinitePay."
+      }
+    ],
+    "createdAt": "2026-09-09T19:37:08.704Z"
+  },
+  {
+    "id": "MM-609887-4256",
+    "date": "09/09/2026",
+    "items": [
+      {
+        "id": "item-42e5a360-bbc9-4ce7-957e-5b87dcc2c75c",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "black",
+        "image": "/uploads/products/prod-cam-001/8badc748448e13dc.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "colorName": "Preto",
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 165.47,
     "status": "Aguardando Pagamento",
     "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 01:42:27",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+        "timestamp": "09/09/2026, 16:36:49",
+        "description": "Pedido registrado. Aguardando confirmação segura do pagamento pela InfinitePay."
       }
     ],
     "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-08-28T01:42:27.980Z",
-    "customerCpf": "",
-    "shippingFee": 15.97,
+    "subtotal": 149.9,
+    "createdAt": "2026-09-09T19:36:49.903Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.57,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
+    "customerPhone": "11937500667",
+    "paymentMethod": "InfinitePay Checkout",
     "paymentStatus": "Pendente",
+    "shippingPrice": 15.57,
+    "couponDiscount": 0,
+    "paymentDetails": {
+      "gateway": "infinitepay",
+      "statusDetail": "INFINITEPAY_INVALID_CHECKOUT_URL"
+    },
+    "shippingOption": {
+      "name": "SEDEX",
+      "carrier": "Correios",
+      "company": "Correios",
+      "quoteId": "sq_1788982602718_n29ybz",
+      "currency": "BRL",
+      "companyId": 1,
+      "serviceId": 2,
+      "environment": "production",
+      "quotedPrice": 15.57,
+      "serviceName": "SEDEX",
+      "deliveryTime": 2,
+      "customerPrice": 15.57,
+      "originalPrice": 15.57,
+      "originPostalCode": "03806010",
+      "destinationPostalCode": "01311100"
+    },
     "shippingStatus": "Aguardando preparação",
+    "paymentProvider": "infinitepay",
     "shippingAddress": {
-      "id": "addr-1787166871376-6986",
+      "id": "addr-1788638781395-1855",
       "cep": "01311100",
       "city": "São Paulo",
       "state": "SP",
       "number": "630",
       "street": "Avenida Paulista",
-      "isDefault": false,
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingDetails": {
+      "source": "melhor_envio_api",
+      "quoteId": "sq_1788982602718_n29ybz",
+      "quotedAt": "2026-09-09T19:36:43.255087+00:00",
+      "destination": {
+        "id": "addr-1788638781395-1855",
+        "cep": "01311100",
+        "city": "São Paulo",
+        "state": "SP",
+        "number": "630",
+        "street": "Avenida Paulista",
+        "isDefault": true,
+        "complement": "",
+        "neighborhood": "Bela Vista",
+        "recipientName": "cliente"
+      },
+      "quoteExpiresAt": "2026-09-09T20:36:42.718+00:00"
+    },
+    "shippingQuoteId": "sq_1788982602718_n29ybz",
+    "shippingService": "SEDEX",
+    "shippingProvider": "Melhor Envio",
+    "estimatedDelivery": "2 dias úteis",
+    "shippingServiceId": "2",
+    "checkoutAttemptKey": "f8f9f1d4-a6ce-44bb-b049-262576363520",
+    "shippingDeliveryTime": 2,
+    "labelGenerationStatus": "not_started",
+    "paymentMethodDiscount": 0,
+    "shipmentPurchaseStatus": "not_started"
+  },
+  {
+    "id": "MM-205629-8577",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788745205481-l8ru",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 165.47,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 22:40:05",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 149.9,
+    "createdAt": "2026-09-07T01:40:05.629Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.57,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620",
+      "mercadoPagoPreferenceId": "3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620",
+      "gateway": "mercadopago",
+      "sessionId": "3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
       "complement": "",
       "neighborhood": "Bela Vista",
       "recipientName": "cliente"
@@ -57,24 +283,28 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentProvider": "mercadopago",
+    "paymentProviderSessionId": "3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620"
   },
   {
-    "id": "MM-397031",
-    "date": "28/08/2026",
+    "id": "MM-057744-8797",
+    "date": "06/09/2026",
     "items": [
       {
-        "id": "item-1787881746065-h7m2",
+        "id": "item-1788745057582-uum3",
         "sku": "MM-CAM-002",
         "size": "P",
         "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
         "price": 189.9,
         "title": "Camiseta Double Layer",
-        "width": 25,
+        "width": 12,
         "height": 4,
-        "length": 30,
-        "weight": 0.35,
+        "length": 17,
+        "weight": 1,
         "quantity": 1,
         "subtotal": 189.9,
         "productId": "prod-cam-002"
@@ -86,21 +316,507 @@
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 01:49:09",
+        "timestamp": "06/09/2026, 22:37:37",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T01:49:09.290Z",
-    "customerCpf": "",
+    "createdAt": "2026-09-07T01:37:37.748Z",
+    "customerCpf": "44606992816",
     "shippingFee": 15.97,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-d52cb017-125b-45db-834e-ce9c984957bd",
+      "mercadoPagoPreferenceId": "3595359362-d52cb017-125b-45db-834e-ce9c984957bd",
+      "gateway": "mercadopago",
+      "sessionId": "3595359362-d52cb017-125b-45db-834e-ce9c984957bd"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentProvider": "mercadopago",
+    "paymentProviderSessionId": "3595359362-d52cb017-125b-45db-834e-ce9c984957bd"
+  },
+  {
+    "id": "MM-541081-8590",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788665540963-y9g7",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:32:21",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-09-06T03:32:21.095Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8",
+      "mercadoPagoPreferenceId": "3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8",
+      "gateway": "mercadopago",
+      "sessionId": "3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentProvider": "mercadopago",
+    "paymentProviderSessionId": "3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8"
+  },
+  {
+    "id": "MM-566590-8715",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788664566470-u1l9",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:16:06",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-09-06T03:16:06.591Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951",
+      "mercadoPagoPreferenceId": "3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951",
+      "gateway": "mercadopago",
+      "sessionId": "3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentProvider": "mercadopago",
+    "paymentProviderSessionId": "3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951"
+  },
+  {
+    "id": "MM-151648-2225",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788664151524-lp3a",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:09:11",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-09-06T03:09:11.663Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "1199999999",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-3822707d-0f4d-4d21-872c-780d8a688375",
+      "mercadoPagoPreferenceId": "3595359362-3822707d-0f4d-4d21-872c-780d8a688375",
+      "gateway": "mercadopago",
+      "sessionId": "3595359362-3822707d-0f4d-4d21-872c-780d8a688375"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentProvider": "mercadopago",
+    "paymentProviderSessionId": "3595359362-3822707d-0f4d-4d21-872c-780d8a688375"
+  },
+  {
+    "id": "MM-980999-7175",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788663980950-kzwo",
+        "sku": "MM-CAM-002",
+        "size": "M",
+        "color": "Preto + Cinza",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 3,
+        "subtotal": 569.7,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 569.7,
+    "status": "Aguardando Pagamento",
+    "userId": "2aae7be5-30f8-42f8-9dfa-544088d425ab",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:06:21",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 569.7,
+    "createdAt": "2026-09-06T03:06:21.016Z",
+    "customerCpf": "11144477735",
+    "shippingFee": 0,
+    "customerName": "Cliente Teste Local",
+    "customerEmail": "codex-checkout-1788663979719@example.com",
+    "customerPhone": "11999999999",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7",
+      "mercadoPagoPreferenceId": "3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "cep": "01311100",
+      "city": "Sao Paulo",
+      "state": "SP",
+      "number": "1000",
+      "street": "Avenida Paulista",
+      "neighborhood": "Bela Vista",
+      "recipientName": "Cliente Teste Local"
+    },
+    "shippingCarrier": "Melhor Envio",
+    "shippingService": "Transportadora Padrão",
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "shippingDeliveryTime": 5
+  },
+  {
+    "id": "MM-753474-9500",
+    "date": "06/09/2026",
+    "items": [
+      {
+        "id": "item-1788663753444-27ez",
+        "sku": "MM-CAM-002",
+        "size": "M",
+        "color": "Preto + Cinza",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 3,
+        "subtotal": 569.7,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 569.7,
+    "status": "Aguardando Pagamento",
+    "userId": "0b53b9c9-bca3-4356-8812-37135c64e299",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "06/09/2026, 00:02:33",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 569.7,
+    "createdAt": "2026-09-06T03:02:33.490Z",
+    "customerCpf": "11144477735",
+    "shippingFee": 0,
+    "customerName": "Cliente Teste Local",
+    "customerEmail": "codex-checkout-1788663752340@example.com",
+    "customerPhone": "11999999999",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f",
+      "mercadoPagoPreferenceId": "3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "cep": "01311100",
+      "city": "Sao Paulo",
+      "state": "SP",
+      "number": "1000",
+      "street": "Avenida Paulista",
+      "neighborhood": "Bela Vista",
+      "recipientName": "Cliente Teste Local"
+    },
+    "shippingCarrier": "Melhor Envio",
+    "shippingService": "Transportadora Padrão",
+    "estimatedDelivery": "5 a 7 dias úteis",
+    "shippingDeliveryTime": 5
+  },
+  {
+    "id": "MM-896656-6103",
+    "date": "05/09/2026",
+    "items": [
+      {
+        "id": "item-1788662896509-upg1",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "05/09/2026, 23:48:16",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-09-06T02:48:16.672Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
     "paymentMethod": "PIX",
     "paymentStatus": "Pendente",
     "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1788638781395-1855",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentDetails": {}
+  },
+  {
+    "id": "MM-320340",
+    "date": "30/08/2026",
+    "items": [
+      {
+        "id": "item-1788131636428-74ft",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 165.47,
+    "paidAt": "2026-08-30T19:14:10.000-04:00",
+    "status": "Em Separação",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "30/08/2026, 23:13:56",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "id": "hist-1788131657015-h69e",
+        "source": "mercado_pago",
+        "status": "Em Separação",
+        "orderId": "MM-320340",
+        "newStatus": "Em Separação",
+        "timestamp": "30/08/2026, 23:14:17",
+        "occurredAt": "2026-08-30T19:14:10.000-04:00",
+        "description": "Pagamento de R$ 165.47 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
+        "previousStatus": "Aguardando Pagamento",
+        "externalEventId": "175475070235"
+      }
+    ],
+    "discount": 0,
+    "subtotal": 149.9,
+    "createdAt": "2026-08-30T23:13:56.700Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 15.57,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-30T19:14:10.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
+      "mercadoPagoPaymentId": "175475070235",
+      "mercadoPagoPreferenceId": "3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Aguardando compra de frete",
     "shippingAddress": {
       "id": "addr-1787166871376-6986",
       "cep": "01311100",
@@ -117,52 +833,343 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
+    "separationStartedAt": "2026-08-30T23:14:16.728Z",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
   },
   {
-    "id": "MM-647844",
-    "date": "28/08/2026",
+    "id": "MM-716508",
+    "date": "30/08/2026",
     "items": [
       {
-        "id": "item-1787882074006-9kz5",
+        "id": "item-1788126185075-mvhl",
         "sku": "MM-CAM-002",
         "size": "P",
         "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
         "price": 189.9,
         "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      },
+      {
+        "id": "item-1788126185075-z1rd",
+        "sku": "MM-CAM-001",
+        "size": "M",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 360.92,
+    "paidAt": "2026-08-30T17:43:18.000-04:00",
+    "status": "Em Separação",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "30/08/2026, 21:43:05",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "id": "hist-1788126206778-zt66",
+        "source": "mercado_pago",
+        "status": "Em Separação",
+        "orderId": "MM-716508",
+        "newStatus": "Em Separação",
+        "timestamp": "30/08/2026, 21:43:26",
+        "occurredAt": "2026-08-30T17:43:18.000-04:00",
+        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
+        "previousStatus": "Aguardando Pagamento",
+        "externalEventId": "175462854597"
+      }
+    ],
+    "discount": 0,
+    "subtotal": 339.8,
+    "createdAt": "2026-08-30T21:43:05.555Z",
+    "customerCpf": "44606992816",
+    "shippingFee": 21.12,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "11937500667",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-30T17:43:18.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
+      "mercadoPagoPaymentId": "175462854597",
+      "mercadoPagoPreferenceId": "3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Aguardando compra de frete",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "separationStartedAt": "2026-08-30T21:43:25.579Z",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
+  },
+  {
+    "id": "MM-725901",
+    "date": "30/08/2026",
+    "items": [
+      {
+        "id": "item-1788125107661-8o24",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      },
+      {
+        "id": "item-1788125107661-9wdc",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
+        "price": 149.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 149.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 360.92,
+    "paidAt": "2026-08-30T17:25:21.000-04:00",
+    "status": "Em Separação",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "30/08/2026, 21:25:08",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "id": "hist-1788125127584-7c75",
+        "source": "mercado_pago",
+        "status": "Em Separação",
+        "orderId": "MM-725901",
+        "newStatus": "Em Separação",
+        "timestamp": "30/08/2026, 21:25:27",
+        "occurredAt": "2026-08-30T17:25:21.000-04:00",
+        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
+        "previousStatus": "Aguardando Pagamento",
+        "externalEventId": "176409955418"
+      }
+    ],
+    "discount": 0,
+    "subtotal": 339.8,
+    "createdAt": "2026-08-30T21:25:08.491Z",
+    "customerCpf": "",
+    "shippingFee": 21.12,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-30T17:25:21.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
+      "mercadoPagoPaymentId": "176409955418",
+      "mercadoPagoPreferenceId": "3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Aguardando compra de frete",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": false,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "separationStartedAt": "2026-08-30T21:25:27.147Z",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
+  },
+  {
+    "id": "MM-710946",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787953148260-2lyb",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
+        "price": 189.9,
+        "title": "Camiseta Contrast Stitch",
         "width": 25,
         "height": 4,
         "length": 30,
         "weight": 0.35,
         "quantity": 1,
         "subtotal": 189.9,
-        "productId": "prod-cam-002"
+        "productId": "prod-cam-001"
       }
     ],
-    "total": 205.87,
+    "total": 204.92,
+    "status": "Pronto para Envio",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 21:39:08",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "status": "Pagamento Aprovado",
+        "timestamp": "28/08/2026, 21:39:28",
+        "description": "Pagamento de R$ 204.92 aprovado no Mercado Pago (account_money)."
+      },
+      {
+        "status": "Pronto para Envio",
+        "timestamp": "29/08/2026, 21:04:18",
+        "description": "Etiqueta oficial gerada via Melhor Envio (ID: ME-1788037457635, Rastreio: BR-710946-ME)."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T21:39:08.786Z",
+    "customerCpf": "",
+    "shippingFee": 15.02,
+    "customerName": "cliente",
+    "trackingCode": "BR-710946-ME",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pago",
+    "paymentDetails": {
+      "paidAt": "2026-08-28T17:39:20.000-04:00",
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
+      "mercadoPagoPaymentId": "175159831347",
+      "mercadoPagoPreferenceId": "3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Aguardando compra de frete",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": false,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "melhorEnvioShipmentId": "ME-1788037457635",
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
+  },
+  {
+    "id": "MM-349347",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787953127218-jz2t",
+        "sku": "MM-CAM-001",
+        "size": "P",
+        "color": "Preto",
+        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
+        "price": 189.9,
+        "title": "Camiseta Contrast Stitch",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-001"
+      }
+    ],
+    "total": 204.52,
     "status": "Aguardando Pagamento",
     "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 01:54:57",
+        "timestamp": "28/08/2026, 21:38:48",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T01:54:57.088Z",
+    "createdAt": "2026-08-28T21:38:48.152Z",
     "customerCpf": "",
-    "shippingFee": 15.97,
+    "shippingFee": 14.62,
     "customerName": "cliente",
     "customerEmail": "cliente@marmot.com",
     "customerPhone": "",
     "paymentMethod": "PIX",
     "paymentStatus": "Pendente",
     "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d",
-      "mercadoPagoPreferenceId": "3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d"
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70",
+      "mercadoPagoPreferenceId": "3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70"
     },
     "shippingStatus": "Aguardando preparação",
     "shippingAddress": {
@@ -181,7 +1188,176 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
+  },
+  {
+    "id": "MM-912802",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787941127923-mrop",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "data:image/webp;base64,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",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 12,
+        "height": 4,
+        "length": 17,
+        "weight": 1,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 204.92,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 18:18:48",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 18:19:14",
+        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 18:19:19",
+        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T18:18:48.864Z",
+    "customerCpf": "",
+    "shippingFee": 15.02,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pagamento Divergente",
+    "paymentDetails": {
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-475a9535-0c91-4fd8-a316-829044886164",
+      "mercadoPagoPaymentId": "175125082423",
+      "mercadoPagoPreferenceId": "3595359362-475a9535-0c91-4fd8-a316-829044886164",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": false,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
+  },
+  {
+    "id": "MM-314439",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787882771264-776d",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 204.92,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 02:06:12",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 02:06:29",
+        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 02:06:33",
+        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
+      },
+      {
+        "status": "Pagamento Divergente",
+        "timestamp": "28/08/2026, 02:07:06",
+        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T02:06:12.296Z",
+    "customerCpf": "",
+    "shippingFee": 15.02,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pagamento Divergente",
+    "paymentDetails": {
+      "cardBrand": "account_money",
+      "installments": 1,
+      "mercadoPagoStatus": "approved",
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-b5765ea4-7b49-421d-a2f2-e2793f3b72d2",
+      "mercadoPagoPaymentId": "175030134277",
+      "mercadoPagoPreferenceId": "3595359362-b5765ea4-7b49-421d-a2f2-e2793f3b72d2",
+      "mercadoPagoStatusDetail": "accredited"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": false,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
   },
   {
     "id": "MM-295799",
@@ -245,7 +1421,75 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
+  },
+  {
+    "id": "MM-377781",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787882586571-keuk",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 02:03:08",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T02:03:08.600Z",
+    "customerCpf": "",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "paymentDetails": {
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-178f38ac-cd06-4163-9a43-cfc9c87deef8",
+      "mercadoPagoPreferenceId": "3595359362-178f38ac-cd06-4163-9a43-cfc9c87deef8"
+    },
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
+    },
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
   },
   {
     "id": "MM-492502",
@@ -339,177 +1583,16 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
   },
   {
-    "id": "MM-912802",
+    "id": "MM-647844",
     "date": "28/08/2026",
     "items": [
       {
-        "id": "item-1787941127923-mrop",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "data:image/webp;base64,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",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 204.92,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 18:18:48",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 18:19:14",
-        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 18:19:19",
-        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-08-28T18:18:48.864Z",
-    "customerCpf": "",
-    "shippingFee": 15.02,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pagamento Divergente",
-    "paymentDetails": {
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-475a9535-0c91-4fd8-a316-829044886164",
-      "mercadoPagoPaymentId": "175125082423",
-      "mercadoPagoPreferenceId": "3595359362-475a9535-0c91-4fd8-a316-829044886164",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": false,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-314439",
-    "date": "28/08/2026",
-    "items": [
-      {
-        "id": "item-1787882771264-776d",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 25,
-        "height": 4,
-        "length": 30,
-        "weight": 0.35,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 204.92,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 02:06:12",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 02:06:29",
-        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 02:06:33",
-        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
-      },
-      {
-        "status": "Pagamento Divergente",
-        "timestamp": "28/08/2026, 02:07:06",
-        "description": "Valor pago no gateway (R$ 189.90) diverge do valor esperado do pedido (R$ 204.92). Aprovação bloqueada por segurança."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-08-28T02:06:12.296Z",
-    "customerCpf": "",
-    "shippingFee": 15.02,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pagamento Divergente",
-    "paymentDetails": {
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-b5765ea4-7b49-421d-a2f2-e2793f3b72d2",
-      "mercadoPagoPaymentId": "175030134277",
-      "mercadoPagoPreferenceId": "3595359362-b5765ea4-7b49-421d-a2f2-e2793f3b72d2",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": false,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-377781",
-    "date": "28/08/2026",
-    "items": [
-      {
-        "id": "item-1787882586571-keuk",
+        "id": "item-1787882074006-9kz5",
         "sku": "MM-CAM-002",
         "size": "P",
         "color": "Bege + Marrom",
@@ -531,13 +1614,13 @@
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 02:03:08",
+        "timestamp": "28/08/2026, 01:54:57",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T02:03:08.600Z",
+    "createdAt": "2026-08-28T01:54:57.088Z",
     "customerCpf": "",
     "shippingFee": 15.97,
     "customerName": "cliente",
@@ -546,72 +1629,8 @@
     "paymentMethod": "PIX",
     "paymentStatus": "Pendente",
     "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-178f38ac-cd06-4163-9a43-cfc9c87deef8",
-      "mercadoPagoPreferenceId": "3595359362-178f38ac-cd06-4163-9a43-cfc9c87deef8"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-349347",
-    "date": "28/08/2026",
-    "items": [
-      {
-        "id": "item-1787953127218-jz2t",
-        "sku": "MM-CAM-001",
-        "size": "P",
-        "color": "Preto",
-        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
-        "price": 189.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 25,
-        "height": 4,
-        "length": 30,
-        "weight": 0.35,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 204.52,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 21:38:48",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-08-28T21:38:48.152Z",
-    "customerCpf": "",
-    "shippingFee": 14.62,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70",
-      "mercadoPagoPreferenceId": "3595359362-029f5eed-af0a-4346-95e8-91f6b8789b70"
+      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d",
+      "mercadoPagoPreferenceId": "3595359362-de9b5a52-094a-4cf1-8e01-ec9bff440d4d"
     },
     "shippingStatus": "Aguardando preparação",
     "shippingAddress": {
@@ -630,110 +1649,10 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started"
   },
-  {
-    "id": "MM-716508",
-    "date": "30/08/2026",
-    "items": [
-      {
-        "id": "item-1788126185075-mvhl",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      },
-      {
-        "id": "item-1788126185075-z1rd",
-        "sku": "MM-CAM-001",
-        "size": "M",
-        "color": "Preto",
-        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
-        "price": 149.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 149.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 360.92,
-    "paidAt": "2026-08-30T17:43:18.000-04:00",
-    "status": "Em Separação",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "30/08/2026, 21:43:05",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "id": "hist-1788126206778-zt66",
-        "source": "mercado_pago",
-        "status": "Em Separação",
-        "orderId": "MM-716508",
-        "newStatus": "Em Separação",
-        "timestamp": "30/08/2026, 21:43:26",
-        "occurredAt": "2026-08-30T17:43:18.000-04:00",
-        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
-        "previousStatus": "Aguardando Pagamento",
-        "externalEventId": "175462854597"
-      }
-    ],
-    "discount": 0,
-    "subtotal": 339.8,
-    "createdAt": "2026-08-30T21:43:05.555Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 21.12,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-30T17:43:18.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
-      "mercadoPagoPaymentId": "175462854597",
-      "mercadoPagoPreferenceId": "3595359362-e9092682-9530-4b8a-bed7-65ff2d9f4ae4",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Preparando",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "separationStartedAt": "2026-08-30T21:43:25.579Z",
-    "shippingDeliveryTime": 2
-  },
-  {},
-  {},
   {
     "id": "MM-394120",
     "date": "28/08/2026",
@@ -792,571 +1711,116 @@
     "shippingService": "SEDEX",
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentDetails": {}
   },
   {
-    "id": "MM-896656-6103",
-    "date": "05/09/2026",
-    "items": [
-      {
-        "id": "item-1788662896509-upg1",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 205.87,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "05/09/2026, 23:48:16",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-09-06T02:48:16.672Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-753474-9500",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788663753444-27ez",
-        "sku": "MM-CAM-002",
-        "size": "M",
-        "color": "Preto + Cinza",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 3,
-        "subtotal": 569.7,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 569.7,
-    "status": "Aguardando Pagamento",
-    "userId": "0b53b9c9-bca3-4356-8812-37135c64e299",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:02:33",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 569.7,
-    "createdAt": "2026-09-06T03:02:33.490Z",
-    "customerCpf": "11144477735",
-    "shippingFee": 0,
-    "customerName": "Cliente Teste Local",
-    "customerEmail": "codex-checkout-1788663752340@example.com",
-    "customerPhone": "11999999999",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f",
-      "mercadoPagoPreferenceId": "3595359362-297726e2-fa57-44b7-883e-7a7bafa2937f"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "cep": "01311100",
-      "city": "Sao Paulo",
-      "state": "SP",
-      "number": "1000",
-      "street": "Avenida Paulista",
-      "neighborhood": "Bela Vista",
-      "recipientName": "Cliente Teste Local"
-    },
-    "shippingCarrier": "Melhor Envio",
-    "shippingService": "Transportadora Padrão",
-    "estimatedDelivery": "5 a 7 dias úteis",
-    "shippingDeliveryTime": 5
-  },
-  {
-    "id": "MM-980999-7175",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788663980950-kzwo",
-        "sku": "MM-CAM-002",
-        "size": "M",
-        "color": "Preto + Cinza",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 3,
-        "subtotal": 569.7,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 569.7,
-    "status": "Aguardando Pagamento",
-    "userId": "2aae7be5-30f8-42f8-9dfa-544088d425ab",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:06:21",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 569.7,
-    "createdAt": "2026-09-06T03:06:21.016Z",
-    "customerCpf": "11144477735",
-    "shippingFee": 0,
-    "customerName": "Cliente Teste Local",
-    "customerEmail": "codex-checkout-1788663979719@example.com",
-    "customerPhone": "11999999999",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7",
-      "mercadoPagoPreferenceId": "3595359362-5d13e4ca-d044-4a7e-84bf-321168a2b5c7"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "cep": "01311100",
-      "city": "Sao Paulo",
-      "state": "SP",
-      "number": "1000",
-      "street": "Avenida Paulista",
-      "neighborhood": "Bela Vista",
-      "recipientName": "Cliente Teste Local"
-    },
-    "shippingCarrier": "Melhor Envio",
-    "shippingService": "Transportadora Padrão",
-    "estimatedDelivery": "5 a 7 dias úteis",
-    "shippingDeliveryTime": 5
-  },
-  {
-    "id": "MM-151648-2225",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788664151524-lp3a",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 205.87,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:09:11",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-09-06T03:09:11.663Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "1199999999",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-3822707d-0f4d-4d21-872c-780d8a688375",
-      "mercadoPagoPreferenceId": "3595359362-3822707d-0f4d-4d21-872c-780d8a688375"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-566590-8715",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788664566470-u1l9",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 205.87,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:16:06",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-09-06T03:16:06.591Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951",
-      "mercadoPagoPreferenceId": "3595359362-4163229c-8c32-4bd5-8ae8-357a8ae3d951"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-541081-8590",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788665540963-y9g7",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 205.87,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 00:32:21",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-09-06T03:32:21.095Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8",
-      "mercadoPagoPreferenceId": "3595359362-992a4127-15fa-4fc6-b448-2d1770af97e8"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-057744-8797",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788745057582-uum3",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      }
-    ],
-    "total": 205.87,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 22:37:37",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 189.9,
-    "createdAt": "2026-09-07T01:37:37.748Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.97,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-d52cb017-125b-45db-834e-ce9c984957bd",
-      "mercadoPagoPreferenceId": "3595359362-d52cb017-125b-45db-834e-ce9c984957bd"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-205629-8577",
-    "date": "06/09/2026",
-    "items": [
-      {
-        "id": "item-1788745205481-l8ru",
-        "sku": "MM-CAM-001",
-        "size": "P",
-        "color": "Preto",
-        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
-        "price": 149.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 149.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 165.47,
-    "status": "Aguardando Pagamento",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "06/09/2026, 22:40:05",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      }
-    ],
-    "discount": 0,
-    "subtotal": 149.9,
-    "createdAt": "2026-09-07T01:40:05.629Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.57,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pendente",
-    "paymentDetails": {
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620",
-      "mercadoPagoPreferenceId": "3595359362-9c97ab1c-decc-48c1-aed5-c6342d4c2620"
-    },
-    "shippingStatus": "Aguardando preparação",
-    "shippingAddress": {
-      "id": "addr-1788638781395-1855",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-710946",
+    "id": "MM-397031",
     "date": "28/08/2026",
     "items": [
       {
-        "id": "item-1787953148260-2lyb",
-        "sku": "MM-CAM-001",
+        "id": "item-1787881746065-h7m2",
+        "sku": "MM-CAM-002",
         "size": "P",
-        "color": "Preto",
-        "image": "/uploads/marmot-p-am-001-g0-7573ed8189d0.jpg",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
         "price": 189.9,
-        "title": "Camiseta Contrast Stitch",
+        "title": "Camiseta Double Layer",
         "width": 25,
         "height": 4,
         "length": 30,
         "weight": 0.35,
         "quantity": 1,
         "subtotal": 189.9,
-        "productId": "prod-cam-001"
+        "productId": "prod-cam-002"
       }
     ],
-    "total": 204.92,
-    "status": "Pronto para Envio",
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
     "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
     "history": [
       {
         "status": "Aguardando Pagamento",
-        "timestamp": "28/08/2026, 21:39:08",
+        "timestamp": "28/08/2026, 01:49:09",
         "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "status": "Pagamento Aprovado",
-        "timestamp": "28/08/2026, 21:39:28",
-        "description": "Pagamento de R$ 204.92 aprovado no Mercado Pago (account_money)."
-      },
-      {
-        "status": "Pronto para Envio",
-        "timestamp": "29/08/2026, 21:04:18",
-        "description": "Etiqueta oficial gerada via Melhor Envio (ID: ME-1788037457635, Rastreio: BR-710946-ME)."
       }
     ],
     "discount": 0,
     "subtotal": 189.9,
-    "createdAt": "2026-08-28T21:39:08.786Z",
+    "createdAt": "2026-08-28T01:49:09.290Z",
     "customerCpf": "",
-    "shippingFee": 15.02,
+    "shippingFee": 15.97,
     "customerName": "cliente",
-    "trackingCode": "BR-710946-ME",
     "customerEmail": "cliente@marmot.com",
     "customerPhone": "",
     "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-28T17:39:20.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
-      "mercadoPagoPaymentId": "175159831347",
-      "mercadoPagoPreferenceId": "3595359362-cabaa7f4-46a3-4dce-b36d-59fd24dcd1d3",
-      "mercadoPagoStatusDetail": "accredited"
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
+    "shippingAddress": {
+      "id": "addr-1787166871376-6986",
+      "cep": "01311100",
+      "city": "São Paulo",
+      "state": "SP",
+      "number": "630",
+      "street": "Avenida Paulista",
+      "isDefault": true,
+      "complement": "",
+      "neighborhood": "Bela Vista",
+      "recipientName": "cliente"
     },
-    "shippingStatus": "Pronto para envio",
+    "shippingCarrier": "Correios",
+    "shippingService": "SEDEX",
+    "estimatedDelivery": "2 a 4 dias úteis",
+    "shippingServiceId": "2",
+    "shippingDeliveryTime": 2,
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentDetails": {}
+  },
+  {
+    "id": "MM-347949-9350",
+    "date": "28/08/2026",
+    "items": [
+      {
+        "id": "item-1787881347949-brpu",
+        "sku": "MM-CAM-002",
+        "size": "P",
+        "color": "Bege + Marrom",
+        "image": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=1000&q=80",
+        "price": 189.9,
+        "title": "Camiseta Double Layer",
+        "width": 25,
+        "height": 4,
+        "length": 30,
+        "weight": 0.35,
+        "quantity": 1,
+        "subtotal": 189.9,
+        "productId": "prod-cam-002"
+      }
+    ],
+    "total": 205.87,
+    "status": "Aguardando Pagamento",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "history": [
+      {
+        "status": "Aguardando Pagamento",
+        "timestamp": "28/08/2026, 01:42:27",
+        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
+      }
+    ],
+    "discount": 0,
+    "subtotal": 189.9,
+    "createdAt": "2026-08-28T01:42:27.980Z",
+    "customerCpf": "",
+    "shippingFee": 15.97,
+    "customerName": "cliente",
+    "customerEmail": "cliente@marmot.com",
+    "customerPhone": "",
+    "paymentMethod": "PIX",
+    "paymentStatus": "Pendente",
+    "shippingStatus": "Aguardando preparação",
     "shippingAddress": {
       "id": "addr-1787166871376-6986",
       "cep": "01311100",
@@ -1374,190 +1838,9 @@
     "estimatedDelivery": "2 a 4 dias úteis",
     "shippingServiceId": "2",
     "shippingDeliveryTime": 2,
-    "melhorEnvioShipmentId": "ME-1788037457635"
+    "shipmentPurchaseStatus": "not_started",
+    "labelGenerationStatus": "not_started",
+    "paymentDetails": {}
   },
-  {
-    "id": "MM-320340",
-    "date": "30/08/2026",
-    "items": [
-      {
-        "id": "item-1788131636428-74ft",
-        "sku": "MM-CAM-001",
-        "size": "P",
-        "color": "Preto",
-        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
-        "price": 149.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 149.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 165.47,
-    "paidAt": "2026-08-30T19:14:10.000-04:00",
-    "status": "Em Separação",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "30/08/2026, 23:13:56",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "id": "hist-1788131657015-h69e",
-        "source": "mercado_pago",
-        "status": "Em Separação",
-        "orderId": "MM-320340",
-        "newStatus": "Em Separação",
-        "timestamp": "30/08/2026, 23:14:17",
-        "occurredAt": "2026-08-30T19:14:10.000-04:00",
-        "description": "Pagamento de R$ 165.47 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
-        "previousStatus": "Aguardando Pagamento",
-        "externalEventId": "175475070235"
-      }
-    ],
-    "discount": 0,
-    "subtotal": 149.9,
-    "createdAt": "2026-08-30T23:13:56.700Z",
-    "customerCpf": "44606992816",
-    "shippingFee": 15.57,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "11937500667",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-30T19:14:10.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
-      "mercadoPagoPaymentId": "175475070235",
-      "mercadoPagoPreferenceId": "3595359362-45fe1eb5-525c-418f-b18e-b5d879ff5621",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Preparando",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": true,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "separationStartedAt": "2026-08-30T23:14:16.728Z",
-    "shippingDeliveryTime": 2
-  },
-  {
-    "id": "MM-725901",
-    "date": "30/08/2026",
-    "items": [
-      {
-        "id": "item-1788125107661-8o24",
-        "sku": "MM-CAM-002",
-        "size": "P",
-        "color": "Bege + Marrom",
-        "image": "/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp",
-        "price": 189.9,
-        "title": "Camiseta Double Layer",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 189.9,
-        "productId": "prod-cam-002"
-      },
-      {
-        "id": "item-1788125107661-9wdc",
-        "sku": "MM-CAM-001",
-        "size": "P",
-        "color": "Preto",
-        "image": "/uploads/products/prod-cam-001/c2ba729e5e82964f.webp",
-        "price": 149.9,
-        "title": "Camiseta Contrast Stitch",
-        "width": 12,
-        "height": 4,
-        "length": 17,
-        "weight": 1,
-        "quantity": 1,
-        "subtotal": 149.9,
-        "productId": "prod-cam-001"
-      }
-    ],
-    "total": 360.92,
-    "paidAt": "2026-08-30T17:25:21.000-04:00",
-    "status": "Em Separação",
-    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
-    "history": [
-      {
-        "status": "Aguardando Pagamento",
-        "timestamp": "30/08/2026, 21:25:08",
-        "description": "Pedido registrado no sistema. Aguardando confirmação do pagamento via Mercado Pago."
-      },
-      {
-        "id": "hist-1788125127584-7c75",
-        "source": "mercado_pago",
-        "status": "Em Separação",
-        "orderId": "MM-725901",
-        "newStatus": "Em Separação",
-        "timestamp": "30/08/2026, 21:25:27",
-        "occurredAt": "2026-08-30T17:25:21.000-04:00",
-        "description": "Pagamento de R$ 360.92 aprovado no Mercado Pago (account_money). Pedido encaminhado automaticamente para separação e conferência no estoque.",
-        "previousStatus": "Aguardando Pagamento",
-        "externalEventId": "176409955418"
-      }
-    ],
-    "discount": 0,
-    "subtotal": 339.8,
-    "createdAt": "2026-08-30T21:25:08.491Z",
-    "customerCpf": "",
-    "shippingFee": 21.12,
-    "customerName": "cliente",
-    "customerEmail": "cliente@marmot.com",
-    "customerPhone": "",
-    "paymentMethod": "PIX",
-    "paymentStatus": "Pago",
-    "paymentDetails": {
-      "paidAt": "2026-08-30T17:25:21.000-04:00",
-      "cardBrand": "account_money",
-      "installments": 1,
-      "mercadoPagoStatus": "approved",
-      "mercadoPagoInitPoint": "https://sandbox.mercadopago.com.br/checkout/v1/redirect?pref_id=3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
-      "mercadoPagoPaymentId": "176409955418",
-      "mercadoPagoPreferenceId": "3595359362-72a29ef3-49b8-4aa7-b5d6-a41354614b6d",
-      "mercadoPagoStatusDetail": "accredited"
-    },
-    "shippingStatus": "Preparando",
-    "shippingAddress": {
-      "id": "addr-1787166871376-6986",
-      "cep": "01311100",
-      "city": "São Paulo",
-      "state": "SP",
-      "number": "630",
-      "street": "Avenida Paulista",
-      "isDefault": false,
-      "complement": "",
-      "neighborhood": "Bela Vista",
-      "recipientName": "cliente"
-    },
-    "shippingCarrier": "Correios",
-    "shippingService": "SEDEX",
-    "estimatedDelivery": "2 a 4 dias úteis",
-    "shippingServiceId": "2",
-    "separationStartedAt": "2026-08-30T21:25:27.147Z",
-    "shippingDeliveryTime": 2
-  }
+  {}
 ]

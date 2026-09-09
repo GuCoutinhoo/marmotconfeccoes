@@ -126,6 +126,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_refund_operations_provider_refund
 
 -- Serialize hosted checkout-link creation per order. This prevents two
 -- concurrent browser requests from opening two payable links for one order.
+DROP FUNCTION IF EXISTS public.claim_payment_session_creation(TEXT, TEXT, UUID);
+
 CREATE OR REPLACE FUNCTION public.claim_payment_session_creation(
   p_order_id TEXT,
   p_user_id TEXT,
@@ -179,6 +181,7 @@ END;
 $$;
 
 DROP FUNCTION IF EXISTS public.link_payment_session_atomic(TEXT, TEXT, TEXT, TEXT, TEXT, TIMESTAMPTZ);
+DROP FUNCTION IF EXISTS public.link_payment_checkout_atomic(TEXT, TEXT, TEXT, TEXT);
 
 CREATE OR REPLACE FUNCTION public.link_payment_checkout_atomic(
   p_order_id TEXT,
@@ -222,6 +225,8 @@ BEGIN
 END;
 $$;
 
+DROP FUNCTION IF EXISTS public.release_payment_session_creation(TEXT, TEXT);
+
 CREATE OR REPLACE FUNCTION public.release_payment_session_creation(
   p_order_id TEXT,
   p_error TEXT DEFAULT NULL
@@ -247,6 +252,8 @@ $$;
 
 -- Financial failures/expiry update only financial columns under a row lock;
 -- they can never downgrade an already paid or refunded order.
+DROP FUNCTION IF EXISTS public.update_provider_payment_state_atomic(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT);
+
 CREATE OR REPLACE FUNCTION public.update_provider_payment_state_atomic(
   p_order_id TEXT,
   p_provider TEXT,
@@ -323,13 +330,14 @@ DROP POLICY IF EXISTS "Refund operations viewable only by admin" ON public.refun
 DROP POLICY IF EXISTS "Refund operations admin only" ON public.refund_operations;
 DROP POLICY IF EXISTS "Refund operations restricted to service role" ON public.refund_operations;
 CREATE POLICY "Refund operations restricted to service role"
-  ON public.refund_operations FOR ALL
-  USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
+  ON public.refund_operations FOR ALL TO service_role
+  USING (TRUE)
+  WITH CHECK (TRUE);
 
 -- One transaction owns payment settlement, stock deduction, financial ledger,
 -- order state, status history and removal of the purchased cart lines.
 DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB);
+DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB, JSONB);
 
 CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
   p_order_id TEXT,
@@ -534,6 +542,8 @@ BEGIN
   );
 END;
 $$;
+
+DROP FUNCTION IF EXISTS public.process_provider_refund_atomic(TEXT, TEXT, TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, UUID, TEXT);
 
 CREATE OR REPLACE FUNCTION public.process_provider_refund_atomic(
   p_order_id TEXT,
