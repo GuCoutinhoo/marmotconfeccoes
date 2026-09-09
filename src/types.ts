@@ -59,6 +59,7 @@ export interface Product {
   featured?: boolean;
   status?: 'active' | 'draft' | 'archived' | 'out_of_stock';
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {

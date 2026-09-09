@@ -18,6 +18,7 @@
         "dotenv": "^17.2.3",
         "express": "^4.21.2",
         "lucide-react": "^0.546.0",
+        "mercadopago": "^3.4.0",
         "motion": "^12.23.24",
         "pg": "^8.23.0",
         "react": "^19.0.1",
@@ -443,6 +444,8 @@
 
     "media-typer": ["media-typer@0.3.0", "", {}, ""],
 
+    "mercadopago": ["mercadopago@3.6.0", "", {}, "sha512-Dk47c/bgRPdbMPcRvopitgZq4jOujMfeMf/msWNr942QQ4p+CDBhhov+059UWhsoyGjdizzJaZeyveApoEgDBg=="],
+
     "merge-descriptors": ["merge-descriptors@1.0.3", "", {}, ""],
 
     "methods": ["methods@1.1.2", "", {}, ""],
@@ -564,7 +567,6 @@
     "split2": ["split2@4.2.0", "", {}, "sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg=="],
 
     "statuses": ["statuses@2.0.2", "", {}, ""],
-
 
     "supabase": ["supabase@2.116.0", "", { "dependencies": { "eciesjs": "^0.5.0", "jose": "^6.2.9" }, "optionalDependencies": { "@supabase/cli-darwin-arm64": "2.116.0", "@supabase/cli-darwin-x64": "2.116.0", "@supabase/cli-linux-arm64": "2.116.0", "@supabase/cli-linux-arm64-musl": "2.116.0", "@supabase/cli-linux-x64": "2.116.0", "@supabase/cli-linux-x64-musl": "2.116.0", "@supabase/cli-windows-arm64": "2.116.0", "@supabase/cli-windows-x64": "2.116.0" }, "bin": { "supabase": "dist/supabase.js" } }, "sha512-cMUHkpjBacq4oLGWnMM2HC2drmUlAlfN/PQb31RARoIdYJ8sqA0xONvqBR6yd5v7w8dXuCPwvfd4N1NTHjBKEw=="],
 

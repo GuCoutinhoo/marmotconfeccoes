@@ -215,8 +215,16 @@ DROP POLICY IF EXISTS "Products write restricted to admin" ON public.products;
 
 CREATE POLICY "Products write restricted to admin"
   ON public.products FOR ALL
-  USING (public.is_admin())
-  WITH CHECK (public.is_admin());
+  USING (
+    auth.role() = 'service_role'
+    OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+    OR public.is_admin()
+  )
+  WITH CHECK (
+    auth.role() = 'service_role'
+    OR (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin'
+    OR public.is_admin()
+  );
 
 -- ------------------------------------------------------------------------------
 -- 4. ORDERS

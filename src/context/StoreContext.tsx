@@ -449,8 +449,24 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       let created: Product | null = null;
 
-      // 1. Direct write to Supabase if configured (Single Source of Truth)
-      if (isSupabaseConfigured()) {
+      // 1. Authoritative create via Backend API (applies server admin authentication & database sync)
+      try {
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: getAuthHeaders(true),
+          credentials: 'include',
+          body: JSON.stringify(productData),
+        });
+
+        if (res.ok) {
+          created = await res.json();
+        }
+      } catch (apiErr) {
+        console.warn('[PRODUCTS] API creation error, trying direct fallback:', apiErr);
+      }
+
+      // 2. Fallback to direct Supabase helper if server API was unavailable
+      if (!created && isSupabaseConfigured()) {
         try {
           const directResult = await createProductInSupabase(productData);
           if (directResult.product) {
@@ -461,38 +477,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
-      // If Supabase succeeded, update state immediately & sync backend in background
-      if (created) {
-        setProducts((prev) => {
-          return validateAndDeduplicateProducts([created!, ...prev.filter((p) => p.id !== created!.id && p.slug !== created!.slug)]);
-        });
-
-        fetch('/api/products', {
-          method: 'POST',
-          headers: getAuthHeaders(true),
-          credentials: 'include',
-          body: JSON.stringify(created),
-        }).catch(() => {});
-
-        return created;
-      }
-
-      // 2. Synchronize to Backend API if Supabase was not configured or direct call failed
-      const res = await fetch('/api/products', {
-        method: 'POST',
-        headers: getAuthHeaders(true),
-        credentials: 'include',
-        body: JSON.stringify(productData),
-      });
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({ error: 'Falha ao salvar produto no servidor' }));
-        throw new Error(errJson.error || 'Falha ao salvar produto no servidor.');
-      }
-
-      created = await res.json();
       if (!created || !created.id) {
-        throw new Error('Servidor retornou um produto inválido.');
+        throw new Error('Falha ao salvar produto no servidor.');
       }
 
       setProducts((prev) => {
@@ -510,8 +496,24 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     try {
       let updated: Product | null = null;
 
-      // 1. Direct write to Supabase if configured
-      if (isSupabaseConfigured()) {
+      // 1. Authoritative update via Backend API (verifies admin privileges & handles database sync)
+      try {
+        const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+          method: 'PUT',
+          headers: getAuthHeaders(true),
+          credentials: 'include',
+          body: JSON.stringify(productData),
+        });
+
+        if (res.ok) {
+          updated = await res.json();
+        }
+      } catch (apiErr) {
+        console.warn('[PRODUCTS] API update error, trying direct fallback:', apiErr);
+      }
+
+      // 2. Fallback to direct Supabase helper if server API was unavailable
+      if (!updated && isSupabaseConfigured()) {
         try {
           const directResult = await updateProductInSupabase(id, productData);
           if (directResult.product) {
@@ -522,39 +524,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
       }
 
-      if (updated) {
-        setProducts((prev) => {
-          return validateAndDeduplicateProducts(
-            prev.map((p) => (p.id === id || p.slug === id || p.id === updated!.id ? updated! : p))
-          );
-        });
-
-        fetch(`/api/products/${encodeURIComponent(id)}`, {
-          method: 'PUT',
-          headers: getAuthHeaders(true),
-          credentials: 'include',
-          body: JSON.stringify(productData),
-        }).catch(() => {});
-
-        return updated;
-      }
-
-      // 2. Synchronize to backend API
-      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(true),
-        credentials: 'include',
-        body: JSON.stringify(productData),
-      });
-
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => ({ error: 'Falha ao atualizar produto no servidor' }));
-        throw new Error(errJson.error || 'Falha ao atualizar produto no servidor.');
-      }
-
-      updated = await res.json();
       if (!updated || !updated.id) {
-        throw new Error('Servidor retornou um produto inválido ao atualizar.');
+        throw new Error('Falha ao atualizar produto no servidor.');
       }
 
       setProducts((prev) => {
@@ -585,16 +556,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         })
       );
 
-      if (isSupabaseConfigured()) {
-        await updateProductStockInSupabase(id, stockCount).catch(() => {});
-      }
-
       fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: getAuthHeaders(true),
         credentials: 'include',
         body: JSON.stringify({ stockCount }),
       }).catch(() => {});
+
+      if (isSupabaseConfigured()) {
+        await updateProductStockInSupabase(id, stockCount).catch(() => {});
+      }
     } catch (error) {
       console.error('Update stock error:', error);
     }
@@ -608,17 +579,17 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         deleteProductImageFromStorage(current.image).catch(() => {});
       }
 
-      // Direct Supabase delete
-      if (isSupabaseConfigured()) {
-        await deleteProductInSupabase(id).catch(() => {});
-      }
-
-      // Backend delete
+      // Authoritative delete via backend
       await fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(true),
         credentials: 'include',
       }).catch(() => {});
+
+      // Synchronize with Supabase
+      if (isSupabaseConfigured()) {
+        await deleteProductInSupabase(id).catch(() => {});
+      }
 
       setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
       return true;

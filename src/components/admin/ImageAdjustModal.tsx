@@ -22,7 +22,7 @@ interface ImageAdjustModalProps {
   imageSrc: string;
   title?: string;
   initialAspectRatio?: '1:1' | '4:5' | '16:9' | 'free';
-  onSave: (adjustedDataUrl: string) => void;
+  onSave: (adjustedDataUrl: string, blob?: Blob) => Promise<void> | void;
   onClose: () => void;
 }
 
@@ -89,7 +89,33 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
   const [sepia, setSepia] = useState<number>(0);
   const [activePreset, setActivePreset] = useState<string>('original');
 
-  // Load Image
+  // Persistence and Async Save States
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Reset status when modal is closed or opened
+  useEffect(() => {
+    if (!isOpen) {
+      setIsSaving(false);
+      setSaveStatus('idle');
+      setErrorMessage(null);
+    }
+  }, [isOpen]);
+
+  // Handle ESC key to safely close only when not saving
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isSaving) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isSaving, onClose]);
+
+  // Load Image with CORS check and proxy fallback to prevent canvas tainting
   useEffect(() => {
     if (!isOpen || !imageSrc) return;
 
@@ -109,16 +135,39 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
       setFlipH(false);
     };
     img.onerror = () => {
-      // Retry without anonymous if CORS header not present
-      const fallbackImg = new Image();
-      fallbackImg.onload = () => {
-        setImageElement(fallbackImg);
-        setImageLoaded(true);
-      };
-      fallbackImg.onerror = () => {
-        setLoadError(true);
-      };
-      fallbackImg.src = imageSrc;
+      // If direct anonymous load fails and it's a remote URL, try via /api/proxy-image
+      if (imageSrc.startsWith('http://') || imageSrc.startsWith('https://')) {
+        const proxyImg = new Image();
+        proxyImg.crossOrigin = 'anonymous';
+        proxyImg.onload = () => {
+          setImageElement(proxyImg);
+          setImageLoaded(true);
+          setOffsetX(0);
+          setOffsetY(0);
+          setZoom(1);
+          setRotation(0);
+          setFlipH(false);
+        };
+        proxyImg.onerror = () => {
+          // Last resort: fallback without crossOrigin
+          const fallbackImg = new Image();
+          fallbackImg.onload = () => {
+            setImageElement(fallbackImg);
+            setImageLoaded(true);
+          };
+          fallbackImg.onerror = () => setLoadError(true);
+          fallbackImg.src = imageSrc;
+        };
+        proxyImg.src = `/api/proxy-image?url=${encodeURIComponent(imageSrc)}`;
+      } else {
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => {
+          setImageElement(fallbackImg);
+          setImageLoaded(true);
+        };
+        fallbackImg.onerror = () => setLoadError(true);
+        fallbackImg.src = imageSrc;
+      }
     };
     img.src = imageSrc;
   }, [isOpen, imageSrc]);
@@ -287,25 +336,83 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
     setSepia(preset.sepia);
   };
 
-  // Export and Save Adjusted Image
-  const handleConfirmSave = () => {
+  // Export and Save Adjusted Image (Async, Canvas -> Blob -> Persistent Server Upload -> Database Update)
+  const handleConfirmSave = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    setSaveStatus('saving');
+    setErrorMessage(null);
+
     const exportCanvas = document.createElement('canvas');
     renderCanvas(exportCanvas, true);
+
+    console.log('[IMAGE EDIT] Started adjustment export');
+    console.log('[IMAGE EDIT] Canvas generated, dimensions:', exportCanvas.width, 'x', exportCanvas.height);
+
     try {
-      const dataUrl = exportCanvas.toDataURL('image/jpeg', 0.98);
-      onSave(dataUrl);
-    } catch (e) {
-      // Fallback if canvas is tainted by external URL
-      if (imageSrc) {
-        onSave(imageSrc);
+      // 1. Generate Blob with high quality JPEG (95% quality)
+      const blob = await new Promise<Blob | null>((resolve) => {
+        try {
+          exportCanvas.toBlob(
+            (b) => resolve(b),
+            'image/jpeg',
+            0.95
+          );
+        } catch (e) {
+          console.warn('[IMAGE EDIT] Canvas.toBlob exception (tainted?):', e);
+          resolve(null);
+        }
+      });
+
+      // 2. Generate dataUrl as well for compatibility
+      let dataUrl = '';
+      try {
+        dataUrl = exportCanvas.toDataURL('image/jpeg', 0.95);
+      } catch (e) {
+        console.warn('[IMAGE EDIT] Canvas.toDataURL exception:', e);
+        if (imageSrc) dataUrl = imageSrc;
       }
+
+      if (!blob && !dataUrl) {
+        throw new Error('Não foi possível processar a imagem ajustada.');
+      }
+
+      console.log('[IMAGE EDIT] Blob generated (size:', blob?.size || 0, 'bytes). Invoking async onSave...');
+
+      // 3. Await the full persistence flow from parent component
+      await onSave(dataUrl, blob || undefined);
+
+      console.log('[IMAGE EDIT] Save confirmed by server and database.');
+      setSaveStatus('success');
+
+      // 4. Close modal after visual confirmation
+      setTimeout(() => {
+        onClose();
+        setIsSaving(false);
+        setSaveStatus('idle');
+      }, 450);
+    } catch (err: any) {
+      console.error('[IMAGE EDIT] Upload/Persistence failed:', err);
+      setIsSaving(false);
+      setSaveStatus('error');
+      setErrorMessage(
+        err?.message ||
+        'Não foi possível salvar a imagem. Sua alteração ainda não foi confirmada no servidor. Tente novamente.'
+      );
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-[150] flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !isSaving) {
+          onClose();
+        }
+      }}
+    >
       <div className="bg-white border border-[#E5E5E1] rounded-2xl max-w-4xl w-full flex flex-col max-h-[92vh] shadow-2xl overflow-hidden text-[#171717]">
         {/* MODAL HEADER */}
         <div className="p-4 sm:p-5 border-b border-[#E5E5E1] flex items-center justify-between bg-[#F9F9F7]">
@@ -319,12 +426,46 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
             </div>
           </div>
           <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-[#6B6B66] hover:text-[#171717] hover:bg-[#E5E5E1] transition-colors"
+            onClick={() => {
+              if (!isSaving) onClose();
+            }}
+            disabled={isSaving}
+            className="p-1.5 rounded-lg text-[#6B6B66] hover:text-[#171717] hover:bg-[#E5E5E1] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* PERSISTENCE STATUS BANNERS */}
+        {saveStatus === 'saving' && (
+          <div className="mx-4 sm:mx-6 mt-3 p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3 text-amber-900 text-xs">
+            <RefreshCw className="w-4 h-4 animate-spin text-amber-600 shrink-0" />
+            <div>
+              <span className="font-bold uppercase tracking-wider block">Salvando imagem permanentemente...</span>
+              <span className="text-[11px] text-amber-700">Fazendo upload para o Storage e atualizando o banco de dados. Aguarde a confirmação.</span>
+            </div>
+          </div>
+        )}
+
+        {saveStatus === 'success' && (
+          <div className="mx-4 sm:mx-6 mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-emerald-900 text-xs">
+            <Check className="w-4 h-4 text-emerald-600 shrink-0 stroke-[3]" />
+            <div>
+              <span className="font-bold uppercase tracking-wider block">✓ Imagem salva e persistida com sucesso!</span>
+              <span className="text-[11px] text-emerald-700">A alteração está gravada no banco de dados e sincronizada.</span>
+            </div>
+          </div>
+        )}
+
+        {saveStatus === 'error' && (
+          <div className="mx-4 sm:mx-6 mt-3 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-900 text-xs">
+            <div className="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold shrink-0">!</div>
+            <div className="flex-1">
+              <span className="font-bold uppercase tracking-wider block">⚠ Falha ao salvar a imagem</span>
+              <span className="text-[11px] text-red-700">{errorMessage || 'Não foi possível salvar a imagem. Sua alteração ainda não foi confirmada no servidor. Tente novamente.'}</span>
+            </div>
+          </div>
+        )}
 
         {/* MODAL BODY */}
         <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 gap-0">
@@ -676,7 +817,8 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetAll}
-                className="p-3 rounded-xl bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs"
+                disabled={isSaving}
+                className="p-3 rounded-xl bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Restaurar valores padrão"
               >
                 <RefreshCw className="w-3.5 h-3.5 text-[#B45309]" />
@@ -686,7 +828,8 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] text-xs font-bold uppercase transition-colors shadow-xs"
+                disabled={isSaving}
+                className="flex-1 py-3 px-4 rounded-xl bg-[#F9F9F7] hover:bg-white border border-[#E5E5E1] text-[#6B6B66] hover:text-[#171717] text-xs font-bold uppercase transition-colors shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Cancelar
               </button>
@@ -694,10 +837,31 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
               <button
                 type="button"
                 onClick={handleConfirmSave}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#F0C84B] hover:bg-amber-400 text-black text-xs font-black uppercase shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2"
+                disabled={isSaving || !imageLoaded}
+                className={`flex-1 py-3 px-4 rounded-xl text-xs font-black uppercase shadow-xs transition-all flex items-center justify-center gap-2 ${
+                  isSaving
+                    ? 'bg-[#F0C84B]/70 text-black/70 cursor-wait'
+                    : saveStatus === 'error'
+                    ? 'bg-red-600 hover:bg-red-500 text-white'
+                    : 'bg-[#F0C84B] hover:bg-amber-400 text-black hover:shadow-md'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                <Check className="w-4 h-4 stroke-[3]" />
-                <span>Aplicar Ajustes</span>
+                {isSaving ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin text-black shrink-0" />
+                    <span>Salvando Imagem...</span>
+                  </>
+                ) : saveStatus === 'error' ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 shrink-0" />
+                    <span>Tentar Novamente</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4 stroke-[3] shrink-0" />
+                    <span>Salvar Ajuste</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

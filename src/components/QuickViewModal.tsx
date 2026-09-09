@@ -4,7 +4,7 @@ import { X, Heart, ShoppingBag, Check, ShieldCheck, Ruler } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { SizeGuideModal } from './SizeGuideModal';
-import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
+import { getValidProductImageUrl, handleProductImageError, getProductCardImageFraming } from '../utils/imageUtils';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -97,7 +97,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 alt={product.title}
                 referrerPolicy="no-referrer"
                 onError={(e) => handleProductImageError(e, product.category, product.id)}
-                className="w-full h-full object-cover object-[center_top]"
+                className={`w-full h-full transition-transform duration-300 ${getProductCardImageFraming(product.category)}`}
               />
               {product.promoPrice && (
                 <span className="absolute top-3 left-3 bg-[#F4C400] text-[#0B0B0E] text-[10px] font-black px-2.5 py-1 uppercase tracking-wider rounded shadow-xs">

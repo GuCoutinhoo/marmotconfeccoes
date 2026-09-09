@@ -4,7 +4,7 @@ import { Heart, Eye, ShoppingBag, Check } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
-import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
+import { getValidProductImageUrl, handleProductImageError, getProductCardImageFraming } from '../utils/imageUtils';
 
 interface ProductCardProps {
   product: Product;
@@ -62,7 +62,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover object-[center_top] transition-transform duration-500 ease-out group-hover:scale-105"
+          className={`w-full h-full transition-transform duration-500 ease-out ${getProductCardImageFraming(product.category)}`}
           onError={(e) => handleProductImageError(e, product.category, product.id)}
           onMouseEnter={() => !hoveredColorImage && images.length > 1 && setCurrentImageIndex(1)}
           onMouseLeave={() => !hoveredColorImage && setCurrentImageIndex(0)}

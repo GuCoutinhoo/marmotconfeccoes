@@ -51,9 +51,15 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
   const [isSaving, setIsSaving] = useState(false);
 
   // Image Adjustment Modal State
+  type AdjustContext =
+    | { type: 'cover' }
+    | { type: 'gallery'; index: number }
+    | { type: 'variant'; variantIndex: number; imageIndex: number };
+
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [adjustTargetImage, setAdjustTargetImage] = useState<string>('');
   const [adjustTitle, setAdjustTitle] = useState<string>('Ajustar Foto do Produto');
+  const [adjustContext, setAdjustContext] = useState<AdjustContext | null>(null);
   const [onAdjustComplete, setOnAdjustComplete] = useState<((url: string) => void) | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -259,16 +265,246 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
     }
   };
 
-  // Open Image Adjuster manually
+  // Open Image Adjuster specifically for Product Cover
+  const handleOpenAdjusterForCover = () => {
+    const img = formImages[0] || editingProduct?.image;
+    if (!img) {
+      showToast('Aviso', 'Nenhuma foto principal de capa para ajustar.', 'warning');
+      return;
+    }
+    setAdjustContext({ type: 'cover' });
+    setAdjustTargetImage(img);
+    setAdjustTitle('Ajustar Foto Principal (Capa)');
+    setAdjustModalOpen(true);
+  };
+
+  // Open Image Adjuster specifically for a Gallery photo
+  const handleOpenAdjusterForGallery = (index: number) => {
+    const img = formImages[index];
+    if (!img) {
+      showToast('Aviso', 'Nenhuma foto selecionada para ajustar.', 'warning');
+      return;
+    }
+    setAdjustContext({ type: 'gallery', index });
+    setAdjustTargetImage(img);
+    setAdjustTitle(`Ajustar Foto da Galeria (${index + 1})`);
+    setAdjustModalOpen(true);
+  };
+
+  // Open Image Adjuster specifically for a Variant photo
+  const handleOpenAdjusterForVariant = (variantIdx: number, imgIdx: number) => {
+    const col = formColors[variantIdx];
+    const img = col?.images?.[imgIdx] || col?.featuredImage || col?.image;
+    if (!img) {
+      showToast('Aviso', 'Nenhuma foto selecionada para ajustar.', 'warning');
+      return;
+    }
+    setAdjustContext({ type: 'variant', variantIndex: variantIdx, imageIndex: imgIdx });
+    setAdjustTargetImage(img);
+    setAdjustTitle(`Ajustar Foto: ${col.colorName || 'Variante'}`);
+    setAdjustModalOpen(true);
+  };
+
+  // Generic Open Image Adjuster (legacy fallback)
   const handleOpenAdjuster = (imageUrl: string, title: string, onSaveCallback: (url: string) => void) => {
     if (!imageUrl) {
       showToast('Aviso', 'Nenhuma foto selecionada para ajustar.', 'warning');
       return;
     }
+    setAdjustContext(null);
     setAdjustTargetImage(imageUrl);
     setAdjustTitle(title);
     setOnAdjustComplete(() => onSaveCallback);
     setAdjustModalOpen(true);
+  };
+
+  // Safe check if an image URL is used by another product before deleting from Storage
+  const isImageReferencedAnywhere = (url: string, prods: Product[], currentProdId?: string): boolean => {
+    if (!url) return false;
+    return prods.some((p) => {
+      if (currentProdId && p.id !== currentProdId) {
+        if (p.image === url) return true;
+        if (Array.isArray(p.images) && p.images.includes(url)) return true;
+        if (Array.isArray(p.colors)) {
+          if (
+            p.colors.some(
+              (c) =>
+                c.featuredImage === url ||
+                c.image === url ||
+                (Array.isArray(c.images) && c.images.includes(url))
+            )
+          ) {
+            return true;
+          }
+        }
+      }
+      return false;
+    });
+  };
+
+  // Full Async Image Adjust & Persistent Save Flow
+  const handleSaveAdjustedImage = async (dataUrl: string, blob?: Blob) => {
+    // If opened via legacy onAdjustComplete without structured context
+    if (!adjustContext) {
+      if (onAdjustComplete) {
+        onAdjustComplete(dataUrl);
+      }
+      return;
+    }
+
+    const isExistingProduct = Boolean(editingProduct?.id);
+    const productId = editingProduct?.id || 'new';
+
+    console.log('[IMAGE EDIT] Started adjustment persistence for product:', productId, 'context:', adjustContext.type);
+
+    // 1. Upload to Supabase Storage or Backend Storage Proxy
+    const sourceToUpload = blob || dataUrl;
+    const filename = `adjusted-${Date.now()}.jpg`;
+    const permanentUrl = await uploadProductImageToStorage(sourceToUpload, productId, filename);
+
+    if (!permanentUrl || permanentUrl.startsWith('data:')) {
+      console.error('[IMAGE EDIT] Upload failed: permanent URL not received');
+      throw new Error('Falha no upload da imagem: o servidor não retornou uma URL permanente.');
+    }
+
+    console.log('[IMAGE EDIT] Storage URL confirmed:', permanentUrl);
+
+    // 2. If it is an EXISTING product in DB, update Supabase IMMEDIATELY
+    if (isExistingProduct && editingProduct) {
+      let patch: Partial<Product> = {};
+      let nextImages = [...formImages];
+      let nextColors = [...formColors];
+      let oldImageUrlToClean: string | null = null;
+
+      if (adjustContext.type === 'cover') {
+        oldImageUrlToClean = formImages[0] || editingProduct.image;
+        nextImages = [permanentUrl, ...formImages.slice(1)];
+        // Strict consistency rule: product.image === product.images[0]
+        patch = {
+          image: permanentUrl,
+          images: nextImages,
+        };
+
+        // If the first variant was using the old cover image, synchronize it
+        if (nextColors.length > 0) {
+          const firstCol = nextColors[0];
+          if (!firstCol.images || firstCol.images.length === 0 || firstCol.featuredImage === oldImageUrlToClean) {
+            nextColors = nextColors.map((c, i) =>
+              i === 0
+                ? {
+                    ...c,
+                    featuredImage: permanentUrl,
+                    image: permanentUrl,
+                    images: c.images && c.images.length > 0 ? [permanentUrl, ...c.images.slice(1)] : [permanentUrl],
+                  }
+                : c
+            );
+            patch.colors = nextColors;
+          }
+        }
+      } else if (adjustContext.type === 'gallery') {
+        const idx = adjustContext.index;
+        oldImageUrlToClean = formImages[idx];
+        nextImages[idx] = permanentUrl;
+        const newPrimary = nextImages[0];
+        patch = {
+          image: newPrimary,
+          images: nextImages,
+        };
+      } else if (adjustContext.type === 'variant') {
+        const { variantIndex, imageIndex } = adjustContext;
+        const targetColor = nextColors[variantIndex];
+        if (targetColor) {
+          const vImgs = [...(targetColor.images || [])];
+          oldImageUrlToClean = vImgs[imageIndex] || targetColor.featuredImage || targetColor.image;
+          vImgs[imageIndex] = permanentUrl;
+          const isCover = imageIndex === 0;
+          const feat = isCover ? permanentUrl : targetColor.featuredImage || vImgs[0] || permanentUrl;
+          nextColors[variantIndex] = {
+            ...targetColor,
+            images: vImgs,
+            featuredImage: feat,
+            image: feat,
+          };
+          patch = {
+            colors: nextColors,
+          };
+        }
+      }
+
+      // Persist to Supabase Database
+      try {
+        console.log('[IMAGE EDIT] Sending UPDATE to database for product:', editingProduct.id, patch);
+        const updatedProduct = await updateProduct(editingProduct.id, patch);
+        console.log('[IMAGE EDIT] Product update confirmed by server and Supabase. Verified image:', updatedProduct.image);
+
+        // Update local React form state
+        setFormImages(nextImages);
+        setFormColors(nextColors);
+        setEditingProduct((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...patch,
+                image: nextImages[0] || prev.image,
+                images: nextImages,
+                colors: nextColors,
+              }
+            : null
+        );
+
+        console.log('[IMAGE EDIT] Local state synced with permanent URL');
+        showToast('Imagem Salva!', 'A foto foi ajustada e persistida permanentemente no banco.', 'success');
+
+        // Safe orphan cleanup: if old image was a Supabase Storage URL and is no longer used anywhere
+        if (oldImageUrlToClean && oldImageUrlToClean !== permanentUrl) {
+          setTimeout(() => {
+            const isUsedElsewhere = isImageReferencedAnywhere(oldImageUrlToClean!, products, editingProduct.id);
+            if (!isUsedElsewhere) {
+              deleteProductImageFromStorage(oldImageUrlToClean!).catch(() => {});
+            }
+          }, 3000);
+        }
+      } catch (dbErr: any) {
+        console.error('[IMAGE EDIT] Product update failed in database:', dbErr);
+        // Clean up orphan file that was uploaded if the DB update failed
+        deleteProductImageFromStorage(permanentUrl).catch(() => {});
+        throw new Error(`Não foi possível salvar a alteração no banco de dados: ${dbErr?.message || 'Erro desconhecido'}`);
+      }
+    } else {
+      // NEW product (not created in database yet)
+      if (adjustContext.type === 'cover') {
+        const next = [permanentUrl, ...formImages.slice(1)];
+        setFormImages(next);
+      } else if (adjustContext.type === 'gallery') {
+        const next = [...formImages];
+        next[adjustContext.index] = permanentUrl;
+        setFormImages(next);
+      } else if (adjustContext.type === 'variant') {
+        const { variantIndex, imageIndex } = adjustContext;
+        const targetColor = formColors[variantIndex];
+        if (targetColor) {
+          const vImgs = [...(targetColor.images || [])];
+          vImgs[imageIndex] = permanentUrl;
+          const isCover = imageIndex === 0;
+          const feat = isCover ? permanentUrl : targetColor.featuredImage || vImgs[0] || permanentUrl;
+          const copy = [...formColors];
+          copy[variantIndex] = {
+            ...targetColor,
+            images: vImgs,
+            featuredImage: feat,
+            image: feat,
+          };
+          setFormColors(copy);
+        }
+      }
+
+      showToast(
+        'Foto Ajustada',
+        'A imagem foi carregada no Storage. Conclua o cadastro clicando em "Criar Produto".',
+        'info'
+      );
+    }
   };
 
   // Cover Photo Upload (Uploads original file in full resolution directly)
@@ -1252,13 +1488,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                         <div className="flex items-center justify-between">
                           <button
                             type="button"
-                            onClick={() =>
-                              handleOpenAdjuster(formImages[0], 'Ajustar Foto de Capa', (adjustedUrl) => {
-                                const next = [...formImages];
-                                next[0] = adjustedUrl;
-                                setFormImages(next);
-                              })
-                            }
+                            onClick={handleOpenAdjusterForCover}
                             className="p-1 bg-white/20 text-white rounded hover:bg-white/30 transition-colors"
                             title="Ajustar / Recortar Foto"
                           >
@@ -1330,13 +1560,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                           <div className="flex items-center justify-between">
                             <button
                               type="button"
-                              onClick={() =>
-                                handleOpenAdjuster(imgUrl, `Ajustar Foto ${index + 1}`, (adjustedUrl) => {
-                                  const next = [...formImages];
-                                  next[index] = adjustedUrl;
-                                  setFormImages(next);
-                                })
-                              }
+                              onClick={() => handleOpenAdjusterForGallery(index)}
                               className="p-1 bg-white/20 text-white rounded hover:bg-white/30 transition-colors"
                               title="Ajustar / Recortar Foto"
                             >
@@ -1834,21 +2058,7 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
                                         <div className="flex justify-end gap-1">
                                           <button
                                             type="button"
-                                            onClick={() =>
-                                              handleOpenAdjuster(
-                                                imgUrl,
-                                                `Ajustar Foto: ${col.colorName}`,
-                                                (adjustedUrl) => {
-                                                  const copy = [...variantImages];
-                                                  copy[imgIdx] = adjustedUrl;
-                                                  handleVariantUpdateInfo(variantIdx, {
-                                                    images: copy,
-                                                    featuredImage: isCover ? adjustedUrl : featuredImg,
-                                                  });
-                                                  setAdjustModalOpen(false);
-                                                }
-                                              )
-                                            }
+                                            onClick={() => handleOpenAdjusterForVariant(variantIdx, imgIdx)}
                                             className="p-1 bg-white/20 text-white hover:text-[#F0C84B] rounded transition-colors"
                                             title="Ajustar / Cortar Foto"
                                           >
@@ -2112,13 +2322,11 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
         imageSrc={adjustTargetImage}
         title={adjustTitle}
         initialAspectRatio="4:5"
-        onSave={(adjustedUrl) => {
-          if (onAdjustComplete) {
-            onAdjustComplete(adjustedUrl);
-          }
+        onSave={handleSaveAdjustedImage}
+        onClose={() => {
           setAdjustModalOpen(false);
+          setAdjustContext(null);
         }}
-        onClose={() => setAdjustModalOpen(false)}
       />
     </div>
   );

@@ -394,9 +394,14 @@ export async function uploadProductImageToStorage(
       }
 
       if (payloadDataUrl) {
+        const authHeaders = getClientAuthHeaders();
         const res = await fetch('/api/upload', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeaders,
+          },
+          credentials: 'include',
           body: JSON.stringify({
             image: payloadDataUrl,
             filename: originalFilename || `product-${uniqueId}.${ext}`,
@@ -411,19 +416,19 @@ export async function uploadProductImageToStorage(
             console.log('[STORAGE] Upload via backend proxy preservando qualidade:', data.url);
             return data.url;
           }
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          console.warn('[STORAGE] Backend upload proxy notice:', res.status, errData);
+          throw new Error(errData?.error || `Falha no upload (código HTTP ${res.status}).`);
         }
       }
-    } catch (proxyErr) {
-      console.warn('[STORAGE] Backend upload proxy notice:', proxyErr);
+    } catch (proxyErr: any) {
+      console.warn('[STORAGE] Backend upload proxy exception:', proxyErr?.message || proxyErr);
+      throw proxyErr;
     }
   }
 
-  // 3. Fallback: If network failed, return original data URL or string
-  if (typeof source === 'string') {
-    return source;
-  }
-
-  return '';
+  throw new Error('Falha ao processar e persistir a imagem no servidor ou Supabase Storage.');
 }
 
 /**
@@ -502,6 +507,41 @@ export function buildProductSupabasePayload(product: Product) {
 }
 
 /**
+ * Helper to build headers with active auth token from local storage
+ */
+function getClientAuthHeaders(): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (typeof window === 'undefined') return headers;
+
+  let token = localStorage.getItem('@marmot_auth_token');
+  if (!token) {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed?.access_token) {
+              token = parsed.access_token;
+              break;
+            }
+          }
+        } catch {}
+      }
+    }
+  }
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+    headers['x-admin-token'] = token;
+  }
+  return headers;
+}
+
+/**
  * Inserts a new product into Supabase table 'products'.
  */
 export async function createProductInSupabase(productData: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
@@ -573,7 +613,35 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
       .single();
 
     if (error) {
-      console.error('[PRODUCTS] Erro ao criar no Supabase via INSERT:', error.message || error);
+      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
+      if (isPermissionDenied) {
+        console.warn('[PRODUCTS] Direct Supabase INSERT restricted by RLS (is_admin). Delegando para API do servidor...');
+      } else {
+        console.warn('[PRODUCTS] Aviso no INSERT do Supabase:', error.message || error);
+      }
+
+      // Seamless fallback via server-side authoritative API endpoint
+      if (typeof window !== 'undefined') {
+        try {
+          const authHeaders = getClientAuthHeaders();
+          const apiRes = await fetch('/api/products', {
+            method: 'POST',
+            headers: authHeaders,
+            credentials: 'include',
+            body: JSON.stringify(newProduct),
+          });
+          if (apiRes.ok) {
+            const apiProduct = await apiRes.json();
+            if (apiProduct && apiProduct.id) {
+              console.log('[PRODUCTS] Produto criado com sucesso via API autoritativa:', apiProduct.id);
+              return { product: apiProduct };
+            }
+          }
+        } catch (apiErr) {
+          console.warn('[PRODUCTS] Fallback para POST /api/products falhou:', apiErr);
+        }
+      }
+
       return { product: null, error };
     }
 
@@ -581,7 +649,24 @@ export async function createProductInSupabase(productData: Partial<Product>): Pr
     console.log('[PRODUCTS] Produto criado com sucesso via INSERT no Supabase:', created.id);
     return { product: created };
   } catch (err: any) {
-    console.error('[PRODUCTS] Exceção ao criar produto no Supabase:', err);
+    console.warn('[PRODUCTS] Exceção ao criar produto no Supabase:', err?.message || err);
+    if (typeof window !== 'undefined') {
+      try {
+        const authHeaders = getClientAuthHeaders();
+        const apiRes = await fetch('/api/products', {
+          method: 'POST',
+          headers: authHeaders,
+          credentials: 'include',
+          body: JSON.stringify(productData),
+        });
+        if (apiRes.ok) {
+          const apiProduct = await apiRes.json();
+          if (apiProduct && apiProduct.id) {
+            return { product: apiProduct };
+          }
+        }
+      } catch {}
+    }
     return { product: null, error: err };
   }
 }
@@ -649,7 +734,35 @@ export async function updateProductInSupabase(id: string, updates: Partial<Produ
       .single();
 
     if (error) {
-      console.error('[PRODUCTS] Erro no UPDATE do Supabase:', error.message || error);
+      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
+      if (isPermissionDenied) {
+        console.warn('[PRODUCTS] Direct Supabase UPDATE restrito por RLS (is_admin). Delegando para API autoritativa do servidor...');
+      } else {
+        console.warn('[PRODUCTS] Aviso no UPDATE do Supabase:', error.message || error);
+      }
+
+      // Seamless fallback via server-side authoritative API endpoint
+      if (typeof window !== 'undefined') {
+        try {
+          const authHeaders = getClientAuthHeaders();
+          const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
+            method: 'PUT',
+            headers: authHeaders,
+            credentials: 'include',
+            body: JSON.stringify(updates),
+          });
+          if (apiRes.ok) {
+            const apiProduct = await apiRes.json();
+            if (apiProduct && apiProduct.id) {
+              console.log('[PRODUCTS] Produto atualizado com sucesso via API autoritativa:', apiProduct.id);
+              return { product: apiProduct };
+            }
+          }
+        } catch (apiErr) {
+          console.warn('[PRODUCTS] Fallback para PUT /api/products falhou:', apiErr);
+        }
+      }
+
       return { product: null, error };
     }
 
@@ -657,7 +770,25 @@ export async function updateProductInSupabase(id: string, updates: Partial<Produ
     console.log('[PRODUCTS] Produto atualizado com sucesso via UPDATE no Supabase:', updated.id);
     return { product: updated };
   } catch (err: any) {
-    console.error('[PRODUCTS] Exceção ao atualizar produto no Supabase:', err);
+    console.warn('[PRODUCTS] Exceção ao atualizar produto no Supabase:', err?.message || err);
+    if (typeof window !== 'undefined') {
+      try {
+        const cleanId = String(id).trim();
+        const authHeaders = getClientAuthHeaders();
+        const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
+          method: 'PUT',
+          headers: authHeaders,
+          credentials: 'include',
+          body: JSON.stringify(updates),
+        });
+        if (apiRes.ok) {
+          const apiProduct = await apiRes.json();
+          if (apiProduct && apiProduct.id) {
+            return { product: apiProduct };
+          }
+        }
+      } catch {}
+    }
     return { product: null, error: err };
   }
 }
@@ -685,14 +816,58 @@ export async function updateProductStockInSupabase(id: string, stockCount: numbe
       .single();
 
     if (error) {
-      console.error('[PRODUCTS] erro ao atualizar estoque no Supabase:', error.message || error);
+      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
+      if (isPermissionDenied) {
+        console.warn('[PRODUCTS] Direct Supabase stock update restrito por RLS. Delegando para API do servidor...');
+      } else {
+        console.warn('[PRODUCTS] Aviso ao atualizar estoque no Supabase:', error.message || error);
+      }
+
+      if (typeof window !== 'undefined') {
+        try {
+          const authHeaders = getClientAuthHeaders();
+          const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}/stock`, {
+            method: 'PUT',
+            headers: authHeaders,
+            credentials: 'include',
+            body: JSON.stringify({ stockCount: newStock }),
+          });
+          if (apiRes.ok) {
+            const apiProduct = await apiRes.json();
+            if (apiProduct && apiProduct.id) {
+              return { product: apiProduct };
+            }
+          }
+        } catch (apiErr) {
+          console.warn('[PRODUCTS] Fallback para PUT /api/products/:id/stock falhou:', apiErr);
+        }
+      }
+
       return { product: null, error };
     }
 
     const updated = mapSupabaseRowToProduct(data);
     return { product: updated };
   } catch (err: any) {
-    console.error('[PRODUCTS] exceção ao atualizar estoque no Supabase:', err);
+    console.warn('[PRODUCTS] Exceção ao atualizar estoque no Supabase:', err?.message || err);
+    if (typeof window !== 'undefined') {
+      try {
+        const cleanId = String(id).trim();
+        const authHeaders = getClientAuthHeaders();
+        const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}/stock`, {
+          method: 'PUT',
+          headers: authHeaders,
+          credentials: 'include',
+          body: JSON.stringify({ stockCount: Math.max(0, parseInt(String(stockCount), 10)) }),
+        });
+        if (apiRes.ok) {
+          const apiProduct = await apiRes.json();
+          if (apiProduct && apiProduct.id) {
+            return { product: apiProduct };
+          }
+        }
+      } catch {}
+    }
     return { product: null, error: err };
   }
 }
@@ -711,14 +886,50 @@ export async function deleteProductInSupabase(id: string): Promise<{ success: bo
       .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
 
     if (error) {
-      console.error('[PRODUCTS] erro ao excluir no Supabase:', error.message || error);
+      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
+      if (isPermissionDenied) {
+        console.warn('[PRODUCTS] Direct Supabase DELETE restrito por RLS. Delegando para API do servidor...');
+      } else {
+        console.warn('[PRODUCTS] Aviso ao excluir no Supabase:', error.message || error);
+      }
+
+      if (typeof window !== 'undefined') {
+        try {
+          const authHeaders = getClientAuthHeaders();
+          const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
+            method: 'DELETE',
+            headers: authHeaders,
+            credentials: 'include',
+          });
+          if (apiRes.ok) {
+            return { success: true };
+          }
+        } catch (apiErr) {
+          console.warn('[PRODUCTS] Fallback para DELETE /api/products/:id falhou:', apiErr);
+        }
+      }
+
       return { success: false, error };
     }
 
     console.log('[PRODUCTS] produto excluído com sucesso no Supabase:', cleanId);
     return { success: true };
   } catch (err: any) {
-    console.error('[PRODUCTS] exceção ao excluir produto no Supabase:', err);
+    console.warn('[PRODUCTS] Exceção ao excluir produto no Supabase:', err?.message || err);
+    if (typeof window !== 'undefined') {
+      try {
+        const cleanId = String(id).trim();
+        const authHeaders = getClientAuthHeaders();
+        const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
+          method: 'DELETE',
+          headers: authHeaders,
+          credentials: 'include',
+        });
+        if (apiRes.ok) {
+          return { success: true };
+        }
+      } catch {}
+    }
     return { success: false, error: err };
   }
 }

@@ -41,11 +41,8 @@ BEGIN
 END;
 $$;
 
--- Lock down execution: Revoke from PUBLIC, anon, and authenticated
-REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.is_admin() FROM anon;
-REVOKE ALL ON FUNCTION public.is_admin() FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.is_admin() TO service_role;
+-- Execution grant: Safe because function internally checks role and returns false if unauthorized
+GRANT EXECUTE ON FUNCTION public.is_admin() TO service_role, authenticated, anon;
 
 CREATE OR REPLACE FUNCTION public.is_admin(user_id uuid)
 RETURNS boolean
@@ -70,10 +67,8 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM anon;
-REVOKE ALL ON FUNCTION public.is_admin(uuid) FROM authenticated;
-GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO service_role;
+-- Execution grant: Safe because function internally checks role and returns false if unauthorized
+GRANT EXECUTE ON FUNCTION public.is_admin(uuid) TO service_role, authenticated, anon;
 
 -- ------------------------------------------------------------------------------
 -- 2. PRODUCT REVIEWS RLS HARDENING (FAIL-CLOSED, SERVICE_ROLE INSERT ONLY)
@@ -169,6 +164,9 @@ CREATE POLICY "shipping_quotes_write_policy" ON public.shipping_quotes
 -- Products write policy: use inline role check
 DROP POLICY IF EXISTS "Products are manageable by admin only" ON public.products;
 DROP POLICY IF EXISTS "Products admin manage" ON public.products;
+DROP POLICY IF EXISTS "Products write restricted to admin" ON public.products;
+DROP POLICY IF EXISTS "Products modification allowed" ON public.products;
+DROP POLICY IF EXISTS "Gerenciamento total de produtos" ON public.products;
 CREATE POLICY "Products admin manage" ON public.products
   FOR ALL
   USING (

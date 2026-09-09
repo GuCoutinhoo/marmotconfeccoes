@@ -139,6 +139,7 @@ export interface Product {
   featured?: boolean;
   status?: 'active' | 'draft' | 'archived' | 'out_of_stock';
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Category {
@@ -1904,19 +1905,25 @@ export class DatabaseManager {
         if (updates.featured !== undefined) updatePayload.featured = Boolean(cleanProduct.featured);
         if (updates.status !== undefined) updatePayload.status = cleanProduct.status || 'active';
 
-        const { error } = await adminClient
+        const { data: updateData, error } = await adminClient
           .from('products')
           .update(updatePayload)
-          .eq('id', cleanProduct.id);
+          .eq('id', cleanProduct.id)
+          .select()
+          .single();
 
         if (error) {
-          console.warn('[DB] Supabase product update notice:', error.message);
+          console.error('[DB] Supabase product update error:', error.message);
+          throw new Error(`Falha no Supabase ao atualizar produto: ${error.message}`);
         } else {
           console.log('[DB] Produto atualizado no Supabase com sucesso via UPDATE:', cleanProduct.id);
+          if (updateData) {
+            cleanProduct.updatedAt = updateData.updated_at || cleanProduct.updatedAt;
+          }
         }
       } catch (sbErr: any) {
-        console.warn('[DB] Supabase product update exception:', sbErr?.message);
-        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
+        console.error('[DB] Supabase product update exception:', sbErr?.message || sbErr);
+        throw sbErr;
       }
     }
 
@@ -6496,7 +6503,7 @@ app.put('/api/products/:id', requireAdmin, async (req: any, res) => {
   }
 });
 
-app.put('/api/products/:id/stock', requireAdmin, async (req, res) => {
+const handleStockUpdate = async (req: any, res: express.Response) => {
   try {
     const { stockCount } = req.body;
     if (stockCount === undefined) {
@@ -6508,7 +6515,10 @@ app.put('/api/products/:id/stock', requireAdmin, async (req, res) => {
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Erro ao atualizar saldo de estoque.' });
   }
-});
+};
+
+app.put('/api/products/:id/stock', requireAdmin, handleStockUpdate);
+app.patch('/api/products/:id/stock', requireAdmin, handleStockUpdate);
 
 app.delete('/api/products/:id', requireAdmin, async (req: any, res) => {
   try {
@@ -6817,6 +6827,28 @@ app.post('/api/upload', requireAdmin, async (req, res) => {
     return res.json({ success: true, url: publicUrl });
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Falha ao processar upload.' });
+  }
+});
+
+// Proxy remote image to prevent canvas cross-origin taint during client-side crop/zoom
+app.get('/api/proxy-image', async (req, res) => {
+  try {
+    const targetUrl = String(req.query.url || '').trim();
+    if (!targetUrl || (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://'))) {
+      return res.status(400).json({ error: 'URL inválida para proxy de imagem.' });
+    }
+    const response = await fetch(targetUrl);
+    if (!response.ok) {
+      return res.status(response.status).json({ error: 'Falha ao buscar imagem remota.' });
+    }
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    const buffer = Buffer.from(await response.arrayBuffer());
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(buffer);
+  } catch (err: any) {
+    res.status(500).json({ error: err?.message || 'Erro no proxy de imagem.' });
   }
 });
 
