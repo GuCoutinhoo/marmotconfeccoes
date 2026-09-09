@@ -317,7 +317,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               delay: 0.08,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="group relative lg:col-span-5 w-full h-[520px] sm:h-[580px] lg:h-auto min-h-[520px] lg:min-h-[680px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col justify-between"
+            className="group relative lg:col-span-5 w-full h-[520px] sm:h-[580px] lg:h-auto min-h-[520px] lg:min-h-[680px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col justify-end"
           >
             {/* Foto Editorial de Fundo */}
             <img
@@ -339,20 +339,8 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               }}
             />
 
-            {/* Gradientes Superior e Inferior para Legibilidade Editorial */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent h-24 pointer-events-none" />
+            {/* Gradientes para Legibilidade Editorial */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-35% to-transparent pointer-events-none" />
-
-            {/* Top-Left: Badge Número Sequencial (ex: 01 / 07 com sublinhado amarelo) */}
-            <div className="relative z-20 p-5 sm:p-6 lg:p-7">
-              <div className="flex flex-col items-start pointer-events-none">
-                <div className="font-mono text-xs sm:text-[13px] tracking-wider leading-none">
-                  <span className="font-bold text-[#F4C400]">{featuredItem.number}</span>
-                  <span className="text-zinc-400 font-normal"> / 07</span>
-                </div>
-                <div className="w-8 h-[2px] bg-[#F4C400] mt-1.5" />
-              </div>
-            </div>
 
             {/* Bottom Content: Traço Amarelo + Título + Heavyweight + Tags + VER CATEGORIA e Seta */}
             <div className="relative z-20 p-5 sm:p-7 lg:p-8">
@@ -415,7 +403,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                   delay: 0.14 + idx * 0.07,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="group relative h-[290px] sm:h-[315px] lg:h-[330px] xl:h-[340px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_16px_32px_rgba(0,0,0,0.16)] transition-all duration-300 flex flex-col justify-between"
+                className="group relative h-[290px] sm:h-[315px] lg:h-[330px] xl:h-[340px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_16px_32px_rgba(0,0,0,0.16)] transition-all duration-300 flex flex-col justify-end"
               >
                 {/* Foto Editorial de Fundo */}
                 <img
@@ -437,20 +425,8 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                   }}
                 />
 
-                {/* Gradientes Superior e Inferior */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-transparent to-transparent h-20 pointer-events-none" />
+                {/* Gradientes para Legibilidade Editorial */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 via-35% to-transparent pointer-events-none" />
-
-                {/* Top-Left: Badge Número Sequencial (ex: 02 / 07, 03 / 07, etc.) */}
-                <div className="relative z-20 p-4 sm:p-5">
-                  <div className="flex flex-col items-start pointer-events-none">
-                    <div className="font-mono text-[11px] sm:text-xs tracking-wider leading-none">
-                      <span className="font-bold text-[#F4C400]">{item.number}</span>
-                      <span className="text-zinc-400 font-normal"> / 07</span>
-                    </div>
-                    <div className="w-7 h-[2px] bg-[#F4C400] mt-1.5" />
-                  </div>
-                </div>
 
                 {/* Bottom Content: Traço Amarelo + Título + Subcategorias + Botão Circular com Seta */}
                 <div className="relative z-20 p-4 sm:p-5 lg:p-6 flex items-end justify-between gap-3">
