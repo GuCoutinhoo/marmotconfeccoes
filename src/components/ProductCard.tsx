@@ -39,7 +39,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   const effectivePrice = product.promoPrice || product.price;
   const installmentCount = 3;
   const installmentValue = effectivePrice / installmentCount;
-  const pixPrice = effectivePrice * 0.95;
 
   const handleQuickAddSize = useCallback((e: React.MouseEvent, size: string) => {
     e.stopPropagation();
@@ -179,9 +178,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <span>
               ou <strong>{installmentCount}x de R$ {installmentValue.toFixed(2).replace('.', ',')}</strong> sem juros
             </span>
-            <span className="text-[#B45309] font-semibold">
-              R$ {pixPrice.toFixed(2).replace('.', ',')} no PIX (5% OFF)
-            </span>
+            <span className="text-[#B45309] font-semibold">PIX ou cartão na InfinitePay</span>
           </div>
 
           {/* Color Indicators */}

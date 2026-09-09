@@ -513,7 +513,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
     if (payNowInFlightRef.current.has(orderId)) return;
     payNowInFlightRef.current.add(orderId);
     try {
-      showToast('Conectando à Stripe...', 'Gerando um checkout seguro para o pedido.', 'info');
+      showToast('Conectando à InfinitePay...', 'Gerando um checkout seguro para o pedido.', 'info');
       const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
       const res = await fetch(`/api/orders/${orderId}/pay-now`, {
         method: 'POST',

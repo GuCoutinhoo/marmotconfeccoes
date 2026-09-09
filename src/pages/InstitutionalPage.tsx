@@ -57,7 +57,7 @@ export const InstitutionalPage: React.FC<InstitutionalPageProps> = ({
     },
     {
       q: 'Quais as formas de pagamento aceitas?',
-      a: 'Aceitamos PIX com 5% de desconto automático, cartão de crédito e boleto bancário pelo Checkout seguro da Stripe.',
+      a: 'Aceitamos PIX e cartão pelo Checkout seguro da InfinitePay. As opções disponíveis são apresentadas no ambiente de pagamento.',
     },
     {
       q: 'Como escolher o meu tamanho correto?',
@@ -283,7 +283,7 @@ export const InstitutionalPage: React.FC<InstitutionalPageProps> = ({
           <div className="bg-white border border-[#E4E4E7] p-8 md:p-12 rounded-2xl space-y-4 animate-fadeIn text-xs text-[#52525B] leading-relaxed shadow-xs">
             <h1 className="text-2xl font-black uppercase text-[#18181B] mb-4">TERMOS DE USO E POLÍTICA DE PRIVACIDADE</h1>
             <p>
-              A MARMOT CONFECÇÕES respeita rigorosamente a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018). Os dados de pagamento são coletados e processados no Checkout hospedado da Stripe; a Marmot não armazena dados completos de cartão.
+              A MARMOT CONFECÇÕES respeita rigorosamente a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018). Os dados de pagamento são coletados e processados no Checkout hospedado da InfinitePay; a Marmot não armazena dados completos de cartão.
             </p>
             <p>
               Garantimos sigilo absoluto de seus dados cadastrais, utilizando-os exclusivamente para processamento, faturamento e entrega de seus pedidos.

@@ -39,9 +39,10 @@ test('Security & Architecture Audit Assertions', async (t) => {
   await t.test('Backend Server-Authoritative Hardening', () => {
     const backend = fs.readFileSync('api/index.ts', 'utf8');
 
-    // Webhook fail-closed
-    assert.ok(backend.includes('webhooks.constructEvent(req.body, signature, webhookSecret)'), 'Fail-closed Stripe webhook signature check missing');
-    assert.ok(backend.includes('STRIPE_WEBHOOK_MODE_MISMATCH'), 'Stripe test/live mode isolation missing');
+    // InfinitePay does not document a webhook signature. Every notification is
+    // confirmed server-to-server before the order mutation is allowed.
+    assert.ok(backend.includes('await checkInfinitePayPayment('), 'InfinitePay server-to-server payment verification missing');
+    assert.ok(backend.includes('checked.amount !== expectedAmountCents'), 'InfinitePay exact amount check missing');
     assert.ok(backend.includes('RESEND_API_KEY não configurada no ambiente de produção'), 'Fail-closed Resend check missing');
 
     // Server-authoritative checkout & pricing

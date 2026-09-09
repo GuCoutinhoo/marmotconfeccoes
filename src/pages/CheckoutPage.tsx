@@ -4,14 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import {
   CreditCard,
-  QrCode,
-  FileText,
   ShieldCheck,
   CheckCircle2,
   Lock,
   ArrowRight,
   Truck,
-  Check,
   Package,
   ShoppingBag,
   Loader2,
@@ -177,8 +174,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   // Coupon State
   const [couponCodeInput, setCouponCodeInput] = useState('');
 
-  // Payment Selection
-  const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'Cartão' | 'Boleto'>('PIX');
   const checkoutAttemptIdRef = useRef<string>(crypto.randomUUID());
   const checkoutRequestInFlightRef = useRef(false);
 
@@ -189,76 +184,102 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [retryOrderId, setRetryOrderId] = useState<string | null>(null);
   const [isVerifyingStatus, setIsVerifyingStatus] = useState(false);
+  const [infinitePayReturn, setInfinitePayReturn] = useState<{
+    orderNsu: string;
+    transactionNsu: string;
+    slug: string;
+    receiptUrl?: string;
+    captureMethod?: string;
+  } | null>(null);
 
-// The return page is read-only. It never marks a payment as paid; only the
-  // signed Stripe webhook can do that. A short polling window is used only to
-  // improve the UX while that webhook is being persisted.
-  const fetchPersistedPaymentStatus = async (orderId: string, sessionId?: string): Promise<Order> => {
-    const endpoint = sessionId
-      ? `/api/stripe/checkout-session/${encodeURIComponent(sessionId)}/status`
-      : `/api/stripe/orders/${encodeURIComponent(orderId)}/status`;
-    const response = await fetch(endpoint, { headers: getCheckoutAuthHeaders() });
+  // The return page never trusts URL parameters as proof of payment. It sends
+  // the provider identifiers to the backend, which verifies them with
+  // InfinitePay payment_check before any financial state is changed.
+  const getPersistedOrder = async (orderId: string): Promise<Order> => {
+    const response = await fetch('/api/infinitepay/orders/' + encodeURIComponent(orderId) + '/status', {
+      headers: getCheckoutAuthHeaders(),
+    });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data.order) throw new Error(data.error || 'Não foi possível consultar o pedido.');
     return data.order as Order;
   };
 
+  const confirmInfinitePayReturn = async (references: {
+    orderNsu: string;
+    transactionNsu: string;
+    slug: string;
+    receiptUrl?: string;
+    captureMethod?: string;
+  }): Promise<Order> => {
+    const response = await fetch('/api/infinitepay/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getCheckoutAuthHeaders() },
+      body: JSON.stringify(references),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok && response.status !== 202) {
+      throw new Error(data.error || 'Não foi possível validar o pagamento.');
+    }
+    if (!data.order) throw new Error('O backend não retornou o pedido validado.');
+    return data.order as Order;
+  };
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const returnState = params.get('stripe_return');
-    const orderId = params.get('order_id') || '';
-    const sessionId = params.get('session_id') || undefined;
-    if (!returnState) return;
+    if (params.get('infinitepay_return') !== '1') return;
 
-    if (!orderId || (returnState === 'success' && !sessionId)) {
-      showToast('Retorno incompleto', 'Não foi possível identificar o pedido retornado pela Stripe.', 'error');
-      return;
-    }
+    const expectedOrderId = params.get('expected_order_id') || '';
+    const orderNsu = params.get('order_nsu') || '';
+    const transactionNsu = params.get('transaction_nsu') || '';
+    const slug = params.get('slug') || '';
+    const receiptUrl = params.get('receipt_url') || undefined;
+    const captureMethod = params.get('capture_method') || undefined;
 
     let cancelled = false;
-    let timer: number | undefined;
-    let attempts = 0;
-    const maxAttempts = returnState === 'success' ? 20 : 1;
-
-    const refresh = async () => {
+    const validateReturn = async () => {
+      setIsVerifyingStatus(true);
       try {
-        setIsVerifyingStatus(true);
-        const order = await fetchPersistedPaymentStatus(orderId, sessionId);
+        if (!expectedOrderId || !orderNsu || expectedOrderId !== orderNsu || !transactionNsu || !slug) {
+          if (expectedOrderId) {
+            const pendingOrder = await getPersistedOrder(expectedOrderId);
+            if (!cancelled) {
+              setCompletedOrder(pendingOrder);
+              registerOrder(pendingOrder);
+              setRetryOrderId(pendingOrder.id);
+              setStep(3);
+            }
+          }
+          throw new Error('O retorno da InfinitePay não contém todos os identificadores esperados.');
+        }
+
+        const references = { orderNsu, transactionNsu, slug, receiptUrl, captureMethod };
+        if (!cancelled) setInfinitePayReturn(references);
+        const order = await confirmInfinitePayReturn(references);
         if (cancelled) return;
+
         setCompletedOrder(order);
         registerOrder(order);
         setStep(3);
-        if (order.paymentStatus !== 'Pago') setRetryOrderId(order.id);
-
         if (order.paymentStatus === 'Pago') {
           clearCart();
-          showToast('Pagamento confirmado!', `Pedido #${order.id} confirmado com segurança.`, 'success');
-          return;
-        }
-        if (order.paymentStatus === 'Recusado' || order.paymentStatus === 'Cancelado') {
-          showToast('Pagamento não concluído', 'Seu carrinho foi preservado para uma nova tentativa.', 'info');
-          return;
-        }
-
-        attempts += 1;
-        if (attempts < maxAttempts && !cancelled) {
-          timer = window.setTimeout(refresh, 2_500);
-        } else if (returnState === 'success') {
-          showToast('Confirmação em processamento', 'A Stripe ainda está processando o pagamento. Você pode acompanhar em Meus Pedidos.', 'info');
+          setRetryOrderId(null);
+          showToast('Pagamento confirmado!', 'Pedido #' + order.id + ' confirmado com segurança.', 'success');
         } else {
-          showToast('Checkout cancelado', 'O pedido não foi marcado como pago e o carrinho continua salvo.', 'info');
+          setRetryOrderId(order.id);
+          showToast('Pagamento ainda não confirmado', 'A InfinitePay não confirmou este pagamento. Seu carrinho foi preservado.', 'info');
         }
       } catch (error: any) {
-        if (!cancelled) showToast('Status indisponível', error?.message || 'Consulte novamente em Meus Pedidos.', 'error');
+        if (!cancelled) {
+          showToast('Erro ao validar pagamento', error?.message || 'Tente verificar novamente em instantes.', 'error');
+        }
       } finally {
         if (!cancelled) setIsVerifyingStatus(false);
       }
     };
 
-    refresh();
+    validateReturn();
     return () => {
       cancelled = true;
-      if (timer) window.clearTimeout(timer);
     };
   }, []);
 
@@ -266,17 +287,17 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
     if (!completedOrder) return;
     setIsVerifyingStatus(true);
     try {
-      const updatedOrder = await fetchPersistedPaymentStatus(
-        completedOrder.id,
-        completedOrder.paymentProviderSessionId || completedOrder.paymentDetails?.sessionId,
-      );
+      const updatedOrder = infinitePayReturn
+        ? await confirmInfinitePayReturn(infinitePayReturn)
+        : await getPersistedOrder(completedOrder.id);
       setCompletedOrder(updatedOrder);
       registerOrder(updatedOrder);
       if (updatedOrder.paymentStatus === 'Pago') {
         clearCart();
-        showToast('Pagamento confirmado!', `Pedido #${updatedOrder.id} aprovado.`, 'success');
+        setRetryOrderId(null);
+        showToast('Pagamento confirmado!', 'Pedido #' + updatedOrder.id + ' aprovado.', 'success');
       } else {
-        showToast('Status atualizado', 'A confirmação pelo webhook da Stripe ainda está pendente.', 'info');
+        showToast('Ainda não confirmado', 'A InfinitePay ainda não confirmou o pagamento.', 'info');
       }
     } catch (error: any) {
       showToast('Erro', error?.message || 'Não foi possível consultar o pedido.', 'error');
@@ -349,9 +370,8 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   const rawShippingFee = activeShippingOption ? (isFreeShipping ? 0 : activeShippingOption.price) : 0;
 
   // Calculations
-  const pixDiscountValue = paymentMethod === 'PIX' ? (cartSubtotal - cartDiscount) * 0.05 : 0;
   const shippingFee = rawShippingFee;
-  const grandTotal = Math.max(0, cartSubtotal - cartDiscount - pixDiscountValue + shippingFee);
+  const grandTotal = Math.max(0, cartSubtotal - cartDiscount + shippingFee);
 
   const handleApplyCouponForm = (e: React.FormEvent) => {
     e.preventDefault();
@@ -435,7 +455,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       }
     }
 
-    // Create the pending order and hosted Stripe Checkout Session.
+    // Persist the pending order before requesting the hosted InfinitePay link.
     await handlePlaceOrder();
   };
 
@@ -455,12 +475,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       const serviceName = activeShippingOption?.name || 'SEDEX Expresso';
       const cleanCep = normalizeCep(address.cep);
 
-      const targetPaymentMethod = paymentMethod === 'Cartão'
-        ? 'Cartão de Crédito'
-        : paymentMethod === 'Boleto'
-        ? 'Boleto Bancário'
-        : 'PIX';
-
       const authToken = localStorage.getItem('@marmot_auth_token') || localStorage.getItem('marmot_auth_token') || '';
       const orderPayload = {
         ...(retryOrderId ? { existingOrderId: retryOrderId } : {}),
@@ -472,7 +486,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
           colorName: item.selectedColor.colorName,
         })),
         couponCode: appliedCoupon?.code || (couponCodeInput.trim() ? couponCodeInput.trim() : undefined),
-        paymentMethod: targetPaymentMethod,
+        paymentMethod: 'InfinitePay Checkout',
         shippingAddress: {
           ...address,
           cep: cleanCep,
@@ -502,7 +516,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         headers['Authorization'] = `Bearer ${authToken}`;
       }
 
-      const res = await fetch('/api/stripe/checkout-session', {
+      const res = await fetch('/api/infinitepay/checkout', {
         method: 'POST',
         headers,
         body: JSON.stringify(orderPayload),
@@ -513,14 +527,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         if (typeof errData.orderId === 'string' && errData.orderId.trim()) {
           setRetryOrderId(errData.orderId.trim());
         }
-        throw new Error(errData.error || 'Erro ao gerar o checkout seguro da Stripe.');
+        throw new Error(errData.error || 'Erro ao gerar o checkout seguro da InfinitePay.');
       }
 
       const data = await res.json();
       const targetCheckoutUrl = data.checkoutUrl || data.targetUrl;
 
       if (!targetCheckoutUrl) {
-        throw new Error('Link de pagamento não retornado pela Stripe.');
+        throw new Error('Link de pagamento não retornado pela InfinitePay.');
       }
 
       if (data.order) {
@@ -530,9 +544,9 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       setRetryOrderId(null);
 
       setRedirectUrl(targetCheckoutUrl);
-      // The cart stays intact until the signed webhook confirms the payment.
+      // The cart stays intact until the backend verifies payment with InfinitePay.
 
-      showToast('Redirecionando...', 'Abrindo o Checkout seguro da Stripe.', 'info');
+      showToast('Redirecionando...', 'Abrindo o Checkout seguro da InfinitePay.', 'info');
 
       window.location.assign(targetCheckoutUrl);
     } catch (err: any) {
@@ -550,7 +564,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         {/* Header Steps */}
         <div className="mb-10 text-center">
           <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">
-            CHECKOUT SEGURO • STRIPE
+            CHECKOUT SEGURO • INFINITEPAY
           </h1>
 
           <div className="flex items-center justify-center gap-4 mt-6 max-w-md mx-auto">
@@ -622,7 +636,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       PAGAMENTO PENDENTE
                     </h2>
                     <p className="text-xs text-[#52525B] mt-2 max-w-lg mx-auto">
-                      Seu pedido foi registrado, mas o pagamento <strong>ainda não foi confirmado</strong> pelo webhook da Stripe.
+                      Seu pedido foi registrado, mas o pagamento <strong>ainda não foi confirmado</strong> pela InfinitePay.
                     </p>
                   </div>
 
@@ -631,7 +645,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       <AlertTriangle className="w-4 h-4" /> Informações sobre o seu pagamento:
                     </div>
                     <p className="text-xs text-[#52525B] leading-relaxed">
-                      PIX e boleto podem levar alguns instantes para confirmar. O pedido será atualizado automaticamente assim que a Stripe notificar a Marmot.
+                      A confirmação depende da verificação segura entre o servidor da Marmot e a InfinitePay. Seus itens continuam no carrinho enquanto o pedido estiver pendente.
                     </p>
                   </div>
                 </>
@@ -655,7 +669,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                       PAGAMENTO NÃO CONCLUÍDO
                     </h2>
                     <p className="text-xs text-[#71717A] mt-2 max-w-lg mx-auto">
-                      A transação não foi aprovada pela Stripe ou pela instituição financeira. Seus itens continuam salvos no carrinho para uma nova tentativa.
+                      A transação não foi aprovada pela InfinitePay ou pela instituição financeira. Seus itens continuam salvos no carrinho para uma nova tentativa.
                     </p>
                   </div>
                 </>
@@ -1168,7 +1182,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                     {isRedirecting || isPlacingOrder ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>REDIRECIONANDO PARA A STRIPE...</span>
+                        <span>REDIRECIONANDO PARA A INFINITEPAY...</span>
                       </>
                     ) : (
                       <>
@@ -1184,7 +1198,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                 <div className="bg-white border border-[#E4E4E7] p-6 sm:p-8 rounded-2xl space-y-6 animate-fadeIn shadow-xs">
                   <div className="flex justify-between items-center border-b border-[#E4E4E7] pb-4">
                     <h2 className="text-sm font-black uppercase tracking-wider text-[#18181B] flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-[#B45309]" /> 2. Método de Pagamento (Stripe)
+                      <CreditCard className="w-4 h-4 text-[#B45309]" /> 2. Pagamento seguro
                     </h2>
                     <button
                       onClick={() => setStep(1)}
@@ -1194,78 +1208,14 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                     </button>
                   </div>
 
-                  {/* Payment Tabs */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      onClick={() => setPaymentMethod('PIX')}
-                      className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all cursor-pointer ${
-                        paymentMethod === 'PIX'
-                          ? 'bg-[#18181B] border-[#18181B] text-white shadow-md'
-                          : 'bg-[#F8F9FA] border-[#E4E4E7] text-[#71717A] hover:border-[#18181B] hover:text-[#18181B]'
-                      }`}
-                    >
-                      <QrCode className="w-6 h-6" />
-                      <span className="text-xs font-bold uppercase">PIX (5% OFF)</span>
-                    </button>
-
-                    <button
-                      onClick={() => setPaymentMethod('Cartão')}
-                      className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all cursor-pointer ${
-                        paymentMethod === 'Cartão'
-                          ? 'bg-[#18181B] border-[#18181B] text-white shadow-md'
-                          : 'bg-[#F8F9FA] border-[#E4E4E7] text-[#71717A] hover:border-[#18181B] hover:text-[#18181B]'
-                      }`}
-                    >
-                      <CreditCard className="w-6 h-6" />
-                      <span className="text-xs font-bold uppercase">Cartão 10x</span>
-                    </button>
-
-                    <button
-                      onClick={() => setPaymentMethod('Boleto')}
-                      className={`p-4 rounded-xl border flex flex-col items-center gap-2 transition-all cursor-pointer ${
-                        paymentMethod === 'Boleto'
-                          ? 'bg-[#18181B] border-[#18181B] text-white shadow-md'
-                          : 'bg-[#F8F9FA] border-[#E4E4E7] text-[#71717A] hover:border-[#18181B] hover:text-[#18181B]'
-                      }`}
-                    >
-                      <FileText className="w-6 h-6" />
-                      <span className="text-xs font-bold uppercase">Boleto</span>
-                    </button>
+                  <div className="bg-[#F8F9FA] border border-[#E4E4E7] p-5 rounded-xl space-y-3">
+                    <p className="text-xs font-bold text-[#18181B] uppercase flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-[#B45309]" /> Checkout hospedado pela InfinitePay
+                    </p>
+                    <p className="text-xs text-[#71717A] leading-relaxed">
+                      Você escolherá PIX ou cartão diretamente no ambiente seguro da InfinitePay. A Marmot não recebe nem armazena os dados do seu cartão.
+                    </p>
                   </div>
-
-                  {/* PIX Explanation */}
-                  {paymentMethod === 'PIX' && (
-                    <div className="bg-[#FEF3C7]/40 border border-[#FDE68A] p-5 rounded-xl space-y-2">
-                      <p className="text-xs font-bold text-[#92400E] uppercase flex items-center gap-1">
-                        <Check className="w-4 h-4" /> Desconto de 5% aplicado automaticamente
-                      </p>
-                      <p className="text-xs text-[#52525B] leading-relaxed">
-                        O QR Code e o código copia e cola serão exibidos no Checkout hospedado e seguro da Stripe.
-                      </p>
-                    </div>
-                  )}
-
-                  {paymentMethod === 'Cartão' && (
-                    <div className="bg-[#F8F9FA] border border-[#E4E4E7] p-5 rounded-xl space-y-2">
-                      <p className="text-xs font-bold text-[#18181B] uppercase flex items-center gap-2">
-                        <Lock className="w-4 h-4 text-[#B45309]" /> Dados preenchidos somente na Stripe
-                      </p>
-                      <p className="text-xs text-[#71717A] leading-relaxed">
-                        A Marmot não coleta nem armazena número, validade ou código de segurança do cartão.
-                      </p>
-                    </div>
-                  )}
-
-
-                  {/* Boleto Info */}
-                  {paymentMethod === 'Boleto' && (
-                    <div className="bg-[#F8F9FA] border border-[#E4E4E7] p-5 rounded-xl space-y-2">
-                      <p className="text-xs font-bold text-[#18181B] uppercase">Instruções para Boleto Bancário</p>
-                      <p className="text-xs text-[#71717A]">
-                        O boleto pode levar até 3 dias úteis para compensar. Os itens ficam reservados por 24 horas.
-                      </p>
-                    </div>
-                  )}
 
                   <div className="flex gap-4">
                     <button
@@ -1363,13 +1313,6 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                     </div>
                   )}
 
-                  {pixDiscountValue > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-bold">
-                      <span>Desconto PIX 5%:</span>
-                      <span className="font-mono">- R$ {pixDiscountValue.toFixed(2).replace('.', ',')}</span>
-                    </div>
-                  )}
-
                   <div className="flex justify-between items-center">
                     <div className="flex flex-col">
                       <span>Frete:</span>
@@ -1410,7 +1353,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
           </div>
         )}
 
-        {/* Stripe Checkout redirection overlay */}
+        {/* InfinitePay Checkout redirection overlay */}
         {isRedirecting && (
           <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-white border border-[#E4E4E7] rounded-2xl p-8 max-w-md w-full text-center space-y-6 shadow-2xl">
@@ -1420,13 +1363,13 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
 
               <div>
                 <span className="text-[11px] font-mono font-bold text-[#B45309] uppercase tracking-widest block mb-1">
-                  STRIPE CHECKOUT
+                  INFINITEPAY CHECKOUT
                 </span>
                 <h3 className="text-xl font-black uppercase text-[#18181B]">
                   Redirecionando...
                 </h3>
                 <p className="text-xs text-[#71717A] mt-2 leading-relaxed">
-                  Você está sendo transferido para o Checkout hospedado da Stripe. A Marmot não recebe os dados do seu cartão.
+                  Você está sendo transferido para o Checkout hospedado da InfinitePay. A Marmot não recebe os dados do seu cartão.
                 </p>
               </div>
 
@@ -1436,7 +1379,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
                     href={redirectUrl}
                     className="w-full bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-black text-xs uppercase py-3.5 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                   >
-                    <span>ABRIR CHECKOUT STRIPE</span>
+                    <span>ABRIR CHECKOUT INFINITEPAY</span>
                     <ExternalLink className="w-4 h-4" />
                   </a>
                   <p className="text-[10px] text-[#71717A]">

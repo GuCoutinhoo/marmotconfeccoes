@@ -116,8 +116,8 @@ test('Integration Suite: Behavioral Remediation & Security Enforcement', async (
     assert.equal(res.status, 401, 'Legacy signed token must return HTTP 401 on /api/auth/me');
   });
 
-  await t.test('Security P0: Token signed with legacy secret is strictly rejected with 401 on Stripe checkout', async () => {
-    const res = await fetch(`${BASE_URL}/api/stripe/checkout-session`, {
+  await t.test('Security P0: Token signed with legacy secret is strictly rejected with 401 on InfinitePay checkout', async () => {
+    const res = await fetch(`${BASE_URL}/api/infinitepay/checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ test('Integration Suite: Behavioral Remediation & Security Enforcement', async (
         checkoutAttemptId: crypto.randomUUID(),
       }),
     });
-    assert.equal(res.status, 401, 'Legacy signed token must return HTTP 401 on Stripe checkout');
+    assert.equal(res.status, 401, 'Legacy signed token must return HTTP 401 on InfinitePay checkout');
   });
 
   // --------------------------------------------------------------------------
@@ -201,8 +201,8 @@ test('Integration Suite: Behavioral Remediation & Security Enforcement', async (
     assert.ok(data.error, 'Must provide error message');
   });
 
-  await t.test('Fail-Closed: Stripe checkout with invalid token returns 401', async () => {
-    const res = await fetch(`${BASE_URL}/api/stripe/checkout-session`, {
+  await t.test('Fail-Closed: InfinitePay checkout with invalid token returns 401', async () => {
+    const res = await fetch(`${BASE_URL}/api/infinitepay/checkout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ test('Integration Suite: Behavioral Remediation & Security Enforcement', async (
         checkoutAttemptId: crypto.randomUUID(),
       }),
     });
-    assert.equal(res.status, 401, 'Invalid bearer token must return HTTP 401 on Stripe checkout');
+    assert.equal(res.status, 401, 'Invalid bearer token must return HTTP 401 on InfinitePay checkout');
   });
 
   // --------------------------------------------------------------------------

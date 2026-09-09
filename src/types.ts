@@ -229,7 +229,7 @@ export interface OrderStatusHistoryItem {
   status: string;
   previousStatus?: string;
   newStatus?: string;
-  source?: 'stripe' | 'melhor_envio' | 'carrier' | 'tracking' | 'tracking_sync' | 'admin' | 'system';
+  source?: 'infinitepay' | 'melhor_envio' | 'carrier' | 'tracking' | 'tracking_sync' | 'admin' | 'system';
   externalEventId?: string;
   timestamp: string;
   occurredAt?: string;
@@ -260,7 +260,7 @@ export interface Order {
   discount: number;
   shippingFee: number;
   total: number;
-  paymentMethod: 'PIX' | 'Cartão de Crédito' | 'Boleto Bancário';
+  paymentMethod: 'PIX' | 'Cartão de Crédito' | 'InfinitePay Checkout';
   paymentDetails?: {
     pixQrCode?: string;
     pixCopiaECola?: string;
@@ -271,6 +271,9 @@ export interface Order {
     transactionId?: string;
     gateway?: string;
     sessionId?: string;
+    checkoutUrl?: string;
+    invoiceSlug?: string;
+    receiptUrl?: string;
     statusDetail?: string;
     paidAt?: string;
     refundedAt?: string;
@@ -279,6 +282,9 @@ export interface Order {
   paymentProvider?: string;
   paymentProviderPaymentId?: string;
   paymentProviderSessionId?: string;
+  checkoutUrl?: string;
+  paymentProviderInvoiceSlug?: string;
+  paymentReceiptUrl?: string;
   checkoutAttemptKey?: string;
   checkoutExpiresAt?: string;
   couponCode?: string;

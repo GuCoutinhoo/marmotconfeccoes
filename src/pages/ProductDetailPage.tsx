@@ -144,7 +144,6 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const effectivePrice = product.promoPrice || product.price;
   const installmentCount = 6;
   const installmentValue = effectivePrice / installmentCount;
-  const pixPrice = effectivePrice * 0.95;
 
   const handleAddToCart = () => {
     setIsAddedRecently(true);
@@ -349,14 +348,9 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   </p>
                 </div>
 
-                <div className="text-right">
-                  <span className="inline-block bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-[10px] font-mono font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
-                    5% OFF NO PIX
-                  </span>
-                  <p className="text-xs font-mono font-bold text-[#92400E] mt-1">
-                    R$ {pixPrice.toFixed(2).replace('.', ',')}
-                  </p>
-                </div>
+                <span className="text-right text-[10px] font-mono font-bold text-[#92400E] uppercase tracking-wider">
+                  PIX ou cartão na InfinitePay
+                </span>
               </div>
             </div>
 

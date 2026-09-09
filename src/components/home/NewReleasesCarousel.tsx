@@ -18,7 +18,7 @@ interface DropProductItem {
   categoryName: 'VESTUÁRIO' | 'ACESSÓRIOS';
   price: number;
   installments: string;
-  pixPrice: string;
+  checkoutNote: string;
   image: string;
   colors: { name: string; hex: string }[];
   colorCountText: string;
@@ -33,7 +33,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'VESTUÁRIO',
     price: 149.90,
     installments: 'ou 3x de R$ 49,97 sem juros',
-    pixPrice: 'R$ 142,41 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Off-White', hex: '#EAE5D9' },
@@ -48,7 +48,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'ACESSÓRIOS',
     price: 149.90,
     installments: 'ou 3x de R$ 49,97 sem juros',
-    pixPrice: 'R$ 142,41 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Preto Washed', hex: '#232326' },
@@ -63,7 +63,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'VESTUÁRIO',
     price: 129.90,
     installments: 'ou 3x de R$ 43,30 sem juros',
-    pixPrice: 'R$ 123,41 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Preto', hex: '#18181B' },
@@ -78,7 +78,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'VESTUÁRIO',
     price: 289.90,
     installments: 'ou 3x de R$ 96,63 sem juros',
-    pixPrice: 'R$ 275,41 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Chumbo Washed', hex: '#2B2B30' },
@@ -93,7 +93,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'ACESSÓRIOS',
     price: 159.90,
     installments: 'ou 3x de R$ 53,30 sem juros',
-    pixPrice: 'R$ 151,91 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Areia Washed', hex: '#D7CDBB' },
@@ -108,7 +108,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'ACESSÓRIOS',
     price: 189.90,
     installments: 'ou 3x de R$ 63,30 sem juros',
-    pixPrice: 'R$ 180,41 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Preto', hex: '#18181B' },
@@ -123,7 +123,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'VESTUÁRIO',
     price: 279.90,
     installments: 'ou 3x de R$ 93,30 sem juros',
-    pixPrice: 'R$ 265,91 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Preto', hex: '#18181B' },
@@ -138,7 +138,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'VESTUÁRIO',
     price: 349.90,
     installments: 'ou 3x de R$ 116,63 sem juros',
-    pixPrice: 'R$ 332,41 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1548883354-7622d03aca27?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Preto / Cinza', hex: '#212124' },
@@ -153,7 +153,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'ACESSÓRIOS',
     price: 139.90,
     installments: 'ou 3x de R$ 46,63 sem juros',
-    pixPrice: 'R$ 132,91 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Marrom Tabaco', hex: '#4E3629' },
@@ -168,7 +168,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     categoryName: 'ACESSÓRIOS',
     price: 69.90,
     installments: 'ou 2x de R$ 34,95 sem juros',
-    pixPrice: 'R$ 66,41 no PIX (5% OFF)',
+    checkoutNote: 'PIX ou cartão na InfinitePay',
     image: 'https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?auto=format&fit=crop&w=800&q=80',
     colors: [
       { name: 'Off-White & Preto', hex: '#EBE8DE' },
@@ -705,7 +705,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                         {item.installments}
                       </div>
                       <div className="text-[10.5px] font-bold text-[#CA8A04] leading-tight">
-                        {item.pixPrice}
+                        {item.checkoutNote}
                       </div>
                     </div>
                   </div>

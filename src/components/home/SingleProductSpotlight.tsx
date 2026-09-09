@@ -164,9 +164,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                   R$ {product.price.toFixed(2).replace('.', ',')}
                 </span>
               )}
-              <span className="text-xs text-[#B45309] font-mono font-bold">
-                R$ {(effectivePrice * 0.95).toFixed(2).replace('.', ',')} no PIX (5% OFF)
-              </span>
+              <span className="text-xs text-[#B45309] font-mono font-bold">PIX ou cartão na InfinitePay</span>
             </div>
 
             {/* Color Selector */}

@@ -92,8 +92,8 @@ CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
   p_payment_id TEXT,
   p_amount NUMERIC,
   p_currency TEXT DEFAULT 'BRL',
-  p_gateway TEXT DEFAULT 'stripe',
-  p_payment_method TEXT DEFAULT 'Stripe Checkout',
+  p_gateway TEXT DEFAULT 'infinitepay',
+  p_payment_method TEXT DEFAULT 'InfinitePay Checkout',
   p_date_approved TIMESTAMPTZ DEFAULT NOW(),
   p_items JSONB DEFAULT '[]'::jsonb
 )

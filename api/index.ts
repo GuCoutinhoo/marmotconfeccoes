@@ -2699,6 +2699,9 @@ export class DatabaseManager {
                   paymentProvider: item.payment_provider || item.data.paymentProvider,
                   paymentProviderPaymentId: item.payment_provider_payment_id || item.data.paymentProviderPaymentId,
                   paymentProviderSessionId: item.payment_provider_session_id || item.data.paymentProviderSessionId,
+                  paymentProviderInvoiceSlug: item.payment_provider_invoice_slug || item.data.paymentProviderInvoiceSlug,
+                  checkoutUrl: item.checkout_url || item.data.checkoutUrl,
+                  paymentReceiptUrl: item.payment_receipt_url || item.data.paymentReceiptUrl,
                   checkoutAttemptKey: item.checkout_attempt_key || item.data.checkoutAttemptKey,
                   checkoutExpiresAt: item.checkout_expires_at || item.data.checkoutExpiresAt,
                   paymentDetails: {
@@ -2706,6 +2709,9 @@ export class DatabaseManager {
                     gateway: item.payment_provider || item.data.paymentDetails?.gateway,
                     transactionId: item.payment_provider_payment_id || item.data.paymentDetails?.transactionId,
                     sessionId: item.payment_provider_session_id || item.data.paymentDetails?.sessionId,
+                    invoiceSlug: item.payment_provider_invoice_slug || item.data.paymentDetails?.invoiceSlug,
+                    checkoutUrl: item.checkout_url || item.data.paymentDetails?.checkoutUrl,
+                    receiptUrl: item.payment_receipt_url || item.data.paymentDetails?.receiptUrl,
                     statusDetail: item.payment_status_detail || item.data.paymentDetails?.statusDetail,
                   },
                 };
@@ -2737,6 +2743,9 @@ export class DatabaseManager {
                 paymentProvider: item.payment_provider || undefined,
                 paymentProviderPaymentId: item.payment_provider_payment_id || undefined,
                 paymentProviderSessionId: item.payment_provider_session_id || undefined,
+                paymentProviderInvoiceSlug: item.payment_provider_invoice_slug || undefined,
+                checkoutUrl: item.checkout_url || undefined,
+                paymentReceiptUrl: item.payment_receipt_url || undefined,
                 checkoutAttemptKey: item.checkout_attempt_key || undefined,
                 checkoutExpiresAt: item.checkout_expires_at || undefined,
                 paymentDetails: {
@@ -2744,6 +2753,9 @@ export class DatabaseManager {
                   gateway: item.payment_provider || item.data?.paymentDetails?.gateway,
                   transactionId: item.payment_provider_payment_id || item.data?.paymentDetails?.transactionId,
                   sessionId: item.payment_provider_session_id || item.data?.paymentDetails?.sessionId,
+                  invoiceSlug: item.payment_provider_invoice_slug || item.data?.paymentDetails?.invoiceSlug,
+                  checkoutUrl: item.checkout_url || item.data?.paymentDetails?.checkoutUrl,
+                  receiptUrl: item.payment_receipt_url || item.data?.paymentDetails?.receiptUrl,
                   statusDetail: item.payment_status_detail || item.data?.paymentDetails?.statusDetail,
                 },
                 shippingDetails: item.data?.shippingDetails || null,
@@ -2803,7 +2815,7 @@ export class DatabaseManager {
           const { data, error } = await adminClient
             .from('orders')
             .select('*')
-            .or(`id.eq.${clean},tracking_code.eq.${clean},payment_provider_session_id.eq.${clean},payment_provider_payment_id.eq.${clean}`)
+            .or(`id.eq.${clean},tracking_code.eq.${clean},payment_provider_session_id.eq.${clean},payment_provider_invoice_slug.eq.${clean},payment_provider_payment_id.eq.${clean}`)
             .maybeSingle();
 
           if (!error && data) {
@@ -2824,6 +2836,9 @@ export class DatabaseManager {
               paymentProvider: data.payment_provider || data.data.paymentProvider,
               paymentProviderPaymentId: data.payment_provider_payment_id || data.data.paymentProviderPaymentId,
               paymentProviderSessionId: data.payment_provider_session_id || data.data.paymentProviderSessionId,
+              paymentProviderInvoiceSlug: data.payment_provider_invoice_slug || data.data.paymentProviderInvoiceSlug,
+              checkoutUrl: data.checkout_url || data.data.checkoutUrl,
+              paymentReceiptUrl: data.payment_receipt_url || data.data.paymentReceiptUrl,
               checkoutAttemptKey: data.checkout_attempt_key || data.data.checkoutAttemptKey,
               checkoutExpiresAt: data.checkout_expires_at || data.data.checkoutExpiresAt,
               paymentDetails: {
@@ -2831,6 +2846,9 @@ export class DatabaseManager {
                 gateway: data.payment_provider || data.data.paymentDetails?.gateway,
                 transactionId: data.payment_provider_payment_id || data.data.paymentDetails?.transactionId,
                 sessionId: data.payment_provider_session_id || data.data.paymentDetails?.sessionId,
+                invoiceSlug: data.payment_provider_invoice_slug || data.data.paymentDetails?.invoiceSlug,
+                checkoutUrl: data.checkout_url || data.data.paymentDetails?.checkoutUrl,
+                receiptUrl: data.payment_receipt_url || data.data.paymentDetails?.receiptUrl,
                 statusDetail: data.payment_status_detail || data.data.paymentDetails?.statusDetail,
               },
             } : {
@@ -2860,6 +2878,9 @@ export class DatabaseManager {
               paymentProvider: data.payment_provider || undefined,
               paymentProviderPaymentId: data.payment_provider_payment_id || undefined,
               paymentProviderSessionId: data.payment_provider_session_id || undefined,
+              paymentProviderInvoiceSlug: data.payment_provider_invoice_slug || undefined,
+              checkoutUrl: data.checkout_url || undefined,
+              paymentReceiptUrl: data.payment_receipt_url || undefined,
               checkoutAttemptKey: data.checkout_attempt_key || undefined,
               checkoutExpiresAt: data.checkout_expires_at || undefined,
               paymentDetails: {
@@ -2867,6 +2888,9 @@ export class DatabaseManager {
                 gateway: data.payment_provider || data.data?.paymentDetails?.gateway,
                 transactionId: data.payment_provider_payment_id || data.data?.paymentDetails?.transactionId,
                 sessionId: data.payment_provider_session_id || data.data?.paymentDetails?.sessionId,
+                invoiceSlug: data.payment_provider_invoice_slug || data.data?.paymentDetails?.invoiceSlug,
+                checkoutUrl: data.checkout_url || data.data?.paymentDetails?.checkoutUrl,
+                receiptUrl: data.payment_receipt_url || data.data?.paymentDetails?.receiptUrl,
                 statusDetail: data.payment_status_detail || data.data?.paymentDetails?.statusDetail,
               },
               shippingDetails: data.data?.shippingDetails || null,
@@ -2897,6 +2921,7 @@ export class DatabaseManager {
       o.id === clean ||
       o.trackingCode === clean ||
       o.paymentProviderSessionId === clean ||
+      o.paymentProviderInvoiceSlug === clean ||
       o.paymentProviderPaymentId === clean ||
       o.paymentDetails?.sessionId === clean ||
       o.paymentDetails?.transactionId === clean
@@ -2968,6 +2993,11 @@ export class DatabaseManager {
         payment_provider: order.paymentProvider || order.paymentDetails?.gateway || null,
         payment_provider_payment_id: order.paymentProviderPaymentId || order.paymentDetails?.transactionId || null,
         payment_provider_session_id: order.paymentProviderSessionId || order.paymentDetails?.sessionId || null,
+        payment_provider_invoice_slug: order.paymentProviderInvoiceSlug || order.paymentDetails?.invoiceSlug || null,
+        payment_installments: order.paymentDetails?.installments || null,
+        payment_amount: order.paymentStatus === 'Pago' ? Number(order.total || 0) : null,
+        payment_receipt_url: order.paymentReceiptUrl || order.paymentDetails?.receiptUrl || null,
+        checkout_url: order.checkoutUrl || order.paymentDetails?.checkoutUrl || null,
         payment_status_detail: order.paymentDetails?.statusDetail || null,
         checkout_attempt_key: order.checkoutAttemptKey || null,
         checkout_expires_at: order.checkoutExpiresAt || null,
@@ -4455,10 +4485,10 @@ export class DatabaseManager {
     paymentId: string,
     transactionAmount: number,
     currency: string = 'BRL',
-    paymentMethod: string = 'Stripe Checkout',
+    paymentMethod: string = 'InfinitePay Checkout',
     dateApproved?: string
   ): Promise<{ success: boolean; alreadyProcessed: boolean; orderId?: string; error?: string }> {
-    return this.processApprovedOrderAtomic(orderId, paymentId, transactionAmount, currency, 'stripe', paymentMethod, dateApproved, []);
+    return this.processApprovedOrderAtomic(orderId, paymentId, transactionAmount, currency, 'infinitepay', paymentMethod, dateApproved, [], {});
   }
 
   public async processApprovedOrderAtomic(
@@ -4466,10 +4496,11 @@ export class DatabaseManager {
     paymentId: string,
     transactionAmount: number,
     currency: string = 'BRL',
-    gateway: string = 'stripe',
-    paymentMethod: string = 'Stripe Checkout',
+    gateway: string = 'infinitepay',
+    paymentMethod: string = 'InfinitePay Checkout',
     dateApproved?: string,
-    items: any[] = []
+    items: any[] = [],
+    paymentMetadata: Record<string, unknown> = {},
   ): Promise<{ success: boolean; alreadyProcessed: boolean; orderId?: string; error?: string }> {
     await this.initialize();
     if (this.mode === 'supabase') {
@@ -4492,6 +4523,7 @@ export class DatabaseManager {
           p_payment_method: paymentMethod,
           p_date_approved: dateApproved || new Date().toISOString(),
           p_items: items && items.length > 0 ? items : [],
+          p_payment_metadata: paymentMetadata,
         });
         if (error) {
           console.error('[DB] Supabase process_approved_order_atomic RPC error:', error.message);
@@ -4571,10 +4603,10 @@ export class DatabaseManager {
     orderId: string,
     userId: string,
     attemptKey: string,
-  ): Promise<{ success: boolean; shouldCreate: boolean; status?: string; sessionId?: string; error?: string }> {
+  ): Promise<{ success: boolean; shouldCreate: boolean; status?: string; checkoutUrl?: string; error?: string }> {
     await this.initialize();
     try {
-      const client = await this.getRequiredSupabaseAdminClient('lock de criação da sessão Stripe');
+      const client = await this.getRequiredSupabaseAdminClient('lock de criação do checkout InfinitePay');
       const { data, error } = await client.rpc('claim_payment_session_creation', {
         p_order_id: orderId,
         p_user_id: userId,
@@ -4585,33 +4617,29 @@ export class DatabaseManager {
         success: Boolean(data?.success),
         shouldCreate: Boolean(data?.shouldCreate ?? data?.should_create),
         status: data?.status,
-        sessionId: data?.sessionId || data?.session_id,
+        checkoutUrl: data?.checkoutUrl || data?.checkout_url,
         error: data?.error,
       };
     } catch (error: any) {
-      console.error('[STRIPE_SESSION_CLAIM_ERROR]', { orderId, message: error?.message || error });
+      console.error('[INFINITEPAY_CHECKOUT_CLAIM_ERROR]', { orderId, message: error?.message || error });
       return { success: false, shouldCreate: false, error: error?.message || 'Falha ao adquirir lock do checkout.' };
     }
   }
 
-  public async linkPaymentSessionAtomic(input: {
+  public async linkPaymentCheckoutAtomic(input: {
     orderId: string;
     provider: string;
-    sessionId: string;
-    paymentId?: string;
+    checkoutUrl: string;
     statusDetail?: string;
-    expiresAt?: string;
   }): Promise<{ success: boolean; error?: string }> {
     await this.initialize();
     try {
-      const client = await this.getRequiredSupabaseAdminClient('vínculo atômico da sessão de pagamento');
-      const { data, error } = await client.rpc('link_payment_session_atomic', {
+      const client = await this.getRequiredSupabaseAdminClient('vínculo atômico do checkout de pagamento');
+      const { data, error } = await client.rpc('link_payment_checkout_atomic', {
         p_order_id: input.orderId,
         p_provider: input.provider,
-        p_session_id: input.sessionId,
-        p_payment_id: input.paymentId || null,
+        p_checkout_url: input.checkoutUrl,
         p_status_detail: input.statusDetail || null,
-        p_expires_at: input.expiresAt || null,
       });
       if (error) throw new Error(error.message);
       if (!data?.success) return { success: false, error: data?.error || 'Não foi possível vincular a sessão.' };
@@ -4619,35 +4647,32 @@ export class DatabaseManager {
       const cached = this.orders.find((order) => order.id === input.orderId);
       if (cached) {
         cached.paymentProvider = input.provider;
-        cached.paymentProviderSessionId = input.sessionId || cached.paymentProviderSessionId;
-        cached.paymentProviderPaymentId = input.paymentId || cached.paymentProviderPaymentId;
-        cached.checkoutExpiresAt = input.expiresAt || cached.checkoutExpiresAt;
+        cached.checkoutUrl = input.checkoutUrl;
         cached.paymentDetails = {
           ...(cached.paymentDetails || {}),
           gateway: input.provider,
-          sessionId: input.sessionId || cached.paymentDetails?.sessionId,
-          transactionId: input.paymentId || cached.paymentDetails?.transactionId,
+          checkoutUrl: input.checkoutUrl,
           statusDetail: input.statusDetail || cached.paymentDetails?.statusDetail,
         };
       }
       return { success: true };
     } catch (error: any) {
-      console.error('[STRIPE_SESSION_LINK_ERROR]', { orderId: input.orderId, message: error?.message || error });
-      return { success: false, error: error?.message || 'Falha ao vincular a sessão de pagamento.' };
+      console.error('[INFINITEPAY_CHECKOUT_LINK_ERROR]', { orderId: input.orderId, message: error?.message || error });
+      return { success: false, error: error?.message || 'Falha ao vincular o checkout de pagamento.' };
     }
   }
 
   public async releasePaymentSessionCreation(orderId: string, reason: string): Promise<void> {
     await this.initialize();
     try {
-      const client = await this.getRequiredSupabaseAdminClient('liberação do lock da sessão Stripe');
+      const client = await this.getRequiredSupabaseAdminClient('liberação do lock do checkout InfinitePay');
       const { error } = await client.rpc('release_payment_session_creation', {
         p_order_id: orderId,
         p_error: reason.slice(0, 500),
       });
       if (error) throw new Error(error.message);
     } catch (error: any) {
-      console.error('[STRIPE_SESSION_RELEASE_ERROR]', { orderId, message: error?.message || error });
+      console.error('[INFINITEPAY_CHECKOUT_RELEASE_ERROR]', { orderId, message: error?.message || error });
     }
   }
 
@@ -4677,7 +4702,7 @@ export class DatabaseManager {
         error: data?.error,
       };
     } catch (error: any) {
-      console.error('[STRIPE_PAYMENT_STATE_ERROR]', { orderId: input.orderId, message: error?.message || error });
+      console.error('[INFINITEPAY_PAYMENT_STATE_ERROR]', { orderId: input.orderId, message: error?.message || error });
       return { success: false, error: error?.message || 'Falha ao atualizar o estado financeiro.' };
     }
   }
@@ -5917,10 +5942,6 @@ export const couponRateLimiter = new RateLimiter(60 * 1000, 30, 'coupons');
 export const newsletterRateLimiter = new RateLimiter(60 * 1000, 10, 'newsletter');
 export const reviewRateLimiter = new RateLimiter(10 * 60 * 1000, 15, 'reviews');
 
-// Stripe validates the signature against the exact bytes sent by Stripe. This
-// route must remain registered before express.json()/express.urlencoded().
-app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), handleStripeWebhook);
-
 app.use(compression({ threshold: 512 }));
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ limit: '15mb', extended: true }));
@@ -6235,27 +6256,41 @@ app.get(['/api/health', '/health'], async (req, res) => {
   const isSupabase = db.getMode() === 'supabase' && Boolean(supabase);
   
   let dbStatus = 'NOT_CONFIGURED';
+  let infinitePaySchemaStatus = 'NOT_CONFIGURED';
   if (isSupabase && supabase) {
     try {
       const { error } = await supabase.from('products').select('id').limit(1);
       dbStatus = error ? 'ERROR' : 'OK';
+      if (!error) {
+        const { error: paymentSchemaError } = await supabase
+          .from('orders')
+          .select('payment_provider_invoice_slug,checkout_url,checkout_attempt_key')
+          .limit(1);
+        infinitePaySchemaStatus = paymentSchemaError ? 'MIGRATION_REQUIRED' : 'OK';
+      }
     } catch {
       dbStatus = 'ERROR';
+      infinitePaySchemaStatus = 'ERROR';
     }
   }
 
-  const stripeStatus = getStripeConfigurationStatus();
+  const infinitePayStatus = getInfinitePayConfigurationStatus();
   const meConfig = getMelhorEnvioConfig();
 
   res.json({
-    status: dbStatus === 'OK' ? 'ok' : 'degraded',
+    status: dbStatus === 'OK' && infinitePaySchemaStatus === 'OK' ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'production',
     databaseMode: db.getMode(),
     databaseStatus: dbStatus,
-    stripeConfigured: stripeStatus.secretKeyConfigured,
-    stripeMode: stripeStatus.mode,
-    stripeWebhookConfigured: stripeStatus.webhookSecretConfigured,
+    infinitePayConfigured: infinitePayStatus.configured && infinitePayStatus.handleValid,
+    infinitePaySchemaStatus,
+    infinitePayReady:
+      infinitePayStatus.configured &&
+      infinitePayStatus.handleValid &&
+      infinitePayStatus.webhookOverrideValid &&
+      infinitePaySchemaStatus === 'OK',
+    infinitePayWebhookOverrideConfigured: infinitePayStatus.webhookOverrideConfigured,
     melhorEnvioConfigured: Boolean(meConfig.token && meConfig.token.length >= 10),
   });
 });
@@ -6301,8 +6336,20 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
     }
 
     const meConfig = getMelhorEnvioConfig();
-    const stripeStatus = getStripeConfigurationStatus();
+    const infinitePayStatus = getInfinitePayConfigurationStatus();
     const resendKey = process.env.RESEND_API_KEY;
+    let infinitePaySchemaStatus = 'NOT_CONFIGURED';
+    if (isSupabase && supabase) {
+      try {
+        const { error } = await supabase
+          .from('orders')
+          .select('payment_provider_invoice_slug,checkout_url,checkout_attempt_key')
+          .limit(1);
+        infinitePaySchemaStatus = error ? 'MIGRATION_REQUIRED' : 'OK';
+      } catch {
+        infinitePaySchemaStatus = 'ERROR';
+      }
+    }
 
     // Evaluate statuses: 'OK' | 'WARNING' | 'ERROR' | 'NOT_CONFIGURED'
     const missingTables = isSupabase
@@ -6317,11 +6364,11 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
       ? 'WARNING'
       : 'ERROR';
 
-    const stripeHealth = !stripeStatus.secretKeyConfigured
+    const infinitePayHealth = !infinitePayStatus.configured
       ? 'NOT_CONFIGURED'
-      : !stripeStatus.secretKeyValid || !stripeStatus.publicKeyValid || !stripeStatus.keysMatchMode
+      : !infinitePayStatus.handleValid || !infinitePayStatus.webhookOverrideValid
       ? 'ERROR'
-      : !stripeStatus.webhookSecretConfigured || !stripeStatus.webhookSecretValid
+      : infinitePaySchemaStatus !== 'OK'
       ? 'WARNING'
       : 'OK';
 
@@ -6337,7 +6384,7 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
 
     const readyForProduction =
       databaseHealth === 'OK' &&
-      stripeHealth === 'OK' &&
+      infinitePayHealth === 'OK' &&
       meHealth === 'OK';
 
     res.json({
@@ -6353,15 +6400,13 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
           tables: tablesStatus,
           missingTables,
         },
-        stripe: {
-          status: stripeHealth,
-          configured: stripeStatus.secretKeyConfigured,
-          mode: stripeStatus.mode,
-          webhookConfigured: stripeStatus.webhookSecretConfigured,
-          webhookSecretValid: stripeStatus.webhookSecretValid,
-          secretKeyValid: stripeStatus.secretKeyValid,
-          publicKeyValid: stripeStatus.publicKeyValid,
-          keysMatchMode: stripeStatus.keysMatchMode,
+        infinitePay: {
+          status: infinitePayHealth,
+          configured: infinitePayStatus.configured,
+          handleValid: infinitePayStatus.handleValid,
+          webhookOverrideConfigured: infinitePayStatus.webhookOverrideConfigured,
+          webhookOverrideValid: infinitePayStatus.webhookOverrideValid,
+          schemaStatus: infinitePaySchemaStatus,
         },
         melhorEnvio: {
           status: meHealth,
@@ -7064,7 +7109,7 @@ app.get('/api/orders/:id', async (req: any, res) => {
   }
 });
 
-app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), handleCreateStripeCheckout);
+app.post(['/api/orders', '/api/user/orders'], checkoutRateLimiter.middleware(), handleCreateInfinitePayCheckout);
 app.put('/api/admin/orders/:id/status', requireAdmin, async (req: any, res) => {
   try {
     const { status, trackingCode } = req.body;
@@ -7686,44 +7731,26 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
   }
 });
 
-// --- Stripe Checkout, webhooks and reconciliation ---
-type StripeCheckoutPaymentMethod = 'PIX' | 'Cartão de Crédito' | 'Boleto Bancário';
-
-function normalizeStripePaymentMethod(value: unknown): StripeCheckoutPaymentMethod {
-  const normalized = String(value || '').trim().toLowerCase();
+// --- InfinitePay Checkout, server-to-server confirmation and reconciliation ---
+function getInfinitePayPaymentMethodLabel(captureMethod: unknown): string {
+  const normalized = String(captureMethod || '').trim().toLowerCase();
   if (normalized === 'pix') return 'PIX';
-  if (normalized === 'boleto' || normalized === 'boleto bancário' || normalized === 'boleto bancario') {
-    return 'Boleto Bancário';
-  }
-  return 'Cartão de Crédito';
+  if (normalized === 'credit_card') return 'Cartão de Crédito';
+  return 'InfinitePay Checkout';
 }
 
-function getStripePaymentMethodTypes(method: StripeCheckoutPaymentMethod): Stripe.Checkout.SessionCreateParams.PaymentMethodType[] {
-  if (method === 'PIX') return ['pix'];
-  if (method === 'Boleto Bancário') return ['boleto'];
-  return ['card'];
-}
-
-function getStripePaymentMethodLabel(intent: Stripe.PaymentIntent): string {
-  const methodType = intent.payment_method_types?.[0];
-  if (methodType === 'pix') return 'PIX';
-  if (methodType === 'boleto') return 'Boleto Bancário';
-  if (methodType === 'card') return 'Cartão de Crédito';
-  return 'Stripe Checkout';
-}
-
-function buildStripeLineItems(
+function buildInfinitePayItems(
   items: OrderItem[],
   productNetCents: number,
   shippingCents: number,
   shippingLabel: string,
-): Stripe.Checkout.SessionCreateParams.LineItem[] {
+): InfinitePayCheckoutItem[] {
   const grossCents = items.reduce(
     (sum, item) => sum + reaisToCents(Number(item.price || 0)) * Math.max(1, Number(item.quantity || 1)),
     0,
   );
   let allocatedProductCents = 0;
-  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+  const lineItems: InfinitePayCheckoutItem[] = [];
 
   items.forEach((item, index) => {
     const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
@@ -7737,48 +7764,35 @@ function buildStripeLineItems(
 
     const baseUnitCents = Math.floor(itemNetCents / quantity);
     const remainder = itemNetCents % quantity;
-    const productData = {
-      name: String(item.title || 'Produto Marmot').slice(0, 120),
-      description: `Tamanho: ${String(item.size || 'Padrão')} • Cor: ${String(item.colorName || item.color || 'Padrão')}`.slice(0, 500),
-      metadata: {
-        product_id: String(item.productId),
-        sku: String(item.sku || ''),
-      },
-    };
+    const description = `${String(item.title || 'Produto Marmot')} - ${String(item.colorName || item.color || 'Padrão')} - ${String(item.size || 'Padrão')}`.slice(0, 255);
 
     const baseQuantity = quantity - remainder;
     if (baseQuantity > 0 && baseUnitCents > 0) {
       lineItems.push({
-        price_data: { currency: 'brl', product_data: productData, unit_amount: baseUnitCents },
         quantity: baseQuantity,
+        price: baseUnitCents,
+        description,
       });
     }
     if (remainder > 0) {
       lineItems.push({
-        price_data: { currency: 'brl', product_data: productData, unit_amount: baseUnitCents + 1 },
         quantity: remainder,
+        price: baseUnitCents + 1,
+        description,
       });
     }
   });
 
   if (shippingCents > 0) {
     lineItems.push({
-      price_data: {
-        currency: 'brl',
-        product_data: {
-          name: 'Frete',
-          description: shippingLabel.slice(0, 500),
-          metadata: { type: 'shipping' },
-        },
-        unit_amount: shippingCents,
-      },
       quantity: 1,
+      price: shippingCents,
+      description: `Frete - ${shippingLabel}`.slice(0, 255),
     });
   }
 
   const lineItemsTotal = lineItems.reduce((sum, item) => {
-    const unitAmount = Number(item.price_data && 'unit_amount' in item.price_data ? item.price_data.unit_amount : 0);
-    return sum + unitAmount * Number(item.quantity || 1);
+    return sum + item.price * item.quantity;
   }, 0);
   if (lineItemsTotal !== productNetCents + shippingCents) {
     throw new Error('Falha ao distribuir o valor exato do pedido em centavos.');
@@ -7786,7 +7800,7 @@ function buildStripeLineItems(
   return lineItems;
 }
 
-function resolveStripeBaseUrl(req: express.Request): string {
+function resolveInfinitePayBaseUrl(req: express.Request): string {
   const isVercelPreview = process.env.VERCEL_ENV === 'preview';
   const baseUrl = resolveApplicationBaseUrl({
     configuredUrl: isVercelPreview ? undefined : process.env.APP_URL,
@@ -7813,13 +7827,12 @@ function canAuthenticatedUserAccessOrder(req: any, order: Order): boolean {
   );
 }
 
-async function createStripeSessionForOrder(
+async function createInfinitePayCheckoutForOrder(
   order: Order,
   req: express.Request,
   checkoutAttemptId: string,
-  idempotencyScope: 'checkout' | 'pay' = 'checkout',
-): Promise<Stripe.Checkout.Session> {
-  assertStripeConfiguration();
+): Promise<{ url: string; reused: boolean; webhookUrlIncluded: boolean }> {
+  assertInfinitePayConfiguration();
 
   const subtotalCents = reaisToCents(Number(order.subtotal));
   const discountCents = reaisToCents(Number(order.discount || 0));
@@ -7832,9 +7845,8 @@ async function createStripeSessionForOrder(
     });
   }
 
-  const method = normalizeStripePaymentMethod(order.paymentMethod);
-  const baseUrl = resolveStripeBaseUrl(req);
-  const lineItems = buildStripeLineItems(
+  const baseUrl = resolveInfinitePayBaseUrl(req);
+  const lineItems = buildInfinitePayItems(
     order.items,
     productNetCents,
     shippingCents,
@@ -7853,12 +7865,8 @@ async function createStripeSessionForOrder(
     });
   }
 
-  if (!claim.shouldCreate && claim.sessionId) {
-    const storedSession = await getRequiredStripeClient().checkout.sessions.retrieve(claim.sessionId);
-    if (storedSession.status === 'open' && storedSession.url) return storedSession;
-
-    await db.releasePaymentSessionCreation(order.id, 'stored_session_not_open');
-    claim = await claimSessionCreation();
+  if (!claim.shouldCreate && claim.checkoutUrl) {
+    return { url: claim.checkoutUrl, reused: true, webhookUrlIncluded: Boolean(resolveInfinitePayWebhookUrl(baseUrl)) };
   }
   if (!claim.shouldCreate) {
     throw Object.assign(new Error('Já existe uma criação de checkout em andamento para este pedido.'), {
@@ -7866,68 +7874,44 @@ async function createStripeSessionForOrder(
     });
   }
 
-  let session: Stripe.Checkout.Session | null = null;
   try {
-    session = await getRequiredStripeClient().checkout.sessions.create(
-      {
-        mode: 'payment',
-        payment_method_types: getStripePaymentMethodTypes(method),
-        line_items: lineItems,
-        customer_email: order.customerEmail || undefined,
-        client_reference_id: order.id,
-        success_url: `${baseUrl}/checkout?stripe_return=success&session_id={CHECKOUT_SESSION_ID}&order_id=${encodeURIComponent(order.id)}`,
-        cancel_url: `${baseUrl}/checkout?stripe_return=cancel&order_id=${encodeURIComponent(order.id)}`,
-        locale: 'pt-BR',
-        metadata: {
-          order_id: order.id,
-          user_id: String(order.userId || ''),
-        },
-        payment_intent_data: {
-          description: `Pedido Marmot #${order.id}`,
-          metadata: {
-            order_id: order.id,
-            user_id: String(order.userId || ''),
-          },
-        },
+    const webhookUrl = resolveInfinitePayWebhookUrl(baseUrl);
+    const checkout = await createInfinitePayCheckout({
+      orderNsu: order.id,
+      redirectUrl: `${baseUrl}/checkout?infinitepay_return=1&expected_order_id=${encodeURIComponent(order.id)}`,
+      webhookUrl,
+      items: lineItems,
+      customer: {
+        name: String(order.customerName || order.shippingAddress?.recipientName || 'Cliente Marmot').slice(0, 150),
+        email: String(order.customerEmail || '').slice(0, 254),
+        phoneNumber: order.customerPhone ? `+55${String(order.customerPhone).replace(/\D/g, '')}` : undefined,
       },
-      { idempotencyKey: `${idempotencyScope}:${order.id}:${checkoutAttemptId}`.slice(0, 255) },
-    );
+      address: {
+        cep: normalizeCep(order.shippingAddress?.cep || ''),
+        number: String(order.shippingAddress?.number || '').slice(0, 30),
+        complement: String(order.shippingAddress?.complement || '').trim().slice(0, 120) || undefined,
+      },
+    });
 
-    if (!session.url) {
-      throw Object.assign(new Error('A Stripe não retornou a URL segura do checkout.'), {
-        code: 'STRIPE_CHECKOUT_URL_MISSING',
-      });
-    }
-
-    const linked = await db.linkPaymentSessionAtomic({
+    const linked = await db.linkPaymentCheckoutAtomic({
       orderId: order.id,
-      provider: 'stripe',
-      sessionId: session.id,
-      statusDetail: session.status || 'open',
-      expiresAt: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined,
+      provider: 'infinitepay',
+      checkoutUrl: checkout.url,
+      statusDetail: 'checkout_created',
     });
     if (!linked.success) {
-      try {
-        if (session.status === 'open') await getRequiredStripeClient().checkout.sessions.expire(session.id);
-      } catch (expirationError: any) {
-        console.error('[STRIPE_ORPHAN_SESSION_EXPIRATION_ERROR]', {
-          orderId: order.id,
-          sessionId: session.id,
-          message: expirationError?.message,
-        });
-      }
       throw Object.assign(new Error(linked.error || 'Não foi possível vincular o checkout ao pedido.'), {
-        code: 'CHECKOUT_SESSION_LINK_FAILED',
+        code: 'CHECKOUT_LINK_FAILED',
       });
     }
-    return session;
+    return { url: checkout.url, reused: false, webhookUrlIncluded: Boolean(webhookUrl) };
   } catch (error: any) {
-    await db.releasePaymentSessionCreation(order.id, error?.code || error?.type || 'stripe_session_creation_failed');
+    await db.releasePaymentSessionCreation(order.id, error?.code || 'infinitepay_checkout_creation_failed');
     throw error;
   }
 }
 
-async function handleCreateStripeCheckout(req: express.Request, res: express.Response) {
+async function handleCreateInfinitePayCheckout(req: express.Request, res: express.Response) {
   const requestId = crypto.randomUUID();
   let persistedOrderId: string | undefined;
   try {
@@ -7955,24 +7939,23 @@ async function handleCreateStripeCheckout(req: express.Request, res: express.Res
       if (previousAttempt.paymentStatus === 'Pago') {
         return res.status(409).json({ code: 'ORDER_ALREADY_PAID', error: 'Este pedido já foi pago.' });
       }
-      const session = await createStripeSessionForOrder(previousAttempt, req, checkoutAttemptId, 'checkout');
-      previousAttempt.paymentProvider = 'stripe';
-      previousAttempt.paymentProviderSessionId = session.id;
-      previousAttempt.checkoutExpiresAt = session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined;
+      const checkout = await createInfinitePayCheckoutForOrder(previousAttempt, req, checkoutAttemptId);
+      previousAttempt.paymentProvider = 'infinitepay';
+      previousAttempt.checkoutUrl = checkout.url;
       previousAttempt.paymentDetails = {
         ...(previousAttempt.paymentDetails || {}),
-        gateway: 'stripe',
-        sessionId: session.id,
-        statusDetail: session.status || 'open',
+        gateway: 'infinitepay',
+        checkoutUrl: checkout.url,
+        statusDetail: 'checkout_created',
       };
-      console.log('[STRIPE_CHECKOUT_REUSED]', { requestId, orderId: previousAttempt.id, sessionId: session.id });
+      console.log('[INFINITEPAY_CHECKOUT_REUSED]', { requestId, orderId: previousAttempt.id });
       return res.status(200).json({
         success: true,
         reused: true,
         orderId: previousAttempt.id,
-        checkoutSessionId: session.id,
-        checkoutUrl: session.url,
-        targetUrl: session.url,
+        checkoutUrl: checkout.url,
+        targetUrl: checkout.url,
+        webhookUrlIncluded: checkout.webhookUrlIncluded,
         order: previousAttempt,
       });
     }
@@ -8048,10 +8031,8 @@ async function handleCreateStripeCheckout(req: express.Request, res: express.Res
       appliedCouponCode = validation.coupon?.code;
     }
 
-    const method = normalizeStripePaymentMethod(body.paymentMethod);
-    const methodDiscountCents = method === 'PIX'
-      ? Math.round((subtotalCents - couponDiscountCents) * 0.05)
-      : 0;
+    const method = 'InfinitePay Checkout';
+    const methodDiscountCents = 0;
     const totalDiscountCents = couponDiscountCents + methodDiscountCents;
 
     const requestedQuoteId = String(body.shippingQuoteId || body.shippingOption?.quoteId || body.shippingOption?.id || '').trim();
@@ -8116,10 +8097,10 @@ async function handleCreateStripeCheckout(req: express.Request, res: express.Res
       date: existingOrder?.date || new Date().toLocaleDateString('pt-BR'),
       status: 'Aguardando Pagamento',
       paymentStatus: 'Pendente',
-      paymentProvider: 'stripe',
+      paymentProvider: 'infinitepay',
       checkoutAttemptKey: checkoutAttemptId,
       paymentMethod: method,
-      paymentDetails: { ...(existingOrder?.paymentDetails || {}), gateway: 'stripe', statusDetail: 'creating_checkout' },
+      paymentDetails: { ...(existingOrder?.paymentDetails || {}), gateway: 'infinitepay', statusDetail: 'creating_checkout' },
       items: validatedItems,
       subtotal: centsToReais(subtotalCents),
       discount: centsToReais(totalDiscountCents),
@@ -8168,7 +8149,7 @@ async function handleCreateStripeCheckout(req: express.Request, res: express.Res
       history: existingOrder?.history?.length ? existingOrder.history : [{
         status: 'Aguardando Pagamento',
         timestamp: new Date().toLocaleString('pt-BR'),
-        description: 'Pedido registrado. Aguardando confirmação segura do pagamento pela Stripe.',
+        description: 'Pedido registrado. Aguardando confirmação segura do pagamento pela InfinitePay.',
       }],
       createdAt: existingOrder?.createdAt || new Date().toISOString(),
     };
@@ -8185,15 +8166,14 @@ async function handleCreateStripeCheckout(req: express.Request, res: express.Res
       persistedOrderId = winner.id;
     }
 
-    const session = await createStripeSessionForOrder(order, req, checkoutAttemptId, 'checkout');
-    order.paymentProvider = 'stripe';
-    order.paymentProviderSessionId = session.id;
-    order.checkoutExpiresAt = session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined;
+    const checkout = await createInfinitePayCheckoutForOrder(order, req, checkoutAttemptId);
+    order.paymentProvider = 'infinitepay';
+    order.checkoutUrl = checkout.url;
     order.paymentDetails = {
       ...(order.paymentDetails || {}),
-      gateway: 'stripe',
-      sessionId: session.id,
-      statusDetail: session.status || 'open',
+      gateway: 'infinitepay',
+      checkoutUrl: checkout.url,
+      statusDetail: 'checkout_created',
     };
 
     if (createdNewOrder) {
@@ -8207,19 +8187,18 @@ async function handleCreateStripeCheckout(req: express.Request, res: express.Res
       }).catch(() => undefined);
     }
 
-    console.log('[STRIPE_CHECKOUT_CREATED]', {
+    console.log('[INFINITEPAY_CHECKOUT_CREATED]', {
       requestId,
       orderId: order.id,
-      sessionId: session.id,
       totalCents,
-      mode: getStripeConfigurationStatus().mode,
+      webhookUrlIncluded: checkout.webhookUrlIncluded,
     });
     return res.status(201).json({
       success: true,
       orderId: order.id,
-      checkoutSessionId: session.id,
-      checkoutUrl: session.url,
-      targetUrl: session.url,
+      checkoutUrl: checkout.url,
+      targetUrl: checkout.url,
+      webhookUrlIncluded: checkout.webhookUrlIncluded,
       order,
       subtotal: order.subtotal,
       discount: order.discount,
@@ -8227,312 +8206,256 @@ async function handleCreateStripeCheckout(req: express.Request, res: express.Res
       total: order.total,
     });
   } catch (error: any) {
-    console.error('[STRIPE_CHECKOUT_ERROR]', {
+    console.error('[INFINITEPAY_CHECKOUT_ERROR]', {
       requestId,
-      code: error?.code || error?.type || 'STRIPE_CHECKOUT_FAILED',
+      code: error?.code || 'INFINITEPAY_CHECKOUT_FAILED',
       message: error?.message,
     });
     const configurationErrors = new Set([
-      'STRIPE_NOT_CONFIGURED',
-      'STRIPE_INVALID_SECRET_KEY',
-      'STRIPE_INVALID_PUBLIC_KEY',
-      'STRIPE_KEY_MODE_MISMATCH',
+      'INFINITEPAY_NOT_CONFIGURED',
+      'INFINITEPAY_INVALID_HANDLE',
+      'INFINITEPAY_INVALID_WEBHOOK_URL',
       'APP_URL_NOT_CONFIGURED',
       'CHECKOUT_PERSISTENCE_REQUIRED',
     ]);
     const status = configurationErrors.has(error?.code) ? 503 : error?.code === 'CHECKOUT_CREATION_IN_PROGRESS' ? 409 : 502;
     return res.status(status).json({
-      code: error?.code || 'STRIPE_CHECKOUT_FAILED',
+      code: error?.code || 'INFINITEPAY_CHECKOUT_FAILED',
       error: status === 503 || status === 409 ? error.message : 'Não foi possível abrir o checkout seguro. Tente novamente.',
       ...(persistedOrderId ? { orderId: persistedOrderId } : {}),
     });
   }
 }
 
-async function updateStripeOrderState(
-  orderId: string,
-  paymentStatus: string,
-  status: string,
-  statusDetail: string,
-  eventId: string,
-): Promise<Order> {
-  if (!orderId) throw new Error('ORDER_NOT_FOUND');
-  const updated = await db.updateProviderPaymentStateAtomic({
-    orderId,
-    provider: 'stripe',
-    paymentStatus,
-    orderStatus: status,
-    statusDetail,
-    eventId,
-  });
-  if (!updated.success) throw new Error(updated.error || 'PAYMENT_STATE_UPDATE_FAILED');
-  const order = await db.getOrderById(orderId);
-  if (!order) throw new Error('ORDER_NOT_FOUND_AFTER_STATE_UPDATE');
-  return order;
+interface InfinitePayConfirmationInput {
+  orderNsu: string;
+  transactionNsu: string;
+  slug: string;
+  receiptUrl?: string;
+  captureMethod?: string;
+  assertedAmountCents?: number;
+  source: 'webhook' | 'redirect' | 'admin_sync';
 }
 
-async function settleStripePaymentIntent(intent: Stripe.PaymentIntent): Promise<{ order: Order; alreadyProcessed: boolean }> {
-  const orderId = String(intent.metadata?.order_id || '').trim();
-  if (!orderId) throw new Error('STRIPE_PAYMENT_WITHOUT_ORDER_ID');
-  const order = await db.getOrderById(orderId);
-  if (!order) throw new Error('ORDER_NOT_FOUND');
-  if (order.paymentProvider && order.paymentProvider !== 'stripe') throw new Error('PAYMENT_PROVIDER_MISMATCH');
-  if (intent.metadata?.user_id && order.userId && intent.metadata.user_id !== order.userId) throw new Error('PAYMENT_USER_MISMATCH');
-  if (intent.status !== 'succeeded') throw new Error('PAYMENT_NOT_SUCCEEDED');
-
-  const amountCents = Number(intent.amount_received || intent.amount);
-  if (amountCents !== reaisToCents(Number(order.total)) || intent.currency.toLowerCase() !== 'brl') {
-    throw new Error('PAYMENT_AMOUNT_MISMATCH');
-  }
-
-  const paymentMethod = getStripePaymentMethodLabel(intent);
-  const result = await db.processApprovedOrderAtomic(
-    order.id,
-    intent.id,
-    centsToReais(amountCents),
-    'BRL',
-    'stripe',
-    paymentMethod,
-    new Date(intent.created * 1000).toISOString(),
-    order.items,
-  );
-  if (!result.success) throw new Error(result.error || 'PAYMENT_SETTLEMENT_FAILED');
-
-  const settledOrder = await db.getOrderById(order.id);
-  if (!settledOrder) throw new Error('ORDER_NOT_FOUND_AFTER_SETTLEMENT');
-  settledOrder.paymentProvider = 'stripe';
-  settledOrder.paymentProviderPaymentId = intent.id;
-  settledOrder.paymentMethod = paymentMethod;
-  settledOrder.paymentDetails = {
-    ...(settledOrder.paymentDetails || {}),
-    gateway: 'stripe',
-    transactionId: intent.id,
-    sessionId: settledOrder.paymentProviderSessionId || settledOrder.paymentDetails?.sessionId,
-    statusDetail: intent.status,
-    paidAt: new Date(intent.created * 1000).toISOString(),
-  };
-  await db.saveOrder(settledOrder);
-
-  // Refresh the process-local cache after the transaction removed purchased
-  // cart lines. The database remains the source of truth.
-  if (settledOrder.userId) await db.getCartForUser(settledOrder.userId);
-
-  if (!result.alreadyProcessed) {
-    console.log('[STRIPE_PAYMENT_CONFIRMED]', { orderId: settledOrder.id, paymentIntentId: intent.id });
-    sendTransactionalEmail({
-      to: settledOrder.customerEmail || '',
-      subject: `Pagamento confirmado — Pedido #${settledOrder.id} // MARMOT`,
-      template: 'payment_approved',
-      orderId: settledOrder.id,
-      userId: settledOrder.userId,
-      html: `<div style="font-family:sans-serif;background:#0c0c0c;color:#fff;padding:32px;max-width:600px;margin:0 auto"><h2>PAGAMENTO CONFIRMADO // MARMOT</h2><p>O pagamento do pedido <strong>#${settledOrder.id}</strong> foi confirmado.</p><p>Seu pedido entrou em separação.</p></div>`,
-    }).catch(() => undefined);
-  }
-  return { order: settledOrder, alreadyProcessed: result.alreadyProcessed };
+interface InfinitePayConfirmationResult {
+  confirmed: boolean;
+  alreadyProcessed: boolean;
+  processing?: boolean;
+  order: Order;
 }
 
-async function findOrderForStripeObject(input: { orderId?: string; sessionId?: string; paymentIntentId?: string }): Promise<Order | null> {
-  if (input.orderId) return db.getOrderById(input.orderId);
-  if (input.sessionId) return db.getOrderById(input.sessionId);
-  if (input.paymentIntentId) return db.getOrderById(input.paymentIntentId);
-  return null;
+class InfinitePayConfirmationError extends Error {
+  code: string;
+  retryable: boolean;
+  httpStatus: number;
+
+  constructor(message: string, code: string, options?: { retryable?: boolean; httpStatus?: number }) {
+    super(message);
+    this.name = 'InfinitePayConfirmationError';
+    this.code = code;
+    this.retryable = Boolean(options?.retryable);
+    this.httpStatus = options?.httpStatus || 409;
+  }
 }
 
-async function handleStripeWebhook(req: express.Request, res: express.Response) {
-  const webhookSecret = getStripeWebhookSecret();
-  const stripeConfiguration = getStripeConfigurationStatus();
-  const signature = req.headers['stripe-signature'];
-  if (!webhookSecret || !stripeConfiguration.webhookSecretValid) {
-    console.error('[STRIPE_WEBHOOK_REJECTED]', { reason: 'webhook_secret_not_configured' });
-    return res.status(503).json({ error: 'Webhook Stripe não configurado.' });
+function validateInfinitePayReference(value: unknown, field: string): string {
+  const normalized = String(value || '').trim();
+  if (!normalized || normalized.length > 255 || !/^[A-Za-z0-9._:-]+$/.test(normalized)) {
+    throw new InfinitePayConfirmationError('Identificador de pagamento inválido.', 'INVALID_' + field.toUpperCase(), { httpStatus: 400 });
   }
-  if (!signature || Array.isArray(signature)) {
-    return res.status(400).json({ error: 'Assinatura Stripe ausente.' });
-  }
+  return normalized;
+}
 
-  try {
-    assertStripeConfiguration();
-  } catch (error: any) {
-    console.error('[STRIPE_WEBHOOK_REJECTED]', { reason: error?.code || 'stripe_configuration_invalid' });
-    return res.status(503).json({ error: 'Configuração Stripe inválida no servidor.' });
-  }
-
-  let event: Stripe.Event;
-  try {
-    event = getRequiredStripeClient().webhooks.constructEvent(req.body, signature, webhookSecret);
-  } catch (error: any) {
-    console.warn('[STRIPE_WEBHOOK_SIGNATURE_INVALID]', { message: error?.message });
-    return res.status(400).json({ error: 'Assinatura do webhook inválida.' });
-  }
-
-  const stripeMode = stripeConfiguration.mode;
-  if ((stripeMode === 'test' && event.livemode) || (stripeMode === 'live' && !event.livemode)) {
-    console.warn('[STRIPE_WEBHOOK_MODE_MISMATCH]', { eventId: event.id, livemode: event.livemode, configuredMode: stripeMode });
-    return res.status(400).json({ error: 'O evento pertence a outro modo da Stripe.' });
-  }
-
-  console.log('[STRIPE_WEBHOOK_VALIDATED]', { eventId: event.id, eventType: event.type, livemode: event.livemode });
-  let linkedOrderId: string | undefined;
-  let shouldQueueFreight = false;
+async function confirmInfinitePayPayment(input: InfinitePayConfirmationInput): Promise<InfinitePayConfirmationResult> {
+  const orderNsu = validateInfinitePayReference(input.orderNsu, 'order_nsu');
+  const transactionNsu = validateInfinitePayReference(input.transactionNsu, 'transaction_nsu');
+  const slug = validateInfinitePayReference(input.slug, 'invoice_slug');
   let claim: { shouldProcess: boolean; status: string; orderId?: string };
+
   try {
-    claim = await db.claimWebhookEvent('stripe', event.id, event.type, {
-      id: event.id,
-      type: event.type,
-      created: event.created,
-      livemode: event.livemode,
+    claim = await db.claimWebhookEvent('infinitepay', transactionNsu, input.source, {
+      orderNsu,
+      transactionNsu,
+      slug,
+      source: input.source,
     });
   } catch (error: any) {
-    console.error('[STRIPE_WEBHOOK_CLAIM_ERROR]', { eventId: event.id, message: error?.message });
-    return res.status(503).json({ error: 'Persistência temporariamente indisponível.' });
+    throw new InfinitePayConfirmationError('Persistência temporariamente indisponível.', 'PAYMENT_EVENT_CLAIM_FAILED', {
+      retryable: true,
+      httpStatus: 503,
+    });
   }
-  if (!claim.shouldProcess) {
-    if (claim.status === 'already_completed' && claim.orderId) {
-      const order = await db.getOrderById(claim.orderId);
-      if (order && needsShipmentFulfillment(order)) scheduleShipmentFulfillment(order.id, 'webhook_retry');
+
+  if (!claim.shouldProcess && claim.status === 'currently_processing') {
+    throw new InfinitePayConfirmationError('A confirmação já está em processamento.', 'PAYMENT_CONFIRMATION_IN_PROGRESS', {
+      retryable: true,
+      httpStatus: 202,
+    });
+  }
+
+  const order = await db.getOrderById(orderNsu);
+  if (!order) {
+    if (claim.shouldProcess) await db.completeWebhookEvent('infinitepay', transactionNsu, undefined, 'order_not_found');
+    throw new InfinitePayConfirmationError('Pedido não encontrado.', 'ORDER_NOT_FOUND', { httpStatus: 404 });
+  }
+  if (order.paymentProvider && order.paymentProvider !== 'infinitepay') {
+    if (claim.shouldProcess) await db.completeWebhookEvent('infinitepay', transactionNsu, order.id, 'provider_mismatch');
+    throw new InfinitePayConfirmationError('O pedido pertence a outro provedor.', 'PAYMENT_PROVIDER_MISMATCH');
+  }
+  if (order.status === 'Cancelado' || order.paymentStatus === 'Cancelado') {
+    if (claim.shouldProcess) await db.completeWebhookEvent('infinitepay', transactionNsu, order.id, 'order_cancelled');
+    throw new InfinitePayConfirmationError('Pedido cancelado não pode receber pagamento.', 'ORDER_CANCELLED');
+  }
+
+  const existingTransaction = String(order.paymentProviderPaymentId || order.paymentDetails?.transactionId || '').trim();
+  if (!claim.shouldProcess && claim.status === 'already_completed') {
+    if (order.paymentStatus === 'Pago' && existingTransaction === transactionNsu) {
+      return { confirmed: true, alreadyProcessed: true, order };
     }
-    console.log('[STRIPE_WEBHOOK_DUPLICATE_IGNORED]', { eventId: event.id, status: claim.status });
-    return res.json({ received: true, duplicate: true });
+    throw new InfinitePayConfirmationError('Evento já concluído sem correspondência financeira.', 'PAYMENT_EVENT_CONFLICT');
+  }
+  if (order.paymentStatus === 'Pago') {
+    if (existingTransaction !== transactionNsu) {
+      await db.completeWebhookEvent('infinitepay', transactionNsu, order.id, 'different_transaction_for_paid_order');
+      throw new InfinitePayConfirmationError('O pedido já possui outra transação confirmada.', 'ORDER_ALREADY_PAID_WITH_ANOTHER_TRANSACTION');
+    }
+    await db.completeWebhookEvent('infinitepay', transactionNsu, order.id);
+    return { confirmed: true, alreadyProcessed: true, order };
   }
 
   try {
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const metadataOrderId = String(session.metadata?.order_id || '').trim();
-        const referenceOrderId = String(session.client_reference_id || '').trim();
-        if (!metadataOrderId || !referenceOrderId || metadataOrderId !== referenceOrderId) {
-          throw new Error('STRIPE_SESSION_ORDER_MISMATCH');
-        }
-        linkedOrderId = metadataOrderId;
-        const order = await findOrderForStripeObject({ orderId: linkedOrderId });
-        if (!order) throw new Error('ORDER_NOT_FOUND');
-        if (order.paymentProvider && order.paymentProvider !== 'stripe') throw new Error('PAYMENT_PROVIDER_MISMATCH');
-        if (session.metadata?.user_id && order.userId && session.metadata.user_id !== order.userId) throw new Error('PAYMENT_USER_MISMATCH');
-        if (Number(session.amount_total || 0) !== reaisToCents(Number(order.total)) || session.currency?.toLowerCase() !== 'brl') {
-          throw new Error('PAYMENT_AMOUNT_MISMATCH');
-        }
-        const paymentIntentId = typeof session.payment_intent === 'string'
-          ? session.payment_intent
-          : session.payment_intent?.id;
-        const linked = await db.linkPaymentSessionAtomic({
-          orderId: order.id,
-          provider: 'stripe',
-          sessionId: session.id,
-          paymentId: paymentIntentId,
-          statusDetail: session.payment_status,
-          expiresAt: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined,
-        });
-        if (!linked.success) throw new Error(linked.error || 'STRIPE_SESSION_LINK_FAILED');
-        console.log('[STRIPE_CHECKOUT_COMPLETED]', { orderId: order.id, sessionId: session.id, paymentStatus: session.payment_status });
-        break;
-      }
-      case 'payment_intent.succeeded': {
-        const intent = event.data.object as Stripe.PaymentIntent;
-        const settled = await settleStripePaymentIntent(intent);
-        linkedOrderId = settled.order.id;
-        shouldQueueFreight = needsShipmentFulfillment(settled.order);
-        break;
-      }
-      case 'payment_intent.payment_failed': {
-        const intent = event.data.object as Stripe.PaymentIntent;
-        linkedOrderId = String(intent.metadata?.order_id || '').trim();
-        await updateStripeOrderState(linkedOrderId, 'Recusado', 'Pagamento Recusado', intent.last_payment_error?.code || 'payment_failed', event.id);
-        console.log('[STRIPE_PAYMENT_FAILED]', { orderId: linkedOrderId, paymentIntentId: intent.id });
-        break;
-      }
-      case 'checkout.session.expired': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        linkedOrderId = String(session.metadata?.order_id || session.client_reference_id || '').trim();
-        await updateStripeOrderState(linkedOrderId, 'Cancelado', 'Cancelado', 'checkout_expired', event.id);
-        console.log('[STRIPE_CHECKOUT_EXPIRED]', { orderId: linkedOrderId, sessionId: session.id });
-        break;
-      }
-      case 'checkout.session.async_payment_succeeded': {
-        // Settlement belongs exclusively to payment_intent.succeeded. This event
-        // is recorded for observability and deliberately performs no mutation.
-        const session = event.data.object as Stripe.Checkout.Session;
-        linkedOrderId = String(session.metadata?.order_id || session.client_reference_id || '').trim();
-        break;
-      }
-      case 'checkout.session.async_payment_failed': {
-        const session = event.data.object as Stripe.Checkout.Session;
-        linkedOrderId = String(session.metadata?.order_id || session.client_reference_id || '').trim();
-        await updateStripeOrderState(linkedOrderId, 'Recusado', 'Pagamento Recusado', 'async_payment_failed', event.id);
-        break;
-      }
-      case 'refund.created':
-      case 'refund.updated':
-      case 'refund.failed': {
-        const refund = event.data.object as Stripe.Refund;
-        const paymentIntentId = typeof refund.payment_intent === 'string' ? refund.payment_intent : refund.payment_intent?.id;
-        const order = await findOrderForStripeObject({ orderId: refund.metadata?.order_id, paymentIntentId });
-        if (!order || !paymentIntentId) throw new Error('REFUND_ORDER_NOT_FOUND');
-        linkedOrderId = order.id;
-        const refundStatus = refund.status === 'succeeded' ? 'succeeded' : refund.status === 'failed' ? 'failed' : refund.status === 'canceled' ? 'canceled' : 'pending';
-        const persisted = await db.processProviderRefundAtomic({
-          orderId: order.id,
-          provider: 'stripe',
-          providerRefundId: refund.id,
-          providerPaymentId: paymentIntentId,
-          amount: centsToReais(refund.amount),
-          currency: refund.currency,
-          status: refundStatus,
-          reason: refund.metadata?.reason,
-        });
-        if (!persisted.success) throw new Error(persisted.error || 'REFUND_PERSISTENCE_FAILED');
-        break;
-      }
-      case 'charge.refunded': {
-        const charge = event.data.object as Stripe.Charge;
-        const paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id;
-        const order = await findOrderForStripeObject({ paymentIntentId });
-        linkedOrderId = order?.id;
-        break;
-      }
-      default:
-        console.log('[STRIPE_WEBHOOK_EVENT_IGNORED]', { eventId: event.id, eventType: event.type });
+    const checked = await checkInfinitePayPayment({ orderNsu, transactionNsu, slug });
+    if (!checked.success || !checked.paid) {
+      await db.completeWebhookEvent('infinitepay', transactionNsu, order.id, 'payment_not_confirmed');
+      return { confirmed: false, alreadyProcessed: false, order };
     }
 
-    await db.completeWebhookEvent('stripe', event.id, linkedOrderId);
-    if (shouldQueueFreight && linkedOrderId) scheduleShipmentFulfillment(linkedOrderId, 'webhook');
-    return res.json({ received: true });
+    const expectedAmountCents = reaisToCents(Number(order.total));
+    if (checked.amount !== expectedAmountCents) {
+      await db.completeWebhookEvent('infinitepay', transactionNsu, order.id, 'payment_amount_mismatch');
+      throw new InfinitePayConfirmationError('O valor confirmado não corresponde ao pedido.', 'PAYMENT_AMOUNT_MISMATCH');
+    }
+    if (input.assertedAmountCents !== undefined && input.assertedAmountCents !== expectedAmountCents) {
+      await db.completeWebhookEvent('infinitepay', transactionNsu, order.id, 'webhook_amount_mismatch');
+      throw new InfinitePayConfirmationError('O valor informado pelo webhook não corresponde ao pedido.', 'WEBHOOK_AMOUNT_MISMATCH');
+    }
+
+    const captureMethod = checked.capture_method || input.captureMethod;
+    const paymentMethod = getInfinitePayPaymentMethodLabel(captureMethod);
+    const receiptUrl = sanitizeInfinitePayReceiptUrl(input.receiptUrl);
+    const result = await db.processApprovedOrderAtomic(
+      order.id,
+      transactionNsu,
+      centsToReais(checked.amount),
+      'BRL',
+      'infinitepay',
+      paymentMethod,
+      new Date().toISOString(),
+      order.items,
+      {
+        invoiceSlug: slug,
+        installments: checked.installments,
+        captureMethod,
+        paidAmountCents: checked.paid_amount,
+        receiptUrl,
+        confirmationSource: input.source,
+      },
+    );
+    if (!result.success) {
+      throw new InfinitePayConfirmationError(result.error || 'Falha ao confirmar o pedido.', 'PAYMENT_SETTLEMENT_FAILED', {
+        retryable: true,
+        httpStatus: 503,
+      });
+    }
+
+    const settledOrder = await db.getOrderById(order.id);
+    if (!settledOrder) {
+      throw new InfinitePayConfirmationError('Pedido não encontrado após confirmação.', 'ORDER_NOT_FOUND_AFTER_SETTLEMENT', {
+        retryable: true,
+        httpStatus: 503,
+      });
+    }
+
+    await db.completeWebhookEvent('infinitepay', transactionNsu, settledOrder.id);
+    if (!result.alreadyProcessed) {
+      console.log('[INFINITEPAY_PAYMENT_CONFIRMED]', {
+        orderId: settledOrder.id,
+        transactionNsu,
+        source: input.source,
+      });
+      sendTransactionalEmail({
+        to: settledOrder.customerEmail || '',
+        subject: 'Pagamento confirmado — Pedido #' + settledOrder.id + ' // MARMOT',
+        template: 'payment_approved',
+        orderId: settledOrder.id,
+        userId: settledOrder.userId,
+        html: '<div style="font-family:sans-serif;background:#0c0c0c;color:#fff;padding:32px;max-width:600px;margin:0 auto"><h2>PAGAMENTO CONFIRMADO // MARMOT</h2><p>O pagamento do pedido <strong>#' + settledOrder.id + '</strong> foi confirmado.</p><p>Seu pedido entrou em separação.</p></div>',
+      }).catch(() => undefined);
+    }
+    if (needsShipmentFulfillment(settledOrder)) {
+      scheduleShipmentFulfillment(settledOrder.id, input.source === 'admin_sync' ? 'admin_sync' : 'webhook');
+    }
+    return { confirmed: true, alreadyProcessed: result.alreadyProcessed, order: settledOrder };
   } catch (error: any) {
     try {
-      await db.completeWebhookEvent('stripe', event.id, linkedOrderId, error?.message || 'processing_failed');
-    } catch (completionError: any) {
-      console.error('[STRIPE_WEBHOOK_FAILURE_RECORD_ERROR]', { eventId: event.id, message: completionError?.message });
+      await db.completeWebhookEvent('infinitepay', transactionNsu, order.id, error?.code || error?.message || 'confirmation_failed');
+    } catch (persistenceError: any) {
+      console.error('[INFINITEPAY_CONFIRMATION_FAILURE_RECORD_ERROR]', {
+        orderId: order.id,
+        transactionNsu,
+        message: persistenceError?.message,
+      });
     }
-    console.error('[STRIPE_WEBHOOK_PROCESSING_ERROR]', {
-      eventId: event.id,
-      eventType: event.type,
-      orderId: linkedOrderId,
-      message: error?.message,
+    if (error instanceof InfinitePayConfirmationError) throw error;
+    if (error instanceof InfinitePayClientError) {
+      throw new InfinitePayConfirmationError('Não foi possível confirmar o pagamento agora.', error.code, {
+        retryable: error.retryable,
+        httpStatus: error.retryable ? 503 : 409,
+      });
+    }
+    throw new InfinitePayConfirmationError('Falha temporária ao confirmar o pagamento.', 'PAYMENT_CONFIRMATION_FAILED', {
+      retryable: true,
+      httpStatus: 503,
     });
-    return res.status(500).json({ error: 'Falha temporária ao processar o webhook.' });
   }
 }
 
-app.post('/api/stripe/checkout-session', checkoutRateLimiter.middleware(), handleCreateStripeCheckout);
+app.post('/api/infinitepay/checkout', checkoutRateLimiter.middleware(), handleCreateInfinitePayCheckout);
 
-app.get('/api/stripe/checkout-session/:sessionId/status', requireAuth, async (req: any, res) => {
+app.post('/api/infinitepay/confirm', requireAuth, checkoutRateLimiter.middleware(), async (req: any, res) => {
   try {
-    const order = await db.getOrderById(req.params.sessionId);
+    const orderNsu = validateInfinitePayReference(req.body?.orderNsu || req.body?.order_nsu, 'order_nsu');
+    const order = await db.getOrderById(orderNsu);
     if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
     if (!canAuthenticatedUserAccessOrder(req, order)) return res.status(403).json({ error: 'Acesso negado.' });
-    return res.json({
-      orderId: order.id,
-      status: order.status,
-      paymentStatus: order.paymentStatus,
-      confirmed: order.paymentStatus === 'Pago',
-      order,
+
+    const result = await confirmInfinitePayPayment({
+      orderNsu,
+      transactionNsu: req.body?.transactionNsu || req.body?.transaction_nsu,
+      slug: req.body?.slug || req.body?.invoice_slug,
+      receiptUrl: req.body?.receiptUrl || req.body?.receipt_url,
+      captureMethod: req.body?.captureMethod || req.body?.capture_method,
+      source: 'redirect',
+    });
+    return res.status(result.confirmed ? 200 : 202).json({
+      confirmed: result.confirmed,
+      alreadyProcessed: result.alreadyProcessed,
+      order: result.order,
     });
   } catch (error: any) {
-    return res.status(500).json({ error: 'Não foi possível consultar o pagamento.' });
+    const status = error instanceof InfinitePayConfirmationError ? error.httpStatus : 500;
+    console.error('[INFINITEPAY_REDIRECT_CONFIRMATION_ERROR]', {
+      code: error?.code || 'CONFIRMATION_FAILED',
+      message: error?.message,
+    });
+    return res.status(status).json({
+      code: error?.code || 'CONFIRMATION_FAILED',
+      error: status >= 500 ? 'Não foi possível validar o pagamento agora. Tente novamente.' : error.message,
+    });
   }
 });
 
-app.get('/api/stripe/orders/:id/status', requireAuth, async (req: any, res) => {
+app.get('/api/infinitepay/orders/:id/status', requireAuth, async (req: any, res) => {
   try {
     const order = await db.getOrderById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
@@ -8549,32 +8472,79 @@ app.get('/api/stripe/orders/:id/status', requireAuth, async (req: any, res) => {
   }
 });
 
+app.post('/api/infinitepay/webhook', express.json({ limit: '256kb' }), async (req, res) => {
+  const parsed = InfinitePayWebhookSchema.safeParse(req.body);
+  if (!parsed.success) {
+    console.warn('[INFINITEPAY_WEBHOOK_REJECTED]', { reason: 'invalid_payload' });
+    return res.status(400).json({ success: false, message: 'Payload inválido' });
+  }
+
+  const payload = parsed.data;
+  try {
+    const result = await confirmInfinitePayPayment({
+      orderNsu: payload.order_nsu,
+      transactionNsu: payload.transaction_nsu,
+      slug: payload.invoice_slug,
+      receiptUrl: payload.receipt_url,
+      captureMethod: payload.capture_method,
+      assertedAmountCents: payload.amount,
+      source: 'webhook',
+    });
+    if (!result.confirmed) {
+      return res.status(400).json({ success: false, message: 'Pagamento ainda não confirmado' });
+    }
+    return res.status(200).json({ success: true, message: null });
+  } catch (error: any) {
+    console.error('[INFINITEPAY_WEBHOOK_PROCESSING_ERROR]', {
+      orderNsu: payload.order_nsu,
+      transactionNsu: payload.transaction_nsu,
+      code: error?.code || 'CONFIRMATION_FAILED',
+      message: error?.message,
+    });
+    return res.status(400).json({ success: false, message: 'Não foi possível confirmar o pagamento' });
+  }
+});
+
 app.post('/api/admin/orders/:id/sync-payment', requireAdmin, async (req: any, res) => {
   try {
     const order = await db.getOrderById(req.params.id);
     if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
-    if (order.paymentProvider !== 'stripe') return res.status(409).json({ error: 'O pedido não pertence à Stripe.' });
-    const sessionId = String(order.paymentProviderSessionId || order.paymentDetails?.sessionId || '').trim();
-    if (!sessionId) return res.status(409).json({ error: 'Pedido sem Checkout Session vinculada.' });
-
-    const session = await getRequiredStripeClient().checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
-    if (session.metadata?.order_id !== order.id || session.client_reference_id !== order.id) {
-      return res.status(409).json({ error: 'A sessão Stripe não corresponde ao pedido.' });
+    if (order.paymentProvider !== 'infinitepay') {
+      return res.status(409).json({ error: 'O pedido não pertence à InfinitePay.' });
     }
-    if (session.payment_status !== 'paid' || !session.payment_intent || typeof session.payment_intent === 'string') {
-      return res.json({ synchronized: true, changed: false, order, stripeStatus: session.payment_status });
+    const transactionNsu = String(order.paymentProviderPaymentId || order.paymentDetails?.transactionId || '').trim();
+    const slug = String(order.paymentProviderInvoiceSlug || order.paymentProviderSessionId || order.paymentDetails?.invoiceSlug || '').trim();
+    if (!transactionNsu || !slug) {
+      return res.status(409).json({ error: 'Pedido ainda não possui os identificadores necessários para consulta.' });
     }
 
-    const settled = await settleStripePaymentIntent(session.payment_intent);
-    if (needsShipmentFulfillment(settled.order)) scheduleShipmentFulfillment(settled.order.id, 'admin_sync');
-    await db.logAdminAction(req.user.email, req.user.name, 'sync_payment', 'order', order.id, 'Pagamento reconciliado com a Stripe.');
-    return res.json({ synchronized: true, changed: !settled.alreadyProcessed, order: settled.order });
+    const result = await confirmInfinitePayPayment({
+      orderNsu: order.id,
+      transactionNsu,
+      slug,
+      receiptUrl: order.paymentReceiptUrl || order.paymentDetails?.receiptUrl,
+      captureMethod: order.paymentDetails?.captureMethod,
+      source: 'admin_sync',
+    });
+    await db.logAdminAction(
+      req.user.email,
+      req.user.name,
+      'sync_payment',
+      'order',
+      order.id,
+      'Pagamento reconciliado com a InfinitePay.',
+    );
+    return res.json({
+      synchronized: true,
+      changed: result.confirmed && !result.alreadyProcessed,
+      confirmed: result.confirmed,
+      order: result.order,
+    });
   } catch (error: any) {
-    console.error('[STRIPE_ADMIN_SYNC_ERROR]', { orderId: req.params.id, message: error?.message });
-    return res.status(502).json({ error: 'Não foi possível sincronizar o pagamento com a Stripe.' });
+    console.error('[INFINITEPAY_ADMIN_SYNC_ERROR]', { orderId: req.params.id, message: error?.message });
+    return res.status(error?.httpStatus || 502).json({ error: 'Não foi possível sincronizar o pagamento com a InfinitePay.' });
   }
 });
-
 // --- Admin Stats & Overview ---
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   try {
@@ -8660,90 +8630,6 @@ app.post('/api/admin/orders/:id/dispatch', requireAdmin, async (req: any, res) =
     res.json(result.order);
   } catch (err: any) {
     res.status(500).json({ error: 'Erro ao despachar pedido.' });
-  }
-});
-
-app.post('/api/admin/orders/:id/refund', requireAdmin, async (req: any, res) => {
-  try {
-    const { amount, reason, refundOperationId } = req.body || {};
-    const numericAmount = Number(amount);
-    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
-      return res.status(400).json({ error: 'Valor de reembolso inválido.' });
-    }
-    const amountCents = reaisToCents(numericAmount);
-    if (!reason || reason.trim().length < 3) {
-      return res.status(400).json({ error: 'Informe a justificativa do reembolso.' });
-    }
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(refundOperationId || ''))) {
-      return res.status(400).json({ error: 'Identificador idempotente do reembolso inválido.' });
-    }
-
-    const order = await db.getOrderById(req.params.id);
-    if (!order) return res.status(404).json({ error: 'Pedido não encontrado.' });
-    if (order.paymentStatus !== 'Pago' && order.paymentStatus !== 'Reembolsado') {
-      return res.status(409).json({ error: 'Somente pedidos pagos podem ser reembolsados.' });
-    }
-    if (order.paymentProvider !== 'stripe') {
-      return res.status(409).json({ error: 'Este pagamento não pertence à Stripe e não pode ser reembolsado por esta integração.' });
-    }
-    const paymentIntentId = String(order.paymentProviderPaymentId || order.paymentDetails?.transactionId || '').trim();
-    if (!paymentIntentId) return res.status(409).json({ error: 'Pedido sem PaymentIntent vinculado.' });
-
-    const alreadyRefundedCents = reaisToCents(Number(order.paymentDetails?.refundedAmount || 0));
-    if (alreadyRefundedCents + amountCents > reaisToCents(Number(order.total))) {
-      return res.status(409).json({ error: 'O valor solicitado ultrapassa o saldo reembolsável do pedido.' });
-    }
-
-    const stripeRefund = await getRequiredStripeClient().refunds.create({
-      payment_intent: paymentIntentId,
-      amount: amountCents,
-      reason: 'requested_by_customer',
-      metadata: {
-        order_id: order.id,
-        reason: String(reason).trim().slice(0, 450),
-        requested_by: String(req.user?.id || ''),
-      },
-    }, { idempotencyKey: `refund:${order.id}:${refundOperationId}` });
-
-    const refundStatus = stripeRefund.status === 'succeeded'
-      ? 'succeeded'
-      : stripeRefund.status === 'failed'
-        ? 'failed'
-        : stripeRefund.status === 'canceled'
-          ? 'canceled'
-          : 'pending';
-    const persisted = await db.processProviderRefundAtomic({
-      orderId: order.id,
-      provider: 'stripe',
-      providerRefundId: stripeRefund.id,
-      providerPaymentId: paymentIntentId,
-      amount: centsToReais(stripeRefund.amount),
-      currency: stripeRefund.currency,
-      status: refundStatus,
-      reason: String(reason).trim(),
-      adminUser: req.user,
-    });
-    if (!persisted.success) throw new Error(persisted.error || 'Falha ao registrar o reembolso no banco.');
-
-    await db.logAdminAction(
-      req.user.email,
-      req.user.name,
-      'refund',
-      'refund',
-      order.id,
-      `Reembolso Stripe solicitado para o pedido #${order.id}.`,
-      { amount: centsToReais(amountCents), refundId: stripeRefund.id, status: refundStatus },
-    );
-    console.log('[STRIPE_REFUND_CREATED]', { orderId: order.id, refundId: stripeRefund.id, status: refundStatus });
-    return res.json({
-      success: true,
-      refundId: stripeRefund.id,
-      refundStatus,
-      order: await db.getOrderById(order.id),
-    });
-  } catch (err: any) {
-    console.error('[STRIPE_REFUND_ERROR]', { orderId: req.params.id, message: err?.message, code: err?.code || err?.type });
-    res.status(502).json({ error: 'A Stripe não conseguiu processar o reembolso. Nenhum estado local foi antecipado.' });
   }
 });
 
@@ -9095,7 +8981,7 @@ async function processMelhorEnvioShipment(
 
   if (!isPaidOrderForFulfillment(order)) {
     throw shipmentProcessingError(
-      'O envio só pode ser comprado após confirmação real do pagamento pela Stripe.',
+      'O envio só pode ser comprado após confirmação server-to-server do pagamento pela InfinitePay.',
       409,
       'PAYMENT_NOT_CONFIRMED',
       'payment_check',
@@ -9172,19 +9058,7 @@ async function processMelhorEnvioShipment(
     if (config.originPostalCode.length !== 8) {
       throw shipmentProcessingError('CEP de origem do Melhor Envio não configurado corretamente.', 503, 'MISSING_ORIGIN_CEP', currentStep, shipmentId || undefined);
     }
-    if (order.paymentProvider === 'stripe') {
-      const stripeMode = getStripeConfigurationStatus().mode;
-      const expectedShippingEnvironment = stripeMode === 'live' ? 'production' : 'sandbox';
-      if (stripeMode === 'unknown' || expectedShippingEnvironment !== config.environment) {
-        throw shipmentProcessingError(
-          'Os ambientes de pagamento Stripe e Melhor Envio são diferentes; a compra automática do frete foi bloqueada.',
-          409,
-          'PAYMENT_SHIPPING_ENVIRONMENT_MISMATCH',
-          currentStep,
-          shipmentId || undefined,
-        );
-      }
-    } else if (actor?.source !== 'admin') {
+    if (order.paymentProvider !== 'infinitepay' && actor?.source !== 'admin') {
       throw shipmentProcessingError(
         'Pedidos históricos de outro provedor só podem iniciar o frete por uma ação administrativa explícita.',
         409,
@@ -10147,28 +10021,26 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay'], requireAuth, async 
     }
 
     order.checkoutAttemptKey = checkoutAttemptId;
-    order.paymentProvider = 'stripe';
-    const session = await createStripeSessionForOrder(order, req, checkoutAttemptId, 'pay');
-    order.paymentProviderSessionId = session.id;
-    order.checkoutExpiresAt = session.expires_at ? new Date(session.expires_at * 1000).toISOString() : undefined;
+    order.paymentProvider = 'infinitepay';
+    const checkout = await createInfinitePayCheckoutForOrder(order, req, checkoutAttemptId);
+    order.checkoutUrl = checkout.url;
     order.paymentDetails = {
       ...(order.paymentDetails || {}),
-      gateway: 'stripe',
-      sessionId: session.id,
-      statusDetail: session.status || 'open',
+      gateway: 'infinitepay',
+      checkoutUrl: checkout.url,
+      statusDetail: 'checkout_created',
     };
 
-    console.log('[STRIPE_PAYMENT_RESUMED]', { orderId: order.id, sessionId: session.id });
+    console.log('[INFINITEPAY_PAYMENT_RESUMED]', { orderId: order.id });
     return res.json({
       success: true,
       orderId: order.id,
-      checkoutSessionId: session.id,
-      checkoutUrl: session.url,
-      targetUrl: session.url,
+      checkoutUrl: checkout.url,
+      targetUrl: checkout.url,
     });
   } catch (error: any) {
-    console.error('[STRIPE_PAYMENT_RESUME_ERROR]', { orderId: req.params.id, message: error?.message });
-    const status = error?.code === 'STRIPE_NOT_CONFIGURED' ? 503 : 502;
+    console.error('[INFINITEPAY_PAYMENT_RESUME_ERROR]', { orderId: req.params.id, message: error?.message });
+    const status = error?.code === 'INFINITEPAY_NOT_CONFIGURED' ? 503 : 502;
     return res.status(status).json({ error: status === 503 ? error.message : 'Não foi possível reabrir o pagamento.' });
   }
 });

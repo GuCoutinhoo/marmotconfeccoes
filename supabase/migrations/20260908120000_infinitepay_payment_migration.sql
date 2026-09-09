@@ -6,6 +6,11 @@ ALTER TABLE public.orders
   ADD COLUMN IF NOT EXISTS payment_provider TEXT,
   ADD COLUMN IF NOT EXISTS payment_provider_payment_id TEXT,
   ADD COLUMN IF NOT EXISTS payment_provider_session_id TEXT,
+  ADD COLUMN IF NOT EXISTS payment_provider_invoice_slug TEXT,
+  ADD COLUMN IF NOT EXISTS payment_installments INTEGER,
+  ADD COLUMN IF NOT EXISTS payment_amount NUMERIC(10, 2),
+  ADD COLUMN IF NOT EXISTS payment_receipt_url TEXT,
+  ADD COLUMN IF NOT EXISTS checkout_url TEXT,
   ADD COLUMN IF NOT EXISTS payment_status_detail TEXT,
   ADD COLUMN IF NOT EXISTS checkout_attempt_key UUID,
   ADD COLUMN IF NOT EXISTS checkout_expires_at TIMESTAMPTZ,
@@ -63,6 +68,10 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_payment_provider_session
   ON public.orders(payment_provider, payment_provider_session_id)
   WHERE payment_provider IS NOT NULL AND payment_provider_session_id IS NOT NULL;
 
+CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_payment_provider_invoice
+  ON public.orders(payment_provider, payment_provider_invoice_slug)
+  WHERE payment_provider IS NOT NULL AND payment_provider_invoice_slug IS NOT NULL;
+
 CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_user_checkout_attempt
   ON public.orders(user_id, checkout_attempt_key)
   WHERE user_id IS NOT NULL AND checkout_attempt_key IS NOT NULL;
@@ -115,9 +124,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_refund_operations_provider_refund
   ON public.refund_operations(payment_provider, provider_refund_id)
   WHERE payment_provider IS NOT NULL AND provider_refund_id IS NOT NULL;
 
--- Serialize Checkout Session creation per order. This prevents two distinct
--- browser requests (with different idempotency keys) from opening two payable
--- Stripe sessions for the same pending order.
+-- Serialize hosted checkout-link creation per order. This prevents two
+-- concurrent browser requests from opening two payable links for one order.
 CREATE OR REPLACE FUNCTION public.claim_payment_session_creation(
   p_order_id TEXT,
   p_user_id TEXT,
@@ -141,14 +149,13 @@ BEGIN
   IF v_order.payment_status = 'Pago' THEN
     RETURN jsonb_build_object('success', FALSE, 'error', 'ORDER_ALREADY_PAID');
   END IF;
-  IF v_order.payment_provider_session_id IS NOT NULL
-     AND v_order.checkout_expires_at IS NOT NULL
-     AND v_order.checkout_expires_at > NOW() THEN
+  IF v_order.checkout_url IS NOT NULL
+     AND v_order.checkout_session_state = 'ready' THEN
     RETURN jsonb_build_object(
       'success', TRUE,
       'shouldCreate', FALSE,
-      'status', 'session_exists',
-      'sessionId', v_order.payment_provider_session_id
+      'status', 'checkout_exists',
+      'checkoutUrl', v_order.checkout_url
     );
   END IF;
   IF v_order.checkout_session_lease_until IS NOT NULL
@@ -171,13 +178,13 @@ BEGIN
 END;
 $$;
 
-CREATE OR REPLACE FUNCTION public.link_payment_session_atomic(
+DROP FUNCTION IF EXISTS public.link_payment_session_atomic(TEXT, TEXT, TEXT, TEXT, TEXT, TIMESTAMPTZ);
+
+CREATE OR REPLACE FUNCTION public.link_payment_checkout_atomic(
   p_order_id TEXT,
   p_provider TEXT,
-  p_session_id TEXT,
-  p_payment_id TEXT DEFAULT NULL,
-  p_status_detail TEXT DEFAULT NULL,
-  p_expires_at TIMESTAMPTZ DEFAULT NULL
+  p_checkout_url TEXT,
+  p_status_detail TEXT DEFAULT NULL
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -199,22 +206,19 @@ BEGIN
 
   UPDATE public.orders
   SET payment_provider = p_provider,
-      payment_provider_session_id = COALESCE(NULLIF(p_session_id, ''), payment_provider_session_id),
-      payment_provider_payment_id = COALESCE(NULLIF(p_payment_id, ''), payment_provider_payment_id),
+      checkout_url = NULLIF(p_checkout_url, ''),
       payment_status_detail = COALESCE(NULLIF(p_status_detail, ''), payment_status_detail),
-      checkout_expires_at = COALESCE(p_expires_at, checkout_expires_at),
       checkout_session_state = 'ready',
       checkout_session_lease_until = NULL,
       payment_details = COALESCE(payment_details, '{}'::jsonb) || jsonb_strip_nulls(jsonb_build_object(
         'gateway', p_provider,
-        'sessionId', NULLIF(p_session_id, ''),
-        'transactionId', NULLIF(p_payment_id, ''),
+        'checkoutUrl', NULLIF(p_checkout_url, ''),
         'statusDetail', NULLIF(p_status_detail, '')
       )),
       updated_at = NOW()
   WHERE id = p_order_id;
 
-  RETURN jsonb_build_object('success', TRUE, 'orderId', p_order_id, 'sessionId', p_session_id);
+  RETURN jsonb_build_object('success', TRUE, 'orderId', p_order_id, 'checkoutUrl', p_checkout_url);
 END;
 $$;
 
@@ -304,7 +308,7 @@ BEGIN
       notes, description, metadata, created_at
     ) VALUES (
       gen_random_uuid(), p_order_id, p_order_status, v_order.status, p_order_status,
-      'Stripe Webhook', p_provider, 'Status financeiro atualizado: ' || p_status_detail || '.',
+      'InfinitePay', p_provider, 'Status financeiro atualizado: ' || p_status_detail || '.',
       'Status financeiro atualizado: ' || p_status_detail || '.',
       jsonb_build_object('externalEventId', p_event_id), NOW()
     );
@@ -325,15 +329,18 @@ CREATE POLICY "Refund operations restricted to service role"
 
 -- One transaction owns payment settlement, stock deduction, financial ledger,
 -- order state, status history and removal of the purchased cart lines.
+DROP FUNCTION IF EXISTS public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB);
+
 CREATE OR REPLACE FUNCTION public.process_approved_order_atomic(
   p_order_id TEXT,
   p_payment_id TEXT,
   p_amount NUMERIC,
   p_currency TEXT DEFAULT 'BRL',
-  p_gateway TEXT DEFAULT 'stripe',
-  p_payment_method TEXT DEFAULT 'Stripe Checkout',
+  p_gateway TEXT DEFAULT 'infinitepay',
+  p_payment_method TEXT DEFAULT 'InfinitePay Checkout',
   p_date_approved TIMESTAMPTZ DEFAULT NOW(),
-  p_items JSONB DEFAULT '[]'::jsonb
+  p_items JSONB DEFAULT '[]'::jsonb,
+  p_payment_metadata JSONB DEFAULT '{}'::jsonb
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -459,7 +466,7 @@ BEGIN
       previous_stock, new_stock, reason, actor, created_at
     ) VALUES (
       gen_random_uuid(), v_item.product_id, p_order_id, 'outflow', -v_item.quantity,
-      v_current_stock, v_new_stock, 'Venda confirmada', 'stripe_webhook', NOW()
+      v_current_stock, v_new_stock, 'Venda confirmada', 'infinitepay_confirmation', NOW()
     );
   END LOOP;
 
@@ -469,7 +476,24 @@ BEGIN
       payment_method = p_payment_method,
       payment_provider = p_gateway,
       payment_provider_payment_id = p_payment_id,
+      payment_provider_session_id = COALESCE(NULLIF(p_payment_metadata->>'invoiceSlug', ''), payment_provider_session_id),
+      payment_provider_invoice_slug = COALESCE(NULLIF(p_payment_metadata->>'invoiceSlug', ''), payment_provider_invoice_slug),
+      payment_installments = COALESCE(NULLIF(p_payment_metadata->>'installments', '')::INTEGER, payment_installments),
+      payment_amount = p_amount,
+      payment_receipt_url = COALESCE(NULLIF(p_payment_metadata->>'receiptUrl', ''), payment_receipt_url),
       payment_status_detail = 'succeeded',
+      payment_details = COALESCE(payment_details, '{}'::jsonb) || jsonb_strip_nulls(jsonb_build_object(
+        'gateway', p_gateway,
+        'transactionId', p_payment_id,
+        'invoiceSlug', NULLIF(p_payment_metadata->>'invoiceSlug', ''),
+        'installments', NULLIF(p_payment_metadata->>'installments', '')::INTEGER,
+        'captureMethod', NULLIF(p_payment_metadata->>'captureMethod', ''),
+        'paidAmountCents', NULLIF(p_payment_metadata->>'paidAmountCents', '')::INTEGER,
+        'receiptUrl', NULLIF(p_payment_metadata->>'receiptUrl', ''),
+        'confirmationSource', NULLIF(p_payment_metadata->>'confirmationSource', ''),
+        'statusDetail', 'paid',
+        'paidAt', p_date_approved
+      )),
       shipping_status = 'Aguardando compra de frete',
       paid_at = COALESCE(paid_at, p_date_approved),
       separation_started_at = COALESCE(separation_started_at, p_date_approved),
@@ -481,7 +505,7 @@ BEGIN
     notes, description, metadata, created_at
   ) VALUES (
     gen_random_uuid(), p_order_id, 'Em Separação', v_order.status, 'Em Separação',
-    'Stripe Webhook', p_gateway, format('Pagamento confirmado (%s %s).', UPPER(p_currency), p_amount),
+    'InfinitePay', p_gateway, format('Pagamento confirmado (%s %s).', UPPER(p_currency), p_amount),
     format('Pagamento confirmado (%s %s).', UPPER(p_currency), p_amount),
     jsonb_build_object('paymentId', p_payment_id), NOW()
   );
@@ -589,14 +613,14 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB) TO service_role;
+REVOKE ALL ON FUNCTION public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB, JSONB) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.process_approved_order_atomic(TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, TIMESTAMPTZ, JSONB, JSONB) TO service_role;
 REVOKE ALL ON FUNCTION public.process_provider_refund_atomic(TEXT, TEXT, TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, UUID, TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.process_provider_refund_atomic(TEXT, TEXT, TEXT, TEXT, NUMERIC, TEXT, TEXT, TEXT, UUID, TEXT) TO service_role;
 REVOKE ALL ON FUNCTION public.claim_payment_session_creation(TEXT, TEXT, UUID) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.claim_payment_session_creation(TEXT, TEXT, UUID) TO service_role;
-REVOKE ALL ON FUNCTION public.link_payment_session_atomic(TEXT, TEXT, TEXT, TEXT, TEXT, TIMESTAMPTZ) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.link_payment_session_atomic(TEXT, TEXT, TEXT, TEXT, TEXT, TIMESTAMPTZ) TO service_role;
+REVOKE ALL ON FUNCTION public.link_payment_checkout_atomic(TEXT, TEXT, TEXT, TEXT) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.link_payment_checkout_atomic(TEXT, TEXT, TEXT, TEXT) TO service_role;
 REVOKE ALL ON FUNCTION public.release_payment_session_creation(TEXT, TEXT) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.release_payment_session_creation(TEXT, TEXT) TO service_role;
 REVOKE ALL ON FUNCTION public.update_provider_payment_state_atomic(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT) FROM PUBLIC, anon, authenticated;

@@ -588,7 +588,7 @@ export const AdminOrdersTab: React.FC = () => {
                         R$ {order.total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </p>
                       <p className="text-[10px] text-[#6B6B66] uppercase">
-                        {order.paymentMethod || 'Stripe Checkout'}
+                        {order.paymentMethod || 'InfinitePay Checkout'}
                       </p>
                     </td>
 

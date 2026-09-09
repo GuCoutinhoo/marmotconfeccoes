@@ -21,7 +21,7 @@ export const HomeFAQ: React.FC = () => {
     },
     {
       q: 'Quais são as formas de pagamento aceitas?',
-      a: 'Aceitamos PIX com 5% de desconto automático, cartão de crédito e boleto bancário pelo Checkout seguro da Stripe. As opções disponíveis são apresentadas antes da confirmação.',
+      a: 'Aceitamos PIX e cartão pelo Checkout seguro da InfinitePay. As opções disponíveis são apresentadas no ambiente de pagamento.',
     },
   ];
 
