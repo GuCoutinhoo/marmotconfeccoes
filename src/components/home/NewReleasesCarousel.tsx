@@ -24,17 +24,17 @@ interface DropProductItem {
   colorCountText: string;
 }
 
-// Curated items matching the exact reference specifications
+// Curated items matching the exact store catalog products
 const CANONICAL_DROP_ITEMS: DropProductItem[] = [
   {
-    id: 'drop-camiseta-contrast-stitch',
+    id: 'prod-cam-001',
     slug: 'camiseta-contrast-stitch',
     title: 'Camiseta Contrast Stitch',
     categoryName: 'CAMISETAS',
     price: 149.90,
     installments: 'ou 3x de R$ 49,97 sem juros',
     checkoutNote: 'R$ 142,41 no PIX (5% OFF)',
-    image: '/categoria camiseta.png',
+    image: '/uploads/products/prod-cam-001/c2ba729e5e82964f.webp',
     colors: [
       { name: 'Preto Washed', hex: '#1C1C1E' },
       { name: 'Areia Off-White', hex: '#EBE6DC' },
@@ -42,14 +42,14 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
-    id: 'drop-jaqueta-anorak',
+    id: 'prod-jaq-001',
     slug: 'jaqueta-anorak',
     title: 'Jaqueta Anorak',
     categoryName: 'JAQUETAS',
     price: 429.90,
     installments: 'ou 3x de R$ 143,30 sem juros',
     checkoutNote: 'R$ 408,40 no PIX (5% OFF)',
-    image: '/categoria jaqueta.png',
+    image: 'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png',
     colors: [
       { name: 'Preto', hex: '#141416' },
       { name: 'Chumbo', hex: '#3E3E44' },
@@ -57,14 +57,14 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
-    id: 'drop-moletom-anorak',
+    id: 'prod-mol-001',
     slug: 'moletom-anorak',
     title: 'Moletom Anorak',
     categoryName: 'MOLETON',
     price: 349.90,
     installments: 'ou 3x de R$ 116,63 sem juros',
     checkoutNote: 'R$ 332,40 no PIX (5% OFF)',
-    image: '/categoria moletom.png',
+    image: '/uploads/products/prod-mol-001/a70c68c9e1c10f30.webp',
     colors: [
       { name: 'Preto', hex: '#171719' },
       { name: 'Areia Washed', hex: '#DED8CC' },
@@ -72,14 +72,14 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
-    id: 'drop-camiseta-double-layer',
+    id: 'prod-cam-002',
     slug: 'camiseta-double-layer',
     title: 'Camiseta Double Layer',
     categoryName: 'CAMISETAS',
     price: 189.90,
     installments: 'ou 3x de R$ 63,30 sem juros',
     checkoutNote: 'R$ 180,41 no PIX (5% OFF)',
-    image: '/look 1.png',
+    image: '/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp',
     colors: [
       { name: 'Marrom / Bege', hex: '#4A3B32' },
       { name: 'Areia', hex: '#DCD4C6' },
@@ -87,14 +87,14 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
-    id: 'drop-jaqueta-bomber-oversized',
+    id: 'prod-jaq-002',
     slug: 'jaqueta-bomber-oversized',
     title: 'Jaqueta Bomber Oversized',
     categoryName: 'JAQUETAS',
     price: 459.90,
     installments: 'ou 3x de R$ 153,30 sem juros',
     checkoutNote: 'R$ 436,90 no PIX (5% OFF)',
-    image: '/look 2.png',
+    image: 'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png',
     colors: [
       { name: 'Preto', hex: '#151517' },
       { name: 'Grafite', hex: '#3B3B42' },
@@ -102,14 +102,14 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
-    id: 'drop-moletom-asymmetric-zip',
+    id: 'prod-mol-002',
     slug: 'moletom-asymmetric-zip',
     title: 'Moletom Asymmetric Zip',
     categoryName: 'MOLETON',
     price: 349.90,
     installments: 'ou 3x de R$ 116,63 sem juros',
     checkoutNote: 'R$ 332,40 no PIX (5% OFF)',
-    image: '/drop 3.png',
+    image: '/uploads/products/prod-mol-002/6b050306d7c2139f.webp',
     colors: [
       { name: 'Cinza Grafite', hex: '#2E2E33' },
       { name: 'Off-White', hex: '#E2DED6' },
@@ -117,14 +117,14 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
-    id: 'drop-calca-cargo-tactical',
-    slug: 'calca-cargo-tactical',
-    title: 'Calça Cargo Tactical Ripstop',
+    id: 'prod-cal-002',
+    slug: 'calca-cargo-baggy',
+    title: 'Calça Cargo Baggy',
     categoryName: 'CALÇAS',
-    price: 279.90,
-    installments: 'ou 3x de R$ 93,30 sem juros',
-    checkoutNote: 'R$ 265,91 no PIX (5% OFF)',
-    image: '/categoria calça.png',
+    price: 329.90,
+    installments: 'ou 3x de R$ 109,97 sem juros',
+    checkoutNote: 'R$ 313,41 no PIX (5% OFF)',
+    image: 'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
     colors: [
       { name: 'Preto', hex: '#18181B' },
       { name: 'Oliva Militar', hex: '#3E4238' },
@@ -132,17 +132,17 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     colorCountText: '2 cores',
   },
   {
-    id: 'drop-shorts-tactical',
-    slug: 'shorts-tactical',
-    title: 'Shorts Tactical Utility',
-    categoryName: 'SHORTS',
-    price: 199.90,
-    installments: 'ou 3x de R$ 66,63 sem juros',
-    checkoutNote: 'R$ 189,91 no PIX (5% OFF)',
-    image: '/categoria shorts.png',
+    id: 'prod-jaq-017',
+    slug: 'jaqueta-varsity-oversized',
+    title: 'Jaqueta Varsity Oversized',
+    categoryName: 'JAQUETAS',
+    price: 499.90,
+    installments: 'ou 3x de R$ 166,63 sem juros',
+    checkoutNote: 'R$ 474,91 no PIX (5% OFF)',
+    image: 'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png',
     colors: [
-      { name: 'Preto', hex: '#18181B' },
-      { name: 'Areia', hex: '#D7CDBB' },
+      { name: 'Preto', hex: '#141416' },
+      { name: 'Off-White', hex: '#E5E0D8' },
     ],
     colorCountText: '2 cores',
   },
@@ -311,6 +311,46 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     );
   };
 
+  // Garante que as fotos e informações venham dos produtos que estão realmente na loja (aba catálogo)
+  const displayItems = React.useMemo(() => {
+    return CANONICAL_DROP_ITEMS.map((canonicalItem) => {
+      const matched = products.find(
+        (p) =>
+          p.id === canonicalItem.id ||
+          p.slug === canonicalItem.slug ||
+          p.title.toLowerCase().trim() === canonicalItem.title.toLowerCase().trim()
+      );
+
+      if (matched && matched.image) {
+        const price = matched.promoPrice || matched.price;
+        const installmentsVal = (price / 3).toFixed(2).replace('.', ',');
+        const pixVal = (price * 0.95).toFixed(2).replace('.', ',');
+
+        return {
+          ...canonicalItem,
+          id: matched.id,
+          slug: matched.slug,
+          title: matched.title,
+          price,
+          installments: `ou 3x de R$ ${installmentsVal} sem juros`,
+          checkoutNote: `R$ ${pixVal} no PIX (5% OFF)`,
+          image: matched.image,
+          categoryName: (matched.category || canonicalItem.categoryName).toUpperCase(),
+          colors:
+            matched.colors && matched.colors.length > 0
+              ? matched.colors.map((c) => ({
+                  name: c.colorName || c.color || 'Padrão',
+                  hex: c.colorHex || '#1C1C1E',
+                }))
+              : canonicalItem.colors,
+          colorCountText: `${matched.colors?.length || canonicalItem.colors.length} cores`,
+        };
+      }
+
+      return canonicalItem;
+    });
+  }, [products]);
+
   return (
     <section
       ref={sectionRef}
@@ -412,7 +452,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           ref={scrollRef}
           className="flex gap-4 sm:gap-4.5 overflow-x-auto scrollbar-none pb-6 pt-1 scroll-smooth snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0"
         >
-          {CANONICAL_DROP_ITEMS.map((item, index) => {
+          {displayItems.map((item, index) => {
             const isFav = isInWishlist(item.id);
 
             return (
