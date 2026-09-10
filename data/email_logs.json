@@ -1,5 +1,15 @@
 [
   {
+    "id": "sim-1788996056867-bszs",
+    "recipient": "cliente@marmot.com",
+    "template": "order_created",
+    "subject": "Pedido #MM-056301-1959 gerado // MARMOT",
+    "status": "simulated",
+    "orderId": "MM-056301-1959",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "createdAt": "2026-09-09T23:20:56.867Z"
+  },
+  {
     "id": "sim-1788745206756-758r",
     "recipient": "cliente@marmot.com",
     "template": "order_created",

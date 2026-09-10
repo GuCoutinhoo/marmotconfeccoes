@@ -524,9 +524,8 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
         body: JSON.stringify({ checkoutAttemptId: crypto.randomUUID() }),
       });
       const data = await res.json();
-      if (res.ok && (data.checkoutUrl || data.targetUrl)) {
-        const redirectUrl = data.checkoutUrl || data.targetUrl;
-        window.location.href = redirectUrl;
+      if (res.ok && data.checkoutUrl) {
+        window.location.assign(data.checkoutUrl);
       } else {
         showToast('Erro', data.error || 'Não foi possível reabrir o pagamento.', 'error');
       }

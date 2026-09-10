@@ -527,13 +527,23 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
         if (typeof errData.orderId === 'string' && errData.orderId.trim()) {
           setRetryOrderId(errData.orderId.trim());
         }
-        throw new Error(errData.error || 'Erro ao gerar o checkout seguro da InfinitePay.');
+        if (import.meta.env.DEV) {
+          console.error('[INFINITEPAY_CHECKOUT_REQUEST_FAILED]', {
+            status: res.status,
+            code: errData.code || 'INFINITEPAY_CHECKOUT_FAILED',
+            hasRetryOrder: Boolean(errData.orderId),
+          });
+        }
+        throw Object.assign(
+          new Error(errData.error || 'Erro ao gerar o checkout seguro da InfinitePay.'),
+          { code: errData.code || 'INFINITEPAY_CHECKOUT_FAILED' },
+        );
       }
 
       const data = await res.json();
-      const targetCheckoutUrl = data.checkoutUrl || data.targetUrl;
+      const checkoutUrl = data.checkoutUrl;
 
-      if (!targetCheckoutUrl) {
+      if (!checkoutUrl) {
         throw new Error('Link de pagamento não retornado pela InfinitePay.');
       }
 
@@ -543,12 +553,12 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
       }
       setRetryOrderId(null);
 
-      setRedirectUrl(targetCheckoutUrl);
+      setRedirectUrl(checkoutUrl);
       // The cart stays intact until the backend verifies payment with InfinitePay.
 
       showToast('Redirecionando...', 'Abrindo o Checkout seguro da InfinitePay.', 'info');
 
-      window.location.assign(targetCheckoutUrl);
+      window.location.assign(checkoutUrl);
     } catch (err: any) {
       console.error('[Checkout Place Order Error]', err);
       showToast('Erro ao finalizar pedido', err.message || 'Tente novamente.', 'error');

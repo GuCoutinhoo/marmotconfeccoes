@@ -2,6 +2,10 @@ import { z } from 'zod';
 
 const INFINITEPAY_API_BASE_URL = 'https://api.checkout.infinitepay.io';
 const REQUEST_TIMEOUT_MS = 12_000;
+export const ALLOWED_INFINITEPAY_CHECKOUT_HOSTS = new Set([
+  'checkout.infinitepay.io',
+  'checkout.infinitepay.com.br',
+]);
 
 const CheckoutItemSchema = z.object({
   quantity: z.number().int().min(1).max(50),
@@ -9,7 +13,7 @@ const CheckoutItemSchema = z.object({
   description: z.string().trim().min(1).max(255),
 });
 
-const CreateCheckoutResponseSchema = z.object({
+export const CreateCheckoutResponseSchema = z.object({
   url: z.string().url(),
 }).passthrough();
 
@@ -172,16 +176,37 @@ export function centsToReais(value: number): number {
 }
 
 export function sanitizeInfinitePayCheckoutUrl(value: string): string {
+  if (typeof value !== 'string' || value.length > 2048) {
+    throw new InfinitePayClientError('A InfinitePay retornou uma URL de checkout inválida.', 'INFINITEPAY_INVALID_CHECKOUT_URL');
+  }
   let url: URL;
   try {
     url = new URL(value);
   } catch {
     throw new InfinitePayClientError('A InfinitePay retornou uma URL de checkout inválida.', 'INFINITEPAY_INVALID_CHECKOUT_URL');
   }
-  if (url.protocol !== 'https:' || url.hostname.toLowerCase() !== 'checkout.infinitepay.com.br' || url.username || url.password) {
+  const hostname = url.hostname.toLowerCase();
+  if (
+    url.protocol !== 'https:' ||
+    !ALLOWED_INFINITEPAY_CHECKOUT_HOSTS.has(hostname) ||
+    Boolean(url.port) ||
+    Boolean(url.username) ||
+    Boolean(url.password)
+  ) {
     throw new InfinitePayClientError('A InfinitePay retornou uma origem de checkout inesperada.', 'INFINITEPAY_INVALID_CHECKOUT_URL');
   }
   return url.toString();
+}
+
+export function parseInfinitePayCheckoutResponse(data: unknown): { url: string } {
+  const parsed = CreateCheckoutResponseSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new InfinitePayClientError(
+      'A InfinitePay retornou uma resposta de checkout inválida.',
+      'INFINITEPAY_INVALID_RESPONSE',
+    );
+  }
+  return { url: sanitizeInfinitePayCheckoutUrl(parsed.data.url) };
 }
 
 export function sanitizeInfinitePayReceiptUrl(value: unknown): string | undefined {
@@ -216,6 +241,29 @@ async function postInfinitePay(path: '/links' | '/payment_check', payload: unkno
       throw new InfinitePayClientError('Resposta inválida recebida da InfinitePay.', 'INFINITEPAY_INVALID_RESPONSE', {
         status: response.status,
         retryable: response.status >= 500,
+      });
+    }
+    if (path === '/links' && process.env.NODE_ENV === 'development') {
+      const responseRecord = data && typeof data === 'object' && !Array.isArray(data)
+        ? data as Record<string, unknown>
+        : {};
+      const returnedUrl = typeof responseRecord.url === 'string' ? responseRecord.url : '';
+      let checkoutOrigin: { protocol?: string; hostname?: string } = {};
+      if (returnedUrl) {
+        try {
+          const parsedUrl = new URL(returnedUrl);
+          checkoutOrigin = {
+            protocol: parsedUrl.protocol,
+            hostname: parsedUrl.hostname,
+          };
+        } catch {
+          checkoutOrigin = {};
+        }
+      }
+      console.log('[INFINITEPAY_CHECKOUT_RESPONSE]', {
+        status: response.status,
+        responseKeys: Object.keys(responseRecord).sort(),
+        ...checkoutOrigin,
       });
     }
     if (!response.ok) {
@@ -260,8 +308,7 @@ export async function createInfinitePayCheckout(input: InfinitePayCheckoutPayloa
       },
     } : {}),
   };
-  const parsed = CreateCheckoutResponseSchema.parse(await postInfinitePay('/links', payload));
-  return { url: sanitizeInfinitePayCheckoutUrl(parsed.url) };
+  return parseInfinitePayCheckoutResponse(await postInfinitePay('/links', payload));
 }
 
 export async function checkInfinitePayPayment(input: {

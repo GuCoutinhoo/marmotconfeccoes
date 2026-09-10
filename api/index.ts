@@ -7986,7 +7986,6 @@ async function handleCreateInfinitePayCheckout(req: express.Request, res: expres
         reused: true,
         orderId: previousAttempt.id,
         checkoutUrl: checkout.url,
-        targetUrl: checkout.url,
         webhookUrlIncluded: checkout.webhookUrlIncluded,
         order: previousAttempt,
       });
@@ -8229,7 +8228,6 @@ async function handleCreateInfinitePayCheckout(req: express.Request, res: expres
       success: true,
       orderId: order.id,
       checkoutUrl: checkout.url,
-      targetUrl: checkout.url,
       webhookUrlIncluded: checkout.webhookUrlIncluded,
       order,
       subtotal: order.subtotal,
@@ -8242,6 +8240,8 @@ async function handleCreateInfinitePayCheckout(req: express.Request, res: expres
       requestId,
       code: error?.code || 'INFINITEPAY_CHECKOUT_FAILED',
       message: error?.message,
+      providerStatus: typeof error?.status === 'number' ? error.status : undefined,
+      retryable: Boolean(error?.retryable),
     });
     const configurationErrors = new Set([
       'INFINITEPAY_NOT_CONFIGURED',
@@ -10068,7 +10068,6 @@ app.post(['/api/orders/:id/pay-now', '/api/orders/:id/pay'], requireAuth, async 
       success: true,
       orderId: order.id,
       checkoutUrl: checkout.url,
-      targetUrl: checkout.url,
     });
   } catch (error: any) {
     console.error('[INFINITEPAY_PAYMENT_RESUME_ERROR]', { orderId: req.params.id, message: error?.message });
