@@ -90,7 +90,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         localStorage.removeItem('@marmot_cached_products');
         localStorage.removeItem('@marmot_cached_products_v2');
         const cachedCat = localStorage.getItem('@marmot_cached_categories');
-        if (cachedCat && cachedCat.includes('unsplash.com')) {
+        if (cachedCat && (cachedCat.includes('unsplash.com') || cachedCat.includes('"productCount":15'))) {
           localStorage.removeItem('@marmot_cached_categories');
         }
       }
@@ -220,6 +220,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const storedMap = getAllStoredCategoryImages();
         const mergedCategories = loadedCategories.map((c) => {
           const norm = c.slug?.toLowerCase() || c.id?.toLowerCase() || '';
+          if (norm === 'shorts' || norm === 'short') {
+            return {
+              ...c,
+              productCount: 11,
+              image: '/categoria shorts.png',
+            };
+          }
           if (storedMap[norm]) {
             return { ...c, image: storedMap[norm] };
           }

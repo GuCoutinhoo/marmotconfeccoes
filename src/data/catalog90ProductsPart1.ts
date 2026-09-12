@@ -2,25 +2,23 @@ import { Product } from '../types';
 
 export const CATALOG_90_PRODUCTS_PART1: Product[] = [
   {
-    "id": "prod-crg-012",
-    "slug": "calca-cargo-zip",
-    "title": "Calça Cargo Zip",
-    "subtitle": "Subtítulo alterado em 2026-08-25T22:09:55.216Z",
-    "description": "Bolsos com fechamento por zíper\nZíperes decorativos ou funcionais nas pernas\nModelagem ampla\nRecortes técnicos\nConstrução moderna\nVisual futurista e streetwear",
-    "price": 339.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
+    "id": "prod-cal-001",
+    "slug": "calca-balloon",
+    "title": "Calça Balloon",
+    "subtitle": "Volume amplo no quadril e nas coxas",
+    "description": "Volume amplo no quadril e nas coxas\nPernas arredondadas com afunilamento na barra\nSilhueta volumosa e marcante\nCintura estruturada\nCaimento solto\nVisual streetwear contemporâneo",
+    "price": 319.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
     "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
+      "lançamento",
+      "mais-vendido"
     ],
     "rating": 5,
-    "reviewCount": 13,
-    "stockCount": 25,
-    "sku": "MM-CRG-012",
+    "reviewCount": 16,
+    "stockCount": 20,
+    "sku": "MM-CAL-001",
     "sizes": [
       "38",
       "40",
@@ -30,97 +28,38 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
         "images": [
-          "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png"
         ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Bolsos com fechamento por zíper",
-      "Zíperes decorativos ou funcionais nas pernas",
-      "Modelagem ampla",
-      "Recortes técnicos",
-      "Construção moderna",
-      "Visual futurista e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T17:47:36.103+00:00"
-  },
-  {
-    "id": "prod-crg-011",
-    "slug": "calca-cargo-washed",
-    "title": "Calça Cargo Washed",
-    "subtitle": "Lavagem envelhecida",
-    "description": "Lavagem envelhecida\nEfeito desbotado e irregular\nBolsos cargo amplos\nModelagem baggy\nAparência propositalmente usada\nVisual vintage e streetwear",
-    "price": 329.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 12,
-    "stockCount": 24,
-    "sku": "MM-CRG-011",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
+      },
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png",
         "images": [
-          "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
     "images": [
-      "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png"
     ],
     "details": [
-      "Lavagem envelhecida",
-      "Efeito desbotado e irregular",
-      "Bolsos cargo amplos",
-      "Modelagem baggy",
-      "Aparência propositalmente usada",
-      "Visual vintage e streetwear"
+      "Volume amplo no quadril e nas coxas",
+      "Pernas arredondadas com afunilamento na barra",
+      "Silhueta volumosa e marcante",
+      "Cintura estruturada",
+      "Caimento solto",
+      "Visual streetwear contemporâneo"
     ],
     "careInstructions": [
       "Lavar do avesso com água fria",
@@ -128,7 +67,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
       "Secar à sombra em varal"
     ],
     "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
+      "100% Algodão Premium / Ripstop Encorpado"
     ],
     "reviews": [],
     "weight": 0.65,
@@ -136,157 +75,17 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "width": 28,
     "length": 36,
     "isNewRelease": true,
-    "isBestSeller": false,
+    "isBestSeller": true,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T17:47:35.694+00:00"
+    "createdAt": "2026-08-25T00:20:33.895+00:00"
   },
   {
-    "id": "prod-crg-010",
-    "slug": "calca-cargo-tactical",
-    "title": "Calça Cargo Tactical",
-    "subtitle": "Bolsos modulares",
-    "description": "Bolsos modulares\nFivelas e reguladores\nStraps funcionais\nTecido resistente\nModelagem ampla\nVisual inspirado em equipamentos militares",
-    "price": 359.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 11,
-    "stockCount": 23,
-    "sku": "MM-CRG-010",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Bolsos modulares",
-      "Fivelas e reguladores",
-      "Straps funcionais",
-      "Tecido resistente",
-      "Modelagem ampla",
-      "Visual inspirado em equipamentos militares"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T17:47:35.274+00:00"
-  },
-  {
-    "id": "prod-crg-009",
-    "slug": "calca-cargo-strap",
-    "title": "Calça Cargo Strap",
-    "subtitle": "Straps pendentes",
-    "description": "Straps pendentes\nFivelas ajustáveis\nBolsos cargo grandes\nModelagem oversized\nDetalhes técnicos aparentes\nVisual agressivo e utilitário",
-    "price": 349.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 10,
-    "stockCount": 22,
-    "sku": "MM-CRG-009",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Straps pendentes",
-      "Fivelas ajustáveis",
-      "Bolsos cargo grandes",
-      "Modelagem oversized",
-      "Detalhes técnicos aparentes",
-      "Visual agressivo e utilitário"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T17:47:34.844+00:00"
-  },
-  {
-    "id": "prod-crg-008",
-    "slug": "calca-cargo-parachute",
-    "title": "Calça Cargo Parachute",
-    "subtitle": "Modelagem extremamente ampla",
-    "description": "Modelagem extremamente ampla\nTecido leve e fluido\nBolsos cargo volumosos\nCordões de ajuste nas barras\nVolume acentuado nas pernas\nVisual inspirado nos anos 2000",
+    "id": "prod-cal-002",
+    "slug": "calca-cargo-baggy",
+    "title": "Calça Cargo Baggy",
+    "subtitle": "Modelagem ampla e solta",
+    "description": "Modelagem ampla e solta\nPernas largas\nBolsos cargo laterais grandes\nCintura confortável\nCaimento pesado e relaxado\nVisual streetwear clássico",
     "price": 339.9,
     "category": "cargos",
     "subcategory": "Cargos",
@@ -300,7 +99,7 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "rating": 5,
     "reviewCount": 17,
     "stockCount": 21,
-    "sku": "MM-CRG-008",
+    "sku": "MM-CAL-002",
     "sizes": [
       "38",
       "40",
@@ -310,307 +109,38 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
         "images": [
-          "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png"
         ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Modelagem extremamente ampla",
-      "Tecido leve e fluido",
-      "Bolsos cargo volumosos",
-      "Cordões de ajuste nas barras",
-      "Volume acentuado nas pernas",
-      "Visual inspirado nos anos 2000"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T17:47:34.417+00:00"
-  },
-  {
-    "id": "prod-crg-007",
-    "slug": "calca-cargo-panel",
-    "title": "Calça Cargo Panel",
-    "subtitle": "Recortes geométricos",
-    "description": "Recortes geométricos\nPainéis sobrepostos\nBolsos integrados aos recortes\nCosturas aparentes\nModelagem ampla\nVisual experimental e arquitetônico",
-    "price": 339.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 16,
-    "stockCount": 20,
-    "sku": "MM-CRG-007",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
+      },
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png",
         "images": [
-          "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
     "images": [
-      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png"
     ],
     "details": [
-      "Recortes geométricos",
-      "Painéis sobrepostos",
-      "Bolsos integrados aos recortes",
-      "Costuras aparentes",
-      "Modelagem ampla",
-      "Visual experimental e arquitetônico"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T17:47:34.018+00:00"
-  },
-  {
-    "id": "prod-crg-006",
-    "slug": "calca-cargo-nylon",
-    "title": "Calça Cargo Nylon",
-    "subtitle": "Nylon leve e técnico",
-    "description": "Nylon leve e técnico\nBolsos cargo com fechamento\nCintura ajustável\nReguladores nas barras\nModelagem ampla\nVisual esportivo e funcional",
-    "price": 319.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 15,
-    "stockCount": 25,
-    "sku": "MM-CRG-006",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Nylon leve e técnico",
-      "Bolsos cargo com fechamento",
-      "Cintura ajustável",
-      "Reguladores nas barras",
-      "Modelagem ampla",
-      "Visual esportivo e funcional"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T17:47:33.599+00:00"
-  },
-  {
-    "id": "prod-crg-004",
-    "slug": "calca-cargo-distressed",
-    "title": "Calça Cargo Distressed",
-    "subtitle": "Áreas propositalmente desgastadas",
-    "description": "Áreas propositalmente desgastadas\nBordas e detalhes puídos\nCosturas aparentes\nBolsos cargo grandes\nLavagem envelhecida\nEstética grunge e streetwear",
-    "price": 329.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 13,
-    "stockCount": 23,
-    "sku": "MM-CRG-004",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Áreas propositalmente desgastadas",
-      "Bordas e detalhes puídos",
-      "Costuras aparentes",
-      "Bolsos cargo grandes",
-      "Lavagem envelhecida",
-      "Estética grunge e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T17:47:32.774+00:00"
-  },
-  {
-    "id": "prod-crg-003",
-    "slug": "calca-cargo-convertible",
-    "title": "Calça Cargo Convertible",
-    "subtitle": "Partes removíveis nas pernas",
-    "description": "Partes removíveis nas pernas\nZíperes horizontais de conversão\nPode ser transformada em bermuda\nBolsos cargo laterais\nConstrução modular\nVisual técnico e funcional",
-    "price": 349.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 12,
-    "stockCount": 22,
-    "sku": "MM-CRG-003",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Partes removíveis nas pernas",
-      "Zíperes horizontais de conversão",
-      "Pode ser transformada em bermuda",
-      "Bolsos cargo laterais",
-      "Construção modular",
-      "Visual técnico e funcional"
+      "Modelagem ampla e solta",
+      "Pernas largas",
+      "Bolsos cargo laterais grandes",
+      "Cintura confortável",
+      "Caimento pesado e relaxado",
+      "Visual streetwear clássico"
     ],
     "careInstructions": [
       "Lavar do avesso com água fria",
@@ -629,7 +159,1963 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "isBestSeller": true,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T17:47:32.349+00:00"
+    "createdAt": "2026-08-25T00:20:34.131+00:00"
+  },
+  {
+    "id": "prod-cal-003",
+    "slug": "calca-cargo-multi-pocket",
+    "title": "Calça Cargo Multi Pocket",
+    "subtitle": "Grande quantidade de bolsos",
+    "description": "Grande quantidade de bolsos\nBolsos laterais, frontais e sobrepostos\nCompartimentos utilitários\nModelagem oversized\nConstrução robusta\nVisual funcional e técnico",
+    "price": 359.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
+    "tags": [
+      "Cargos",
+      "Calças",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 18,
+    "stockCount": 22,
+    "sku": "MM-CAL-003",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "grafite",
+        "colorName": "Grafite",
+        "colorHex": "#4B4F52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png"
+        ]
+      },
+      {
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png"
+    ],
+    "details": [
+      "Grande quantidade de bolsos",
+      "Bolsos laterais, frontais e sobrepostos",
+      "Compartimentos utilitários",
+      "Modelagem oversized",
+      "Construção robusta",
+      "Visual funcional e técnico"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:34.374+00:00"
+  },
+  {
+    "id": "prod-cal-004",
+    "slug": "calca-carpenter",
+    "title": "Calça Carpenter",
+    "subtitle": "Modelagem reta ou levemente ampla",
+    "description": "Modelagem reta ou levemente ampla\nBolsos utilitários\nAlça lateral para ferramentas\nCosturas reforçadas\nTecido resistente\nVisual inspirado em roupas de trabalho",
+    "price": 329.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 19,
+    "stockCount": 23,
+    "sku": "MM-CAL-004",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png"
+        ]
+      },
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png"
+    ],
+    "details": [
+      "Modelagem reta ou levemente ampla",
+      "Bolsos utilitários",
+      "Alça lateral para ferramentas",
+      "Costuras reforçadas",
+      "Tecido resistente",
+      "Visual inspirado em roupas de trabalho"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:34.611+00:00"
+  },
+  {
+    "id": "prod-cal-005",
+    "slug": "calca-corduroy-baggy",
+    "title": "Calça Corduroy Baggy",
+    "subtitle": "Tecido de veludo cotelê",
+    "description": "Tecido de veludo cotelê\nTextura marcada por linhas verticais\nModelagem baggy\nPernas largas\nCaimento pesado e confortável\nVisual retrô e streetwear",
+    "price": 349.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 20,
+    "stockCount": 24,
+    "sku": "MM-CAL-005",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png"
+        ]
+      },
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png"
+    ],
+    "details": [
+      "Tecido de veludo cotelê",
+      "Textura marcada por linhas verticais",
+      "Modelagem baggy",
+      "Pernas largas",
+      "Caimento pesado e confortável",
+      "Visual retrô e streetwear"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:34.826+00:00"
+  },
+  {
+    "id": "prod-cal-006",
+    "slug": "calca-distressed-denim",
+    "title": "Calça Distressed Denim",
+    "subtitle": "Jeans com áreas desgastadas",
+    "description": "Jeans com áreas desgastadas\nRasgos ou pontos propositalmente puídos\nLavagem irregular\nBordas com acabamento bruto\nModelagem ampla\nEstética grunge e vintage",
+    "price": 339.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 21,
+    "stockCount": 25,
+    "sku": "MM-CAL-006",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto-lavado",
+        "colorName": "Preto Lavado",
+        "colorHex": "#303236",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png"
+        ]
+      },
+      {
+        "color": "azul",
+        "colorName": "Azul",
+        "colorHex": "#355C8A",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png"
+    ],
+    "details": [
+      "Jeans com áreas desgastadas",
+      "Rasgos ou pontos propositalmente puídos",
+      "Lavagem irregular",
+      "Bordas com acabamento bruto",
+      "Modelagem ampla",
+      "Estética grunge e vintage"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:35.054+00:00"
+  },
+  {
+    "id": "prod-cal-007",
+    "slug": "calca-double-knee",
+    "title": "Calça Double Knee",
+    "subtitle": "Reforço duplo na região dos joelhos",
+    "description": "Reforço duplo na região dos joelhos\nPainéis adicionais frontais\nTecido resistente\nModelagem ampla ou reta\nConstrução inspirada em workwear\nVisual robusto e utilitário",
+    "price": 349.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 22,
+    "stockCount": 26,
+    "sku": "MM-CAL-007",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png"
+        ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png"
+    ],
+    "details": [
+      "Reforço duplo na região dos joelhos",
+      "Painéis adicionais frontais",
+      "Tecido resistente",
+      "Modelagem ampla ou reta",
+      "Construção inspirada em workwear",
+      "Visual robusto e utilitário"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:35.644+00:00"
+  },
+  {
+    "id": "prod-cal-008",
+    "slug": "calca-nylon-utility",
+    "title": "Calça Nylon Utility",
+    "subtitle": "Nylon leve e técnico",
+    "description": "Nylon leve e técnico\nBolsos funcionais\nAjustes na cintura ou nas barras\nModelagem ampla\nConstrução prática\nVisual esportivo e utilitário",
+    "price": 329.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 23,
+    "stockCount": 27,
+    "sku": "MM-CAL-008",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png"
+        ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png"
+    ],
+    "details": [
+      "Nylon leve e técnico",
+      "Bolsos funcionais",
+      "Ajustes na cintura ou nas barras",
+      "Modelagem ampla",
+      "Construção prática",
+      "Visual esportivo e utilitário"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:35.848+00:00"
+  },
+  {
+    "id": "prod-cal-009",
+    "slug": "calca-panel-construction",
+    "title": "Calça Panel Construction",
+    "subtitle": "Recortes geométricos nas pernas",
+    "description": "Recortes geométricos nas pernas\nPainéis sobrepostos\nCosturas visíveis\nConstrução arquitetônica\nModelagem ampla\nVisual experimental e moderno",
+    "price": 359.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 24,
+    "stockCount": 28,
+    "sku": "MM-CAL-009",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png"
+    ],
+    "details": [
+      "Recortes geométricos nas pernas",
+      "Painéis sobrepostos",
+      "Costuras visíveis",
+      "Construção arquitetônica",
+      "Modelagem ampla",
+      "Visual experimental e moderno"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:36.064+00:00"
+  },
+  {
+    "id": "prod-cal-010",
+    "slug": "calca-parachute",
+    "title": "Calça Parachute",
+    "subtitle": "Modelagem extremamente ampla",
+    "description": "Modelagem extremamente ampla\nTecido leve\nCordões ou ajustes na barra\nVolume acentuado nas pernas\nCintura ajustável\nVisual inspirado em roupas técnicas dos anos 2000",
+    "price": 339.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 25,
+    "stockCount": 29,
+    "sku": "MM-CAL-010",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png"
+        ]
+      },
+      {
+        "color": "chumbo",
+        "colorName": "Chumbo",
+        "colorHex": "#4A4E52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png"
+    ],
+    "details": [
+      "Modelagem extremamente ampla",
+      "Tecido leve",
+      "Cordões ou ajustes na barra",
+      "Volume acentuado nas pernas",
+      "Cintura ajustável",
+      "Visual inspirado em roupas técnicas dos anos 2000"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:36.302+00:00"
+  },
+  {
+    "id": "prod-cal-011",
+    "slug": "calca-patchwork",
+    "title": "Calça Patchwork",
+    "subtitle": "Painéis de tecidos diferentes",
+    "description": "Painéis de tecidos diferentes\nMistura de cores ou lavagens\nCosturas aparentes\nConstrução assimétrica\nModelagem ampla\nVisual artesanal e experimental",
+    "price": 369.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 26,
+    "stockCount": 20,
+    "sku": "MM-CAL-011",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto-e-cinza",
+        "colorName": "Preto e Cinza",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png"
+        ]
+      },
+      {
+        "color": "marrom-e-bege",
+        "colorName": "Marrom e Bege",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png"
+    ],
+    "details": [
+      "Painéis de tecidos diferentes",
+      "Mistura de cores ou lavagens",
+      "Costuras aparentes",
+      "Construção assimétrica",
+      "Modelagem ampla",
+      "Visual artesanal e experimental"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:36.512+00:00"
+  },
+  {
+    "id": "prod-cal-012",
+    "slug": "calca-pleated-wide",
+    "title": "Calça Pleated Wide",
+    "subtitle": "Pregas frontais na cintura",
+    "description": "Pregas frontais na cintura\nPernas bem largas\nCaimento fluido\nCintura mais estruturada\nVolume elegante\nMistura de alfaiataria com streetwear",
+    "price": 349.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 27,
+    "stockCount": 21,
+    "sku": "MM-CAL-012",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png"
+        ]
+      },
+      {
+        "color": "grafite",
+        "colorName": "Grafite",
+        "colorHex": "#4B4F52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png"
+    ],
+    "details": [
+      "Pregas frontais na cintura",
+      "Pernas bem largas",
+      "Caimento fluido",
+      "Cintura mais estruturada",
+      "Volume elegante",
+      "Mistura de alfaiataria com streetwear"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:36.739+00:00"
+  },
+  {
+    "id": "prod-cal-013",
+    "slug": "calca-raw-seam",
+    "title": "Calça Raw Seam",
+    "subtitle": "Costuras propositalmente aparentes",
+    "description": "Costuras propositalmente aparentes\nAcabamentos crus\nBordas ou junções sem acabamento tradicional\nModelagem ampla\nConstrução desconstruída\nVisual experimental e streetwear",
+    "price": 329.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 28,
+    "stockCount": 22,
+    "sku": "MM-CAL-013",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png"
+    ],
+    "details": [
+      "Costuras propositalmente aparentes",
+      "Acabamentos crus",
+      "Bordas ou junções sem acabamento tradicional",
+      "Modelagem ampla",
+      "Construção desconstruída",
+      "Visual experimental e streetwear"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:36.948+00:00"
+  },
+  {
+    "id": "prod-cal-014",
+    "slug": "calca-tactical",
+    "title": "Calça Tactical",
+    "subtitle": "Bolsos funcionais",
+    "description": "Bolsos funcionais\nFivelas e ajustes\nStraps ou detalhes modulares\nTecido resistente\nModelagem ampla\nVisual inspirado em equipamentos militares",
+    "price": 369.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 29,
+    "stockCount": 23,
+    "sku": "MM-CAL-014",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png"
+        ]
+      },
+      {
+        "color": "chumbo",
+        "colorName": "Chumbo",
+        "colorHex": "#4A4E52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png"
+    ],
+    "details": [
+      "Bolsos funcionais",
+      "Fivelas e ajustes",
+      "Straps ou detalhes modulares",
+      "Tecido resistente",
+      "Modelagem ampla",
+      "Visual inspirado em equipamentos militares"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:37.153+00:00"
+  },
+  {
+    "id": "prod-cal-015",
+    "slug": "calca-track-oversized",
+    "title": "Calça Track Oversized",
+    "subtitle": "Inspiração esportiva",
+    "description": "Inspiração esportiva\nModelagem oversized\nPernas largas\nTecido leve\nFaixas ou recortes laterais\nVisual retrô esportivo",
+    "price": 299.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 30,
+    "stockCount": 24,
+    "sku": "MM-CAL-015",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png"
+        ]
+      },
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png"
+    ],
+    "details": [
+      "Inspiração esportiva",
+      "Modelagem oversized",
+      "Pernas largas",
+      "Tecido leve",
+      "Faixas ou recortes laterais",
+      "Visual retrô esportivo"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:37.379+00:00"
+  },
+  {
+    "id": "prod-cal-016",
+    "slug": "calca-washed-baggy",
+    "title": "Calça Washed Baggy",
+    "subtitle": "Lavagem envelhecida",
+    "description": "Lavagem envelhecida\nEfeito desbotado\nModelagem baggy\nPernas amplas\nTecido com aparência usada\nVisual vintage e streetwear",
+    "price": 339.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 16,
+    "stockCount": 25,
+    "sku": "MM-CAL-016",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png"
+    ],
+    "details": [
+      "Lavagem envelhecida",
+      "Efeito desbotado",
+      "Modelagem baggy",
+      "Pernas amplas",
+      "Tecido com aparência usada",
+      "Visual vintage e streetwear"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:37.605+00:00"
+  },
+  {
+    "id": "prod-cal-017",
+    "slug": "calca-wide-leg",
+    "title": "Calça Wide Leg",
+    "subtitle": "Pernas largas do quadril até a barra",
+    "description": "Pernas largas do quadril até a barra\nModelagem ampla e reta\nCaimento solto\nSilhueta alongada\nConstrução minimalista\nVisual moderno e streetwear",
+    "price": 329.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 17,
+    "stockCount": 26,
+    "sku": "MM-CAL-017",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png"
+    ],
+    "details": [
+      "Pernas largas do quadril até a barra",
+      "Modelagem ampla e reta",
+      "Caimento solto",
+      "Silhueta alongada",
+      "Construção minimalista",
+      "Visual moderno e streetwear"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:37.829+00:00"
+  },
+  {
+    "id": "prod-cal-018",
+    "slug": "calca-zip-off",
+    "title": "Calça Zip Off",
+    "subtitle": "Zíper horizontal nas pernas",
+    "description": "Zíper horizontal nas pernas\nPartes inferiores removíveis\nPossibilidade de transformar em bermuda\nConstrução modular\nDetalhes técnicos\nVisual funcional e utilitário",
+    "price": 369.9,
+    "category": "calcas",
+    "subcategory": "Calças",
+    "collection": "Coleção Marmot Denim & Cargo 2026",
+    "tags": [
+      "Calça",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 18,
+    "stockCount": 27,
+    "sku": "MM-CAL-018",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png"
+        ]
+      },
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png"
+    ],
+    "details": [
+      "Zíper horizontal nas pernas",
+      "Partes inferiores removíveis",
+      "Possibilidade de transformar em bermuda",
+      "Construção modular",
+      "Detalhes técnicos",
+      "Visual funcional e utilitário"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Premium / Ripstop Encorpado"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:20:38.103+00:00"
+  },
+  {
+    "id": "prod-cam-001",
+    "slug": "camiseta-contrast-stitch",
+    "title": "Camiseta Contrast Stitch",
+    "subtitle": "",
+    "description": "Updated description test",
+    "price": 149.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-001",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/Camiseta Contrast Stitch - Preto.png",
+        "featuredImage": "/Camiseta Contrast Stitch - Preto.png",
+        "images": [
+          "/Camiseta Contrast Stitch - Preto.png"
+        ]
+      },
+      {
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#f2daa6",
+        "image": "/Camiseta Contrast Stitch - Bege.png",
+        "featuredImage": "/Camiseta Contrast Stitch - Bege.png",
+        "images": [
+          "/Camiseta Contrast Stitch - Bege.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Contrast Stitch - Preto.png",
+    "images": [
+      "/Camiseta Contrast Stitch - Preto.png",
+      "/Camiseta Contrast Stitch - Bege.png"
+    ],
+    "details": [],
+    "careInstructions": [],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 1,
+    "height": 4,
+    "width": 12,
+    "length": 17,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:17.547+00:00"
+  },
+  {
+    "id": "prod-cam-002",
+    "slug": "camiseta-double-layer",
+    "title": "Camiseta Double Layer",
+    "subtitle": "",
+    "description": "Segunda camada aparente na barra\nMangas com efeito de sobreposição\nComprimentos diferentes entre as camadas\nAparência de duas camisetas usadas juntas\nModelagem oversized\nVisual em camadas",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-002",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "bege-marrom",
+        "colorName": "Bege + Marrom",
+        "colorHex": "#6c5145",
+        "image": "/Camiseta Double Layer - Bege e Marrom.png",
+        "featuredImage": "/Camiseta Double Layer - Bege e Marrom.png",
+        "images": [
+          "/Camiseta Double Layer - Bege e Marrom.png"
+        ]
+      },
+      {
+        "color": "preto-cinza",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#F5F5F0",
+        "image": "/Camiseta Double Layer - Cinza e Preto.png",
+        "featuredImage": "/Camiseta Double Layer - Cinza e Preto.png",
+        "images": [
+          "/Camiseta Double Layer - Cinza e Preto.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Double Layer - Bege e Marrom.png",
+    "images": [
+      "/Camiseta Double Layer - Bege e Marrom.png",
+      "/Camiseta Double Layer - Cinza e Preto.png"
+    ],
+    "details": [],
+    "careInstructions": [],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 1,
+    "height": 4,
+    "width": 12,
+    "length": 17,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:18.181+00:00"
+  },
+  {
+    "id": "prod-cam-003",
+    "slug": "camiseta-drop-shoulder",
+    "title": "Camiseta Drop Shoulder",
+    "subtitle": "",
+    "description": "Ombros bem caídos\nCostura da manga abaixo da linha natural do ombro\nMangas mais largas\nCorpo amplo\nCaimento relaxado\nVisual streetwear minimalista",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-003",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#4d3232",
+        "image": "/Camiseta Drop Shoulder - Marrom.png",
+        "featuredImage": "/Camiseta Drop Shoulder - Marrom.png",
+        "images": [
+          "/Camiseta Drop Shoulder - Marrom.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#6c6c6a",
+        "image": "/Camiseta Drop Shoulder - Cinza.png",
+        "featuredImage": "/Camiseta Drop Shoulder - Cinza.png",
+        "images": [
+          "/Camiseta Drop Shoulder - Cinza.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Drop Shoulder - Marrom.png",
+    "images": [
+      "/Camiseta Drop Shoulder - Marrom.png",
+      "/Camiseta Drop Shoulder - Cinza.png"
+    ],
+    "details": [],
+    "careInstructions": [],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:18.499+00:00"
+  },
+  {
+    "id": "prod-cam-004",
+    "slug": "camiseta-heavy-boxy",
+    "title": "Camiseta Heavy Boxy",
+    "subtitle": "",
+    "description": "Corpo curto e largo\nModelagem boxy\nOmbros caídos\nMangas largas\nTecido pesado e encorpado\nEstrutura firme",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-004",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/Camiseta Heavy Boxy - Preto.png",
+        "featuredImage": "/Camiseta Heavy Boxy - Preto.png",
+        "images": [
+          "/Camiseta Heavy Boxy - Preto.png"
+        ]
+      },
+      {
+        "color": "offwhite",
+        "colorName": "Off White",
+        "colorHex": "#F5F5F0",
+        "image": "/Camiseta Heavy Boxy - Branco.png",
+        "featuredImage": "/Camiseta Heavy Boxy - Branco.png",
+        "images": [
+          "/Camiseta Heavy Boxy - Branco.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Heavy Boxy - Preto.png",
+    "images": [
+      "/Camiseta Heavy Boxy - Preto.png",
+      "/Camiseta Heavy Boxy - Branco.png"
+    ],
+    "details": [],
+    "careInstructions": [],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:18.722+00:00"
+  },
+  {
+    "id": "prod-cam-005",
+    "slug": "camiseta-panel",
+    "title": "Camiseta Panel",
+    "subtitle": "",
+    "description": "Painéis diferentes no corpo\nRecortes geométricos\nCosturas aparentes\nPossibilidade de contraste entre tecidos ou cores\nConstrução visual mais elaborada\nEstética arquitetônica",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-005",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "bege-marrom",
+        "colorName": "Bege + Marrom",
+        "colorHex": "#6c5a4e",
+        "image": "/Camiseta Panel - Bege e Marrom.png",
+        "featuredImage": "/Camiseta Panel - Bege e Marrom.png",
+        "images": [
+          "/Camiseta Panel - Bege e Marrom.png"
+        ]
+      },
+      {
+        "color": "preto-cinza",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#4b4b49",
+        "image": "/Camiseta Panel - Preto e Cinza.png",
+        "featuredImage": "/Camiseta Panel - Preto e Cinza.png",
+        "images": [
+          "/Camiseta Panel - Preto e Cinza.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Panel - Bege e Marrom.png",
+    "images": [
+      "/Camiseta Panel - Bege e Marrom.png",
+      "/Camiseta Panel - Preto e Cinza.png"
+    ],
+    "details": [],
+    "careInstructions": [],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:18.972+00:00"
+  },
+  {
+    "id": "prod-cam-006",
+    "slug": "camiseta-pocket-utility",
+    "title": "Camiseta Pocket Utility",
+    "subtitle": "",
+    "description": "Bolso grande no peito\nBolsos adicionais ou divisórias utilitárias\nDetalhes funcionais\nModelagem oversized\nVisual inspirado em roupas cargo\nConstrução prática e streetwear",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-006",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#55533b",
+        "image": "/Camiseta Pocket Utility - Verde.png",
+        "featuredImage": "/Camiseta Pocket Utility - Verde.png",
+        "images": [
+          "/Camiseta Pocket Utility - Verde.png"
+        ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#000000",
+        "image": "/Camiseta Pocket Utility - Preto.png",
+        "featuredImage": "/Camiseta Pocket Utility - Preto.png",
+        "images": [
+          "/Camiseta Pocket Utility - Preto.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Pocket Utility - Verde.png",
+    "images": [
+      "/Camiseta Pocket Utility - Verde.png",
+      "/Camiseta Pocket Utility - Preto.png"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Gola canelada 3cm 2x1",
+      "Algodão 260g/m² penteado"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:19.193+00:00"
+  },
+  {
+    "id": "prod-cam-007",
+    "slug": "camiseta-raglan-oversized",
+    "title": "Camiseta Raglan Oversized",
+    "subtitle": "",
+    "description": "Mangas raglan\nCostura das mangas partindo da gola\nMangas amplas\nCorpo largo\nModelagem oversized\nVisual esportivo e retrô",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-007",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto-branco",
+        "colorName": "Preto + Branco",
+        "colorHex": "#ffffff",
+        "image": "/Camiseta Raglan Oversized - Branco e Preto.png",
+        "featuredImage": "/Camiseta Raglan Oversized - Branco e Preto.png",
+        "images": [
+          "/Camiseta Raglan Oversized - Branco e Preto.png"
+        ]
+      },
+      {
+        "color": "preto-cinza",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#000000",
+        "image": "/Camiseta Raglan Oversized - Preto e Cinza.png",
+        "featuredImage": "/Camiseta Raglan Oversized - Preto e Cinza.png",
+        "images": [
+          "/Camiseta Raglan Oversized - Preto e Cinza.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Raglan Oversized - Branco e Preto.png",
+    "images": [
+      "/Camiseta Raglan Oversized - Branco e Preto.png",
+      "/Camiseta Raglan Oversized - Preto e Cinza.png"
+    ],
+    "details": [],
+    "careInstructions": [],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:19.427+00:00"
+  },
+  {
+    "id": "prod-cam-008",
+    "slug": "camiseta-raw-hem",
+    "title": "Camiseta Raw Hem",
+    "subtitle": "",
+    "description": "Barra com acabamento cru\nBordas propositalmente sem acabamento tradicional\nCosturas aparentes\nVisual desconstruído\nModelagem ampla\nAparência propositalmente irregular",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-008",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "id": "cam-008-blk",
+        "color": "Preto",
+        "colorName": "Off-Black",
+        "colorHex": "#1A1A1A",
+        "image": "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp",
+        "featuredImage": "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp",
+        "images": [
+          "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp"
+        ],
+        "sku": "MAR-CAM-008-BLK",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp",
+    "images": [
+      "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp"
+    ],
+    "details": [],
+    "careInstructions": [],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": false,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:19.647+00:00"
+  },
+  {
+    "id": "prod-cam-009",
+    "slug": "camiseta-striped-heavy",
+    "title": "Camiseta Striped Heavy",
+    "subtitle": "",
+    "description": "Listras horizontais largas\nTecido pesado\nModelagem oversized\nOmbros caídos\nMangas largas\nVisual streetwear retrô",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-009",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "branco-e-preto",
+        "colorName": "Branco e Preto",
+        "colorHex": "#121212",
+        "image": "/Camiseta Striped Heavy - Preto e Branco.png",
+        "featuredImage": "/Camiseta Striped Heavy - Preto e Branco.png",
+        "images": [
+          "/Camiseta Striped Heavy - Preto e Branco.png"
+        ]
+      },
+      {
+        "color": "marrom-e-bege",
+        "colorName": "Marrom e Bege",
+        "colorHex": "#540707",
+        "image": "/Camiseta Striped Heavy - Bege e Marrom.png",
+        "featuredImage": "/Camiseta Striped Heavy - Bege e Marrom.png",
+        "images": [
+          "/Camiseta Striped Heavy - Bege e Marrom.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Striped Heavy - Preto e Branco.png",
+    "images": [
+      "/Camiseta Striped Heavy - Preto e Branco.png",
+      "/Camiseta Striped Heavy - Bege e Marrom.png"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Gola canelada 3cm 2x1",
+      "Algodão 260g/m² penteado"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:19.866+00:00"
+  },
+  {
+    "id": "prod-cam-010",
+    "slug": "camiseta-washed-vintage",
+    "title": "Camiseta Washed Vintage",
+    "subtitle": "",
+    "description": "Lavagem envelhecida\nEfeito desbotado\nTecido com aparência usada\nTonalidade irregular\nModelagem oversized\nVisual vintage e streetwear",
+    "price": 189.9,
+    "category": "camisetas",
+    "subcategory": "Camisetas",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 30,
+    "sku": "MM-CAM-010",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "cinza-escuro",
+        "colorName": "Cinza Escuro",
+        "colorHex": "#403b3b",
+        "image": "/Camiseta Washed Vintage - Cinza escuro.png",
+        "featuredImage": "/Camiseta Washed Vintage - Cinza escuro.png",
+        "images": [
+          "/Camiseta Washed Vintage - Cinza escuro.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#bab5b5",
+        "image": "/Camiseta Washed Vintage - Cinza Claro.png",
+        "featuredImage": "/Camiseta Washed Vintage - Cinza Claro.png",
+        "images": [
+          "/Camiseta Washed Vintage - Cinza Claro.png"
+        ]
+      }
+    ],
+    "image": "/Camiseta Washed Vintage - Cinza escuro.png",
+    "images": [
+      "/Camiseta Washed Vintage - Cinza escuro.png",
+      "/Camiseta Washed Vintage - Cinza Claro.png"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Gola canelada 3cm 2x1",
+      "Algodão 260g/m² penteado"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.35,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T23:04:20.088+00:00"
   },
   {
     "id": "prod-crg-002",
@@ -702,1860 +2188,3555 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "createdAt": "2026-08-25T17:47:31.539+00:00"
   },
   {
-    "id": "prod-acs-015",
-    "slug": "luva-fingerless",
-    "title": "Luva Fingerless",
-    "subtitle": "Dedos parcialmente expostos",
-    "description": "Dedos parcialmente expostos\nConstrução em tecido, couro ou material técnico\nAjuste firme\nDetalhes utilitários\nVisual grunge e experimental",
-    "price": 139.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "id": "prod-crg-003",
+    "slug": "calca-cargo-convertible",
+    "title": "Calça Cargo Convertible",
+    "subtitle": "Partes removíveis nas pernas",
+    "description": "Partes removíveis nas pernas\nZíperes horizontais de conversão\nPode ser transformada em bermuda\nBolsos cargo laterais\nConstrução modular\nVisual técnico e funcional",
+    "price": 349.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
     "tags": [
-      "Acessórios",
+      "Cargos",
+      "Calças",
       "Streetwear",
       "Utilitário"
     ],
     "rating": 5,
-    "reviewCount": 17,
-    "stockCount": 29,
-    "sku": "MM-ACS-015",
+    "reviewCount": 12,
+    "stockCount": 22,
+    "sku": "MM-CRG-003",
     "sizes": [
-      "Único"
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
     ],
     "colors": [
       {
         "color": "black",
-        "colorName": "Preto",
+        "colorName": "Pitch Black",
         "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
+        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "lead_grey",
-        "colorName": "Cinza chumbo",
-        "colorHex": "#353942",
-        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Dedos parcialmente expostos",
-      "Construção em tecido, couro ou material técnico",
-      "Ajuste firme",
-      "Detalhes utilitários",
-      "Visual grunge e experimental"
+      "Partes removíveis nas pernas",
+      "Zíperes horizontais de conversão",
+      "Pode ser transformada em bermuda",
+      "Bolsos cargo laterais",
+      "Construção modular",
+      "Visual técnico e funcional"
     ],
     "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
     ],
     "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
     "isNewRelease": true,
-    "isBestSeller": false,
+    "isBestSeller": true,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:10:49.925+00:00"
+    "createdAt": "2026-08-25T17:47:32.349+00:00"
   },
   {
-    "id": "prod-acs-014",
-    "slug": "pulseira-chain",
-    "title": "Pulseira Chain",
-    "subtitle": "Elos metálicos",
-    "description": "Elos metálicos\nConstrução pesada\nFecho aparente\nVisual industrial\nEstética streetwear minimalista",
-    "price": 149.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "id": "prod-crg-004",
+    "slug": "calca-cargo-distressed",
+    "title": "Calça Cargo Distressed",
+    "subtitle": "Áreas propositalmente desgastadas",
+    "description": "Áreas propositalmente desgastadas\nBordas e detalhes puídos\nCosturas aparentes\nBolsos cargo grandes\nLavagem envelhecida\nEstética grunge e streetwear",
+    "price": 329.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
     "tags": [
-      "Acessórios",
+      "Cargos",
+      "Calças",
       "Streetwear",
       "Utilitário"
     ],
     "rating": 5,
-    "reviewCount": 16,
-    "stockCount": 28,
-    "sku": "MM-ACS-014",
+    "reviewCount": 13,
+    "stockCount": 23,
+    "sku": "MM-CRG-004",
     "sizes": [
-      "Único"
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
     ],
     "colors": [
       {
-        "color": "silver",
-        "colorName": "Prata",
-        "colorHex": "#C5CCD6",
-        "image": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+        "color": "black",
+        "colorName": "Pitch Black",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "metallic_black",
-        "colorName": "Preto metálico",
-        "colorHex": "#25272B",
-        "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Elos metálicos",
-      "Construção pesada",
-      "Fecho aparente",
-      "Visual industrial",
-      "Estética streetwear minimalista"
+      "Áreas propositalmente desgastadas",
+      "Bordas e detalhes puídos",
+      "Costuras aparentes",
+      "Bolsos cargo grandes",
+      "Lavagem envelhecida",
+      "Estética grunge e streetwear"
     ],
     "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
     ],
     "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:10:49.713+00:00"
+    "createdAt": "2026-08-25T17:47:32.774+00:00"
   },
   {
-    "id": "prod-acs-013",
-    "slug": "corrente-necklace",
-    "title": "Corrente Necklace",
-    "subtitle": "Corrente metálica de espessura média",
-    "description": "Corrente metálica de espessura média\nDesign simples ou industrial\nPode receber pingentes\nVisual urbano\nAcabamento robusto",
-    "price": 169.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "id": "prod-crg-006",
+    "slug": "calca-cargo-nylon",
+    "title": "Calça Cargo Nylon",
+    "subtitle": "Nylon leve e técnico",
+    "description": "Nylon leve e técnico\nBolsos cargo com fechamento\nCintura ajustável\nReguladores nas barras\nModelagem ampla\nVisual esportivo e funcional",
+    "price": 319.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
     "tags": [
-      "Acessórios",
+      "Cargos",
+      "Calças",
       "Streetwear",
       "Utilitário"
     ],
     "rating": 5,
     "reviewCount": 15,
-    "stockCount": 27,
-    "sku": "MM-ACS-013",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "silver",
-        "colorName": "Prata",
-        "colorHex": "#C5CCD6",
-        "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "metallic_black",
-        "colorName": "Preto metálico",
-        "colorHex": "#25272B",
-        "image": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Corrente metálica de espessura média",
-      "Design simples ou industrial",
-      "Pode receber pingentes",
-      "Visual urbano",
-      "Acabamento robusto"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:49.478+00:00"
-  },
-  {
-    "id": "prod-acs-012",
-    "slug": "oculos-retangular",
-    "title": "Óculos Retangular",
-    "subtitle": "Armação estreita",
-    "description": "Armação estreita\nLinhas retas\nDesign minimalista\nVisual retrô e contemporâneo\nFácil combinação com looks oversized",
-    "price": 219.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 26,
-    "stockCount": 26,
-    "sku": "MM-ACS-012",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "tortoise_brown",
-        "colorName": "Tartaruga marrom",
-        "colorHex": "#654321",
-        "image": "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Armação estreita",
-      "Linhas retas",
-      "Design minimalista",
-      "Visual retrô e contemporâneo",
-      "Fácil combinação com looks oversized"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:49.237+00:00"
-  },
-  {
-    "id": "prod-acs-011",
-    "slug": "oculos-wraparound",
-    "title": "Óculos Wraparound",
-    "subtitle": "Lentes curvas",
-    "description": "Lentes curvas\nFormato esportivo\nArmação envolvente\nVisual futurista\nInspiração Y2K",
-    "price": 229.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 25,
     "stockCount": 25,
-    "sku": "MM-ACS-011",
+    "sku": "MM-CRG-006",
     "sizes": [
-      "Único"
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
     ],
     "colors": [
       {
         "color": "black",
-        "colorName": "Preto",
+        "colorName": "Pitch Black",
         "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
+        "image": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "silver_darklens",
-        "colorName": "Prata + Lente escura",
-        "colorHex": "#A2AAB4",
-        "image": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Lentes curvas",
-      "Formato esportivo",
-      "Armação envolvente",
-      "Visual futurista",
-      "Inspiração Y2K"
+      "Nylon leve e técnico",
+      "Bolsos cargo com fechamento",
+      "Cintura ajustável",
+      "Reguladores nas barras",
+      "Modelagem ampla",
+      "Visual esportivo e funcional"
     ],
     "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
     ],
     "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:10:49.017+00:00"
+    "createdAt": "2026-08-25T17:47:33.599+00:00"
   },
   {
-    "id": "prod-acs-010",
-    "slug": "carteira-chain",
-    "title": "Carteira Chain",
-    "subtitle": "Carteira compacta",
-    "description": "Carteira compacta\nCorrente metálica lateral\nConstrução em couro ou material semelhante\nVisual inspirado em skate e punk\nDetalhe metálico marcante",
-    "price": 149.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "id": "prod-crg-007",
+    "slug": "calca-cargo-panel",
+    "title": "Calça Cargo Panel",
+    "subtitle": "Recortes geométricos",
+    "description": "Recortes geométricos\nPainéis sobrepostos\nBolsos integrados aos recortes\nCosturas aparentes\nModelagem ampla\nVisual experimental e arquitetônico",
+    "price": 339.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
     "tags": [
-      "Acessórios",
+      "Cargos",
+      "Calças",
       "Streetwear",
       "Utilitário"
     ],
     "rating": 5,
-    "reviewCount": 24,
-    "stockCount": 34,
-    "sku": "MM-ACS-010",
+    "reviewCount": 16,
+    "stockCount": 20,
+    "sku": "MM-CRG-007",
     "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black_silver",
-        "colorName": "Preto + Prata",
-        "colorHex": "#181818",
-        "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "brown_silver",
-        "colorName": "Marrom + Prata",
-        "colorHex": "#5A3D2A",
-        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Carteira compacta",
-      "Corrente metálica lateral",
-      "Construção em couro ou material semelhante",
-      "Visual inspirado em skate e punk",
-      "Detalhe metálico marcante"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:48.791+00:00"
-  },
-  {
-    "id": "prod-acs-009",
-    "slug": "cinto-studded",
-    "title": "Cinto Studded",
-    "subtitle": "Aplicações metálicas",
-    "description": "Aplicações metálicas\nConstrução robusta\nFivela marcante\nInspiração punk e grunge\nVisual mais agressivo",
-    "price": 179.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 23,
-    "stockCount": 33,
-    "sku": "MM-ACS-009",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black_silver",
-        "colorName": "Preto + Prata",
-        "colorHex": "#1A1A1A",
-        "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "dark_brown_silver",
-        "colorName": "Marrom escuro + Prata",
-        "colorHex": "#4A3525",
-        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Aplicações metálicas",
-      "Construção robusta",
-      "Fivela marcante",
-      "Inspiração punk e grunge",
-      "Visual mais agressivo"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:48.571+00:00"
-  },
-  {
-    "id": "prod-acs-008",
-    "slug": "cinto-webbing",
-    "title": "Cinto Webbing",
-    "subtitle": "Fita larga em nylon",
-    "description": "Fita larga em nylon\nFivela metálica ou técnica\nComprimento ajustável\nPonta alongada\nVisual utilitário",
-    "price": 129.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 22,
-    "stockCount": 32,
-    "sku": "MM-ACS-008",
-    "sizes": [
-      "Único"
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
     ],
     "colors": [
       {
         "color": "black",
-        "colorName": "Preto",
+        "colorName": "Pitch Black",
         "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+        "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "grey",
-        "colorName": "Cinza",
-        "colorHex": "#5B626C",
-        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Fita larga em nylon",
-      "Fivela metálica ou técnica",
-      "Comprimento ajustável",
-      "Ponta alongada",
-      "Visual utilitário"
+      "Recortes geométricos",
+      "Painéis sobrepostos",
+      "Bolsos integrados aos recortes",
+      "Costuras aparentes",
+      "Modelagem ampla",
+      "Visual experimental e arquitetônico"
     ],
     "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
     ],
     "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:10:48.351+00:00"
+    "createdAt": "2026-08-25T17:47:34.018+00:00"
   },
   {
-    "id": "prod-acs-007",
-    "slug": "mochila-tactical",
-    "title": "Mochila Tactical",
-    "subtitle": "Estrutura robusta",
-    "description": "Estrutura robusta\nBolsos modulares\nStraps externos\nCompartimentos organizadores\nVisual técnico e militar",
+    "id": "prod-crg-008",
+    "slug": "calca-cargo-parachute",
+    "title": "Calça Cargo Parachute",
+    "subtitle": "Modelagem extremamente ampla",
+    "description": "Modelagem extremamente ampla\nTecido leve e fluido\nBolsos cargo volumosos\nCordões de ajuste nas barras\nVolume acentuado nas pernas\nVisual inspirado nos anos 2000",
+    "price": 339.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
+    "tags": [
+      "Cargos",
+      "Calças",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 17,
+    "stockCount": 21,
+    "sku": "MM-CRG-008",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Pitch Black",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1584865288642-42078afe6942?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Modelagem extremamente ampla",
+      "Tecido leve e fluido",
+      "Bolsos cargo volumosos",
+      "Cordões de ajuste nas barras",
+      "Volume acentuado nas pernas",
+      "Visual inspirado nos anos 2000"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T17:47:34.417+00:00"
+  },
+  {
+    "id": "prod-crg-009",
+    "slug": "calca-cargo-strap",
+    "title": "Calça Cargo Strap",
+    "subtitle": "Straps pendentes",
+    "description": "Straps pendentes\nFivelas ajustáveis\nBolsos cargo grandes\nModelagem oversized\nDetalhes técnicos aparentes\nVisual agressivo e utilitário",
     "price": 349.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
     "tags": [
-      "Acessórios",
+      "Cargos",
+      "Calças",
       "Streetwear",
       "Utilitário"
     ],
     "rating": 5,
-    "reviewCount": 21,
-    "stockCount": 31,
-    "sku": "MM-ACS-007",
+    "reviewCount": 10,
+    "stockCount": 22,
+    "sku": "MM-CRG-009",
     "sizes": [
-      "Único"
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
     ],
     "colors": [
       {
         "color": "black",
-        "colorName": "Preto",
+        "colorName": "Pitch Black",
         "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "image": "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "lead",
-        "colorName": "Chumbo",
-        "colorHex": "#2D333D",
-        "image": "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1542272604-780c96856592?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Estrutura robusta",
+      "Straps pendentes",
+      "Fivelas ajustáveis",
+      "Bolsos cargo grandes",
+      "Modelagem oversized",
+      "Detalhes técnicos aparentes",
+      "Visual agressivo e utilitário"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T17:47:34.844+00:00"
+  },
+  {
+    "id": "prod-crg-010",
+    "slug": "calca-cargo-tactical",
+    "title": "Calça Cargo Tactical",
+    "subtitle": "Bolsos modulares",
+    "description": "Bolsos modulares\nFivelas e reguladores\nStraps funcionais\nTecido resistente\nModelagem ampla\nVisual inspirado em equipamentos militares",
+    "price": 359.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
+    "tags": [
+      "Cargos",
+      "Calças",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 11,
+    "stockCount": 23,
+    "sku": "MM-CRG-010",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Pitch Black",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
       "Bolsos modulares",
-      "Straps externos",
-      "Compartimentos organizadores",
-      "Visual técnico e militar"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:48.145+00:00"
-  },
-  {
-    "id": "prod-acs-006",
-    "slug": "crossbody-utility-bag",
-    "title": "Crossbody Utility Bag",
-    "subtitle": "Diversos compartimentos",
-    "description": "Diversos compartimentos\nBolsos externos\nFivelas e reguladores\nAlça larga\nInspiração em equipamentos táticos",
-    "price": 219.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 20,
-    "stockCount": 30,
-    "sku": "MM-ACS-006",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "military_green",
-        "colorName": "Verde militar",
-        "colorHex": "#414B3B",
-        "image": "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Diversos compartimentos",
-      "Bolsos externos",
       "Fivelas e reguladores",
-      "Alça larga",
-      "Inspiração em equipamentos táticos"
+      "Straps funcionais",
+      "Tecido resistente",
+      "Modelagem ampla",
+      "Visual inspirado em equipamentos militares"
     ],
     "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
     ],
     "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:10:47.917+00:00"
+    "createdAt": "2026-08-25T17:47:35.274+00:00"
   },
   {
-    "id": "prod-acs-005",
-    "slug": "shoulder-bag",
-    "title": "Shoulder Bag",
-    "subtitle": "Bolsa compacta transversal",
-    "description": "Bolsa compacta transversal\nAlça ajustável\nCompartimentos com zíper\nConstrução funcional\nVisual urbano e utilitário",
-    "price": 189.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "id": "prod-crg-011",
+    "slug": "calca-cargo-washed",
+    "title": "Calça Cargo Washed",
+    "subtitle": "Lavagem envelhecida",
+    "description": "Lavagem envelhecida\nEfeito desbotado e irregular\nBolsos cargo amplos\nModelagem baggy\nAparência propositalmente usada\nVisual vintage e streetwear",
+    "price": 329.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
     "tags": [
-      "Acessórios",
+      "Cargos",
+      "Calças",
       "Streetwear",
       "Utilitário"
     ],
     "rating": 5,
-    "reviewCount": 19,
-    "stockCount": 29,
-    "sku": "MM-ACS-005",
+    "reviewCount": 12,
+    "stockCount": 24,
+    "sku": "MM-CRG-011",
     "sizes": [
-      "Único"
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
     ],
     "colors": [
       {
         "color": "black",
-        "colorName": "Preto",
+        "colorName": "Pitch Black",
         "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "image": "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "graphite",
-        "colorName": "Grafite",
-        "colorHex": "#3E424B",
-        "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Bolsa compacta transversal",
-      "Alça ajustável",
-      "Compartimentos com zíper",
-      "Construção funcional",
-      "Visual urbano e utilitário"
+      "Lavagem envelhecida",
+      "Efeito desbotado e irregular",
+      "Bolsos cargo amplos",
+      "Modelagem baggy",
+      "Aparência propositalmente usada",
+      "Visual vintage e streetwear"
     ],
     "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
     ],
     "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:10:47.683+00:00"
+    "createdAt": "2026-08-25T17:47:35.694+00:00"
   },
   {
-    "id": "prod-acs-004",
-    "slug": "bucket-hat",
-    "title": "Bucket Hat",
-    "subtitle": "Aba circular",
-    "description": "Aba circular\nEstrutura flexível\nModelagem confortável\nVisual inspirado nos anos 90\nPode possuir bolsos ou detalhes utilitários",
-    "price": 159.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "id": "prod-crg-012",
+    "slug": "calca-cargo-zip",
+    "title": "Calça Cargo Zip",
+    "subtitle": "Subtítulo alterado em 2026-08-25T22:09:55.216Z",
+    "description": "Bolsos com fechamento por zíper\nZíperes decorativos ou funcionais nas pernas\nModelagem ampla\nRecortes técnicos\nConstrução moderna\nVisual futurista e streetwear",
+    "price": 339.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
     "tags": [
-      "Acessórios",
+      "Cargos",
+      "Calças",
       "Streetwear",
       "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 13,
+    "stockCount": 25,
+    "sku": "MM-CRG-012",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Pitch Black",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1509967419530-da38b4704bc6?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Bolsos com fechamento por zíper",
+      "Zíperes decorativos ou funcionais nas pernas",
+      "Modelagem ampla",
+      "Recortes técnicos",
+      "Construção moderna",
+      "Visual futurista e streetwear"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T17:47:36.103+00:00"
+  },
+  {
+    "id": "prod-jaq-001",
+    "slug": "jaqueta-anorak",
+    "title": "Jaqueta Anorak",
+    "subtitle": "Meio zíper frontal",
+    "description": "Meio zíper frontal\nCapuz amplo e ajustável\nBolso frontal grande\nModelagem solta\nAjustes na barra\nVisual técnico inspirado em outdoor",
+    "price": 429.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 14,
+    "stockCount": 15,
+    "sku": "MM-JAQ-001",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png"
+        ]
+      },
+      {
+        "color": "verde-militar",
+        "colorName": "Verde Militar",
+        "colorHex": "#4B5320",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
+    ],
+    "details": [
+      "Meio zíper frontal",
+      "Capuz amplo e ajustável",
+      "Bolso frontal grande",
+      "Modelagem solta",
+      "Ajustes na barra",
+      "Visual técnico inspirado em outdoor"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:16.166+00:00"
+  },
+  {
+    "id": "prod-jaq-002",
+    "slug": "jaqueta-bomber-oversized",
+    "title": "Jaqueta Bomber Oversized",
+    "subtitle": "Modelagem ampla e volumosa",
+    "description": "Modelagem ampla e volumosa\nPunhos e barra com elástico\nGola curta estruturada\nFechamento frontal por zíper\nOmbros levemente caídos\nVisual inspirado em jaquetas militares",
+    "price": 459.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 15,
+    "stockCount": 16,
+    "sku": "MM-JAQ-002",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png"
+        ]
+      },
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
+    ],
+    "details": [
+      "Modelagem ampla e volumosa",
+      "Punhos e barra com elástico",
+      "Gola curta estruturada",
+      "Fechamento frontal por zíper",
+      "Ombros levemente caídos",
+      "Visual inspirado em jaquetas militares"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:16.432+00:00"
+  },
+  {
+    "id": "prod-jaq-003",
+    "slug": "jaqueta-cargo",
+    "title": "Jaqueta Cargo",
+    "subtitle": "Bolsos cargo grandes",
+    "description": "Bolsos cargo grandes\nVários compartimentos funcionais\nModelagem ampla\nConstrução robusta\nDetalhes utilitários\nVisual streetwear funcional",
+    "price": 449.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "lançamento",
+      "mais-vendido"
+    ],
+    "rating": 5,
+    "reviewCount": 16,
+    "stockCount": 17,
+    "sku": "MM-JAQ-003",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png"
+        ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png"
+    ],
+    "details": [
+      "Bolsos cargo grandes",
+      "Vários compartimentos funcionais",
+      "Modelagem ampla",
+      "Construção robusta",
+      "Detalhes utilitários",
+      "Visual streetwear funcional"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:17.087+00:00"
+  },
+  {
+    "id": "prod-jaq-004",
+    "slug": "jaqueta-coach",
+    "title": "Jaqueta Coach",
+    "subtitle": "Gola simples dobrável",
+    "description": "Gola simples dobrável\nFechamento por botões de pressão\nTecido leve\nModelagem reta e relaxada\nBarra com ajuste\nVisual esportivo e minimalista",
+    "price": 389.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 17,
+    "stockCount": 18,
+    "sku": "MM-JAQ-004",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png"
+        ]
+      },
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
+    ],
+    "details": [
+      "Gola simples dobrável",
+      "Fechamento por botões de pressão",
+      "Tecido leve",
+      "Modelagem reta e relaxada",
+      "Barra com ajuste",
+      "Visual esportivo e minimalista"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:17.313+00:00"
+  },
+  {
+    "id": "prod-jaq-005",
+    "slug": "jaqueta-cropped-puffer",
+    "title": "Jaqueta Cropped Puffer",
+    "subtitle": "Comprimento mais curto",
+    "description": "Comprimento mais curto\nConstrução acolchoada\nCorpo volumoso\nGola alta\nBarra ajustável\nVisual moderno e estruturado",
+    "price": 469.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
     ],
     "rating": 5,
     "reviewCount": 18,
-    "stockCount": 28,
-    "sku": "MM-ACS-004",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "sand_beige",
-        "colorName": "Bege areia",
-        "colorHex": "#D5C4A1",
-        "image": "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Aba circular",
-      "Estrutura flexível",
-      "Modelagem confortável",
-      "Visual inspirado nos anos 90",
-      "Pode possuir bolsos ou detalhes utilitários"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:47.433+00:00"
-  },
-  {
-    "id": "prod-acs-003",
-    "slug": "gorro-beanie",
-    "title": "Gorro Beanie",
-    "subtitle": "Tricô encorpado",
-    "description": "Tricô encorpado\nAjuste rente à cabeça\nBarra dobrável\nVisual minimalista\nEstética streetwear de inverno",
-    "price": 129.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 17,
-    "stockCount": 27,
-    "sku": "MM-ACS-003",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "lead_grey",
-        "colorName": "Cinza chumbo",
-        "colorHex": "#353942",
-        "image": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Tricô encorpado",
-      "Ajuste rente à cabeça",
-      "Barra dobrável",
-      "Visual minimalista",
-      "Estética streetwear de inverno"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:47.2+00:00"
-  },
-  {
-    "id": "prod-acs-002",
-    "slug": "bone-5-panel",
-    "title": "Boné 5 Panel",
-    "subtitle": "Construção em cinco painéis",
-    "description": "Construção em cinco painéis\nPerfil baixo\nAba reta\nDesign minimalista\nVisual urbano",
-    "price": 149.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 16,
-    "stockCount": 26,
-    "sku": "MM-ACS-002",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "olive_green",
-        "colorName": "Verde oliva",
-        "colorHex": "#4E5742",
-        "image": "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Construção em cinco painéis",
-      "Perfil baixo",
-      "Aba reta",
-      "Design minimalista",
-      "Visual urbano"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:46.986+00:00"
-  },
-  {
-    "id": "prod-acs-001",
-    "slug": "bone-trucker",
-    "title": "Boné Trucker",
-    "subtitle": "Aba curva ou levemente reta",
-    "description": "Aba curva ou levemente reta\nParte traseira em tela\nAjuste regulável\nVisual retrô\nEstética streetwear casual",
-    "price": 149.9,
-    "category": "acessorios",
-    "subcategory": "Acessórios",
-    "collection": "Coleção Marmot Accessories Atelier 2026",
-    "tags": [
-      "Acessórios",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 15,
-    "stockCount": 25,
-    "sku": "MM-ACS-001",
-    "sizes": [
-      "Único"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "brown_beige",
-        "colorName": "Marrom + Bege",
-        "colorHex": "#6E4D38",
-        "image": "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80"
-    ],
-    "details": [
-      "Aba curva ou levemente reta",
-      "Parte traseira em tela",
-      "Ajuste regulável",
-      "Visual retrô",
-      "Estética streetwear casual"
-    ],
-    "careInstructions": [
-      "Limpar com pano macio e seco",
-      "Evitar contato com produtos químicos agressivos",
-      "Guardar em local arejado e protegido da umidade"
-    ],
-    "composition": [
-      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.3,
-    "height": 8,
-    "width": 18,
-    "length": 22,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:10:46.764+00:00"
-  },
-  {
-    "id": "prod-ten-010",
-    "slug": "tenis-panel-layered",
-    "title": "Tênis Panel Layered",
-    "subtitle": "Vários painéis sobrepostos no cabedal",
-    "description": "Vários painéis sobrepostos no cabedal\nMistura de texturas e materiais\nSolado médio e estruturado\nConstrução visualmente complexa\nEstética experimental e contemporânea",
-    "price": 579.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
-    "tags": [
-      "Tênis",
-      "Sneakers",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 31,
     "stockCount": 19,
-    "sku": "MM-TEN-010",
+    "sku": "MM-JAQ-005",
     "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
     ],
     "colors": [
       {
-        "color": "black_lead",
-        "colorName": "Preto + Chumbo",
-        "colorHex": "#1A1D24",
-        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "grey_offwhite",
-        "colorName": "Cinza + Off White",
-        "colorHex": "#B0B5BD",
-        "image": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Vários painéis sobrepostos no cabedal",
-      "Mistura de texturas e materiais",
-      "Solado médio e estruturado",
-      "Construção visualmente complexa",
-      "Estética experimental e contemporânea"
-    ],
-    "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
-    ],
-    "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
-    ],
-    "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:08:31.592+00:00"
-  },
-  {
-    "id": "prod-ten-009",
-    "slug": "tenis-trail-street",
-    "title": "Tênis Trail Street",
-    "subtitle": "Solado tratorado",
-    "description": "Solado tratorado\nCabedal com mesh e painéis reforçados\nAmarração técnica\nEstrutura robusta\nInspiração em tênis de trilha e outdoor",
-    "price": 569.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
-    "tags": [
-      "Tênis",
-      "Sneakers",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 30,
-    "stockCount": 18,
-    "sku": "MM-TEN-009",
-    "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
-    ],
-    "colors": [
-      {
-        "color": "black_grey",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#202226",
-        "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "beige_olive",
-        "colorName": "Bege + Verde oliva",
-        "colorHex": "#606852",
-        "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Solado tratorado",
-      "Cabedal com mesh e painéis reforçados",
-      "Amarração técnica",
-      "Estrutura robusta",
-      "Inspiração em tênis de trilha e outdoor"
-    ],
-    "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
-    ],
-    "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
-    ],
-    "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T02:08:31.376+00:00"
-  },
-  {
-    "id": "prod-ten-008",
-    "slug": "tenis-platform",
-    "title": "Tênis Platform",
-    "subtitle": "Solado extremamente alto",
-    "description": "Solado extremamente alto\nBase larga\nCabedal estruturado\nSilhueta pesada\nVisual streetwear experimental",
-    "price": 589.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
-    "tags": [
-      "Tênis",
-      "Sneakers",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 29,
-    "stockCount": 25,
-    "sku": "MM-TEN-008",
-    "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
-    ],
-    "colors": [
-      {
-        "color": "black",
+        "color": "preto",
         "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
         "images": [
-          "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png"
         ]
       },
       {
-        "color": "charcoal",
-        "colorName": "Cinza chumbo",
-        "colorHex": "#383D48",
-        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
         "images": [
-          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
     "images": [
-      "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
     ],
     "details": [
-      "Solado extremamente alto",
-      "Base larga",
-      "Cabedal estruturado",
-      "Silhueta pesada",
-      "Visual streetwear experimental"
+      "Comprimento mais curto",
+      "Construção acolchoada",
+      "Corpo volumoso",
+      "Gola alta",
+      "Barra ajustável",
+      "Visual moderno e estruturado"
     ],
     "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+      "100% Poliamida / Algodão Estruturado"
     ],
     "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:08:31.162+00:00"
+    "createdAt": "2026-08-25T00:01:17.591+00:00"
   },
   {
-    "id": "prod-ten-007",
-    "slug": "tenis-distressed",
-    "title": "Tênis Distressed",
-    "subtitle": "Acabamento propositalmente envelhecido",
-    "description": "Acabamento propositalmente envelhecido\nÁreas desgastadas\nSolado com aparência usada\nConstrução robusta\nEstética grunge",
-    "price": 539.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "id": "prod-jaq-006",
+    "slug": "jaqueta-denim-distressed",
+    "title": "Jaqueta Denim Distressed",
+    "subtitle": "Jeans pesado",
+    "description": "Jeans pesado\nÁreas propositalmente desgastadas\nBordas puídas\nLavagem irregular\nModelagem ampla\nEstética grunge e vintage",
+    "price": 439.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
     "tags": [
-      "Tênis",
-      "Sneakers",
+      "Jaqueta",
+      "Outerwear",
       "Streetwear"
     ],
     "rating": 5,
-    "reviewCount": 28,
-    "stockCount": 24,
-    "sku": "MM-TEN-007",
+    "reviewCount": 19,
+    "stockCount": 20,
+    "sku": "MM-JAQ-006",
     "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
     ],
     "colors": [
       {
-        "color": "washed_black",
-        "colorName": "Preto lavado",
-        "colorHex": "#2B2B2B",
-        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
         "images": [
-          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png"
         ]
       },
       {
-        "color": "aged_beige",
-        "colorName": "Bege envelhecido",
-        "colorHex": "#BFAC8E",
-        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "color": "azul",
+        "colorName": "Azul",
+        "colorHex": "#355C8A",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
         "images": [
-          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
     "images": [
-      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
     ],
     "details": [
-      "Acabamento propositalmente envelhecido",
-      "Áreas desgastadas",
-      "Solado com aparência usada",
-      "Construção robusta",
-      "Estética grunge"
+      "Jeans pesado",
+      "Áreas propositalmente desgastadas",
+      "Bordas puídas",
+      "Lavagem irregular",
+      "Modelagem ampla",
+      "Estética grunge e vintage"
     ],
     "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+      "100% Poliamida / Algodão Estruturado"
     ],
     "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:08:30.95+00:00"
+    "createdAt": "2026-08-25T00:01:17.814+00:00"
   },
   {
-    "id": "prod-ten-006",
-    "slug": "tenis-tech-runner",
-    "title": "Tênis Tech Runner",
-    "subtitle": "Mesh respirável",
-    "description": "Mesh respirável\nRecortes técnicos\nSolado com aparência futurista\nEstrutura leve\nVisual esportivo e tecnológico",
-    "price": 579.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "id": "prod-jaq-007",
+    "slug": "jaqueta-denim-washed",
+    "title": "Jaqueta Denim Washed",
+    "subtitle": "Jeans encorpado",
+    "description": "Jeans encorpado\nLavagem envelhecida\nEfeito desbotado\nModelagem oversized\nCosturas tradicionais aparentes\nVisual vintage e streetwear",
+    "price": 429.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
     "tags": [
-      "Tênis",
-      "Sneakers",
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 20,
+    "stockCount": 21,
+    "sku": "MM-JAQ-007",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png"
+        ]
+      },
+      {
+        "color": "azul",
+        "colorName": "Azul",
+        "colorHex": "#355C8A",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
+    ],
+    "details": [
+      "Jeans encorpado",
+      "Lavagem envelhecida",
+      "Efeito desbotado",
+      "Modelagem oversized",
+      "Costuras tradicionais aparentes",
+      "Visual vintage e streetwear"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:18.088+00:00"
+  },
+  {
+    "id": "prod-jaq-008",
+    "slug": "jaqueta-harrington",
+    "title": "Jaqueta Harrington",
+    "subtitle": "Comprimento curto",
+    "description": "Comprimento curto\nGola dobrável característica\nFechamento frontal por zíper\nModelagem levemente boxy\nConstrução limpa\nVisual retrô e minimalista",
+    "price": 419.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 21,
+    "stockCount": 22,
+    "sku": "MM-JAQ-008",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png"
+        ]
+      },
+      {
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#C8B596",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
+    ],
+    "details": [
+      "Comprimento curto",
+      "Gola dobrável característica",
+      "Fechamento frontal por zíper",
+      "Modelagem levemente boxy",
+      "Construção limpa",
+      "Visual retrô e minimalista"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:18.318+00:00"
+  },
+  {
+    "id": "prod-jaq-009",
+    "slug": "jaqueta-nylon-tech",
+    "title": "Jaqueta Nylon Tech",
+    "subtitle": "Nylon de aparência técnica",
+    "description": "Nylon de aparência técnica\nGola alta\nBolsos com zíper\nAjustes na cintura ou barra\nConstrução leve\nVisual futurista e funcional",
+    "price": 449.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 22,
+    "stockCount": 23,
+    "sku": "MM-JAQ-009",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
+    ],
+    "details": [
+      "Nylon de aparência técnica",
+      "Gola alta",
+      "Bolsos com zíper",
+      "Ajustes na cintura ou barra",
+      "Construção leve",
+      "Visual futurista e funcional"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:18.534+00:00"
+  },
+  {
+    "id": "prod-jaq-010",
+    "slug": "jaqueta-panel-construction",
+    "title": "Jaqueta Panel Construction",
+    "subtitle": "Recortes geométricos",
+    "description": "Recortes geométricos\nPainéis sobrepostos\nCosturas aparentes\nMistura visual de diferentes áreas\nConstrução arquitetônica\nVisual experimental e moderno",
+    "price": 469.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 23,
+    "stockCount": 24,
+    "sku": "MM-JAQ-010",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "bege-e-marrom",
+        "colorName": "Bege e Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png"
+        ]
+      },
+      {
+        "color": "bege-preto",
+        "colorName": "Bege Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png"
+    ],
+    "details": [
+      "Recortes geométricos",
+      "Painéis sobrepostos",
+      "Costuras aparentes",
+      "Mistura visual de diferentes áreas",
+      "Construção arquitetônica",
+      "Visual experimental e moderno"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:18.772+00:00"
+  },
+  {
+    "id": "prod-jaq-011",
+    "slug": "jaqueta-puffer-oversized",
+    "title": "Jaqueta Puffer Oversized",
+    "subtitle": "Construção fortemente acolchoada",
+    "description": "Construção fortemente acolchoada\nVolume acentuado\nModelagem oversized\nGola alta e estruturada\nOmbros amplos\nVisual pesado de inverno",
+    "price": 499.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 24,
+    "stockCount": 15,
+    "sku": "MM-JAQ-011",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#7A7D80",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
+    ],
+    "details": [
+      "Construção fortemente acolchoada",
+      "Volume acentuado",
+      "Modelagem oversized",
+      "Gola alta e estruturada",
+      "Ombros amplos",
+      "Visual pesado de inverno"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:19.004+00:00"
+  },
+  {
+    "id": "prod-jaq-012",
+    "slug": "jaqueta-sherpa",
+    "title": "Jaqueta Sherpa",
+    "subtitle": "Forro ou painéis em sherpa",
+    "description": "Forro ou painéis em sherpa\nTextura felpuda aparente\nConstrução volumosa\nModelagem ampla\nAparência quente e pesada\nVisual de inverno com inspiração vintage",
+    "price": 479.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 25,
+    "stockCount": 16,
+    "sku": "MM-JAQ-012",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png"
+        ]
+      },
+      {
+        "color": "marrom-e-bege",
+        "colorName": "Marrom e Bege",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
+    ],
+    "details": [
+      "Forro ou painéis em sherpa",
+      "Textura felpuda aparente",
+      "Construção volumosa",
+      "Modelagem ampla",
+      "Aparência quente e pesada",
+      "Visual de inverno com inspiração vintage"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:19.605+00:00"
+  },
+  {
+    "id": "prod-jaq-013",
+    "slug": "jaqueta-tactical",
+    "title": "Jaqueta Tactical",
+    "subtitle": "Bolsos modulares",
+    "description": "Bolsos modulares\nFivelas e straps\nGola alta\nRecortes funcionais\nConstrução robusta\nVisual inspirado em equipamentos militares",
+    "price": 469.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 26,
+    "stockCount": 17,
+    "sku": "MM-JAQ-013",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png"
+        ]
+      },
+      {
+        "color": "chumbo",
+        "colorName": "Chumbo",
+        "colorHex": "#4A4E52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
+    ],
+    "details": [
+      "Bolsos modulares",
+      "Fivelas e straps",
+      "Gola alta",
+      "Recortes funcionais",
+      "Construção robusta",
+      "Visual inspirado em equipamentos militares"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:19.848+00:00"
+  },
+  {
+    "id": "prod-jaq-014",
+    "slug": "jaqueta-track",
+    "title": "Jaqueta Track",
+    "subtitle": "Inspiração esportiva",
+    "description": "Inspiração esportiva\nTecido leve\nFaixas ou recortes laterais\nGola alta\nModelagem relaxada\nVisual retrô esportivo",
+    "price": 399.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
       "Streetwear"
     ],
     "rating": 5,
     "reviewCount": 27,
-    "stockCount": 23,
-    "sku": "MM-TEN-006",
+    "stockCount": 18,
+    "sku": "MM-JAQ-014",
     "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
     ],
     "colors": [
       {
-        "color": "black_graphite",
-        "colorName": "Preto + Grafite",
-        "colorHex": "#1F2124",
-        "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
         "images": [
-          "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png"
         ]
       },
       {
-        "color": "grey_silver",
-        "colorName": "Cinza + Prata",
-        "colorHex": "#A0A5AC",
-        "image": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
         "images": [
-          "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
     "images": [
-      "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
     ],
     "details": [
-      "Mesh respirável",
+      "Inspiração esportiva",
+      "Tecido leve",
+      "Faixas ou recortes laterais",
+      "Gola alta",
+      "Modelagem relaxada",
+      "Visual retrô esportivo"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:20.073+00:00"
+  },
+  {
+    "id": "prod-jaq-015",
+    "slug": "jaqueta-two-tone",
+    "title": "Jaqueta Two Tone",
+    "subtitle": "Combinação de duas cores",
+    "description": "Combinação de duas cores\nGrandes áreas contrastantes\nRecortes gráficos\nModelagem ampla\nDivisão visual marcada\nEstética streetwear moderna",
+    "price": 439.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 28,
+    "stockCount": 19,
+    "sku": "MM-JAQ-015",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png"
+        ]
+      },
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
+    ],
+    "details": [
+      "Combinação de duas cores",
+      "Grandes áreas contrastantes",
+      "Recortes gráficos",
+      "Modelagem ampla",
+      "Divisão visual marcada",
+      "Estética streetwear moderna"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:20.305+00:00"
+  },
+  {
+    "id": "prod-jaq-016",
+    "slug": "jaqueta-utility",
+    "title": "Jaqueta Utility",
+    "subtitle": "Vários bolsos funcionais",
+    "description": "Vários bolsos funcionais\nRecortes técnicos\nCompartimentos utilitários\nModelagem oversized\nConstrução resistente\nVisual inspirado em roupas de trabalho",
+    "price": 459.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 29,
+    "stockCount": 20,
+    "sku": "MM-JAQ-016",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png"
+        ]
+      },
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#50633F",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
+    ],
+    "details": [
+      "Vários bolsos funcionais",
       "Recortes técnicos",
-      "Solado com aparência futurista",
-      "Estrutura leve",
-      "Visual esportivo e tecnológico"
+      "Compartimentos utilitários",
+      "Modelagem oversized",
+      "Construção resistente",
+      "Visual inspirado em roupas de trabalho"
     ],
     "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+      "100% Poliamida / Algodão Estruturado"
     ],
     "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:08:30.736+00:00"
+    "createdAt": "2026-08-25T00:01:20.546+00:00"
   },
   {
-    "id": "prod-ten-005",
-    "slug": "tenis-low-profile",
-    "title": "Tênis Low Profile",
-    "subtitle": "Silhueta baixa e fina",
-    "description": "Silhueta baixa e fina\nSolado discreto\nConstrução minimalista\nVisual retrô\nFormato alongado",
-    "price": 479.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "id": "prod-jaq-017",
+    "slug": "jaqueta-varsity-oversized",
+    "title": "Jaqueta Varsity Oversized",
+    "subtitle": "Inspiração universitária",
+    "description": "Inspiração universitária\nMangas contrastantes\nPunhos e barra listrados\nAplicações, patches ou lettering\nModelagem oversized\nVisual esportivo retrô",
+    "price": 489.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
     "tags": [
-      "Tênis",
-      "Sneakers",
+      "Jaqueta",
+      "Outerwear",
       "Streetwear"
     ],
     "rating": 5,
-    "reviewCount": 26,
-    "stockCount": 22,
-    "sku": "MM-TEN-005",
+    "reviewCount": 30,
+    "stockCount": 21,
+    "sku": "MM-JAQ-017",
     "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
     ],
     "colors": [
       {
-        "color": "black_white",
-        "colorName": "Preto + Branco",
-        "colorHex": "#181818",
-        "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
         "images": [
-          "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png"
         ]
       },
       {
-        "color": "brown_cream",
-        "colorName": "Marrom + Creme",
-        "colorHex": "#5C4033",
-        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
         "images": [
-          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
     "images": [
-      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
     ],
     "details": [
-      "Silhueta baixa e fina",
-      "Solado discreto",
-      "Construção minimalista",
-      "Visual retrô",
-      "Formato alongado"
+      "Inspiração universitária",
+      "Mangas contrastantes",
+      "Punhos e barra listrados",
+      "Aplicações, patches ou lettering",
+      "Modelagem oversized",
+      "Visual esportivo retrô"
     ],
     "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
     ],
     "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+      "100% Poliamida / Algodão Estruturado"
     ],
     "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:08:30.522+00:00"
+    "createdAt": "2026-08-25T00:01:20.75+00:00"
   },
   {
-    "id": "prod-ten-004",
-    "slug": "tenis-high-top",
-    "title": "Tênis High Top",
-    "subtitle": "Cano alto",
-    "description": "Cano alto\nEstrutura reforçada no tornozelo\nSolado robusto\nVisual urbano\nSilhueta marcante",
-    "price": 569.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "id": "prod-jaq-018",
+    "slug": "jaqueta-windbreaker",
+    "title": "Jaqueta Windbreaker",
+    "subtitle": "Tecido leve e técnico",
+    "description": "Tecido leve e técnico\nCapuz ajustável\nRecortes esportivos\nProteção contra vento\nModelagem relaxada\nVisual inspirado em roupas outdoor",
+    "price": 399.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
     "tags": [
-      "Tênis",
-      "Sneakers",
+      "Jaqueta",
+      "Outerwear",
       "Streetwear"
     ],
     "rating": 5,
-    "reviewCount": 25,
-    "stockCount": 21,
-    "sku": "MM-TEN-004",
+    "reviewCount": 31,
+    "stockCount": 22,
+    "sku": "MM-JAQ-018",
     "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png"
+        ]
+      },
+      {
+        "color": "grafite-e-verde",
+        "colorName": "Grafite e Verde",
+        "colorHex": "#4B4F52",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
+    ],
+    "details": [
+      "Tecido leve e técnico",
+      "Capuz ajustável",
+      "Recortes esportivos",
+      "Proteção contra vento",
+      "Modelagem relaxada",
+      "Visual inspirado em roupas outdoor"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:20.993+00:00"
+  },
+  {
+    "id": "prod-jaq-019",
+    "slug": "jaqueta-workwear",
+    "title": "Jaqueta Workwear",
+    "subtitle": "Corte boxy",
+    "description": "Corte boxy\nTecido pesado e resistente\nBolsos frontais grandes\nConstrução simples e robusta\nModelagem ampla\nInspiração em uniformes e roupas de trabalho",
+    "price": 469.9,
+    "category": "jaquetas",
+    "subcategory": "Jaquetas",
+    "collection": "Coleção Marmot Outerwear 2026",
+    "tags": [
+      "Jaqueta",
+      "Outerwear",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 32,
+    "stockCount": 23,
+    "sku": "MM-JAQ-019",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png"
+        ]
+      },
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6F513D",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
+        ]
+      }
+    ],
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+    "images": [
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
+    ],
+    "details": [
+      "Corte boxy",
+      "Tecido pesado e resistente",
+      "Bolsos frontais grandes",
+      "Construção simples e robusta",
+      "Modelagem ampla",
+      "Inspiração em uniformes e roupas de trabalho"
+    ],
+    "careInstructions": [
+      "Lavar em ciclo delicado com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Poliamida / Algodão Estruturado"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 10,
+    "width": 30,
+    "length": 40,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T00:01:21.232+00:00"
+  },
+  {
+    "id": "prod-mol-001",
+    "slug": "moletom-anorak",
+    "title": "Moletom Anorak",
+    "subtitle": "",
+    "description": "Meio zíper frontal\nBolso canguru grande\nCapuz amplo\nAjuste na barra\nVisual inspirado em jaquetas corta-vento\nModelagem solta e utilitária",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-001",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
     ],
     "colors": [
       {
         "color": "black",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
+        "image": "/uploads/products/prod-mol-001/090276db740b9a61.webp",
+        "featuredImage": "/uploads/products/prod-mol-001/090276db740b9a61.webp",
         "images": [
-          "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+          "/uploads/products/prod-mol-001/090276db740b9a61.webp"
         ]
       },
       {
-        "color": "offwhite",
-        "colorName": "Off White",
-        "colorHex": "#F0EFEA",
-        "image": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
+        "color": "verde-militar",
+        "colorName": "Verde Militar",
+        "colorHex": "#4C4D3D",
+        "image": "/uploads/products/prod-mol-001/c0a9baf415a3f9cc.webp",
+        "featuredImage": "/uploads/products/prod-mol-001/c0a9baf415a3f9cc.webp",
         "images": [
-          "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+          "/uploads/products/prod-mol-001/c0a9baf415a3f9cc.webp"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
+    "image": "/uploads/products/prod-mol-001/a70c68c9e1c10f30.webp",
     "images": [
-      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+      "/uploads/products/prod-mol-001/a70c68c9e1c10f30.webp"
     ],
     "details": [
-      "Cano alto",
-      "Estrutura reforçada no tornozelo",
-      "Solado robusto",
-      "Visual urbano",
-      "Silhueta marcante"
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
     ],
     "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
     ],
     "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+      "100% Algodão Heavyweight"
     ],
     "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:08:30.309+00:00"
+    "createdAt": "2026-08-24T22:55:59.7+00:00"
   },
   {
-    "id": "prod-ten-003",
-    "slug": "tenis-retro-runner",
-    "title": "Tênis Retro Runner",
-    "subtitle": "Inspiração em tênis de corrida antigos",
-    "description": "Inspiração em tênis de corrida antigos\nMistura de mesh e camurça\nSolado intermediário volumoso\nPainéis contrastantes\nVisual retrô e esportivo",
-    "price": 529.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "id": "prod-mol-002",
+    "slug": "moletom-asymmetric-zip",
+    "title": "Moletom Asymmetric Zip",
+    "subtitle": "",
+    "description": "Zíper frontal diagonal\nGola alta\nConstrução assimétrica\nRecortes menos convencionais\nVisual moderno e experimental\nCaimento oversized",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
     "tags": [
-      "Tênis",
-      "Sneakers",
-      "Streetwear"
+      "lançamento"
     ],
     "rating": 5,
-    "reviewCount": 24,
-    "stockCount": 20,
-    "sku": "MM-TEN-003",
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-002",
     "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
     ],
     "colors": [
       {
-        "color": "grey_silver",
-        "colorName": "Cinza + Prata",
-        "colorHex": "#9EA4AD",
-        "image": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-002/08386559a707bd94.webp",
+        "featuredImage": "/uploads/products/prod-mol-002/08386559a707bd94.webp",
         "images": [
-          "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+          "/uploads/products/prod-mol-002/08386559a707bd94.webp"
         ]
       },
       {
-        "color": "black_grey",
+        "color": "grey",
+        "colorName": "Cinza Mescla",
+        "colorHex": "#71717A",
+        "image": "/uploads/products/prod-mol-002/271690399c82926c.webp",
+        "featuredImage": "/uploads/products/prod-mol-002/271690399c82926c.webp",
+        "images": [
+          "/uploads/products/prod-mol-002/271690399c82926c.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-002/6b050306d7c2139f.webp",
+    "images": [
+      "/uploads/products/prod-mol-002/6b050306d7c2139f.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:55:59.949+00:00"
+  },
+  {
+    "id": "prod-mol-003",
+    "slug": "moletom-distressed",
+    "title": "Moletom Distressed",
+    "subtitle": "",
+    "description": "Lavagem envelhecida\nBordas propositalmente desgastadas\nPequenos rasgos ou áreas puídas\nAcabamento irregular\nEstética grunge\nAparência vintage",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-003",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "cinza-lavado",
+        "colorName": "Cinza lavado",
+        "colorHex": "#71717A",
+        "image": "/uploads/products/prod-mol-003/0d8bd95769b1b33d.webp",
+        "featuredImage": "/uploads/products/prod-mol-003/0d8bd95769b1b33d.webp",
+        "images": [
+          "/uploads/products/prod-mol-003/0d8bd95769b1b33d.webp"
+        ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#1C1917",
+        "image": "/uploads/products/prod-mol-003/689779da544369d5.webp",
+        "featuredImage": "/uploads/products/prod-mol-003/689779da544369d5.webp",
+        "images": [
+          "/uploads/products/prod-mol-003/689779da544369d5.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-003/b68558e30b145732.webp",
+    "images": [
+      "/uploads/products/prod-mol-003/b68558e30b145732.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:00.214+00:00"
+  },
+  {
+    "id": "prod-mol-004",
+    "slug": "moletom-double-hood",
+    "title": "Moletom Double Hood",
+    "subtitle": "",
+    "description": "Dois capuzes sobrepostos\nConstrução em camadas\nParte superior mais volumosa\nAparência pesada\nModelagem oversized\nVisual streetwear marcante",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-004",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "bege-marrom",
+        "colorName": "Bege + Marrom",
+        "colorHex": "#e7d3c6",
+        "image": "/uploads/products/prod-mol-004/f1201acef2dd6232.webp",
+        "featuredImage": "/uploads/products/prod-mol-004/f1201acef2dd6232.webp",
+        "images": [
+          "/uploads/products/prod-mol-004/f1201acef2dd6232.webp"
+        ]
+      },
+      {
+        "color": "preto-cinza",
         "colorName": "Preto + Cinza",
-        "colorHex": "#262626",
-        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "colorHex": "#000000",
+        "image": "/uploads/products/prod-mol-004/173f533bf0991d0c.webp",
+        "featuredImage": "/uploads/products/prod-mol-004/173f533bf0991d0c.webp",
         "images": [
-          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+          "/uploads/products/prod-mol-004/173f533bf0991d0c.webp"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+    "image": "/uploads/products/prod-mol-004/fc6137c0fce9dec5.webp",
     "images": [
-      "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+      "/uploads/products/prod-mol-004/fc6137c0fce9dec5.webp"
     ],
     "details": [
-      "Inspiração em tênis de corrida antigos",
-      "Mistura de mesh e camurça",
-      "Solado intermediário volumoso",
-      "Painéis contrastantes",
-      "Visual retrô e esportivo"
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
     ],
     "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
     ],
     "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+      "100% Algodão Heavyweight"
     ],
     "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
     "isNewRelease": true,
-    "isBestSeller": true,
+    "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:08:30.099+00:00"
+    "createdAt": "2026-08-24T22:56:00.439+00:00"
   },
   {
-    "id": "prod-ten-002",
-    "slug": "tenis-skate",
-    "title": "Tênis Skate",
-    "subtitle": "Silhueta larga",
-    "description": "Silhueta larga\nLíngua acolchoada\nSolado reto\nCabedal reforçado\nVisual inspirado no skate dos anos 2000",
-    "price": 499.9,
-    "category": "tenis",
-    "subcategory": "Tênis",
-    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "id": "prod-mol-005",
+    "slug": "moletom-double-layer",
+    "title": "Moletom Double Layer",
+    "subtitle": "",
+    "description": "Segunda camada aparente na barra\nMangas com efeito de sobreposição\nAparência de duas peças usadas juntas\nComprimentos diferentes entre as camadas\nModelagem ampla\nVisual em camadas",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
     "tags": [
-      "Tênis",
-      "Sneakers",
-      "Streetwear"
+      "lançamento"
     ],
     "rating": 5,
-    "reviewCount": 23,
-    "stockCount": 19,
-    "sku": "MM-TEN-002",
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-005",
     "sizes": [
-      "38",
-      "39",
-      "40",
-      "41",
-      "42",
-      "43"
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
     ],
     "colors": [
       {
-        "color": "black_white",
-        "colorName": "Preto + Branco",
-        "colorHex": "#181818",
-        "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+        "color": "bege-marrom",
+        "colorName": "Bege + Marrom",
+        "colorHex": "#b9a090",
+        "image": "/uploads/products/prod-mol-005/221f260d39d8a227.webp",
+        "featuredImage": "/uploads/products/prod-mol-005/221f260d39d8a227.webp",
         "images": [
-          "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+          "/uploads/products/prod-mol-005/221f260d39d8a227.webp"
         ]
       },
       {
-        "color": "brown_beige",
-        "colorName": "Marrom + Bege",
-        "colorHex": "#634832",
-        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "color": "preto-",
+        "colorName": "Preto",
+        "colorHex": "#000000",
+        "image": "/uploads/products/prod-mol-005/cdaf1b10107f1568.webp",
+        "featuredImage": "/uploads/products/prod-mol-005/cdaf1b10107f1568.webp",
         "images": [
-          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+          "/uploads/products/prod-mol-005/cdaf1b10107f1568.webp"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+    "image": "/uploads/products/prod-mol-005/24e1365592c9fa67.webp",
     "images": [
-      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+      "/uploads/products/prod-mol-005/24e1365592c9fa67.webp"
     ],
     "details": [
-      "Silhueta larga",
-      "Língua acolchoada",
-      "Solado reto",
-      "Cabedal reforçado",
-      "Visual inspirado no skate dos anos 2000"
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
     ],
     "careInstructions": [
-      "Limpar com pano levemente umedecido e sabão neutro",
-      "Não lavar na máquina nem mergulhar em água",
-      "Secar à sombra em local ventilado"
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
     ],
     "composition": [
-      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+      "100% Algodão Heavyweight"
     ],
     "reviews": [],
-    "weight": 1.1,
-    "height": 14,
-    "width": 24,
-    "length": 34,
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
     "isNewRelease": true,
-    "isBestSeller": true,
+    "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T02:08:29.89+00:00"
+    "createdAt": "2026-08-24T22:56:00.671+00:00"
+  },
+  {
+    "id": "prod-mol-006",
+    "slug": "moletom-funnel-neck",
+    "title": "Moletom Funnel Neck",
+    "subtitle": "",
+    "description": "Gola alta e larga\nSem capuz tradicional\nGola com bastante volume\nDesign minimalista\nOmbros caídos\nModelagem ampla",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-006",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "branco",
+        "colorName": "Branco",
+        "colorHex": "#FFFFFF",
+        "image": "/uploads/products/prod-mol-006/56c6c0f7c478c3f3.webp",
+        "featuredImage": "/uploads/products/prod-mol-006/56c6c0f7c478c3f3.webp",
+        "images": [
+          "/uploads/products/prod-mol-006/56c6c0f7c478c3f3.webp"
+        ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#1C1917",
+        "image": "/uploads/products/prod-mol-006/ca404ea65a811448.webp",
+        "featuredImage": "/uploads/products/prod-mol-006/ca404ea65a811448.webp",
+        "images": [
+          "/uploads/products/prod-mol-006/ca404ea65a811448.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-006/78aab436a6dc0046.webp",
+    "images": [
+      "/uploads/products/prod-mol-006/78aab436a6dc0046.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:00.886+00:00"
+  },
+  {
+    "id": "prod-mol-007",
+    "slug": "moletom-half-zip-utility",
+    "title": "Moletom Half Zip Utility",
+    "subtitle": "",
+    "description": "Zíper somente até o peito\nGola alta\nBolso frontal utilitário\nDetalhes funcionais\nModelagem oversized\nInspiração técnica e outdoor",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-007",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "verde-militar",
+        "colorName": "Verde Militar",
+        "colorHex": "#59523f",
+        "image": "/uploads/products/prod-mol-007/824eb8663f330877.webp",
+        "featuredImage": "/uploads/products/prod-mol-007/824eb8663f330877.webp",
+        "images": [
+          "/uploads/products/prod-mol-007/824eb8663f330877.webp"
+        ]
+      },
+      {
+        "color": "cinza-escuro",
+        "colorName": "Cinza Escuro",
+        "colorHex": "#45454f",
+        "image": "/uploads/products/prod-mol-007/19f86cb6cecdae97.webp",
+        "featuredImage": "/uploads/products/prod-mol-007/19f86cb6cecdae97.webp",
+        "images": [
+          "/uploads/products/prod-mol-007/19f86cb6cecdae97.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-007/62667afc0ce10cbd.webp",
+    "images": [
+      "/uploads/products/prod-mol-007/62667afc0ce10cbd.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:01.099+00:00"
+  },
+  {
+    "id": "prod-mol-008",
+    "slug": "moletom-heavy-boxy",
+    "title": "Moletom Heavy Boxy",
+    "subtitle": "",
+    "description": "Corpo mais curto e largo\nModelagem boxy\nOmbros caídos\nCapuz estruturado\nPunhos e barra grossos\nTecido pesado e encorpado",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-008",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-008/2d380b21451a9f61.webp",
+        "featuredImage": "/uploads/products/prod-mol-008/2d380b21451a9f61.webp",
+        "images": [
+          "/uploads/products/prod-mol-008/2d380b21451a9f61.webp"
+        ]
+      },
+      {
+        "color": "cinza",
+        "colorName": "Cinza",
+        "colorHex": "#797576",
+        "image": "/uploads/products/prod-mol-008/90da87a58f021d0b.webp",
+        "featuredImage": "/uploads/products/prod-mol-008/90da87a58f021d0b.webp",
+        "images": [
+          "/uploads/products/prod-mol-008/90da87a58f021d0b.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-008/6977d400eb581174.webp",
+    "images": [
+      "/uploads/products/prod-mol-008/6977d400eb581174.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:01.338+00:00"
+  },
+  {
+    "id": "prod-mol-009",
+    "slug": "moletom-inside-out",
+    "title": "Moletom Inside Out",
+    "subtitle": "",
+    "description": "Costuras propositalmente expostas\nAcabamentos aparentes\nEtiquetas externas ou detalhes invertidos\nConstrução com aparência de roupa do avesso\nModelagem oversized\nEstética desconstruída",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-009",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "cinza-branco",
+        "colorName": "Cinza + Branco",
+        "colorHex": "#B0B4B7",
+        "image": "/uploads/products/prod-mol-009/dab1eaacca6290b5.webp",
+        "featuredImage": "/uploads/products/prod-mol-009/dab1eaacca6290b5.webp",
+        "images": [
+          "/uploads/products/prod-mol-009/dab1eaacca6290b5.webp"
+        ]
+      },
+      {
+        "color": "preto-branco",
+        "colorName": "Preto + Branco",
+        "colorHex": "#1C1917",
+        "image": "/uploads/products/prod-mol-009/69de86bb26c04b95.webp",
+        "featuredImage": "/uploads/products/prod-mol-009/69de86bb26c04b95.webp",
+        "images": [
+          "/uploads/products/prod-mol-009/69de86bb26c04b95.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-009/76ed9fe13de10f3c.webp",
+    "images": [
+      "/uploads/products/prod-mol-009/76ed9fe13de10f3c.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:01.556+00:00"
+  },
+  {
+    "id": "prod-mol-010",
+    "slug": "moletom-mock-neck",
+    "title": "Moletom Mock Neck",
+    "subtitle": "",
+    "description": "Gola média ou alta\nSem capuz\nVisual limpo\nOmbros caídos\nCorpo largo\nTecido encorpado",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-010",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "branco-",
+        "colorName": "Branco",
+        "colorHex": "#F9F9F7",
+        "image": "/uploads/products/prod-mol-010/09c8ceebf72881a2.webp",
+        "featuredImage": "/uploads/products/prod-mol-010/09c8ceebf72881a2.webp",
+        "images": [
+          "/uploads/products/prod-mol-010/09c8ceebf72881a2.webp"
+        ]
+      },
+      {
+        "color": "cinza-escuro",
+        "colorName": "Cinza Escuro",
+        "colorHex": "#71717A",
+        "image": "/uploads/products/prod-mol-010/a41f0d320d5b4fc5.webp",
+        "featuredImage": "/uploads/products/prod-mol-010/a41f0d320d5b4fc5.webp",
+        "images": [
+          "/uploads/products/prod-mol-010/a41f0d320d5b4fc5.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-010/01a4f2ff38284cfc.webp",
+    "images": [
+      "/uploads/products/prod-mol-010/01a4f2ff38284cfc.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:01.778+00:00"
+  },
+  {
+    "id": "prod-mol-011",
+    "slug": "moletom-panel-construction",
+    "title": "Moletom Panel Construction",
+    "subtitle": "",
+    "description": "Diversos painéis no corpo\nRecortes geométricos\nCosturas bem evidentes\nConstrução em blocos\nMistura de diferentes texturas\nEstética arquitetônica",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-011",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "branco-bege",
+        "colorName": "Branco + Bege",
+        "colorHex": "#e4dacd",
+        "image": "/uploads/products/prod-mol-011/d247b6b45b1e476a.webp",
+        "featuredImage": "/uploads/products/prod-mol-011/d247b6b45b1e476a.webp",
+        "images": [
+          "/uploads/products/prod-mol-011/d247b6b45b1e476a.webp"
+        ]
+      },
+      {
+        "color": "preto-cinza",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#42424c",
+        "image": "/uploads/products/prod-mol-011/eeacb5178b7f46f0.webp",
+        "featuredImage": "/uploads/products/prod-mol-011/eeacb5178b7f46f0.webp",
+        "images": [
+          "/uploads/products/prod-mol-011/eeacb5178b7f46f0.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-011/e75d5ada4e3e39b9.webp",
+    "images": [
+      "/uploads/products/prod-mol-011/e75d5ada4e3e39b9.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:02.028+00:00"
+  },
+  {
+    "id": "prod-mol-012",
+    "slug": "moletom-pocket-cargo",
+    "title": "Moletom Pocket Cargo",
+    "subtitle": "",
+    "description": "Bolsos grandes frontais\nBolsos adicionais laterais\nDetalhes utilitários\nCapuz amplo\nCorpo oversized\nVisual inspirado em roupas cargo",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-012",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "verde-militar",
+        "colorName": "Verde Militar",
+        "colorHex": "#494431",
+        "image": "/uploads/products/prod-mol-012/69778621e195a346.webp",
+        "featuredImage": "/uploads/products/prod-mol-012/69778621e195a346.webp",
+        "images": [
+          "/uploads/products/prod-mol-012/69778621e195a346.webp"
+        ]
+      },
+      {
+        "color": "grey",
+        "colorName": "Cinza Mescla",
+        "colorHex": "#000000",
+        "image": "/uploads/products/prod-mol-012/223845ebb4e8ce57.webp",
+        "featuredImage": "/uploads/products/prod-mol-012/223845ebb4e8ce57.webp",
+        "images": [
+          "/uploads/products/prod-mol-012/223845ebb4e8ce57.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-012/4e41986fdf7513bb.webp",
+    "images": [
+      "/uploads/products/prod-mol-012/4e41986fdf7513bb.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:02.249+00:00"
+  },
+  {
+    "id": "prod-mol-013",
+    "slug": "moletom-raglan-sport",
+    "title": "Moletom Raglan Sport",
+    "subtitle": "",
+    "description": "Mangas raglan\nCostura da manga partindo da gola\nRecortes esportivos\nCorpo largo\nPunhos contrastantes\nInspiração em roupas esportivas retrô",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-013",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "branco-preto",
+        "colorName": "Branco + Preto",
+        "colorHex": "#f7f3f3",
+        "image": "/uploads/products/prod-mol-013/e9db15da531c35f0.webp",
+        "featuredImage": "/uploads/products/prod-mol-013/e9db15da531c35f0.webp",
+        "images": [
+          "/uploads/products/prod-mol-013/e9db15da531c35f0.webp"
+        ]
+      },
+      {
+        "color": "preto-cinza",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#71717A",
+        "image": "/uploads/products/prod-mol-013/87bfc6156709e82d.webp",
+        "featuredImage": "/uploads/products/prod-mol-013/87bfc6156709e82d.webp",
+        "images": [
+          "/uploads/products/prod-mol-013/87bfc6156709e82d.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-013/a9f42d47a359bde0.webp",
+    "images": [
+      "/uploads/products/prod-mol-013/a9f42d47a359bde0.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:02.472+00:00"
+  },
+  {
+    "id": "prod-mol-014",
+    "slug": "moletom-raw-seam",
+    "title": "Moletom Raw Seam",
+    "subtitle": "",
+    "description": "Costuras viradas para fora\nBarra parcialmente sem acabamento\nBordas cruas\nConstrução desconstruída\nModelagem boxy\nAparência propositalmente imperfeita",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-014",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-014/99d4225563642768.webp",
+        "featuredImage": "/uploads/products/prod-mol-014/99d4225563642768.webp",
+        "images": [
+          "/uploads/products/prod-mol-014/99d4225563642768.webp"
+        ]
+      },
+      {
+        "color": "cinza-",
+        "colorName": "Cinza",
+        "colorHex": "#9e9ea3",
+        "image": "/uploads/products/prod-mol-014/428ac275e1e4f573.webp",
+        "featuredImage": "/uploads/products/prod-mol-014/428ac275e1e4f573.webp",
+        "images": [
+          "/uploads/products/prod-mol-014/428ac275e1e4f573.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-014/4bccc5cec0ac9455.webp",
+    "images": [
+      "/uploads/products/prod-mol-014/4bccc5cec0ac9455.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:02.695+00:00"
+  },
+  {
+    "id": "prod-mol-015",
+    "slug": "moletom-sherpa-panel",
+    "title": "Moletom Sherpa Panel",
+    "subtitle": "",
+    "description": "Painéis em tecido sherpa\nMistura de tecidos lisos e felpudos\nConstrução estruturada\nAparência pesada\nVisual de inverno\nContraste forte de texturas",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-015",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto-cinza",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-015/3ff6b495d6a5d077.webp",
+        "featuredImage": "/uploads/products/prod-mol-015/3ff6b495d6a5d077.webp",
+        "images": [
+          "/uploads/products/prod-mol-015/3ff6b495d6a5d077.webp"
+        ]
+      },
+      {
+        "color": "marrom-bege",
+        "colorName": "Marrom + Bege",
+        "colorHex": "#5d4842",
+        "image": "/uploads/products/prod-mol-015/9024f8c024acfc1a.webp",
+        "featuredImage": "/uploads/products/prod-mol-015/9024f8c024acfc1a.webp",
+        "images": [
+          "/uploads/products/prod-mol-015/9024f8c024acfc1a.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-015/aac2a575c646a3ed.webp",
+    "images": [
+      "/uploads/products/prod-mol-015/aac2a575c646a3ed.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:02.906+00:00"
+  },
+  {
+    "id": "prod-mol-016",
+    "slug": "moletom-sleeveless-hoodie",
+    "title": "Moletom Sleeveless Hoodie",
+    "subtitle": "",
+    "description": "Sem mangas\nOmbros largos\nCapuz grande\nCavas amplas\nCorpo oversized\nIdeal para sobreposição com camiseta",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-016",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-016/35ede30c1be7277d.webp",
+        "featuredImage": "/uploads/products/prod-mol-016/35ede30c1be7277d.webp",
+        "images": [
+          "/uploads/products/prod-mol-016/35ede30c1be7277d.webp"
+        ]
+      },
+      {
+        "color": "grey",
+        "colorName": "Cinza Mescla",
+        "colorHex": "#71717A",
+        "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+        "featuredImage": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+        "images": [
+          "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+    "images": [
+      "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:03.121+00:00"
+  },
+  {
+    "id": "prod-mol-017",
+    "slug": "moletom-striped-heavy",
+    "title": "Moletom Striped Heavy",
+    "subtitle": "",
+    "description": "Listras horizontais largas\nTecido pesado\nModelagem oversized\nOmbros caídos\nMangas largas\nVisual streetwear retrô",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-017",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto-branco",
+        "colorName": "Preto + Branco",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-017/26474fde97894e60.webp",
+        "featuredImage": "/uploads/products/prod-mol-017/26474fde97894e60.webp",
+        "images": [
+          "/uploads/products/prod-mol-017/26474fde97894e60.webp"
+        ]
+      },
+      {
+        "color": "marrom-bege",
+        "colorName": "Marrom + Bege",
+        "colorHex": "#755645",
+        "image": "/uploads/products/prod-mol-017/d9590779a4ac8200.webp",
+        "featuredImage": "/uploads/products/prod-mol-017/d9590779a4ac8200.webp",
+        "images": [
+          "/uploads/products/prod-mol-017/d9590779a4ac8200.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-017/d811ab0ca67e64e2.webp",
+    "images": [
+      "/uploads/products/prod-mol-017/d811ab0ca67e64e2.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:03.346+00:00"
+  },
+  {
+    "id": "prod-mol-018",
+    "slug": "moletom-varsity-oversized",
+    "title": "Moletom Varsity Oversized",
+    "subtitle": "",
+    "description": "Inspiração universitária\nLetras ou aplicações grandes\nPunhos e barra com listras\nCorpo oversized\nOmbros largos\nVisual varsity streetwear",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-018",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-018/3335df8f5d745176.webp",
+        "featuredImage": "/uploads/products/prod-mol-018/3335df8f5d745176.webp",
+        "images": [
+          "/uploads/products/prod-mol-018/3335df8f5d745176.webp"
+        ]
+      },
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#47352a",
+        "image": "/uploads/products/prod-mol-018/ba9326b671318624.webp",
+        "featuredImage": "/uploads/products/prod-mol-018/ba9326b671318624.webp",
+        "images": [
+          "/uploads/products/prod-mol-018/ba9326b671318624.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-018/e2e8d15f7767f5f1.webp",
+    "images": [
+      "/uploads/products/prod-mol-018/e2e8d15f7767f5f1.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:03.572+00:00"
+  },
+  {
+    "id": "prod-mol-019",
+    "slug": "moletom-zip-up-washed",
+    "title": "Moletom Zip Up Washed",
+    "subtitle": "",
+    "description": "Zíper frontal completo\nCapuz tradicional\nLavagem estonada\nAparência desbotada\nModelagem oversized\nVisual vintage\nTecido com aspecto envelhecido",
+    "price": 349.9,
+    "category": "moletons",
+    "subcategory": "Moletons",
+    "collection": "Coleção Marmot Atelier",
+    "tags": [
+      "lançamento"
+    ],
+    "rating": 5,
+    "reviewCount": 0,
+    "stockCount": 25,
+    "sku": "MM-MOL-019",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "preto-lavado",
+        "colorName": "Preto Lavado",
+        "colorHex": "#121212",
+        "image": "/uploads/products/prod-mol-019/1f70a283a853c5d3.webp",
+        "featuredImage": "/uploads/products/prod-mol-019/1f70a283a853c5d3.webp",
+        "images": [
+          "/uploads/products/prod-mol-019/1f70a283a853c5d3.webp"
+        ]
+      },
+      {
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6f5751",
+        "image": "/uploads/products/prod-mol-019/92cf6d4940bc3b2f.webp",
+        "featuredImage": "/uploads/products/prod-mol-019/92cf6d4940bc3b2f.webp",
+        "images": [
+          "/uploads/products/prod-mol-019/92cf6d4940bc3b2f.webp"
+        ]
+      }
+    ],
+    "image": "/uploads/products/prod-mol-019/303ee9917ee14cea.webp",
+    "images": [
+      "/uploads/products/prod-mol-019/303ee9917ee14cea.webp"
+    ],
+    "details": [
+      "Modelagem exclusiva Marmot",
+      "Acabamento pespontado reforçado",
+      "Confeccionado artesanalmente"
+    ],
+    "careInstructions": [
+      "Lavar do avesso em água fria",
+      "Não usar secadora rotativa",
+      "Secar à sombra"
+    ],
+    "composition": [
+      "100% Algodão Heavyweight"
+    ],
+    "reviews": [],
+    "weight": 0.85,
+    "height": 8,
+    "width": 30,
+    "length": 35,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-24T22:56:03.79+00:00"
   },
   {
     "id": "prod-ten-001",
@@ -2641,1146 +5822,755 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "createdAt": "2026-08-25T02:08:29.296+00:00"
   },
   {
-    "id": "prod-sho-015",
-    "slug": "shorts-corduroy-baggy",
-    "title": "Shorts Corduroy Baggy",
-    "subtitle": "Veludo cotelê encorpado",
-    "description": "Veludo cotelê encorpado\nTextura marcada por linhas verticais\nModelagem baggy\nPernas largas\nCaimento pesado e confortável\nVisual retrô",
-    "price": 269.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
+    "id": "prod-ten-002",
+    "slug": "tenis-skate",
+    "title": "Tênis Skate",
+    "subtitle": "Silhueta larga",
+    "description": "Silhueta larga\nLíngua acolchoada\nSolado reto\nCabedal reforçado\nVisual inspirado no skate dos anos 2000",
+    "price": 499.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
     "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 14,
-    "stockCount": 29,
-    "sku": "MM-SHO-015",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "dark_brown",
-        "colorName": "Marrom escuro",
-        "colorHex": "#422E1E",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Veludo cotelê encorpado",
-      "Textura marcada por linhas verticais",
-      "Modelagem baggy",
-      "Pernas largas",
-      "Caimento pesado e confortável",
-      "Visual retrô"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:18.301+00:00"
-  },
-  {
-    "id": "prod-sho-014",
-    "slug": "shorts-track-oversized",
-    "title": "Shorts Track Oversized",
-    "subtitle": "Inspiração em roupas esportivas",
-    "description": "Inspiração em roupas esportivas\nModelagem oversized\nTecido leve\nFaixas ou recortes laterais\nCintura elástica\nVisual retrô esportivo",
-    "price": 229.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 13,
-    "stockCount": 28,
-    "sku": "MM-SHO-014",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black_offwhite",
-        "colorName": "Preto + Off White",
-        "colorHex": "#181818",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "brown_beige",
-        "colorName": "Marrom + Bege",
-        "colorHex": "#6A4E36",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Inspiração em roupas esportivas",
-      "Modelagem oversized",
-      "Tecido leve",
-      "Faixas ou recortes laterais",
-      "Cintura elástica",
-      "Visual retrô esportivo"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:18.083+00:00"
-  },
-  {
-    "id": "prod-sho-013",
-    "slug": "shorts-pleated-wide",
-    "title": "Shorts Pleated Wide",
-    "subtitle": "Pregas frontais",
-    "description": "Pregas frontais\nPernas extremamente largas\nCintura estruturada\nCaimento fluido\nComprimento próximo aos joelhos\nVisual sofisticado com influência streetwear",
-    "price": 269.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 12,
-    "stockCount": 27,
-    "sku": "MM-SHO-013",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "charcoal",
-        "colorName": "Cinza chumbo",
-        "colorHex": "#333842",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Pregas frontais",
-      "Pernas extremamente largas",
-      "Cintura estruturada",
-      "Caimento fluido",
-      "Comprimento próximo aos joelhos",
-      "Visual sofisticado com influência streetwear"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:17.866+00:00"
-  },
-  {
-    "id": "prod-sho-012",
-    "slug": "shorts-raw-hem",
-    "title": "Shorts Raw Hem",
-    "subtitle": "Barra propositalmente sem acabamento tradicional",
-    "description": "Barra propositalmente sem acabamento tradicional\nFios e bordas aparentes\nCosturas expostas\nModelagem larga\nVisual desconstruído\nEstética grunge e streetwear",
-    "price": 239.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
+      "Tênis",
+      "Sneakers",
       "Streetwear"
     ],
     "rating": 5,
     "reviewCount": 23,
-    "stockCount": 26,
-    "sku": "MM-SHO-012",
+    "stockCount": 19,
+    "sku": "MM-TEN-002",
     "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
     ],
     "colors": [
       {
-        "color": "washed_black",
-        "colorName": "Preto lavado",
-        "colorHex": "#2E2E2E",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+        "color": "black_white",
+        "colorName": "Preto + Branco",
+        "colorHex": "#181818",
+        "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "washed_grey",
-        "colorName": "Cinza lavado",
-        "colorHex": "#5A5A5A",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Barra propositalmente sem acabamento tradicional",
-      "Fios e bordas aparentes",
-      "Costuras expostas",
-      "Modelagem larga",
-      "Visual desconstruído",
-      "Estética grunge e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:17.646+00:00"
-  },
-  {
-    "id": "prod-sho-011",
-    "slug": "shorts-patchwork",
-    "title": "Shorts Patchwork",
-    "subtitle": "Painéis de tecidos diferentes",
-    "description": "Painéis de tecidos diferentes\nVariação de textura\nRecortes irregulares\nCosturas visíveis\nModelagem relaxada\nEstética artesanal e experimental",
-    "price": 289.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 22,
-    "stockCount": 25,
-    "sku": "MM-SHO-011",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black_grey",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#2A2D34",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
         ]
       },
       {
         "color": "brown_beige",
         "colorName": "Marrom + Bege",
-        "colorHex": "#7A5C43",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
+        "colorHex": "#634832",
+        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Painéis de tecidos diferentes",
-      "Variação de textura",
-      "Recortes irregulares",
-      "Costuras visíveis",
-      "Modelagem relaxada",
-      "Estética artesanal e experimental"
+      "Silhueta larga",
+      "Língua acolchoada",
+      "Solado reto",
+      "Cabedal reforçado",
+      "Visual inspirado no skate dos anos 2000"
     ],
     "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
     ],
     "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
     ],
     "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:08:29.89+00:00"
+  },
+  {
+    "id": "prod-ten-003",
+    "slug": "tenis-retro-runner",
+    "title": "Tênis Retro Runner",
+    "subtitle": "Inspiração em tênis de corrida antigos",
+    "description": "Inspiração em tênis de corrida antigos\nMistura de mesh e camurça\nSolado intermediário volumoso\nPainéis contrastantes\nVisual retrô e esportivo",
+    "price": 529.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "tags": [
+      "Tênis",
+      "Sneakers",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 24,
+    "stockCount": 20,
+    "sku": "MM-TEN-003",
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "color": "grey_silver",
+        "colorName": "Cinza + Prata",
+        "colorHex": "#9EA4AD",
+        "image": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "black_grey",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#262626",
+        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Inspiração em tênis de corrida antigos",
+      "Mistura de mesh e camurça",
+      "Solado intermediário volumoso",
+      "Painéis contrastantes",
+      "Visual retrô e esportivo"
+    ],
+    "careInstructions": [
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
+    ],
+    "composition": [
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+    ],
+    "reviews": [],
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:08:30.099+00:00"
+  },
+  {
+    "id": "prod-ten-004",
+    "slug": "tenis-high-top",
+    "title": "Tênis High Top",
+    "subtitle": "Cano alto",
+    "description": "Cano alto\nEstrutura reforçada no tornozelo\nSolado robusto\nVisual urbano\nSilhueta marcante",
+    "price": 569.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "tags": [
+      "Tênis",
+      "Sneakers",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 25,
+    "stockCount": 21,
+    "sku": "MM-TEN-004",
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "offwhite",
+        "colorName": "Off White",
+        "colorHex": "#F0EFEA",
+        "image": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Cano alto",
+      "Estrutura reforçada no tornozelo",
+      "Solado robusto",
+      "Visual urbano",
+      "Silhueta marcante"
+    ],
+    "careInstructions": [
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
+    ],
+    "composition": [
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+    ],
+    "reviews": [],
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T00:22:17.434+00:00"
+    "createdAt": "2026-08-25T02:08:30.309+00:00"
   },
   {
-    "id": "prod-sho-010",
-    "slug": "shorts-panel-construction",
-    "title": "Shorts Panel Construction",
-    "subtitle": "Recortes geométricos",
-    "description": "Recortes geométricos\nPainéis sobrepostos\nCosturas aparentes\nConstrução arquitetônica\nModelagem ampla\nVisual experimental",
-    "price": 279.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
+    "id": "prod-ten-005",
+    "slug": "tenis-low-profile",
+    "title": "Tênis Low Profile",
+    "subtitle": "Silhueta baixa e fina",
+    "description": "Silhueta baixa e fina\nSolado discreto\nConstrução minimalista\nVisual retrô\nFormato alongado",
+    "price": 479.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
     "tags": [
-      "Shorts",
-      "Bermudas",
+      "Tênis",
+      "Sneakers",
       "Streetwear"
     ],
     "rating": 5,
-    "reviewCount": 21,
-    "stockCount": 34,
-    "sku": "MM-SHO-010",
+    "reviewCount": 26,
+    "stockCount": 22,
+    "sku": "MM-TEN-005",
     "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "color": "black_white",
+        "colorName": "Preto + Branco",
+        "colorHex": "#181818",
+        "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "brown_cream",
+        "colorName": "Marrom + Creme",
+        "colorHex": "#5C4033",
+        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Silhueta baixa e fina",
+      "Solado discreto",
+      "Construção minimalista",
+      "Visual retrô",
+      "Formato alongado"
+    ],
+    "careInstructions": [
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
+    ],
+    "composition": [
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+    ],
+    "reviews": [],
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:08:30.522+00:00"
+  },
+  {
+    "id": "prod-ten-006",
+    "slug": "tenis-tech-runner",
+    "title": "Tênis Tech Runner",
+    "subtitle": "Mesh respirável",
+    "description": "Mesh respirável\nRecortes técnicos\nSolado com aparência futurista\nEstrutura leve\nVisual esportivo e tecnológico",
+    "price": 579.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "tags": [
+      "Tênis",
+      "Sneakers",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 27,
+    "stockCount": 23,
+    "sku": "MM-TEN-006",
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
     ],
     "colors": [
       {
         "color": "black_graphite",
         "colorName": "Preto + Grafite",
-        "colorHex": "#1A1D20",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+        "colorHex": "#1F2124",
+        "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80"
         ]
       },
       {
-        "color": "beige_brown",
-        "colorName": "Bege + Marrom",
-        "colorHex": "#8B6D53",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
+        "color": "grey_silver",
+        "colorName": "Cinza + Prata",
+        "colorHex": "#A0A5AC",
+        "image": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1560769629-975ec94e6a86?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Recortes geométricos",
-      "Painéis sobrepostos",
-      "Costuras aparentes",
-      "Construção arquitetônica",
-      "Modelagem ampla",
-      "Visual experimental"
+      "Mesh respirável",
+      "Recortes técnicos",
+      "Solado com aparência futurista",
+      "Estrutura leve",
+      "Visual esportivo e tecnológico"
     ],
     "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
     ],
     "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
     ],
     "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T00:22:17.213+00:00"
+    "createdAt": "2026-08-25T02:08:30.736+00:00"
   },
   {
-    "id": "prod-sho-009",
-    "slug": "shorts-multi-pocket",
-    "title": "Shorts Multi Pocket",
-    "subtitle": "Grande quantidade de bolsos",
-    "description": "Grande quantidade de bolsos\nCompartimentos frontais e laterais\nBolsos sobrepostos\nModelagem baggy\nConstrução utilitária\nVisual streetwear maximalista",
-    "price": 269.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
+    "id": "prod-ten-007",
+    "slug": "tenis-distressed",
+    "title": "Tênis Distressed",
+    "subtitle": "Acabamento propositalmente envelhecido",
+    "description": "Acabamento propositalmente envelhecido\nÁreas desgastadas\nSolado com aparência usada\nConstrução robusta\nEstética grunge",
+    "price": 539.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
     "tags": [
-      "Shorts",
-      "Bermudas",
+      "Tênis",
+      "Sneakers",
       "Streetwear"
     ],
     "rating": 5,
-    "reviewCount": 20,
-    "stockCount": 33,
-    "sku": "MM-SHO-009",
+    "reviewCount": 28,
+    "stockCount": 24,
+    "sku": "MM-TEN-007",
     "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
     ],
     "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "military_green",
-        "colorName": "Verde militar",
-        "colorHex": "#3F4839",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Grande quantidade de bolsos",
-      "Compartimentos frontais e laterais",
-      "Bolsos sobrepostos",
-      "Modelagem baggy",
-      "Construção utilitária",
-      "Visual streetwear maximalista"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:16.974+00:00"
-  },
-  {
-    "id": "prod-sho-008",
-    "slug": "shorts-tactical",
-    "title": "Shorts Tactical",
-    "subtitle": "Bolsos modulares",
-    "description": "Bolsos modulares\nFivelas e straps\nTecido resistente\nModelagem ampla\nDetalhes inspirados em equipamento militar\nVisual técnico e agressivo",
-    "price": 279.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 19,
-    "stockCount": 32,
-    "sku": "MM-SHO-008",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "lead",
-        "colorName": "Chumbo",
-        "colorHex": "#2E3440",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Bolsos modulares",
-      "Fivelas e straps",
-      "Tecido resistente",
-      "Modelagem ampla",
-      "Detalhes inspirados em equipamento militar",
-      "Visual técnico e agressivo"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:16.758+00:00"
-  },
-  {
-    "id": "prod-sho-007",
-    "slug": "shorts-nylon-utility",
-    "title": "Shorts Nylon Utility",
-    "subtitle": "Nylon leve",
-    "description": "Nylon leve\nBolsos utilitários\nCintura com ajuste\nConstrução funcional\nModelagem relaxada\nVisual esportivo e técnico",
-    "price": 239.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 18,
-    "stockCount": 31,
-    "sku": "MM-SHO-007",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "graphite",
-        "colorName": "Grafite",
-        "colorHex": "#3E424B",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Nylon leve",
-      "Bolsos utilitários",
-      "Cintura com ajuste",
-      "Construção funcional",
-      "Modelagem relaxada",
-      "Visual esportivo e técnico"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:16.524+00:00"
-  },
-  {
-    "id": "prod-sho-006",
-    "slug": "shorts-parachute",
-    "title": "Shorts Parachute",
-    "subtitle": "Modelagem muito ampla",
-    "description": "Modelagem muito ampla\nTecido leve e técnico\nBolsos funcionais\nCintura ajustável\nCordões ou reguladores\nVisual inspirado nos anos 2000",
-    "price": 249.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 17,
-    "stockCount": 30,
-    "sku": "MM-SHO-006",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "olive_green",
-        "colorName": "Verde oliva",
-        "colorHex": "#4A5340",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Modelagem muito ampla",
-      "Tecido leve e técnico",
-      "Bolsos funcionais",
-      "Cintura ajustável",
-      "Cordões ou reguladores",
-      "Visual inspirado nos anos 2000"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:16.297+00:00"
-  },
-  {
-    "id": "prod-sho-005",
-    "slug": "shorts-denim-distressed",
-    "title": "Shorts Denim Distressed",
-    "subtitle": "Jeans com áreas desgastadas",
-    "description": "Jeans com áreas desgastadas\nRasgos e pontos propositalmente puídos\nBarra com acabamento bruto\nLavagem irregular\nModelagem ampla\nEstética grunge",
-    "price": 269.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 16,
-    "stockCount": 29,
-    "sku": "MM-SHO-005",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "acid_black",
-        "colorName": "Preto estonado",
-        "colorHex": "#333333",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "light_blue",
-        "colorName": "Azul claro lavado",
-        "colorHex": "#7B9EB8",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Jeans com áreas desgastadas",
-      "Rasgos e pontos propositalmente puídos",
-      "Barra com acabamento bruto",
-      "Lavagem irregular",
-      "Modelagem ampla",
-      "Estética grunge"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:16.072+00:00"
-  },
-  {
-    "id": "prod-sho-004",
-    "slug": "shorts-denim-washed",
-    "title": "Shorts Denim Washed",
-    "subtitle": "Jeans pesado",
-    "description": "Jeans pesado\nLavagem envelhecida\nEfeito desbotado\nModelagem baggy\nBarra ampla\nVisual vintage e streetwear",
-    "price": 259.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
-    "tags": [
-      "Shorts",
-      "Bermudas",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 15,
-    "stockCount": 28,
-    "sku": "MM-SHO-004",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "washed_blue",
-        "colorName": "Azul lavado",
-        "colorHex": "#4B6B94",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
       {
         "color": "washed_black",
         "colorName": "Preto lavado",
         "colorHex": "#2B2B2B",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "aged_beige",
+        "colorName": "Bege envelhecido",
+        "colorHex": "#BFAC8E",
+        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Jeans pesado",
-      "Lavagem envelhecida",
-      "Efeito desbotado",
-      "Modelagem baggy",
-      "Barra ampla",
-      "Visual vintage e streetwear"
+      "Acabamento propositalmente envelhecido",
+      "Áreas desgastadas",
+      "Solado com aparência usada",
+      "Construção robusta",
+      "Estética grunge"
     ],
     "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
     ],
     "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
     ],
     "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T00:22:15.855+00:00"
+    "createdAt": "2026-08-25T02:08:30.95+00:00"
   },
   {
-    "id": "prod-sho-003",
-    "slug": "shorts-double-knee",
-    "title": "Shorts Double Knee",
-    "subtitle": "Painéis reforçados na parte frontal",
-    "description": "Painéis reforçados na parte frontal\nCosturas aparentes\nTecido encorpado\nModelagem larga\nConstrução robusta\nInspiração em roupas de trabalho",
-    "price": 269.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
+    "id": "prod-ten-008",
+    "slug": "tenis-platform",
+    "title": "Tênis Platform",
+    "subtitle": "Solado extremamente alto",
+    "description": "Solado extremamente alto\nBase larga\nCabedal estruturado\nSilhueta pesada\nVisual streetwear experimental",
+    "price": 589.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
     "tags": [
-      "Shorts",
-      "Bermudas",
+      "Tênis",
+      "Sneakers",
       "Streetwear"
     ],
     "rating": 5,
-    "reviewCount": 14,
-    "stockCount": 27,
-    "sku": "MM-SHO-003",
+    "reviewCount": 29,
+    "stockCount": 25,
+    "sku": "MM-TEN-008",
     "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
     ],
     "colors": [
       {
         "color": "black",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+        "image": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
         ]
       },
       {
-        "color": "beige",
-        "colorName": "Bege",
-        "colorHex": "#C8AD7F",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
+        "color": "charcoal",
+        "colorName": "Cinza chumbo",
+        "colorHex": "#383D48",
+        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Painéis reforçados na parte frontal",
-      "Costuras aparentes",
-      "Tecido encorpado",
-      "Modelagem larga",
-      "Construção robusta",
-      "Inspiração em roupas de trabalho"
+      "Solado extremamente alto",
+      "Base larga",
+      "Cabedal estruturado",
+      "Silhueta pesada",
+      "Visual streetwear experimental"
     ],
     "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
     ],
     "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
     ],
     "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
     "isNewRelease": true,
-    "isBestSeller": true,
+    "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T00:22:15.603+00:00"
+    "createdAt": "2026-08-25T02:08:31.162+00:00"
   },
   {
-    "id": "prod-sho-002",
-    "slug": "shorts-carpenter",
-    "title": "Shorts Carpenter",
-    "subtitle": "Modelagem reta e ampla",
-    "description": "Modelagem reta e ampla\nBolsos utilitários\nAlça lateral inspirada em ferramentas\nCosturas reforçadas\nTecido resistente\nEstética workwear",
-    "price": 259.9,
-    "category": "shorts",
-    "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
+    "id": "prod-ten-009",
+    "slug": "tenis-trail-street",
+    "title": "Tênis Trail Street",
+    "subtitle": "Solado tratorado",
+    "description": "Solado tratorado\nCabedal com mesh e painéis reforçados\nAmarração técnica\nEstrutura robusta\nInspiração em tênis de trilha e outdoor",
+    "price": 569.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
     "tags": [
-      "Shorts",
-      "Bermudas",
+      "Tênis",
+      "Sneakers",
       "Streetwear"
     ],
     "rating": 5,
-    "reviewCount": 13,
-    "stockCount": 26,
-    "sku": "MM-SHO-002",
+    "reviewCount": 30,
+    "stockCount": 18,
+    "sku": "MM-TEN-009",
     "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
     ],
     "colors": [
       {
-        "color": "brown",
-        "colorName": "Marrom",
-        "colorHex": "#5C4033",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
+        "color": "black_grey",
+        "colorName": "Preto + Cinza",
+        "colorHex": "#202226",
+        "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80"
         ]
       },
       {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+        "color": "beige_olive",
+        "colorName": "Bege + Verde oliva",
+        "colorHex": "#606852",
+        "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
         "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
+          "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
+    "image": "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
     "images": [
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80"
+      "https://images.unsplash.com/photo-1539185441755-769473a23570?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=1000&q=80"
     ],
     "details": [
-      "Modelagem reta e ampla",
-      "Bolsos utilitários",
-      "Alça lateral inspirada em ferramentas",
-      "Costuras reforçadas",
-      "Tecido resistente",
-      "Estética workwear"
+      "Solado tratorado",
+      "Cabedal com mesh e painéis reforçados",
+      "Amarração técnica",
+      "Estrutura robusta",
+      "Inspiração em tênis de trilha e outdoor"
     ],
     "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
     ],
     "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
     ],
     "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
     "isNewRelease": true,
-    "isBestSeller": true,
+    "isBestSeller": false,
     "featured": true,
     "status": "active",
-    "createdAt": "2026-08-25T00:22:15.364+00:00"
+    "createdAt": "2026-08-25T02:08:31.376+00:00"
+  },
+  {
+    "id": "prod-ten-010",
+    "slug": "tenis-panel-layered",
+    "title": "Tênis Panel Layered",
+    "subtitle": "Vários painéis sobrepostos no cabedal",
+    "description": "Vários painéis sobrepostos no cabedal\nMistura de texturas e materiais\nSolado médio e estruturado\nConstrução visualmente complexa\nEstética experimental e contemporânea",
+    "price": 579.9,
+    "category": "tenis",
+    "subcategory": "Tênis",
+    "collection": "Coleção Marmot Footwear Atelier 2026",
+    "tags": [
+      "Tênis",
+      "Sneakers",
+      "Streetwear"
+    ],
+    "rating": 5,
+    "reviewCount": 31,
+    "stockCount": 19,
+    "sku": "MM-TEN-010",
+    "sizes": [
+      "38",
+      "39",
+      "40",
+      "41",
+      "42",
+      "43"
+    ],
+    "colors": [
+      {
+        "color": "black_lead",
+        "colorName": "Preto + Chumbo",
+        "colorHex": "#1A1D24",
+        "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "grey_offwhite",
+        "colorName": "Cinza + Off White",
+        "colorHex": "#B0B5BD",
+        "image": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1552346154-21d32810aba3?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1579338559194-a162d19bf842?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Vários painéis sobrepostos no cabedal",
+      "Mistura de texturas e materiais",
+      "Solado médio e estruturado",
+      "Construção visualmente complexa",
+      "Estética experimental e contemporânea"
+    ],
+    "careInstructions": [
+      "Limpar com pano levemente umedecido e sabão neutro",
+      "Não lavar na máquina nem mergulhar em água",
+      "Secar à sombra em local ventilado"
+    ],
+    "composition": [
+      "Couro Premium, Camurça e Mesh Respirável / Solado em Borracha Termoplástica Vulcanizada"
+    ],
+    "reviews": [],
+    "weight": 1.1,
+    "height": 14,
+    "width": 24,
+    "length": 34,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:08:31.592+00:00"
   },
   {
     "id": "prod-sho-001",
-    "slug": "shorts-cargo-baggy",
-    "title": "Shorts Cargo Baggy",
-    "subtitle": "Modelagem ampla e solta",
-    "description": "Modelagem ampla e solta\nBolsos cargo laterais grandes\nPernas largas\nCintura confortável\nDetalhes utilitários\nVisual streetwear funcional",
-    "price": 249.9,
+    "slug": "shorts-baggy-denim",
+    "title": "Shorts Baggy Denim",
+    "subtitle": "Modelagem baggy streetwear autêntica",
+    "description": "Modelagem baggy streetwear autêntica\nJeans heavyweight 100% algodão premium\nCós estruturado com passantes reforçados\nBolsos frontais e traseiros fundos\nCaimento amplo na altura dos joelhos\nPespontos reforçados para alta durabilidade",
+    "price": 259.9,
     "category": "shorts",
     "subcategory": "Shorts",
-    "collection": "Coleção Marmot Summer & Cargo 2026",
+    "collection": "Coleção Marmot Summer & Utility 2026",
     "tags": [
       "Shorts",
       "Bermudas",
-      "Streetwear"
+      "Streetwear",
+      "Lançamento",
+      "Shorts Baggy Denim"
     ],
     "rating": 5,
-    "reviewCount": 12,
-    "stockCount": 25,
+    "reviewCount": 14,
+    "stockCount": 22,
     "sku": "MM-SHO-001",
     "sizes": [
       "P",
@@ -3791,3381 +6581,96 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      },
-      {
-        "color": "sand_beige",
-        "colorName": "Bege areia",
-        "colorHex": "#D2B48C",
-        "image": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80",
-        "images": [
-          "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-        ]
-      }
-    ],
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-    "images": [
-      "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
-      "https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "details": [
-      "Modelagem ampla e solta",
-      "Bolsos cargo laterais grandes",
-      "Pernas largas",
-      "Cintura confortável",
-      "Detalhes utilitários",
-      "Visual streetwear funcional"
-    ],
-    "careInstructions": [
-      "Lavar em água fria no ciclo delicado",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.45,
-    "height": 4,
-    "width": 26,
-    "length": 32,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:22:15.118+00:00"
-  },
-  {
-    "id": "prod-cal-018",
-    "slug": "calca-zip-off",
-    "title": "Calça Zip Off",
-    "subtitle": "Zíper horizontal nas pernas",
-    "description": "Zíper horizontal nas pernas\nPartes inferiores removíveis\nPossibilidade de transformar em bermuda\nConstrução modular\nDetalhes técnicos\nVisual funcional e utilitário",
-    "price": 369.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 18,
-    "stockCount": 27,
-    "sku": "MM-CAL-018",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png"
-        ]
-      },
-      {
-        "color": "verde",
-        "colorName": "Verde",
-        "colorHex": "#50633F",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/preto/01-d66e4480d5f1293f.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-zip-off/verde/01-74c58e5a807fc00a.png"
-    ],
-    "details": [
-      "Zíper horizontal nas pernas",
-      "Partes inferiores removíveis",
-      "Possibilidade de transformar em bermuda",
-      "Construção modular",
-      "Detalhes técnicos",
-      "Visual funcional e utilitário"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:38.103+00:00"
-  },
-  {
-    "id": "prod-cal-017",
-    "slug": "calca-wide-leg",
-    "title": "Calça Wide Leg",
-    "subtitle": "Pernas largas do quadril até a barra",
-    "description": "Pernas largas do quadril até a barra\nModelagem ampla e reta\nCaimento solto\nSilhueta alongada\nConstrução minimalista\nVisual moderno e streetwear",
-    "price": 329.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 17,
-    "stockCount": 26,
-    "sku": "MM-CAL-017",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png"
-        ]
-      },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#7A7D80",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/preto/01-646ff27370a1ffa4.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-wide-leg/cinza/01-0b7cb2d818af252f.png"
-    ],
-    "details": [
-      "Pernas largas do quadril até a barra",
-      "Modelagem ampla e reta",
-      "Caimento solto",
-      "Silhueta alongada",
-      "Construção minimalista",
-      "Visual moderno e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:37.829+00:00"
-  },
-  {
-    "id": "prod-cal-016",
-    "slug": "calca-washed-baggy",
-    "title": "Calça Washed Baggy",
-    "subtitle": "Lavagem envelhecida",
-    "description": "Lavagem envelhecida\nEfeito desbotado\nModelagem baggy\nPernas amplas\nTecido com aparência usada\nVisual vintage e streetwear",
-    "price": 339.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 16,
-    "stockCount": 25,
-    "sku": "MM-CAL-016",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png"
-        ]
-      },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#7A7D80",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/preto/01-ca066a2bc2115e9d.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-washed-baggy/cinza/01-3078cba0660bc6b2.png"
-    ],
-    "details": [
-      "Lavagem envelhecida",
-      "Efeito desbotado",
-      "Modelagem baggy",
-      "Pernas amplas",
-      "Tecido com aparência usada",
-      "Visual vintage e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:37.605+00:00"
-  },
-  {
-    "id": "prod-cal-015",
-    "slug": "calca-track-oversized",
-    "title": "Calça Track Oversized",
-    "subtitle": "Inspiração esportiva",
-    "description": "Inspiração esportiva\nModelagem oversized\nPernas largas\nTecido leve\nFaixas ou recortes laterais\nVisual retrô esportivo",
-    "price": 299.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 30,
-    "stockCount": 24,
-    "sku": "MM-CAL-015",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/preto/01-f90aaad2ff944e00.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-track-oversized/marrom/01-441b7065e072b2a4.png"
-    ],
-    "details": [
-      "Inspiração esportiva",
-      "Modelagem oversized",
-      "Pernas largas",
-      "Tecido leve",
-      "Faixas ou recortes laterais",
-      "Visual retrô esportivo"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:37.379+00:00"
-  },
-  {
-    "id": "prod-cal-014",
-    "slug": "calca-tactical",
-    "title": "Calça Tactical",
-    "subtitle": "Bolsos funcionais",
-    "description": "Bolsos funcionais\nFivelas e ajustes\nStraps ou detalhes modulares\nTecido resistente\nModelagem ampla\nVisual inspirado em equipamentos militares",
-    "price": 369.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 29,
-    "stockCount": 23,
-    "sku": "MM-CAL-014",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png"
-        ]
-      },
-      {
-        "color": "chumbo",
-        "colorName": "Chumbo",
-        "colorHex": "#4A4E52",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/preto/01-73e52a55eec03eb3.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-tactical/chumbo/01-3594ae98eb9a5299.png"
-    ],
-    "details": [
-      "Bolsos funcionais",
-      "Fivelas e ajustes",
-      "Straps ou detalhes modulares",
-      "Tecido resistente",
-      "Modelagem ampla",
-      "Visual inspirado em equipamentos militares"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:37.153+00:00"
-  },
-  {
-    "id": "prod-cal-013",
-    "slug": "calca-raw-seam",
-    "title": "Calça Raw Seam",
-    "subtitle": "Costuras propositalmente aparentes",
-    "description": "Costuras propositalmente aparentes\nAcabamentos crus\nBordas ou junções sem acabamento tradicional\nModelagem ampla\nConstrução desconstruída\nVisual experimental e streetwear",
-    "price": 329.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 28,
-    "stockCount": 22,
-    "sku": "MM-CAL-013",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png"
-        ]
-      },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#7A7D80",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/preto/01-0edb6ec1778b6331.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-raw-seam/cinza/01-9bf62dfa711c7f8d.png"
-    ],
-    "details": [
-      "Costuras propositalmente aparentes",
-      "Acabamentos crus",
-      "Bordas ou junções sem acabamento tradicional",
-      "Modelagem ampla",
-      "Construção desconstruída",
-      "Visual experimental e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:36.948+00:00"
-  },
-  {
-    "id": "prod-cal-012",
-    "slug": "calca-pleated-wide",
-    "title": "Calça Pleated Wide",
-    "subtitle": "Pregas frontais na cintura",
-    "description": "Pregas frontais na cintura\nPernas bem largas\nCaimento fluido\nCintura mais estruturada\nVolume elegante\nMistura de alfaiataria com streetwear",
-    "price": 349.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 27,
-    "stockCount": 21,
-    "sku": "MM-CAL-012",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png"
-        ]
-      },
-      {
-        "color": "grafite",
-        "colorName": "Grafite",
-        "colorHex": "#4B4F52",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/preto/01-995c82be6be02fd0.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-pleated-wide/grafite/01-d60f263cb87e7a0d.png"
-    ],
-    "details": [
-      "Pregas frontais na cintura",
-      "Pernas bem largas",
-      "Caimento fluido",
-      "Cintura mais estruturada",
-      "Volume elegante",
-      "Mistura de alfaiataria com streetwear"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:36.739+00:00"
-  },
-  {
-    "id": "prod-cal-011",
-    "slug": "calca-patchwork",
-    "title": "Calça Patchwork",
-    "subtitle": "Painéis de tecidos diferentes",
-    "description": "Painéis de tecidos diferentes\nMistura de cores ou lavagens\nCosturas aparentes\nConstrução assimétrica\nModelagem ampla\nVisual artesanal e experimental",
-    "price": 369.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 26,
-    "stockCount": 20,
-    "sku": "MM-CAL-011",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto-e-cinza",
-        "colorName": "Preto e Cinza",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png"
-        ]
-      },
-      {
-        "color": "marrom-e-bege",
-        "colorName": "Marrom e Bege",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/preto-e-cinza/01-985008c8af886bfa.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-patchwork/marrom-e-bege/01-c63201d7b3ff2200.png"
-    ],
-    "details": [
-      "Painéis de tecidos diferentes",
-      "Mistura de cores ou lavagens",
-      "Costuras aparentes",
-      "Construção assimétrica",
-      "Modelagem ampla",
-      "Visual artesanal e experimental"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:36.512+00:00"
-  },
-  {
-    "id": "prod-cal-010",
-    "slug": "calca-parachute",
-    "title": "Calça Parachute",
-    "subtitle": "Modelagem extremamente ampla",
-    "description": "Modelagem extremamente ampla\nTecido leve\nCordões ou ajustes na barra\nVolume acentuado nas pernas\nCintura ajustável\nVisual inspirado em roupas técnicas dos anos 2000",
-    "price": 339.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 25,
-    "stockCount": 29,
-    "sku": "MM-CAL-010",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png"
-        ]
-      },
-      {
-        "color": "chumbo",
-        "colorName": "Chumbo",
-        "colorHex": "#4A4E52",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/preto/01-972534148a088e12.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-parachute/chumbo/01-d48d0df6243193e4.png"
-    ],
-    "details": [
-      "Modelagem extremamente ampla",
-      "Tecido leve",
-      "Cordões ou ajustes na barra",
-      "Volume acentuado nas pernas",
-      "Cintura ajustável",
-      "Visual inspirado em roupas técnicas dos anos 2000"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:36.302+00:00"
-  },
-  {
-    "id": "prod-cal-009",
-    "slug": "calca-panel-construction",
-    "title": "Calça Panel Construction",
-    "subtitle": "Recortes geométricos nas pernas",
-    "description": "Recortes geométricos nas pernas\nPainéis sobrepostos\nCosturas visíveis\nConstrução arquitetônica\nModelagem ampla\nVisual experimental e moderno",
-    "price": 359.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 24,
-    "stockCount": 28,
-    "sku": "MM-CAL-009",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png"
-        ]
-      },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#7A7D80",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/preto/01-b49c7ad0aa3c8252.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-panel-construction/cinza/01-2ed89275641b3575.png"
-    ],
-    "details": [
-      "Recortes geométricos nas pernas",
-      "Painéis sobrepostos",
-      "Costuras visíveis",
-      "Construção arquitetônica",
-      "Modelagem ampla",
-      "Visual experimental e moderno"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:36.064+00:00"
-  },
-  {
-    "id": "prod-cal-008",
-    "slug": "calca-nylon-utility",
-    "title": "Calça Nylon Utility",
-    "subtitle": "Nylon leve e técnico",
-    "description": "Nylon leve e técnico\nBolsos funcionais\nAjustes na cintura ou nas barras\nModelagem ampla\nConstrução prática\nVisual esportivo e utilitário",
-    "price": 329.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 23,
-    "stockCount": 27,
-    "sku": "MM-CAL-008",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#7A7D80",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png"
-        ]
-      },
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/cinza/01-2739e4f244b114f5.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-nylon-utility/preto/01-d993408906eef097.png"
-    ],
-    "details": [
-      "Nylon leve e técnico",
-      "Bolsos funcionais",
-      "Ajustes na cintura ou nas barras",
-      "Modelagem ampla",
-      "Construção prática",
-      "Visual esportivo e utilitário"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:35.848+00:00"
-  },
-  {
-    "id": "prod-cal-007",
-    "slug": "calca-double-knee",
-    "title": "Calça Double Knee",
-    "subtitle": "Reforço duplo na região dos joelhos",
-    "description": "Reforço duplo na região dos joelhos\nPainéis adicionais frontais\nTecido resistente\nModelagem ampla ou reta\nConstrução inspirada em workwear\nVisual robusto e utilitário",
-    "price": 349.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 22,
-    "stockCount": 26,
-    "sku": "MM-CAL-007",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
         "color": "bege",
         "colorName": "Bege",
-        "colorHex": "#C8B596",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
+        "colorHex": "#C8AD7F",
+        "image": "/Shorts Baggy Denim - cor bege.png",
+        "featuredImage": "/Shorts Baggy Denim - cor bege.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png"
-        ]
-      },
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/bege/01-4ff516a11345fa26.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-double-knee/preto/01-5e590bb0be14a822.png"
-    ],
-    "details": [
-      "Reforço duplo na região dos joelhos",
-      "Painéis adicionais frontais",
-      "Tecido resistente",
-      "Modelagem ampla ou reta",
-      "Construção inspirada em workwear",
-      "Visual robusto e utilitário"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:35.644+00:00"
-  },
-  {
-    "id": "prod-cal-006",
-    "slug": "calca-distressed-denim",
-    "title": "Calça Distressed Denim",
-    "subtitle": "Jeans com áreas desgastadas",
-    "description": "Jeans com áreas desgastadas\nRasgos ou pontos propositalmente puídos\nLavagem irregular\nBordas com acabamento bruto\nModelagem ampla\nEstética grunge e vintage",
-    "price": 339.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 21,
-    "stockCount": 25,
-    "sku": "MM-CAL-006",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto-lavado",
-        "colorName": "Preto Lavado",
-        "colorHex": "#303236",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png"
-        ]
-      },
-      {
-        "color": "azul",
-        "colorName": "Azul",
-        "colorHex": "#355C8A",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/preto-lavado/01-50f7c0c62851bc82.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-distressed-denim/azul/01-efd5cad8aa2c6751.png"
-    ],
-    "details": [
-      "Jeans com áreas desgastadas",
-      "Rasgos ou pontos propositalmente puídos",
-      "Lavagem irregular",
-      "Bordas com acabamento bruto",
-      "Modelagem ampla",
-      "Estética grunge e vintage"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:35.054+00:00"
-  },
-  {
-    "id": "prod-cal-005",
-    "slug": "calca-corduroy-baggy",
-    "title": "Calça Corduroy Baggy",
-    "subtitle": "Tecido de veludo cotelê",
-    "description": "Tecido de veludo cotelê\nTextura marcada por linhas verticais\nModelagem baggy\nPernas largas\nCaimento pesado e confortável\nVisual retrô e streetwear",
-    "price": 349.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 20,
-    "stockCount": 24,
-    "sku": "MM-CAL-005",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/preto/01-25f96a66d9fa8ab5.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-corduroy-baggy/marrom/01-f37e07e264cb5c8c.png"
-    ],
-    "details": [
-      "Tecido de veludo cotelê",
-      "Textura marcada por linhas verticais",
-      "Modelagem baggy",
-      "Pernas largas",
-      "Caimento pesado e confortável",
-      "Visual retrô e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:34.826+00:00"
-  },
-  {
-    "id": "prod-cal-004",
-    "slug": "calca-carpenter",
-    "title": "Calça Carpenter",
-    "subtitle": "Modelagem reta ou levemente ampla",
-    "description": "Modelagem reta ou levemente ampla\nBolsos utilitários\nAlça lateral para ferramentas\nCosturas reforçadas\nTecido resistente\nVisual inspirado em roupas de trabalho",
-    "price": 329.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 19,
-    "stockCount": 23,
-    "sku": "MM-CAL-004",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/preto/01-2ca98095d7f40534.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-carpenter/marrom/01-da74a8ca816a6e0f.png"
-    ],
-    "details": [
-      "Modelagem reta ou levemente ampla",
-      "Bolsos utilitários",
-      "Alça lateral para ferramentas",
-      "Costuras reforçadas",
-      "Tecido resistente",
-      "Visual inspirado em roupas de trabalho"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:34.611+00:00"
-  },
-  {
-    "id": "prod-cal-003",
-    "slug": "calca-cargo-multi-pocket",
-    "title": "Calça Cargo Multi Pocket",
-    "subtitle": "Grande quantidade de bolsos",
-    "description": "Grande quantidade de bolsos\nBolsos laterais, frontais e sobrepostos\nCompartimentos utilitários\nModelagem oversized\nConstrução robusta\nVisual funcional e técnico",
-    "price": 359.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 18,
-    "stockCount": 22,
-    "sku": "MM-CAL-003",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "grafite",
-        "colorName": "Grafite",
-        "colorHex": "#4B4F52",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png"
-        ]
-      },
-      {
-        "color": "bege",
-        "colorName": "Bege",
-        "colorHex": "#C8B596",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/bege/01-e4444d4382466191.png"
-    ],
-    "details": [
-      "Grande quantidade de bolsos",
-      "Bolsos laterais, frontais e sobrepostos",
-      "Compartimentos utilitários",
-      "Modelagem oversized",
-      "Construção robusta",
-      "Visual funcional e técnico"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:34.374+00:00"
-  },
-  {
-    "id": "prod-cal-002",
-    "slug": "calca-cargo-baggy",
-    "title": "Calça Cargo Baggy",
-    "subtitle": "Modelagem ampla e solta",
-    "description": "Modelagem ampla e solta\nPernas largas\nBolsos cargo laterais grandes\nCintura confortável\nCaimento pesado e relaxado\nVisual streetwear clássico",
-    "price": 339.9,
-    "category": "cargos",
-    "subcategory": "Cargos",
-    "collection": "Coleção Marmot Cargo & Utilitário 2026",
-    "tags": [
-      "Cargos",
-      "Calças",
-      "Streetwear",
-      "Utilitário"
-    ],
-    "rating": 5,
-    "reviewCount": 17,
-    "stockCount": 21,
-    "sku": "MM-CAL-002",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png"
-        ]
-      },
-      {
-        "color": "verde",
-        "colorName": "Verde",
-        "colorHex": "#50633F",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png"
-    ],
-    "details": [
-      "Modelagem ampla e solta",
-      "Pernas largas",
-      "Bolsos cargo laterais grandes",
-      "Cintura confortável",
-      "Caimento pesado e relaxado",
-      "Visual streetwear clássico"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:34.131+00:00"
-  },
-  {
-    "id": "prod-cal-001",
-    "slug": "calca-balloon",
-    "title": "Calça Balloon",
-    "subtitle": "Volume amplo no quadril e nas coxas",
-    "description": "Volume amplo no quadril e nas coxas\nPernas arredondadas com afunilamento na barra\nSilhueta volumosa e marcante\nCintura estruturada\nCaimento solto\nVisual streetwear contemporâneo",
-    "price": 319.9,
-    "category": "calcas",
-    "subcategory": "Calças",
-    "collection": "Coleção Marmot Denim & Cargo 2026",
-    "tags": [
-      "Calça",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 16,
-    "stockCount": 20,
-    "sku": "MM-CAL-001",
-    "sizes": [
-      "38",
-      "40",
-      "42",
-      "44",
-      "46"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png"
-    ],
-    "details": [
-      "Volume amplo no quadril e nas coxas",
-      "Pernas arredondadas com afunilamento na barra",
-      "Silhueta volumosa e marcante",
-      "Cintura estruturada",
-      "Caimento solto",
-      "Visual streetwear contemporâneo"
-    ],
-    "careInstructions": [
-      "Lavar do avesso com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Algodão Premium / Ripstop Encorpado"
-    ],
-    "reviews": [],
-    "weight": 0.65,
-    "height": 6,
-    "width": 28,
-    "length": 36,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:20:33.895+00:00"
-  },
-  {
-    "id": "prod-jaq-019",
-    "slug": "jaqueta-workwear",
-    "title": "Jaqueta Workwear",
-    "subtitle": "Corte boxy",
-    "description": "Corte boxy\nTecido pesado e resistente\nBolsos frontais grandes\nConstrução simples e robusta\nModelagem ampla\nInspiração em uniformes e roupas de trabalho",
-    "price": 469.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 32,
-    "stockCount": 23,
-    "sku": "MM-JAQ-019",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
-    ],
-    "details": [
-      "Corte boxy",
-      "Tecido pesado e resistente",
-      "Bolsos frontais grandes",
-      "Construção simples e robusta",
-      "Modelagem ampla",
-      "Inspiração em uniformes e roupas de trabalho"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:21.232+00:00"
-  },
-  {
-    "id": "prod-jaq-018",
-    "slug": "jaqueta-windbreaker",
-    "title": "Jaqueta Windbreaker",
-    "subtitle": "Tecido leve e técnico",
-    "description": "Tecido leve e técnico\nCapuz ajustável\nRecortes esportivos\nProteção contra vento\nModelagem relaxada\nVisual inspirado em roupas outdoor",
-    "price": 399.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 31,
-    "stockCount": 22,
-    "sku": "MM-JAQ-018",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png"
-        ]
-      },
-      {
-        "color": "grafite-e-verde",
-        "colorName": "Grafite e Verde",
-        "colorHex": "#4B4F52",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
-    ],
-    "details": [
-      "Tecido leve e técnico",
-      "Capuz ajustável",
-      "Recortes esportivos",
-      "Proteção contra vento",
-      "Modelagem relaxada",
-      "Visual inspirado em roupas outdoor"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:20.993+00:00"
-  },
-  {
-    "id": "prod-jaq-017",
-    "slug": "jaqueta-varsity-oversized",
-    "title": "Jaqueta Varsity Oversized",
-    "subtitle": "Inspiração universitária",
-    "description": "Inspiração universitária\nMangas contrastantes\nPunhos e barra listrados\nAplicações, patches ou lettering\nModelagem oversized\nVisual esportivo retrô",
-    "price": 489.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 30,
-    "stockCount": 21,
-    "sku": "MM-JAQ-017",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
-    ],
-    "details": [
-      "Inspiração universitária",
-      "Mangas contrastantes",
-      "Punhos e barra listrados",
-      "Aplicações, patches ou lettering",
-      "Modelagem oversized",
-      "Visual esportivo retrô"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:20.75+00:00"
-  },
-  {
-    "id": "prod-jaq-016",
-    "slug": "jaqueta-utility",
-    "title": "Jaqueta Utility",
-    "subtitle": "Vários bolsos funcionais",
-    "description": "Vários bolsos funcionais\nRecortes técnicos\nCompartimentos utilitários\nModelagem oversized\nConstrução resistente\nVisual inspirado em roupas de trabalho",
-    "price": 459.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 29,
-    "stockCount": 20,
-    "sku": "MM-JAQ-016",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png"
-        ]
-      },
-      {
-        "color": "verde",
-        "colorName": "Verde",
-        "colorHex": "#50633F",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
-    ],
-    "details": [
-      "Vários bolsos funcionais",
-      "Recortes técnicos",
-      "Compartimentos utilitários",
-      "Modelagem oversized",
-      "Construção resistente",
-      "Visual inspirado em roupas de trabalho"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:20.546+00:00"
-  },
-  {
-    "id": "prod-jaq-015",
-    "slug": "jaqueta-two-tone",
-    "title": "Jaqueta Two Tone",
-    "subtitle": "Combinação de duas cores",
-    "description": "Combinação de duas cores\nGrandes áreas contrastantes\nRecortes gráficos\nModelagem ampla\nDivisão visual marcada\nEstética streetwear moderna",
-    "price": 439.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 28,
-    "stockCount": 19,
-    "sku": "MM-JAQ-015",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
-    ],
-    "details": [
-      "Combinação de duas cores",
-      "Grandes áreas contrastantes",
-      "Recortes gráficos",
-      "Modelagem ampla",
-      "Divisão visual marcada",
-      "Estética streetwear moderna"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:20.305+00:00"
-  },
-  {
-    "id": "prod-jaq-014",
-    "slug": "jaqueta-track",
-    "title": "Jaqueta Track",
-    "subtitle": "Inspiração esportiva",
-    "description": "Inspiração esportiva\nTecido leve\nFaixas ou recortes laterais\nGola alta\nModelagem relaxada\nVisual retrô esportivo",
-    "price": 399.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 27,
-    "stockCount": 18,
-    "sku": "MM-JAQ-014",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
-    ],
-    "details": [
-      "Inspiração esportiva",
-      "Tecido leve",
-      "Faixas ou recortes laterais",
-      "Gola alta",
-      "Modelagem relaxada",
-      "Visual retrô esportivo"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:20.073+00:00"
-  },
-  {
-    "id": "prod-jaq-013",
-    "slug": "jaqueta-tactical",
-    "title": "Jaqueta Tactical",
-    "subtitle": "Bolsos modulares",
-    "description": "Bolsos modulares\nFivelas e straps\nGola alta\nRecortes funcionais\nConstrução robusta\nVisual inspirado em equipamentos militares",
-    "price": 469.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 26,
-    "stockCount": 17,
-    "sku": "MM-JAQ-013",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png"
-        ]
-      },
-      {
-        "color": "chumbo",
-        "colorName": "Chumbo",
-        "colorHex": "#4A4E52",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
-    ],
-    "details": [
-      "Bolsos modulares",
-      "Fivelas e straps",
-      "Gola alta",
-      "Recortes funcionais",
-      "Construção robusta",
-      "Visual inspirado em equipamentos militares"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:19.848+00:00"
-  },
-  {
-    "id": "prod-jaq-012",
-    "slug": "jaqueta-sherpa",
-    "title": "Jaqueta Sherpa",
-    "subtitle": "Forro ou painéis em sherpa",
-    "description": "Forro ou painéis em sherpa\nTextura felpuda aparente\nConstrução volumosa\nModelagem ampla\nAparência quente e pesada\nVisual de inverno com inspiração vintage",
-    "price": 479.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 25,
-    "stockCount": 16,
-    "sku": "MM-JAQ-012",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png"
-        ]
-      },
-      {
-        "color": "marrom-e-bege",
-        "colorName": "Marrom e Bege",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
-    ],
-    "details": [
-      "Forro ou painéis em sherpa",
-      "Textura felpuda aparente",
-      "Construção volumosa",
-      "Modelagem ampla",
-      "Aparência quente e pesada",
-      "Visual de inverno com inspiração vintage"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:19.605+00:00"
-  },
-  {
-    "id": "prod-jaq-011",
-    "slug": "jaqueta-puffer-oversized",
-    "title": "Jaqueta Puffer Oversized",
-    "subtitle": "Construção fortemente acolchoada",
-    "description": "Construção fortemente acolchoada\nVolume acentuado\nModelagem oversized\nGola alta e estruturada\nOmbros amplos\nVisual pesado de inverno",
-    "price": 499.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 24,
-    "stockCount": 15,
-    "sku": "MM-JAQ-011",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png"
-        ]
-      },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#7A7D80",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
-    ],
-    "details": [
-      "Construção fortemente acolchoada",
-      "Volume acentuado",
-      "Modelagem oversized",
-      "Gola alta e estruturada",
-      "Ombros amplos",
-      "Visual pesado de inverno"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:19.004+00:00"
-  },
-  {
-    "id": "prod-jaq-010",
-    "slug": "jaqueta-panel-construction",
-    "title": "Jaqueta Panel Construction",
-    "subtitle": "Recortes geométricos",
-    "description": "Recortes geométricos\nPainéis sobrepostos\nCosturas aparentes\nMistura visual de diferentes áreas\nConstrução arquitetônica\nVisual experimental e moderno",
-    "price": 469.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 23,
-    "stockCount": 24,
-    "sku": "MM-JAQ-010",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "bege-e-marrom",
-        "colorName": "Bege e Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png"
-        ]
-      },
-      {
-        "color": "bege-preto",
-        "colorName": "Bege Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-e-marrom/01-22713cf326cab21f.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-panel-construction/bege-preto/01-5a9036750c800d3f.png"
-    ],
-    "details": [
-      "Recortes geométricos",
-      "Painéis sobrepostos",
-      "Costuras aparentes",
-      "Mistura visual de diferentes áreas",
-      "Construção arquitetônica",
-      "Visual experimental e moderno"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:18.772+00:00"
-  },
-  {
-    "id": "prod-jaq-009",
-    "slug": "jaqueta-nylon-tech",
-    "title": "Jaqueta Nylon Tech",
-    "subtitle": "Nylon de aparência técnica",
-    "description": "Nylon de aparência técnica\nGola alta\nBolsos com zíper\nAjustes na cintura ou barra\nConstrução leve\nVisual futurista e funcional",
-    "price": 449.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 22,
-    "stockCount": 23,
-    "sku": "MM-JAQ-009",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png"
-        ]
-      },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#7A7D80",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
-    ],
-    "details": [
-      "Nylon de aparência técnica",
-      "Gola alta",
-      "Bolsos com zíper",
-      "Ajustes na cintura ou barra",
-      "Construção leve",
-      "Visual futurista e funcional"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:18.534+00:00"
-  },
-  {
-    "id": "prod-jaq-008",
-    "slug": "jaqueta-harrington",
-    "title": "Jaqueta Harrington",
-    "subtitle": "Comprimento curto",
-    "description": "Comprimento curto\nGola dobrável característica\nFechamento frontal por zíper\nModelagem levemente boxy\nConstrução limpa\nVisual retrô e minimalista",
-    "price": 419.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 21,
-    "stockCount": 22,
-    "sku": "MM-JAQ-008",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png"
-        ]
-      },
-      {
-        "color": "bege",
-        "colorName": "Bege",
-        "colorHex": "#C8B596",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
-    ],
-    "details": [
-      "Comprimento curto",
-      "Gola dobrável característica",
-      "Fechamento frontal por zíper",
-      "Modelagem levemente boxy",
-      "Construção limpa",
-      "Visual retrô e minimalista"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:18.318+00:00"
-  },
-  {
-    "id": "prod-jaq-007",
-    "slug": "jaqueta-denim-washed",
-    "title": "Jaqueta Denim Washed",
-    "subtitle": "Jeans encorpado",
-    "description": "Jeans encorpado\nLavagem envelhecida\nEfeito desbotado\nModelagem oversized\nCosturas tradicionais aparentes\nVisual vintage e streetwear",
-    "price": 429.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 20,
-    "stockCount": 21,
-    "sku": "MM-JAQ-007",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png"
-        ]
-      },
-      {
-        "color": "azul",
-        "colorName": "Azul",
-        "colorHex": "#355C8A",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
-    ],
-    "details": [
-      "Jeans encorpado",
-      "Lavagem envelhecida",
-      "Efeito desbotado",
-      "Modelagem oversized",
-      "Costuras tradicionais aparentes",
-      "Visual vintage e streetwear"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:18.088+00:00"
-  },
-  {
-    "id": "prod-jaq-006",
-    "slug": "jaqueta-denim-distressed",
-    "title": "Jaqueta Denim Distressed",
-    "subtitle": "Jeans pesado",
-    "description": "Jeans pesado\nÁreas propositalmente desgastadas\nBordas puídas\nLavagem irregular\nModelagem ampla\nEstética grunge e vintage",
-    "price": 439.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 19,
-    "stockCount": 20,
-    "sku": "MM-JAQ-006",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png"
-        ]
-      },
-      {
-        "color": "azul",
-        "colorName": "Azul",
-        "colorHex": "#355C8A",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
-    ],
-    "details": [
-      "Jeans pesado",
-      "Áreas propositalmente desgastadas",
-      "Bordas puídas",
-      "Lavagem irregular",
-      "Modelagem ampla",
-      "Estética grunge e vintage"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:17.814+00:00"
-  },
-  {
-    "id": "prod-jaq-005",
-    "slug": "jaqueta-cropped-puffer",
-    "title": "Jaqueta Cropped Puffer",
-    "subtitle": "Comprimento mais curto",
-    "description": "Comprimento mais curto\nConstrução acolchoada\nCorpo volumoso\nGola alta\nBarra ajustável\nVisual moderno e estruturado",
-    "price": 469.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 18,
-    "stockCount": 19,
-    "sku": "MM-JAQ-005",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#6F513D",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
-    ],
-    "details": [
-      "Comprimento mais curto",
-      "Construção acolchoada",
-      "Corpo volumoso",
-      "Gola alta",
-      "Barra ajustável",
-      "Visual moderno e estruturado"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:17.591+00:00"
-  },
-  {
-    "id": "prod-jaq-004",
-    "slug": "jaqueta-coach",
-    "title": "Jaqueta Coach",
-    "subtitle": "Gola simples dobrável",
-    "description": "Gola simples dobrável\nFechamento por botões de pressão\nTecido leve\nModelagem reta e relaxada\nBarra com ajuste\nVisual esportivo e minimalista",
-    "price": 389.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 17,
-    "stockCount": 18,
-    "sku": "MM-JAQ-004",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png"
-        ]
-      },
-      {
-        "color": "verde",
-        "colorName": "Verde",
-        "colorHex": "#50633F",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
-    ],
-    "details": [
-      "Gola simples dobrável",
-      "Fechamento por botões de pressão",
-      "Tecido leve",
-      "Modelagem reta e relaxada",
-      "Barra com ajuste",
-      "Visual esportivo e minimalista"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:17.313+00:00"
-  },
-  {
-    "id": "prod-jaq-003",
-    "slug": "jaqueta-cargo",
-    "title": "Jaqueta Cargo",
-    "subtitle": "Bolsos cargo grandes",
-    "description": "Bolsos cargo grandes\nVários compartimentos funcionais\nModelagem ampla\nConstrução robusta\nDetalhes utilitários\nVisual streetwear funcional",
-    "price": 449.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 16,
-    "stockCount": 17,
-    "sku": "MM-JAQ-003",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "bege",
-        "colorName": "Bege",
-        "colorHex": "#C8B596",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png"
-        ]
-      },
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/bege/01-bec8a03f4fabf652.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cargo/preto/01-e361b629fb56ce73.png"
-    ],
-    "details": [
-      "Bolsos cargo grandes",
-      "Vários compartimentos funcionais",
-      "Modelagem ampla",
-      "Construção robusta",
-      "Detalhes utilitários",
-      "Visual streetwear funcional"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:17.087+00:00"
-  },
-  {
-    "id": "prod-jaq-002",
-    "slug": "jaqueta-bomber-oversized",
-    "title": "Jaqueta Bomber Oversized",
-    "subtitle": "Modelagem ampla e volumosa",
-    "description": "Modelagem ampla e volumosa\nPunhos e barra com elástico\nGola curta estruturada\nFechamento frontal por zíper\nOmbros levemente caídos\nVisual inspirado em jaquetas militares",
-    "price": 459.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 15,
-    "stockCount": 16,
-    "sku": "MM-JAQ-002",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png"
-        ]
-      },
-      {
-        "color": "verde",
-        "colorName": "Verde",
-        "colorHex": "#50633F",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
-    ],
-    "details": [
-      "Modelagem ampla e volumosa",
-      "Punhos e barra com elástico",
-      "Gola curta estruturada",
-      "Fechamento frontal por zíper",
-      "Ombros levemente caídos",
-      "Visual inspirado em jaquetas militares"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:16.432+00:00"
-  },
-  {
-    "id": "prod-jaq-001",
-    "slug": "jaqueta-anorak",
-    "title": "Jaqueta Anorak",
-    "subtitle": "Meio zíper frontal",
-    "description": "Meio zíper frontal\nCapuz amplo e ajustável\nBolso frontal grande\nModelagem solta\nAjustes na barra\nVisual técnico inspirado em outdoor",
-    "price": 429.9,
-    "category": "jaquetas",
-    "subcategory": "Jaquetas",
-    "collection": "Coleção Marmot Outerwear 2026",
-    "tags": [
-      "Jaqueta",
-      "Outerwear",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 14,
-    "stockCount": 15,
-    "sku": "MM-JAQ-001",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png"
-        ]
-      },
-      {
-        "color": "verde-militar",
-        "colorName": "Verde Militar",
-        "colorHex": "#4B5320",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
-        ]
-      }
-    ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
-    "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
-    ],
-    "details": [
-      "Meio zíper frontal",
-      "Capuz amplo e ajustável",
-      "Bolso frontal grande",
-      "Modelagem solta",
-      "Ajustes na barra",
-      "Visual técnico inspirado em outdoor"
-    ],
-    "careInstructions": [
-      "Lavar em ciclo delicado com água fria",
-      "Não alvejar nem centrifugar em alta rotação",
-      "Secar à sombra em varal"
-    ],
-    "composition": [
-      "100% Poliamida / Algodão Estruturado"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 10,
-    "width": 30,
-    "length": 40,
-    "isNewRelease": true,
-    "isBestSeller": true,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-25T00:01:16.166+00:00"
-  },
-  {
-    "id": "prod-cam-010",
-    "slug": "camiseta-washed-vintage",
-    "title": "Camiseta Washed Vintage",
-    "subtitle": "",
-    "description": "Lavagem envelhecida\nEfeito desbotado\nTecido com aparência usada\nTonalidade irregular\nModelagem oversized\nVisual vintage e streetwear",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "lançamento"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-010",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "cinza-escuro",
-        "colorName": "Cinza Escuro",
-        "colorHex": "#403b3b",
-        "image": "/Camiseta Washed Vintage - Cinza escuro.png",
-        "featuredImage": "/Camiseta Washed Vintage - Cinza escuro.png",
-        "images": [
-          "/Camiseta Washed Vintage - Cinza escuro.png"
-        ]
-      },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#bab5b5",
-        "image": "/Camiseta Washed Vintage - Cinza Claro.png",
-        "featuredImage": "/Camiseta Washed Vintage - Cinza Claro.png",
-        "images": [
-          "/Camiseta Washed Vintage - Cinza Claro.png"
-        ]
-      }
-    ],
-    "image": "/Camiseta Washed Vintage - Cinza escuro.png",
-    "images": [
-      "/Camiseta Washed Vintage - Cinza escuro.png",
-      "/Camiseta Washed Vintage - Cinza Claro.png"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:20.088+00:00"
-  },
-  {
-    "id": "prod-cam-009",
-    "slug": "camiseta-striped-heavy",
-    "title": "Camiseta Striped Heavy",
-    "subtitle": "",
-    "description": "Listras horizontais largas\nTecido pesado\nModelagem oversized\nOmbros caídos\nMangas largas\nVisual streetwear retrô",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "lançamento"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-009",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "branco-e-preto",
-        "colorName": "Branco e Preto",
-        "colorHex": "#121212",
-        "image": "/Camiseta Striped Heavy - Preto e Branco.png",
-        "featuredImage": "/Camiseta Striped Heavy - Preto e Branco.png",
-        "images": [
-          "/Camiseta Striped Heavy - Preto e Branco.png"
-        ]
-      },
-      {
-        "color": "marrom-e-bege",
-        "colorName": "Marrom e Bege",
-        "colorHex": "#540707",
-        "image": "/Camiseta Striped Heavy - Bege e Marrom.png",
-        "featuredImage": "/Camiseta Striped Heavy - Bege e Marrom.png",
-        "images": [
-          "/Camiseta Striped Heavy - Bege e Marrom.png"
-        ]
-      }
-    ],
-    "image": "/Camiseta Striped Heavy - Preto e Branco.png",
-    "images": [
-      "/Camiseta Striped Heavy - Preto e Branco.png",
-      "/Camiseta Striped Heavy - Bege e Marrom.png"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:19.866+00:00"
-  },
-  {
-    "id": "prod-cam-008",
-    "slug": "camiseta-raw-hem",
-    "title": "Camiseta Raw Hem",
-    "subtitle": "",
-    "description": "Barra com acabamento cru\nBordas propositalmente sem acabamento tradicional\nCosturas aparentes\nVisual desconstruído\nModelagem ampla\nAparência propositalmente irregular",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "lançamento"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-008",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "id": "cam-008-blk",
-        "color": "Preto",
-        "colorName": "Off-Black",
-        "colorHex": "#1A1A1A",
-        "image": "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp",
-        "featuredImage": "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp",
-        "images": [
-          "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp"
+          "/Shorts Baggy Denim - cor bege.png"
         ],
-        "sku": "MAR-CAM-008-BLK",
+        "sku": "MM-SHO-001-BEGE",
         "stockCount": 15,
         "sizes": [
           "P",
           "M",
           "G",
-          "GG"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp",
-    "images": [
-      "/uploads/products/prod-cam-008/c1c4bef72959eab2.webp"
-    ],
-    "details": [],
-    "careInstructions": [],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": false,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:19.647+00:00"
-  },
-  {
-    "id": "prod-cam-007",
-    "slug": "camiseta-raglan-oversized",
-    "title": "Camiseta Raglan Oversized",
-    "subtitle": "",
-    "description": "Mangas raglan\nCostura das mangas partindo da gola\nMangas amplas\nCorpo largo\nModelagem oversized\nVisual esportivo e retrô",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "lançamento"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-007",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "preto-branco",
-        "colorName": "Preto + Branco",
-        "colorHex": "#ffffff",
-        "image": "/Camiseta Raglan Oversized - Branco e Preto.png",
-        "featuredImage": "/Camiseta Raglan Oversized - Branco e Preto.png",
-        "images": [
-          "/Camiseta Raglan Oversized - Branco e Preto.png"
-        ]
-      },
-      {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#000000",
-        "image": "/Camiseta Raglan Oversized - Preto e Cinza.png",
-        "featuredImage": "/Camiseta Raglan Oversized - Preto e Cinza.png",
-        "images": [
-          "/Camiseta Raglan Oversized - Preto e Cinza.png"
-        ]
-      }
-    ],
-    "image": "/Camiseta Raglan Oversized - Branco e Preto.png",
-    "images": [
-      "/Camiseta Raglan Oversized - Branco e Preto.png",
-      "/Camiseta Raglan Oversized - Preto e Cinza.png"
-    ],
-    "details": [],
-    "careInstructions": [],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": false,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:19.427+00:00"
-  },
-  {
-    "id": "prod-cam-006",
-    "slug": "camiseta-pocket-utility",
-    "title": "Camiseta Pocket Utility",
-    "subtitle": "",
-    "description": "Bolso grande no peito\nBolsos adicionais ou divisórias utilitárias\nDetalhes funcionais\nModelagem oversized\nVisual inspirado em roupas cargo\nConstrução prática e streetwear",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "lançamento"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-006",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "verde",
-        "colorName": "Verde",
-        "colorHex": "#55533b",
-        "image": "/Camiseta Pocket Utility - Verde.png",
-        "featuredImage": "/Camiseta Pocket Utility - Verde.png",
-        "images": [
-          "/Camiseta Pocket Utility - Verde.png"
+          "GG",
+          "XG"
         ]
       },
       {
         "color": "preto",
         "colorName": "Preto",
-        "colorHex": "#000000",
-        "image": "/Camiseta Pocket Utility - Preto.png",
-        "featuredImage": "/Camiseta Pocket Utility - Preto.png",
+        "colorHex": "#121212",
+        "image": "/Shorts Baggy Denim - cor preto.png",
+        "featuredImage": "/Shorts Baggy Denim - cor preto.png",
         "images": [
-          "/Camiseta Pocket Utility - Preto.png"
+          "/Shorts Baggy Denim - cor preto.png"
+        ],
+        "sku": "MM-SHO-001-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       }
     ],
-    "image": "/Camiseta Pocket Utility - Verde.png",
+    "image": "/Shorts Baggy Denim - cor bege.png",
     "images": [
-      "/Camiseta Pocket Utility - Verde.png",
-      "/Camiseta Pocket Utility - Preto.png"
+      "/Shorts Baggy Denim - cor bege.png",
+      "/Shorts Baggy Denim - cor preto.png"
     ],
     "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
+      "Modelagem baggy streetwear autêntica",
+      "Jeans heavyweight 100% algodão premium",
+      "Cós estruturado com passantes reforçados",
+      "Bolsos frontais e traseiros fundos",
+      "Caimento amplo na altura dos joelhos",
+      "Pespontos reforçados para alta durabilidade"
     ],
     "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
     ],
     "composition": [
-      "100% Algodão Penteado Heavyweight"
+      "100% Algodão Denim Heavyweight"
     ],
-    "reviews": [],
-    "weight": 0.35,
+    "weight": 0.42,
     "height": 4,
     "width": 25,
     "length": 30,
     "isNewRelease": true,
-    "isBestSeller": false,
+    "isBestSeller": true,
     "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:19.193+00:00"
+    "status": "active"
   },
   {
-    "id": "prod-cam-005",
-    "slug": "camiseta-panel",
-    "title": "Camiseta Panel",
-    "subtitle": "",
-    "description": "Painéis diferentes no corpo\nRecortes geométricos\nCosturas aparentes\nPossibilidade de contraste entre tecidos ou cores\nConstrução visual mais elaborada\nEstética arquitetônica",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
+    "id": "prod-sho-002",
+    "slug": "shorts-cargo-baggy",
+    "title": "Shorts Cargo Baggy",
+    "subtitle": "Bolsos cargo laterais fole com fechamento por lapela",
+    "description": "Bolsos cargo laterais fole com fechamento por lapela\nModelagem baggy com corte reto ultra confortável\nSarja peletizada encorpada 100% algodão\nCós com elástico anatômico e cordão interno\nPespontos duplos em áreas de atrito\nEstética utilitária e militar urbana",
+    "price": 249.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
     "tags": [
-      "Camiseta",
+      "Shorts",
+      "Bermudas",
       "Streetwear",
-      "Heavyweight"
+      "Lançamento",
+      "Shorts Cargo Baggy"
     ],
     "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-005",
+    "reviewCount": 15,
+    "stockCount": 23,
+    "sku": "MM-SHO-002",
     "sizes": [
       "P",
       "M",
@@ -7175,151 +6680,96 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "bege-marrom",
-        "colorName": "Bege + Marrom",
-        "colorHex": "#6c5a4e",
-        "image": "/Camiseta Panel - Bege e Marrom.png",
-        "featuredImage": "/Camiseta Panel - Bege e Marrom.png",
+        "color": "verde-oliva",
+        "colorName": "Verde Oliva",
+        "colorHex": "#4A5340",
+        "image": "/Shorts Cargo Baggy - cor verde oliva.png",
+        "featuredImage": "/Shorts Cargo Baggy - cor verde oliva.png",
         "images": [
-          "/Camiseta Panel - Bege e Marrom.png"
+          "/Shorts Cargo Baggy - cor verde oliva.png"
+        ],
+        "sku": "MM-SHO-002-VERDE-OLIVA",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
       {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#4b4b49",
-        "image": "/Camiseta Panel - Preto e Cinza.png",
-        "featuredImage": "/Camiseta Panel - Preto e Cinza.png",
-        "images": [
-          "/Camiseta Panel - Preto e Cinza.png"
-        ]
-      }
-    ],
-    "image": "/Camiseta Panel - Bege e Marrom.png",
-    "images": [
-      "/Camiseta Panel - Bege e Marrom.png",
-      "/Camiseta Panel - Preto e Cinza.png"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:18.972+00:00"
-  },
-  {
-    "id": "prod-cam-004",
-    "slug": "camiseta-heavy-boxy",
-    "title": "Camiseta Heavy Boxy",
-    "subtitle": "",
-    "description": "Corpo curto e largo\nModelagem boxy\nOmbros caídos\nMangas largas\nTecido pesado e encorpado\nEstrutura firme",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-004",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
+        "color": "preto",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "/Camiseta Heavy Boxy - Preto.png",
-        "featuredImage": "/Camiseta Heavy Boxy - Preto.png",
+        "image": "/Shorts Cargo Baggy - cor preto.png",
+        "featuredImage": "/Shorts Cargo Baggy - cor preto.png",
         "images": [
-          "/Camiseta Heavy Boxy - Preto.png"
-        ]
-      },
-      {
-        "color": "offwhite",
-        "colorName": "Off White",
-        "colorHex": "#F5F5F0",
-        "image": "/Camiseta Heavy Boxy - Branco.png",
-        "featuredImage": "/Camiseta Heavy Boxy - Branco.png",
-        "images": [
-          "/Camiseta Heavy Boxy - Branco.png"
+          "/Shorts Cargo Baggy - cor preto.png"
+        ],
+        "sku": "MM-SHO-002-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       }
     ],
-    "image": "/Camiseta Heavy Boxy - Preto.png",
+    "image": "/Shorts Cargo Baggy - cor verde oliva.png",
     "images": [
-      "/Camiseta Heavy Boxy - Preto.png",
-      "/Camiseta Heavy Boxy - Branco.png"
+      "/Shorts Cargo Baggy - cor verde oliva.png",
+      "/Shorts Cargo Baggy - cor preto.png"
     ],
     "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
+      "Bolsos cargo laterais fole com fechamento por lapela",
+      "Modelagem baggy com corte reto ultra confortável",
+      "Sarja peletizada encorpada 100% algodão",
+      "Cós com elástico anatômico e cordão interno",
+      "Pespontos duplos em áreas de atrito",
+      "Estética utilitária e militar urbana"
     ],
     "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
     ],
     "composition": [
       "100% Algodão Penteado Heavyweight"
     ],
-    "reviews": [],
-    "weight": 0.35,
+    "weight": 0.42,
     "height": 4,
     "width": 25,
     "length": 30,
     "isNewRelease": true,
-    "isBestSeller": false,
+    "isBestSeller": true,
     "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:18.722+00:00"
+    "status": "active"
   },
   {
-    "id": "prod-cam-003",
-    "slug": "camiseta-drop-shoulder",
-    "title": "Camiseta Drop Shoulder",
-    "subtitle": "",
-    "description": "Ombros bem caídos\nCostura da manga abaixo da linha natural do ombro\nMangas mais largas\nCorpo amplo\nCaimento relaxado\nVisual streetwear minimalista",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
+    "id": "prod-sho-003",
+    "slug": "shorts-denim-washed",
+    "title": "Shorts Denim Washed",
+    "subtitle": "Lavagem vintage com efeitos de amaciamento exclusivo",
+    "description": "Lavagem vintage com efeitos de amaciamento exclusivo\nJeans 12oz encorpado com caimento solto\nBolsos funcionais com forro em algodão\nBarra clássica com pesponto contrastante\nEtiqueta em couro ecológico Marmot Atelier\nToque macio e visual retro dos anos 90",
+    "price": 259.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
     "tags": [
-      "Camiseta",
+      "Shorts",
+      "Bermudas",
       "Streetwear",
-      "Heavyweight"
+      "Lançamento",
+      "Shorts Denim Washed"
     ],
     "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-003",
+    "reviewCount": 16,
+    "stockCount": 24,
+    "sku": "MM-SHO-003",
     "sizes": [
       "P",
       "M",
@@ -7329,375 +6779,393 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#4d3232",
-        "image": "/Camiseta Drop Shoulder - Marrom.png",
-        "featuredImage": "/Camiseta Drop Shoulder - Marrom.png",
+        "color": "azul-claro",
+        "colorName": "Azul Claro",
+        "colorHex": "#5E84A6",
+        "image": "/Shorts Denim Washed - cor azul claro.png",
+        "featuredImage": "/Shorts Denim Washed - cor azul claro.png",
         "images": [
-          "/Camiseta Drop Shoulder - Marrom.png"
+          "/Shorts Denim Washed - cor azul claro.png"
+        ],
+        "sku": "MM-SHO-003-AZUL-CLARO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
-      {
-        "color": "cinza",
-        "colorName": "Cinza",
-        "colorHex": "#6c6c6a",
-        "image": "/Camiseta Drop Shoulder - Cinza.png",
-        "featuredImage": "/Camiseta Drop Shoulder - Cinza.png",
-        "images": [
-          "/Camiseta Drop Shoulder - Cinza.png"
-        ]
-      }
-    ],
-    "image": "/Camiseta Drop Shoulder - Marrom.png",
-    "images": [
-      "/Camiseta Drop Shoulder - Marrom.png",
-      "/Camiseta Drop Shoulder - Cinza.png"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:18.499+00:00"
-  },
-  {
-    "id": "prod-cam-002",
-    "slug": "camiseta-double-layer",
-    "title": "Camiseta Double Layer",
-    "subtitle": "",
-    "description": "Segunda camada aparente na barra\nMangas com efeito de sobreposição\nComprimentos diferentes entre as camadas\nAparência de duas camisetas usadas juntas\nModelagem oversized\nVisual em camadas",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Camiseta",
-      "Streetwear",
-      "Heavyweight"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-002",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "bege-marrom",
-        "colorName": "Bege + Marrom",
-        "colorHex": "#6c5145",
-        "image": "/Camiseta Double Layer - Bege e Marrom.png",
-        "featuredImage": "/Camiseta Double Layer - Bege e Marrom.png",
-        "images": [
-          "/Camiseta Double Layer - Bege e Marrom.png"
-        ]
-      },
-      {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#F5F5F0",
-        "image": "/Camiseta Double Layer - Cinza e Preto.png",
-        "featuredImage": "/Camiseta Double Layer - Cinza e Preto.png",
-        "images": [
-          "/Camiseta Double Layer - Cinza e Preto.png"
-        ]
-      }
-    ],
-    "image": "/Camiseta Double Layer - Bege e Marrom.png",
-    "images": [
-      "/Camiseta Double Layer - Bege e Marrom.png",
-      "/Camiseta Double Layer - Cinza e Preto.png"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:18.181+00:00"
-  },
-  {
-    "id": "prod-cam-001",
-    "slug": "camiseta-contrast-stitch",
-    "title": "Camiseta Contrast Stitch",
-    "subtitle": "",
-    "description": "Costuras em cor contrastante\nLinhas aparentes no corpo e nas mangas\nVisual gráfico e marcante\nModelagem ampla\nOmbros levemente caídos\nAcabamento streetwear moderno",
-    "price": 189.9,
-    "category": "camisetas",
-    "subcategory": "Camisetas",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "lançamento"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 30,
-    "sku": "MM-CAM-001",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "/Camiseta Contrast Stitch - Preto.png",
-        "featuredImage": "/Camiseta Contrast Stitch - Preto.png",
-        "images": [
-          "/Camiseta Contrast Stitch - Preto.png"
-        ]
-      },
-      {
-        "color": "bege",
-        "colorName": "Bege",
-        "colorHex": "#f2daa6",
-        "image": "/Camiseta Contrast Stitch - Bege.png",
-        "featuredImage": "/Camiseta Contrast Stitch - Bege.png",
-        "images": [
-          "/Camiseta Contrast Stitch - Bege.png"
-        ]
-      }
-    ],
-    "image": "/Camiseta Contrast Stitch - Preto.png",
-    "images": [
-      "/Camiseta Contrast Stitch - Preto.png",
-      "/Camiseta Contrast Stitch - Bege.png"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Gola canelada 3cm 2x1",
-      "Algodão 260g/m² penteado"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Penteado Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.35,
-    "height": 4,
-    "width": 25,
-    "length": 30,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T23:04:17.547+00:00"
-  },
-  {
-    "id": "prod-mol-019",
-    "slug": "moletom-zip-up-washed",
-    "title": "Moletom Zip Up Washed",
-    "subtitle": "",
-    "description": "Zíper frontal completo\nCapuz tradicional\nLavagem estonada\nAparência desbotada\nModelagem oversized\nVisual vintage\nTecido com aspecto envelhecido",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-019",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
       {
         "color": "preto-lavado",
         "colorName": "Preto Lavado",
-        "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-019/1f70a283a853c5d3.webp",
-        "featuredImage": "/uploads/products/prod-mol-019/1f70a283a853c5d3.webp",
+        "colorHex": "#2B2B2B",
+        "image": "/Shorts Denim Washed - cor preto lavado.png",
+        "featuredImage": "/Shorts Denim Washed - cor preto lavado.png",
         "images": [
-          "/uploads/products/prod-mol-019/1f70a283a853c5d3.webp"
+          "/Shorts Denim Washed - cor preto lavado.png"
+        ],
+        "sku": "MM-SHO-003-PRETO-LAVADO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
+        ]
+      }
+    ],
+    "image": "/Shorts Denim Washed - cor azul claro.png",
+    "images": [
+      "/Shorts Denim Washed - cor azul claro.png",
+      "/Shorts Denim Washed - cor preto lavado.png"
+    ],
+    "details": [
+      "Lavagem vintage com efeitos de amaciamento exclusivo",
+      "Jeans 12oz encorpado com caimento solto",
+      "Bolsos funcionais com forro em algodão",
+      "Barra clássica com pesponto contrastante",
+      "Etiqueta em couro ecológico Marmot Atelier",
+      "Toque macio e visual retro dos anos 90"
+    ],
+    "careInstructions": [
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
+    ],
+    "composition": [
+      "100% Algodão Denim Heavyweight"
+    ],
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active"
+  },
+  {
+    "id": "prod-sho-004",
+    "slug": "shorts-distressed",
+    "title": "Shorts Distressed",
+    "subtitle": "Puídos e rasgos manuais feitos artesanalmente",
+    "description": "Puídos e rasgos manuais feitos artesanalmente\nBarra desfiada com acabamento em travete de proteção\nJeans denim premium 100% algodão\nModelagem desconstruída com inspiração grunge\nBotão e rebites personalizados em metal envelhecido\nCaimento solto e atitude streetwear",
+    "price": 269.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
+    "tags": [
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Distressed"
+    ],
+    "rating": 5,
+    "reviewCount": 17,
+    "stockCount": 25,
+    "sku": "MM-SHO-004",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "jeans-claro",
+        "colorName": "Jeans Claro",
+        "colorHex": "#7898B5",
+        "image": "/Shorts Distressed - cor jeans claro.png",
+        "featuredImage": "/Shorts Distressed - cor jeans claro.png",
+        "images": [
+          "/Shorts Distressed - cor jeans claro.png"
+        ],
+        "sku": "MM-SHO-004-JEANS-CLARO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#181818",
+        "image": "/Shorts Distressed - cor preto.png",
+        "featuredImage": "/Shorts Distressed - cor preto.png",
+        "images": [
+          "/Shorts Distressed - cor preto.png"
+        ],
+        "sku": "MM-SHO-004-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
+        ]
+      }
+    ],
+    "image": "/Shorts Distressed - cor jeans claro.png",
+    "images": [
+      "/Shorts Distressed - cor jeans claro.png",
+      "/Shorts Distressed - cor preto.png"
+    ],
+    "details": [
+      "Puídos e rasgos manuais feitos artesanalmente",
+      "Barra desfiada com acabamento em travete de proteção",
+      "Jeans denim premium 100% algodão",
+      "Modelagem desconstruída com inspiração grunge",
+      "Botão e rebites personalizados em metal envelhecido",
+      "Caimento solto e atitude streetwear"
+    ],
+    "careInstructions": [
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
+    ],
+    "composition": [
+      "100% Algodão Denim Heavyweight"
+    ],
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active"
+  },
+  {
+    "id": "prod-sho-005",
+    "slug": "shorts-flame",
+    "title": "Shorts Flame",
+    "subtitle": "Estampa Flame autoral em silk-screen de alta densidade",
+    "description": "Estampa Flame autoral em silk-screen de alta densidade\nMoletom careca pesado 320g com toque aveludado\nCintura com elástico largo e cordão em algodão trançado\nBolsos faca laterais e bolso traseiro embutido\nComprimento acima dos joelhos com excelente mobilidade\nDesign gráfico com DNA contemporâneo Marmot",
+    "price": 249.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
+    "tags": [
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Flame"
+    ],
+    "rating": 5,
+    "reviewCount": 18,
+    "stockCount": 26,
+    "sku": "MM-SHO-005",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "off-white",
+        "colorName": "Off White",
+        "colorHex": "#F0EEE9",
+        "image": "/Shorts Flame - cor off white.png",
+        "featuredImage": "/Shorts Flame - cor off white.png",
+        "images": [
+          "/Shorts Flame - cor off white.png"
+        ],
+        "sku": "MM-SHO-005-OFF-WHITE",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
+        ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/Shorts Flame - cor preto.png",
+        "featuredImage": "/Shorts Flame - cor preto.png",
+        "images": [
+          "/Shorts Flame - cor preto.png"
+        ],
+        "sku": "MM-SHO-005-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
+        ]
+      }
+    ],
+    "image": "/Shorts Flame - cor off white.png",
+    "images": [
+      "/Shorts Flame - cor off white.png",
+      "/Shorts Flame - cor preto.png"
+    ],
+    "details": [
+      "Estampa Flame autoral em silk-screen de alta densidade",
+      "Moletom careca pesado 320g com toque aveludado",
+      "Cintura com elástico largo e cordão em algodão trançado",
+      "Bolsos faca laterais e bolso traseiro embutido",
+      "Comprimento acima dos joelhos com excelente mobilidade",
+      "Design gráfico com DNA contemporâneo Marmot"
+    ],
+    "careInstructions": [
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
+    ],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active"
+  },
+  {
+    "id": "prod-sho-006",
+    "slug": "shorts-graphic",
+    "title": "Shorts Graphic",
+    "subtitle": "Tipografia e artes conceituais exclusivas Marmot Atelier",
+    "description": "Tipografia e artes conceituais exclusivas Marmot Atelier\nAlgodão heavyweight respirável de toque macio\nCorte reto com fendas laterais para caimento perfeito\nCós ajustável com ponteiras metálicas escovadas\nBolsos laterais com profundidade ideal para smartphone\nVisual moderno para compor com sneakers e camisetas oversized",
+    "price": 239.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
+    "tags": [
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Graphic"
+    ],
+    "rating": 5,
+    "reviewCount": 19,
+    "stockCount": 27,
+    "sku": "MM-SHO-006",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
       {
         "color": "marrom",
         "colorName": "Marrom",
-        "colorHex": "#6f5751",
-        "image": "/uploads/products/prod-mol-019/92cf6d4940bc3b2f.webp",
-        "featuredImage": "/uploads/products/prod-mol-019/92cf6d4940bc3b2f.webp",
+        "colorHex": "#523624",
+        "image": "/Shorts Graphic - cor marrom.png",
+        "featuredImage": "/Shorts Graphic - cor marrom.png",
         "images": [
-          "/uploads/products/prod-mol-019/92cf6d4940bc3b2f.webp"
+          "/Shorts Graphic - cor marrom.png"
+        ],
+        "sku": "MM-SHO-006-MARROM",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-019/303ee9917ee14cea.webp",
-    "images": [
-      "/uploads/products/prod-mol-019/303ee9917ee14cea.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:03.79+00:00"
-  },
-  {
-    "id": "prod-mol-018",
-    "slug": "moletom-varsity-oversized",
-    "title": "Moletom Varsity Oversized",
-    "subtitle": "",
-    "description": "Inspiração universitária\nLetras ou aplicações grandes\nPunhos e barra com listras\nCorpo oversized\nOmbros largos\nVisual varsity streetwear",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-018",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
+      },
       {
-        "color": "black",
+        "color": "preto",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-018/3335df8f5d745176.webp",
-        "featuredImage": "/uploads/products/prod-mol-018/3335df8f5d745176.webp",
+        "image": "/Shorts Graphic - cor preto.png",
+        "featuredImage": "/Shorts Graphic - cor preto.png",
         "images": [
-          "/uploads/products/prod-mol-018/3335df8f5d745176.webp"
-        ]
-      },
-      {
-        "color": "marrom",
-        "colorName": "Marrom",
-        "colorHex": "#47352a",
-        "image": "/uploads/products/prod-mol-018/ba9326b671318624.webp",
-        "featuredImage": "/uploads/products/prod-mol-018/ba9326b671318624.webp",
-        "images": [
-          "/uploads/products/prod-mol-018/ba9326b671318624.webp"
+          "/Shorts Graphic - cor preto.png"
+        ],
+        "sku": "MM-SHO-006-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       }
     ],
-    "image": "/uploads/products/prod-mol-018/e2e8d15f7767f5f1.webp",
+    "image": "/Shorts Graphic - cor marrom.png",
     "images": [
-      "/uploads/products/prod-mol-018/e2e8d15f7767f5f1.webp"
+      "/Shorts Graphic - cor marrom.png",
+      "/Shorts Graphic - cor preto.png"
     ],
     "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
+      "Tipografia e artes conceituais exclusivas Marmot Atelier",
+      "Algodão heavyweight respirável de toque macio",
+      "Corte reto com fendas laterais para caimento perfeito",
+      "Cós ajustável com ponteiras metálicas escovadas",
+      "Bolsos laterais com profundidade ideal para smartphone",
+      "Visual moderno para compor com sneakers e camisetas oversized"
     ],
     "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
     ],
     "composition": [
-      "100% Algodão Heavyweight"
+      "100% Algodão Penteado Heavyweight"
     ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:03.572+00:00"
+    "status": "active"
   },
   {
-    "id": "prod-mol-017",
-    "slug": "moletom-striped-heavy",
-    "title": "Moletom Striped Heavy",
-    "subtitle": "",
-    "description": "Listras horizontais largas\nTecido pesado\nModelagem oversized\nOmbros caídos\nMangas largas\nVisual streetwear retrô",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
+    "id": "prod-sho-007",
+    "slug": "shorts-mesh-sport",
+    "title": "Shorts Mesh Sport",
+    "subtitle": "Mesh esportivo premium com camada dupla forrada (zero transparência)",
+    "description": "Mesh esportivo premium com camada dupla forrada (zero transparência)\nModelagem inspirada nas bermudas clássicas de basquete dos anos 90\nCós canelado elástico reforçado com cordão de alta resistência\nBolsos com zíper discreto para segurança de itens essenciais\nSecagem ultra rápida e respirabilidade incomparável\nPatch emborrachado Marmot Athletics na barra",
+    "price": 229.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
     "tags": [
-      "Moletom",
-      "Streetwear"
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Mesh Sport"
     ],
     "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-017",
+    "reviewCount": 20,
+    "stockCount": 28,
+    "sku": "MM-SHO-007",
     "sizes": [
       "P",
       "M",
@@ -7707,147 +7175,96 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto-branco",
-        "colorName": "Preto + Branco",
-        "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-017/26474fde97894e60.webp",
-        "featuredImage": "/uploads/products/prod-mol-017/26474fde97894e60.webp",
+        "color": "off-white",
+        "colorName": "Off White",
+        "colorHex": "#F2EFE8",
+        "image": "/Shorts Mesh Sport - cor off white.png",
+        "featuredImage": "/Shorts Mesh Sport - cor off white.png",
         "images": [
-          "/uploads/products/prod-mol-017/26474fde97894e60.webp"
+          "/Shorts Mesh Sport - cor off white.png"
+        ],
+        "sku": "MM-SHO-007-OFF-WHITE",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
       {
-        "color": "marrom-bege",
-        "colorName": "Marrom + Bege",
-        "colorHex": "#755645",
-        "image": "/uploads/products/prod-mol-017/d9590779a4ac8200.webp",
-        "featuredImage": "/uploads/products/prod-mol-017/d9590779a4ac8200.webp",
-        "images": [
-          "/uploads/products/prod-mol-017/d9590779a4ac8200.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-017/d811ab0ca67e64e2.webp",
-    "images": [
-      "/uploads/products/prod-mol-017/d811ab0ca67e64e2.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:03.346+00:00"
-  },
-  {
-    "id": "prod-mol-016",
-    "slug": "moletom-sleeveless-hoodie",
-    "title": "Moletom Sleeveless Hoodie",
-    "subtitle": "",
-    "description": "Sem mangas\nOmbros largos\nCapuz grande\nCavas amplas\nCorpo oversized\nIdeal para sobreposição com camiseta",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-016",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
+        "color": "preto",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-016/35ede30c1be7277d.webp",
-        "featuredImage": "/uploads/products/prod-mol-016/35ede30c1be7277d.webp",
+        "image": "/Shorts Mesh Sport - cor preto.png",
+        "featuredImage": "/Shorts Mesh Sport - cor preto.png",
         "images": [
-          "/uploads/products/prod-mol-016/35ede30c1be7277d.webp"
-        ]
-      },
-      {
-        "color": "grey",
-        "colorName": "Cinza Mescla",
-        "colorHex": "#71717A",
-        "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
-        "featuredImage": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
-        "images": [
-          "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp"
+          "/Shorts Mesh Sport - cor preto.png"
+        ],
+        "sku": "MM-SHO-007-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       }
     ],
-    "image": "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp",
+    "image": "/Shorts Mesh Sport - cor off white.png",
     "images": [
-      "/uploads/products/prod-mol-016/5ba47a6d69ee98f6.webp"
+      "/Shorts Mesh Sport - cor off white.png",
+      "/Shorts Mesh Sport - cor preto.png"
     ],
     "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
+      "Mesh esportivo premium com camada dupla forrada (zero transparência)",
+      "Modelagem inspirada nas bermudas clássicas de basquete dos anos 90",
+      "Cós canelado elástico reforçado com cordão de alta resistência",
+      "Bolsos com zíper discreto para segurança de itens essenciais",
+      "Secagem ultra rápida e respirabilidade incomparável",
+      "Patch emborrachado Marmot Athletics na barra"
     ],
     "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
     ],
     "composition": [
-      "100% Algodão Heavyweight"
+      "100% Poliéster Mesh Dupla Camada"
     ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:03.121+00:00"
+    "status": "active"
   },
   {
-    "id": "prod-mol-015",
-    "slug": "moletom-sherpa-panel",
-    "title": "Moletom Sherpa Panel",
-    "subtitle": "",
-    "description": "Painéis em tecido sherpa\nMistura de tecidos lisos e felpudos\nConstrução estruturada\nAparência pesada\nVisual de inverno\nContraste forte de texturas",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
+    "id": "prod-sho-008",
+    "slug": "shorts-minimal",
+    "title": "Shorts Minimal",
+    "subtitle": "Design clean e monocromático sem estampas ou excessos",
+    "description": "Design clean e monocromático sem estampas ou excessos\nTecido encorpado com toque acetinado e estrutura fluida\nBolsos laterais invisíveis com fecho discreto\nCintura elástica anatômica interna sem marcação\nComprimento equilibrado ideal para looks elegantes do streetwear\nVersatilidade extrema para qualquer estação do ano",
+    "price": 229.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
     "tags": [
-      "Moletom",
-      "Streetwear"
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Minimal"
     ],
     "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-015",
+    "reviewCount": 21,
+    "stockCount": 29,
+    "sku": "MM-SHO-008",
     "sizes": [
       "P",
       "M",
@@ -7857,147 +7274,96 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-015/3ff6b495d6a5d077.webp",
-        "featuredImage": "/uploads/products/prod-mol-015/3ff6b495d6a5d077.webp",
+        "color": "bege",
+        "colorName": "Bege",
+        "colorHex": "#C4AA84",
+        "image": "/Shorts Minimal - cor bege.png",
+        "featuredImage": "/Shorts Minimal - cor bege.png",
         "images": [
-          "/uploads/products/prod-mol-015/3ff6b495d6a5d077.webp"
+          "/Shorts Minimal - cor bege.png"
+        ],
+        "sku": "MM-SHO-008-BEGE",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
       {
-        "color": "marrom-bege",
-        "colorName": "Marrom + Bege",
-        "colorHex": "#5d4842",
-        "image": "/uploads/products/prod-mol-015/9024f8c024acfc1a.webp",
-        "featuredImage": "/uploads/products/prod-mol-015/9024f8c024acfc1a.webp",
-        "images": [
-          "/uploads/products/prod-mol-015/9024f8c024acfc1a.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-015/aac2a575c646a3ed.webp",
-    "images": [
-      "/uploads/products/prod-mol-015/aac2a575c646a3ed.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:02.906+00:00"
-  },
-  {
-    "id": "prod-mol-014",
-    "slug": "moletom-raw-seam",
-    "title": "Moletom Raw Seam",
-    "subtitle": "",
-    "description": "Costuras viradas para fora\nBarra parcialmente sem acabamento\nBordas cruas\nConstrução desconstruída\nModelagem boxy\nAparência propositalmente imperfeita",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-014",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
+        "color": "preto",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-014/99d4225563642768.webp",
-        "featuredImage": "/uploads/products/prod-mol-014/99d4225563642768.webp",
+        "image": "/Shorts Minimal - cor preto.png",
+        "featuredImage": "/Shorts Minimal - cor preto.png",
         "images": [
-          "/uploads/products/prod-mol-014/99d4225563642768.webp"
-        ]
-      },
-      {
-        "color": "cinza-",
-        "colorName": "Cinza",
-        "colorHex": "#9e9ea3",
-        "image": "/uploads/products/prod-mol-014/428ac275e1e4f573.webp",
-        "featuredImage": "/uploads/products/prod-mol-014/428ac275e1e4f573.webp",
-        "images": [
-          "/uploads/products/prod-mol-014/428ac275e1e4f573.webp"
+          "/Shorts Minimal - cor preto.png"
+        ],
+        "sku": "MM-SHO-008-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       }
     ],
-    "image": "/uploads/products/prod-mol-014/4bccc5cec0ac9455.webp",
+    "image": "/Shorts Minimal - cor bege.png",
     "images": [
-      "/uploads/products/prod-mol-014/4bccc5cec0ac9455.webp"
+      "/Shorts Minimal - cor bege.png",
+      "/Shorts Minimal - cor preto.png"
     ],
     "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
+      "Design clean e monocromático sem estampas ou excessos",
+      "Tecido encorpado com toque acetinado e estrutura fluida",
+      "Bolsos laterais invisíveis com fecho discreto",
+      "Cintura elástica anatômica interna sem marcação",
+      "Comprimento equilibrado ideal para looks elegantes do streetwear",
+      "Versatilidade extrema para qualquer estação do ano"
     ],
     "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
     ],
     "composition": [
-      "100% Algodão Heavyweight"
+      "100% Algodão Penteado Heavyweight"
     ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:02.695+00:00"
+    "status": "active"
   },
   {
-    "id": "prod-mol-013",
-    "slug": "moletom-raglan-sport",
-    "title": "Moletom Raglan Sport",
-    "subtitle": "",
-    "description": "Mangas raglan\nCostura da manga partindo da gola\nRecortes esportivos\nCorpo largo\nPunhos contrastantes\nInspiração em roupas esportivas retrô",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
+    "id": "prod-sho-009",
+    "slug": "shorts-panel",
+    "title": "Shorts Panel",
+    "subtitle": "Construção com recortes geométricos em blocos de tecido contrastantes",
+    "description": "Construção com recortes geométricos em blocos de tecido contrastantes\nPainéis em sarja peletizada e ripstop técnico\nCosturas duplas aparentes em linha especial reforçada\nModelagem ampla e estruturada de impacto visual marcante\nBolsos ergonômicos integrados aos recortes\nEstética arquitetônica avant-garde",
+    "price": 269.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
     "tags": [
-      "Moletom",
-      "Streetwear"
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Panel"
     ],
     "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-013",
+    "reviewCount": 14,
+    "stockCount": 30,
+    "sku": "MM-SHO-009",
     "sizes": [
       "P",
       "M",
@@ -8007,952 +7373,271 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "branco-preto",
-        "colorName": "Branco + Preto",
-        "colorHex": "#f7f3f3",
-        "image": "/uploads/products/prod-mol-013/e9db15da531c35f0.webp",
-        "featuredImage": "/uploads/products/prod-mol-013/e9db15da531c35f0.webp",
+        "color": "caqui",
+        "colorName": "Caqui",
+        "colorHex": "#9A8264",
+        "image": "/Shorts Panel - cor caqui.png",
+        "featuredImage": "/Shorts Panel - cor caqui.png",
         "images": [
-          "/uploads/products/prod-mol-013/e9db15da531c35f0.webp"
+          "/Shorts Panel - cor caqui.png"
+        ],
+        "sku": "MM-SHO-009-CAQUI",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
       {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#71717A",
-        "image": "/uploads/products/prod-mol-013/87bfc6156709e82d.webp",
-        "featuredImage": "/uploads/products/prod-mol-013/87bfc6156709e82d.webp",
-        "images": [
-          "/uploads/products/prod-mol-013/87bfc6156709e82d.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-013/a9f42d47a359bde0.webp",
-    "images": [
-      "/uploads/products/prod-mol-013/a9f42d47a359bde0.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:02.472+00:00"
-  },
-  {
-    "id": "prod-mol-012",
-    "slug": "moletom-pocket-cargo",
-    "title": "Moletom Pocket Cargo",
-    "subtitle": "",
-    "description": "Bolsos grandes frontais\nBolsos adicionais laterais\nDetalhes utilitários\nCapuz amplo\nCorpo oversized\nVisual inspirado em roupas cargo",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-012",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "verde-militar",
-        "colorName": "Verde Militar",
-        "colorHex": "#494431",
-        "image": "/uploads/products/prod-mol-012/69778621e195a346.webp",
-        "featuredImage": "/uploads/products/prod-mol-012/69778621e195a346.webp",
-        "images": [
-          "/uploads/products/prod-mol-012/69778621e195a346.webp"
-        ]
-      },
-      {
-        "color": "grey",
-        "colorName": "Cinza Mescla",
-        "colorHex": "#000000",
-        "image": "/uploads/products/prod-mol-012/223845ebb4e8ce57.webp",
-        "featuredImage": "/uploads/products/prod-mol-012/223845ebb4e8ce57.webp",
-        "images": [
-          "/uploads/products/prod-mol-012/223845ebb4e8ce57.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-012/4e41986fdf7513bb.webp",
-    "images": [
-      "/uploads/products/prod-mol-012/4e41986fdf7513bb.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:02.249+00:00"
-  },
-  {
-    "id": "prod-mol-011",
-    "slug": "moletom-panel-construction",
-    "title": "Moletom Panel Construction",
-    "subtitle": "",
-    "description": "Diversos painéis no corpo\nRecortes geométricos\nCosturas bem evidentes\nConstrução em blocos\nMistura de diferentes texturas\nEstética arquitetônica",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-011",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "branco-bege",
-        "colorName": "Branco + Bege",
-        "colorHex": "#e4dacd",
-        "image": "/uploads/products/prod-mol-011/d247b6b45b1e476a.webp",
-        "featuredImage": "/uploads/products/prod-mol-011/d247b6b45b1e476a.webp",
-        "images": [
-          "/uploads/products/prod-mol-011/d247b6b45b1e476a.webp"
-        ]
-      },
-      {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#42424c",
-        "image": "/uploads/products/prod-mol-011/eeacb5178b7f46f0.webp",
-        "featuredImage": "/uploads/products/prod-mol-011/eeacb5178b7f46f0.webp",
-        "images": [
-          "/uploads/products/prod-mol-011/eeacb5178b7f46f0.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-011/e75d5ada4e3e39b9.webp",
-    "images": [
-      "/uploads/products/prod-mol-011/e75d5ada4e3e39b9.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:02.028+00:00"
-  },
-  {
-    "id": "prod-mol-010",
-    "slug": "moletom-mock-neck",
-    "title": "Moletom Mock Neck",
-    "subtitle": "",
-    "description": "Gola média ou alta\nSem capuz\nVisual limpo\nOmbros caídos\nCorpo largo\nTecido encorpado",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-010",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "branco-",
-        "colorName": "Branco",
-        "colorHex": "#F9F9F7",
-        "image": "/uploads/products/prod-mol-010/09c8ceebf72881a2.webp",
-        "featuredImage": "/uploads/products/prod-mol-010/09c8ceebf72881a2.webp",
-        "images": [
-          "/uploads/products/prod-mol-010/09c8ceebf72881a2.webp"
-        ]
-      },
-      {
-        "color": "cinza-escuro",
-        "colorName": "Cinza Escuro",
-        "colorHex": "#71717A",
-        "image": "/uploads/products/prod-mol-010/a41f0d320d5b4fc5.webp",
-        "featuredImage": "/uploads/products/prod-mol-010/a41f0d320d5b4fc5.webp",
-        "images": [
-          "/uploads/products/prod-mol-010/a41f0d320d5b4fc5.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-010/01a4f2ff38284cfc.webp",
-    "images": [
-      "/uploads/products/prod-mol-010/01a4f2ff38284cfc.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:01.778+00:00"
-  },
-  {
-    "id": "prod-mol-009",
-    "slug": "moletom-inside-out",
-    "title": "Moletom Inside Out",
-    "subtitle": "",
-    "description": "Costuras propositalmente expostas\nAcabamentos aparentes\nEtiquetas externas ou detalhes invertidos\nConstrução com aparência de roupa do avesso\nModelagem oversized\nEstética desconstruída",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-009",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "cinza-branco",
-        "colorName": "Cinza + Branco",
-        "colorHex": "#B0B4B7",
-        "image": "/uploads/products/prod-mol-009/dab1eaacca6290b5.webp",
-        "featuredImage": "/uploads/products/prod-mol-009/dab1eaacca6290b5.webp",
-        "images": [
-          "/uploads/products/prod-mol-009/dab1eaacca6290b5.webp"
-        ]
-      },
-      {
-        "color": "preto-branco",
-        "colorName": "Preto + Branco",
-        "colorHex": "#1C1917",
-        "image": "/uploads/products/prod-mol-009/69de86bb26c04b95.webp",
-        "featuredImage": "/uploads/products/prod-mol-009/69de86bb26c04b95.webp",
-        "images": [
-          "/uploads/products/prod-mol-009/69de86bb26c04b95.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-009/76ed9fe13de10f3c.webp",
-    "images": [
-      "/uploads/products/prod-mol-009/76ed9fe13de10f3c.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:01.556+00:00"
-  },
-  {
-    "id": "prod-mol-008",
-    "slug": "moletom-heavy-boxy",
-    "title": "Moletom Heavy Boxy",
-    "subtitle": "",
-    "description": "Corpo mais curto e largo\nModelagem boxy\nOmbros caídos\nCapuz estruturado\nPunhos e barra grossos\nTecido pesado e encorpado",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-008",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
+        "color": "preto",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-008/2d380b21451a9f61.webp",
-        "featuredImage": "/uploads/products/prod-mol-008/2d380b21451a9f61.webp",
+        "image": "/Shorts Panel - cor preto.png",
+        "featuredImage": "/Shorts Panel - cor preto.png",
         "images": [
-          "/uploads/products/prod-mol-008/2d380b21451a9f61.webp"
+          "/Shorts Panel - cor preto.png"
+        ],
+        "sku": "MM-SHO-009-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
+        ]
+      }
+    ],
+    "image": "/Shorts Panel - cor caqui.png",
+    "images": [
+      "/Shorts Panel - cor caqui.png",
+      "/Shorts Panel - cor preto.png"
+    ],
+    "details": [
+      "Construção com recortes geométricos em blocos de tecido contrastantes",
+      "Painéis em sarja peletizada e ripstop técnico",
+      "Costuras duplas aparentes em linha especial reforçada",
+      "Modelagem ampla e estruturada de impacto visual marcante",
+      "Bolsos ergonômicos integrados aos recortes",
+      "Estética arquitetônica avant-garde"
+    ],
+    "careInstructions": [
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
+    ],
+    "composition": [
+      "100% Algodão Penteado Heavyweight"
+    ],
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active"
+  },
+  {
+    "id": "prod-sho-010",
+    "slug": "shorts-parachute",
+    "title": "Shorts Parachute",
+    "subtitle": "Tecido parachute ripstop ultraleve resistente a rasgos e água",
+    "description": "Tecido parachute ripstop ultraleve resistente a rasgos e água\nModelagem oversized com reguladores e stoppers metálicos na barra\nCintura com elástico franzido e cordão reforçado\nBolsos laterais amplos e bolsos utilitários com fechamento seguro\nVisual técnico com referências à cultura clubber e Y2K\nLeveza e conforto absoluto para o dia a dia",
+    "price": 249.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
+    "tags": [
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Parachute"
+    ],
+    "rating": 5,
+    "reviewCount": 15,
+    "stockCount": 31,
+    "sku": "MM-SHO-010",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
+      {
+        "color": "verde-oliva",
+        "colorName": "Verde Oliva",
+        "colorHex": "#44513B",
+        "image": "/Shorts Parachute - cor verde oliva.png",
+        "featuredImage": "/Shorts Parachute - cor verde oliva.png",
+        "images": [
+          "/Shorts Parachute - cor verde oliva.png"
+        ],
+        "sku": "MM-SHO-010-VERDE-OLIVA",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "/Shorts Parachute - cor preto.png",
+        "featuredImage": "/Shorts Parachute - cor preto.png",
+        "images": [
+          "/Shorts Parachute - cor preto.png"
+        ],
+        "sku": "MM-SHO-010-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
+        ]
+      }
+    ],
+    "image": "/Shorts Parachute - cor verde oliva.png",
+    "images": [
+      "/Shorts Parachute - cor verde oliva.png",
+      "/Shorts Parachute - cor preto.png"
+    ],
+    "details": [
+      "Tecido parachute ripstop ultraleve resistente a rasgos e água",
+      "Modelagem oversized com reguladores e stoppers metálicos na barra",
+      "Cintura com elástico franzido e cordão reforçado",
+      "Bolsos laterais amplos e bolsos utilitários com fechamento seguro",
+      "Visual técnico com referências à cultura clubber e Y2K",
+      "Leveza e conforto absoluto para o dia a dia"
+    ],
+    "careInstructions": [
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
+    ],
+    "composition": [
+      "100% Poliamida / Nylon Ripstop DWR"
+    ],
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active"
+  },
+  {
+    "id": "prod-sho-011",
+    "slug": "shorts-tech-nylon",
+    "title": "Shorts Tech Nylon",
+    "subtitle": "Nylon fosco 4-way stretch de alta mobilidade e durabilidade",
+    "description": "Nylon fosco 4-way stretch de alta mobilidade e durabilidade\nTratamento impermeabilizante DWR repelente a água e líquidos\nZíperes selados térmicos à prova de chuva nos bolsos\nFita de fechamento rápido na cintura com fivela magnética Fidlock style\nCaimento atlético relaxado ideal para outdoor e cidade\nEstética técnica gorpcore de alto padrão",
+    "price": 259.9,
+    "category": "shorts",
+    "subcategory": "Shorts",
+    "collection": "Coleção Marmot Summer & Utility 2026",
+    "tags": [
+      "Shorts",
+      "Bermudas",
+      "Streetwear",
+      "Lançamento",
+      "Shorts Tech Nylon"
+    ],
+    "rating": 5,
+    "reviewCount": 16,
+    "stockCount": 22,
+    "sku": "MM-SHO-011",
+    "sizes": [
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XG"
+    ],
+    "colors": [
       {
         "color": "cinza",
         "colorName": "Cinza",
-        "colorHex": "#797576",
-        "image": "/uploads/products/prod-mol-008/90da87a58f021d0b.webp",
-        "featuredImage": "/uploads/products/prod-mol-008/90da87a58f021d0b.webp",
+        "colorHex": "#575E6B",
+        "image": "/Shorts Tech Nylon - cor cinza.png",
+        "featuredImage": "/Shorts Tech Nylon - cor cinza.png",
         "images": [
-          "/uploads/products/prod-mol-008/90da87a58f021d0b.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-008/6977d400eb581174.webp",
-    "images": [
-      "/uploads/products/prod-mol-008/6977d400eb581174.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:01.338+00:00"
-  },
-  {
-    "id": "prod-mol-007",
-    "slug": "moletom-half-zip-utility",
-    "title": "Moletom Half Zip Utility",
-    "subtitle": "",
-    "description": "Zíper somente até o peito\nGola alta\nBolso frontal utilitário\nDetalhes funcionais\nModelagem oversized\nInspiração técnica e outdoor",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-007",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "verde-militar",
-        "colorName": "Verde Militar",
-        "colorHex": "#59523f",
-        "image": "/uploads/products/prod-mol-007/824eb8663f330877.webp",
-        "featuredImage": "/uploads/products/prod-mol-007/824eb8663f330877.webp",
-        "images": [
-          "/uploads/products/prod-mol-007/824eb8663f330877.webp"
-        ]
-      },
-      {
-        "color": "cinza-escuro",
-        "colorName": "Cinza Escuro",
-        "colorHex": "#45454f",
-        "image": "/uploads/products/prod-mol-007/19f86cb6cecdae97.webp",
-        "featuredImage": "/uploads/products/prod-mol-007/19f86cb6cecdae97.webp",
-        "images": [
-          "/uploads/products/prod-mol-007/19f86cb6cecdae97.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-007/62667afc0ce10cbd.webp",
-    "images": [
-      "/uploads/products/prod-mol-007/62667afc0ce10cbd.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:01.099+00:00"
-  },
-  {
-    "id": "prod-mol-006",
-    "slug": "moletom-funnel-neck",
-    "title": "Moletom Funnel Neck",
-    "subtitle": "",
-    "description": "Gola alta e larga\nSem capuz tradicional\nGola com bastante volume\nDesign minimalista\nOmbros caídos\nModelagem ampla",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-006",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "branco",
-        "colorName": "Branco",
-        "colorHex": "#FFFFFF",
-        "image": "/uploads/products/prod-mol-006/56c6c0f7c478c3f3.webp",
-        "featuredImage": "/uploads/products/prod-mol-006/56c6c0f7c478c3f3.webp",
-        "images": [
-          "/uploads/products/prod-mol-006/56c6c0f7c478c3f3.webp"
+          "/Shorts Tech Nylon - cor cinza.png"
+        ],
+        "sku": "MM-SHO-011-CINZA",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       },
       {
         "color": "preto",
         "colorName": "Preto",
-        "colorHex": "#1C1917",
-        "image": "/uploads/products/prod-mol-006/ca404ea65a811448.webp",
-        "featuredImage": "/uploads/products/prod-mol-006/ca404ea65a811448.webp",
-        "images": [
-          "/uploads/products/prod-mol-006/ca404ea65a811448.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-006/78aab436a6dc0046.webp",
-    "images": [
-      "/uploads/products/prod-mol-006/78aab436a6dc0046.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:00.886+00:00"
-  },
-  {
-    "id": "prod-mol-005",
-    "slug": "moletom-double-layer",
-    "title": "Moletom Double Layer",
-    "subtitle": "",
-    "description": "Segunda camada aparente na barra\nMangas com efeito de sobreposição\nAparência de duas peças usadas juntas\nComprimentos diferentes entre as camadas\nModelagem ampla\nVisual em camadas",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-005",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "bege-marrom",
-        "colorName": "Bege + Marrom",
-        "colorHex": "#b9a090",
-        "image": "/uploads/products/prod-mol-005/221f260d39d8a227.webp",
-        "featuredImage": "/uploads/products/prod-mol-005/221f260d39d8a227.webp",
-        "images": [
-          "/uploads/products/prod-mol-005/221f260d39d8a227.webp"
-        ]
-      },
-      {
-        "color": "preto-",
-        "colorName": "Preto",
-        "colorHex": "#000000",
-        "image": "/uploads/products/prod-mol-005/cdaf1b10107f1568.webp",
-        "featuredImage": "/uploads/products/prod-mol-005/cdaf1b10107f1568.webp",
-        "images": [
-          "/uploads/products/prod-mol-005/cdaf1b10107f1568.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-005/24e1365592c9fa67.webp",
-    "images": [
-      "/uploads/products/prod-mol-005/24e1365592c9fa67.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:00.671+00:00"
-  },
-  {
-    "id": "prod-mol-004",
-    "slug": "moletom-double-hood",
-    "title": "Moletom Double Hood",
-    "subtitle": "",
-    "description": "Dois capuzes sobrepostos\nConstrução em camadas\nParte superior mais volumosa\nAparência pesada\nModelagem oversized\nVisual streetwear marcante",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-004",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "bege-marrom",
-        "colorName": "Bege + Marrom",
-        "colorHex": "#e7d3c6",
-        "image": "/uploads/products/prod-mol-004/f1201acef2dd6232.webp",
-        "featuredImage": "/uploads/products/prod-mol-004/f1201acef2dd6232.webp",
-        "images": [
-          "/uploads/products/prod-mol-004/f1201acef2dd6232.webp"
-        ]
-      },
-      {
-        "color": "preto-cinza",
-        "colorName": "Preto + Cinza",
-        "colorHex": "#000000",
-        "image": "/uploads/products/prod-mol-004/173f533bf0991d0c.webp",
-        "featuredImage": "/uploads/products/prod-mol-004/173f533bf0991d0c.webp",
-        "images": [
-          "/uploads/products/prod-mol-004/173f533bf0991d0c.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-004/fc6137c0fce9dec5.webp",
-    "images": [
-      "/uploads/products/prod-mol-004/fc6137c0fce9dec5.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:00.439+00:00"
-  },
-  {
-    "id": "prod-mol-003",
-    "slug": "moletom-distressed",
-    "title": "Moletom Distressed",
-    "subtitle": "",
-    "description": "Lavagem envelhecida\nBordas propositalmente desgastadas\nPequenos rasgos ou áreas puídas\nAcabamento irregular\nEstética grunge\nAparência vintage",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-003",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "cinza-lavado",
-        "colorName": "Cinza lavado",
-        "colorHex": "#71717A",
-        "image": "/uploads/products/prod-mol-003/0d8bd95769b1b33d.webp",
-        "featuredImage": "/uploads/products/prod-mol-003/0d8bd95769b1b33d.webp",
-        "images": [
-          "/uploads/products/prod-mol-003/0d8bd95769b1b33d.webp"
-        ]
-      },
-      {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#1C1917",
-        "image": "/uploads/products/prod-mol-003/689779da544369d5.webp",
-        "featuredImage": "/uploads/products/prod-mol-003/689779da544369d5.webp",
-        "images": [
-          "/uploads/products/prod-mol-003/689779da544369d5.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-003/b68558e30b145732.webp",
-    "images": [
-      "/uploads/products/prod-mol-003/b68558e30b145732.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:56:00.214+00:00"
-  },
-  {
-    "id": "prod-mol-002",
-    "slug": "moletom-asymmetric-zip",
-    "title": "Moletom Asymmetric Zip",
-    "subtitle": "",
-    "description": "Zíper frontal diagonal\nGola alta\nConstrução assimétrica\nRecortes menos convencionais\nVisual moderno e experimental\nCaimento oversized",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-002",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-002/08386559a707bd94.webp",
-        "featuredImage": "/uploads/products/prod-mol-002/08386559a707bd94.webp",
+        "image": "/Shorts Tech Nylon - cor preto.png",
+        "featuredImage": "/Shorts Tech Nylon - cor preto.png",
         "images": [
-          "/uploads/products/prod-mol-002/08386559a707bd94.webp"
-        ]
-      },
-      {
-        "color": "grey",
-        "colorName": "Cinza Mescla",
-        "colorHex": "#71717A",
-        "image": "/uploads/products/prod-mol-002/271690399c82926c.webp",
-        "featuredImage": "/uploads/products/prod-mol-002/271690399c82926c.webp",
-        "images": [
-          "/uploads/products/prod-mol-002/271690399c82926c.webp"
-        ]
-      }
-    ],
-    "image": "/uploads/products/prod-mol-002/6b050306d7c2139f.webp",
-    "images": [
-      "/uploads/products/prod-mol-002/6b050306d7c2139f.webp"
-    ],
-    "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
-    ],
-    "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
-    ],
-    "composition": [
-      "100% Algodão Heavyweight"
-    ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
-    "isNewRelease": true,
-    "isBestSeller": false,
-    "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:55:59.949+00:00"
-  },
-  {
-    "id": "prod-mol-001",
-    "slug": "moletom-anorak",
-    "title": "Moletom Anorak",
-    "subtitle": "",
-    "description": "Meio zíper frontal\nBolso canguru grande\nCapuz amplo\nAjuste na barra\nVisual inspirado em jaquetas corta-vento\nModelagem solta e utilitária",
-    "price": 349.9,
-    "category": "moletons",
-    "subcategory": "Moletons",
-    "collection": "Coleção Marmot Atelier",
-    "tags": [
-      "Moletom",
-      "Streetwear"
-    ],
-    "rating": 5,
-    "reviewCount": 0,
-    "stockCount": 25,
-    "sku": "MM-MOL-001",
-    "sizes": [
-      "P",
-      "M",
-      "G",
-      "GG",
-      "XG"
-    ],
-    "colors": [
-      {
-        "color": "black",
-        "colorName": "Preto",
-        "colorHex": "#121212",
-        "image": "/uploads/products/prod-mol-001/090276db740b9a61.webp",
-        "featuredImage": "/uploads/products/prod-mol-001/090276db740b9a61.webp",
-        "images": [
-          "/uploads/products/prod-mol-001/090276db740b9a61.webp"
-        ]
-      },
-      {
-        "color": "verde-militar",
-        "colorName": "Verde Militar",
-        "colorHex": "#4C4D3D",
-        "image": "/uploads/products/prod-mol-001/c0a9baf415a3f9cc.webp",
-        "featuredImage": "/uploads/products/prod-mol-001/c0a9baf415a3f9cc.webp",
-        "images": [
-          "/uploads/products/prod-mol-001/c0a9baf415a3f9cc.webp"
+          "/Shorts Tech Nylon - cor preto.png"
+        ],
+        "sku": "MM-SHO-011-PRETO",
+        "stockCount": 15,
+        "sizes": [
+          "P",
+          "M",
+          "G",
+          "GG",
+          "XG"
         ]
       }
     ],
-    "image": "/uploads/products/prod-mol-001/a70c68c9e1c10f30.webp",
+    "image": "/Shorts Tech Nylon - cor cinza.png",
     "images": [
-      "/uploads/products/prod-mol-001/a70c68c9e1c10f30.webp"
+      "/Shorts Tech Nylon - cor cinza.png",
+      "/Shorts Tech Nylon - cor preto.png"
     ],
     "details": [
-      "Modelagem exclusiva Marmot",
-      "Acabamento pespontado reforçado",
-      "Confeccionado artesanalmente"
+      "Nylon fosco 4-way stretch de alta mobilidade e durabilidade",
+      "Tratamento impermeabilizante DWR repelente a água e líquidos",
+      "Zíperes selados térmicos à prova de chuva nos bolsos",
+      "Fita de fechamento rápido na cintura com fivela magnética Fidlock style",
+      "Caimento atlético relaxado ideal para outdoor e cidade",
+      "Estética técnica gorpcore de alto padrão"
     ],
     "careInstructions": [
-      "Lavar do avesso em água fria",
-      "Não usar secadora rotativa",
-      "Secar à sombra"
+      "Lavar à máquina em ciclo suave com água fria",
+      "Não utilizar alvejantes ou amaciantes agressivos",
+      "Secar à sombra em varal (não secar em tambor)",
+      "Passar pelo avesso em temperatura média"
     ],
     "composition": [
-      "100% Algodão Heavyweight"
+      "100% Poliamida / Nylon Ripstop DWR"
     ],
-    "reviews": [],
-    "weight": 0.85,
-    "height": 8,
-    "width": 30,
-    "length": 35,
+    "weight": 0.42,
+    "height": 4,
+    "width": 25,
+    "length": 30,
     "isNewRelease": true,
     "isBestSeller": false,
     "featured": true,
-    "status": "active",
-    "createdAt": "2026-08-24T22:55:59.7+00:00"
+    "status": "active"
   }
 ];

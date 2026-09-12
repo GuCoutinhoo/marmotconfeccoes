@@ -11,7 +11,7 @@ export const DEFAULT_CATEGORY_IMAGE_URLS: Record<string, string> = {
   moletons: '/categories/categoria-moletons.png?v=20260907_v4_ultrahd',
   jaquetas: '/categories/categoria-jaquetas.png?v=20260907_v4_ultrahd',
   calcas: '/categories/categoria-calcas.png?v=20260907_v4_ultrahd',
-  shorts: '/categories/categoria-shorts.png?v=20260907_v4_ultrahd',
+  shorts: '/categoria shorts.png',
   tenis: '/categories/categoria-tenis.png?v=20260907_v4_ultrahd',
   acessorios: '/categories/categoria-acessorios.png?v=20260907_v4_ultrahd',
 };

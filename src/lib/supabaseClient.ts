@@ -1,12 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, Category, Address, Order, CartItem, ProductVariant } from '../types';
 import { getCamisetaImageMapping } from '../data/camisetaImageMappings';
+import { getShortsImageMapping, buildShortsProducts } from '../data/shortsImageMappings';
 
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
 
-let resolvedUrl = import.meta.env.VITE_SUPABASE_URL?.trim() || SUPABASE_PROJECT_URL;
-let resolvedAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || SUPABASE_DEFAULT_ANON_KEY;
+let resolvedUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL?.trim()) || SUPABASE_PROJECT_URL;
+let resolvedAnonKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY?.trim()) || SUPABASE_DEFAULT_ANON_KEY;
 
 // Security & Connectivity Guard:
 // If running in browser and the URL is an internal loopback/emulator address (127.0.0.1, localhost, or port 54321)
@@ -66,12 +67,17 @@ export function mapSupabaseRowToProduct(row: any): Product {
   const rowId = String(row.id || d.id || '').trim();
   const rowSlug = String(row.slug || d.slug || '').trim();
   const camisetaMapping = getCamisetaImageMapping(rowId) || getCamisetaImageMapping(rowSlug);
+  const shortsMapping = getShortsImageMapping(rowId) || getShortsImageMapping(rowSlug);
 
   const primaryImg = camisetaMapping
     ? camisetaMapping.defaultImage
+    : shortsMapping
+    ? shortsMapping.defaultImage
     : (row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || '');
   const allImagesList = camisetaMapping
     ? camisetaMapping.images
+    : shortsMapping
+    ? shortsMapping.images
     : (Array.isArray(row.images) && row.images.length > 0
         ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
         : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : [])));
@@ -95,6 +101,18 @@ export function mapSupabaseRowToProduct(row: any): Product {
       if (match) {
         featured = match.image;
         variantImages = [match.image];
+      }
+    }
+
+    if (shortsMapping) {
+      const match = shortsMapping.variants.find(
+        (v) =>
+          (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
+          (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
+      );
+      if (match) {
+        featured = match.featuredImage || match.image;
+        variantImages = match.images;
       }
     }
 
@@ -160,16 +178,18 @@ export function mapSupabaseRowToProduct(row: any): Product {
 export function mapSupabaseRowToCategory(row: any): Category {
   if (!row) return {} as Category;
   const d = (row.data && typeof row.data === 'object') ? row.data : {};
+  const slug = String(row.slug || d.slug || row.id || d.id || '').toLowerCase().trim();
+  const isShorts = slug === 'shorts' || slug === 'short' || row.id === 'shorts';
 
   return {
     id: String(row.id || d.id || row.slug || d.slug || `cat-${Date.now()}`),
-    slug: String(row.slug || d.slug || row.name || d.name || '').toLowerCase().trim(),
-    name: row.name || d.name || 'Categoria',
-    tagline: row.tagline || d.tagline || '',
-    description: row.description || d.description || '',
-    image: row.image || d.image || '',
-    subcategories: Array.isArray(row.subcategories) ? row.subcategories : (Array.isArray(d.subcategories) ? d.subcategories : ['Geral']),
-    productCount: typeof row.product_count === 'number' ? row.product_count : (typeof d.productCount === 'number' ? d.productCount : 0),
+    slug: isShorts ? 'shorts' : slug,
+    name: isShorts ? 'Shorts' : (row.name || d.name || 'Categoria'),
+    tagline: isShorts ? 'Shorts & Bermudas Streetwear Autênticos' : (row.tagline || d.tagline || ''),
+    description: isShorts ? 'Shorts e bermudas streetwear com modelagens baggy, parachute, denim e tech nylon.' : (row.description || d.description || ''),
+    image: isShorts ? '/categoria shorts.png' : (row.image || d.image || ''),
+    subcategories: isShorts ? ['Baggy Denim', 'Cargo Baggy', 'Parachute', 'Tech Nylon'] : (Array.isArray(row.subcategories) ? row.subcategories : (Array.isArray(d.subcategories) ? d.subcategories : ['Geral'])),
+    productCount: isShorts ? 11 : (typeof row.product_count === 'number' ? row.product_count : (typeof d.productCount === 'number' ? d.productCount : 0)),
     order: typeof row.order === 'number' ? row.order : (typeof d.order === 'number' ? d.order : 0),
     active: row.active !== undefined ? Boolean(row.active) : (d.active !== undefined ? Boolean(d.active) : true),
     createdAt: row.created_at || d.createdAt || new Date().toISOString(),
@@ -184,13 +204,28 @@ let supabaseProductFetchRequestId = 0;
 /**
  * Validates array of products and deduplicates by unique product.id using Map.
  * Discards any corrupted, null or missing-id records.
+ * STRICT ENFORCEMENT: Discards all 15 old legacy shorts with unsplash images
+ * and enforces the exact 11 authoritative shorts created from the user's images.
  */
 export function validateAndDeduplicateProducts(products: Product[]): Product[] {
-  if (!Array.isArray(products) || products.length === 0) return [];
+  const authoritativeShorts = buildShortsProducts();
+  if (!Array.isArray(products) || products.length === 0) return authoritativeShorts;
+
+  const nonShorts = products.filter((item) => {
+    if (!item || typeof item !== 'object') return false;
+    const cat = String(item.category || '').toLowerCase().trim();
+    const subcat = String(item.subcategory || '').toLowerCase().trim();
+    const id = String(item.id || '').trim();
+    if (cat === 'shorts' || cat === 'short' || subcat === 'shorts' || id.startsWith('prod-sho-')) {
+      return false;
+    }
+    return true;
+  });
+
+  const combined = [...nonShorts, ...authoritativeShorts];
   const byId = new Map<string, Product>();
 
-  for (const item of products) {
-    if (!item || typeof item !== 'object') continue;
+  for (const item of combined) {
     const cleanId = String(item.id || '').trim();
     if (!cleanId) continue;
     // Map ensures each unique id appears exactly once (latest or valid item)
