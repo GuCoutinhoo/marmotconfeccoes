@@ -2,7 +2,7 @@ import React from 'react';
 import { Product } from '../../types';
 import { ProductCard } from '../ProductCard';
 import { ProductSkeleton } from '../ProductSkeleton';
-import { ArrowRight } from 'lucide-react';
+import { Trophy, TrendingUp, ArrowRight } from 'lucide-react';
 
 interface BestsellersRankingProps {
   products: Product[];
@@ -25,45 +25,32 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
   }
 
   return (
-    <section className="py-12 sm:py-16 lg:py-20 bg-white border-b border-[#E4E4E7]">
+    <section className="py-8 sm:py-10 lg:py-12 bg-white border-b border-[#E4E4E7]">
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        {/* Editorial Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 pb-6 sm:pb-8 border-b border-[#E4E4E7] mb-8 sm:mb-10 lg:mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
-            {/* Minimalist Atelier Tag */}
-            <div className="flex items-center gap-2 text-[10.5px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#B45309] mb-2.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#B45309] inline-block" />
-              <span>CURADORIA & DEMANDA // DROP RANKING</span>
+            <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1">
+              <Trophy className="w-3.5 h-3.5" />
+              <span>FAVORITOS DA COMUNIDADE</span>
             </div>
-
-            {/* Main Headline */}
-            <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-[#18181B] leading-none">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">
               OS MAIS PROCURADOS
             </h2>
-
-            {/* Subtitle */}
-            <p className="text-xs sm:text-sm text-[#71717A] mt-2.5 max-w-xl font-normal leading-relaxed">
-              Modelagens autorais desenvolvidas para caimento boxy e matéria-prima de alta gramatura. As silhuetas de maior procura e recompra no ateliê.
+            <p className="text-xs sm:text-[13px] text-[#52525B] mt-1 max-w-lg">
+              As peças com maior índice de recompra e destaque pela durabilidade da malha pesada.
             </p>
           </div>
 
-          {/* Integrated Editorial CTA */}
-          <div className="flex items-center gap-4 shrink-0 sm:self-end mt-2 sm:mt-0">
-            <div className="hidden xl:flex items-center text-[11px] font-mono font-semibold text-[#71717A] pr-4 border-r border-[#E4E4E7]">
-              <span>[ 08 PEÇAS EM DESTAQUE ]</span>
-            </div>
-            <button
-              onClick={() => onNavigate('shop')}
-              className="group inline-flex items-center gap-2.5 px-4 sm:px-5 py-2.5 sm:py-3 bg-white border border-[#18181B] hover:bg-[#18181B] text-[#18181B] hover:text-white transition-all duration-200 rounded-[2px] text-xs font-bold uppercase tracking-wider cursor-pointer shadow-2xs"
-            >
-              <span>Ver Todo o Catálogo</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-            </button>
-          </div>
+          <button
+            onClick={() => onNavigate('shop')}
+            className="text-xs sm:text-[13px] font-bold uppercase text-[#B45309] hover:text-[#18181B] hover:underline flex items-center gap-1.5 cursor-pointer"
+          >
+            Ver Todo o Catálogo <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* 8 Bestsellers Grid with Spacious Editorial Respiration */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-7 xl:gap-8">
+        {/* 8 Bestsellers Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {isProductsEmpty ? (
             Array.from({ length: 8 }).map((_, idx) => (
               <div key={`bs-skel-${idx}`} className="flex flex-col h-full">
@@ -72,12 +59,14 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
             ))
           ) : (
             bestsellers.map((product, index) => (
-              <div key={product.id} className="flex flex-col h-full">
+              <div key={product.id} className="relative group flex flex-col h-full">
+                {/* Discrete Leaderboard Badge */}
+                <div className="absolute top-3 left-3 z-20 bg-white/95 text-[#B45309] font-mono font-black text-xs px-2.5 py-1 rounded-[2px] border border-[#DCDCE0] backdrop-blur-md flex items-center gap-1">
+                  <TrendingUp className="w-3 h-3 text-[#B45309]" /> #{String(index + 1).padStart(2, '0')}
+                </div>
+
                 <ProductCard
                   product={product}
-                  rankingIndex={index + 1}
-                  totalRanking={8}
-                  showCategory={false}
                   onQuickView={onQuickView}
                   onProductClick={(id) => onNavigate('product', id)}
                 />

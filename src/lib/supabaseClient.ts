@@ -1,7 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, Category, Address, Order, CartItem, ProductVariant } from '../types';
 import { getCamisetaImageMapping } from '../data/camisetaImageMappings';
-import { getShortsImageMapping } from '../data/shortsImageMappings';
 
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
@@ -66,28 +65,22 @@ export function mapSupabaseRowToProduct(row: any): Product {
 
   const rowId = String(row.id || d.id || '').trim();
   const rowSlug = String(row.slug || d.slug || '').trim();
-  const rawTitle = String(row.title || d.title || row.name || d.name || '').trim();
   const camisetaMapping = getCamisetaImageMapping(rowId) || getCamisetaImageMapping(rowSlug);
-  const shortsMapping = getShortsImageMapping(rawTitle, rowSlug) || getShortsImageMapping(rowSlug) || getShortsImageMapping(rowId);
 
   const primaryImg = camisetaMapping
     ? camisetaMapping.defaultImage
-    : (shortsMapping
-        ? shortsMapping.defaultImage
-        : (row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || ''));
+    : (row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || '');
   const allImagesList = camisetaMapping
     ? camisetaMapping.images
-    : (shortsMapping
-        ? shortsMapping.images
-        : (Array.isArray(row.images) && row.images.length > 0
-            ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
-            : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : []))));
+    : (Array.isArray(row.images) && row.images.length > 0
+        ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
+        : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : [])));
 
   const rawColors = Array.isArray(row.colors) && row.colors.length > 0
     ? row.colors
     : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
 
-  let cleanColors = rawColors.map((c: any) => {
+  const cleanColors = rawColors.map((c: any) => {
     let variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
       ? c.images
       : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
@@ -119,32 +112,10 @@ export function mapSupabaseRowToProduct(row: any): Product {
     };
   });
 
-  if (shortsMapping) {
-    cleanColors = shortsMapping.variants.map((v, vIdx) => {
-      const existing = rawColors.find((c: any) =>
-        (c.color && (c.color.toLowerCase() === v.colorKey.toLowerCase() || c.color.toLowerCase().includes(v.colorKey.toLowerCase()))) ||
-        (c.colorName && c.colorName.toLowerCase().includes(v.colorName.toLowerCase()))
-      ) || rawColors[vIdx];
-
-      return {
-        id: existing?.id || `${rowId}-var-${vIdx + 1}`,
-        color: v.colorKey,
-        colorName: v.colorName,
-        colorHex: v.colorHex,
-        image: v.image,
-        featuredImage: v.image,
-        images: [v.image],
-        sku: existing?.sku || `MM-SHO-${String(vIdx + 1).padStart(3, '0')}`,
-        stockCount: existing?.stockCount ?? 20,
-        sizes: existing?.sizes || ['P', 'M', 'G', 'GG', 'XG'],
-      };
-    });
-  }
-
   return {
     id: String(row.id || d.id || `prod-${Date.now()}`),
-    slug: shortsMapping ? shortsMapping.slug : String(row.slug || d.slug || (row.title ? row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
-    title: shortsMapping ? shortsMapping.title : (row.title || d.title || 'Produto Streetwear'),
+    slug: String(row.slug || d.slug || (row.title ? row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
+    title: row.title || d.title || 'Produto Streetwear',
     subtitle: row.subtitle || d.subtitle || '',
     description: row.description || d.description || '',
     price: typeof row.price === 'number' ? row.price : parseFloat(row.price || d.price || 0),
@@ -222,9 +193,6 @@ export function validateAndDeduplicateProducts(products: Product[]): Product[] {
     if (!item || typeof item !== 'object') continue;
     const cleanId = String(item.id || '').trim();
     if (!cleanId) continue;
-    // Discard obsolete dummy shorts without assets (prod-sho-013, prod-sho-015)
-    if (cleanId === 'prod-sho-013' || cleanId === 'prod-sho-015') continue;
-    if (item.title === 'Shorts Pleated Wide' || item.title === 'Shorts Corduroy Baggy') continue;
     // Map ensures each unique id appears exactly once (latest or valid item)
     byId.set(cleanId, item);
   }

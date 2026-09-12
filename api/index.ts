@@ -25,7 +25,6 @@ import {
 } from '../src/server/infinitePayClient';
 import { IS_TEST_MODE } from '../src/server/runtime-flags';
 import { getCamisetaImageMapping } from '../src/data/camisetaImageMappings';
-import { getShortsImageMapping } from '../src/data/shortsImageMappings';
 
 export { IS_TEST_MODE };
 
@@ -998,33 +997,27 @@ export class DatabaseManager {
     if (!p) return {} as Product;
     const prodId = String(p.id || `prod-${Date.now()}`);
     const prodSlug = String(p.slug || '').trim();
-    const prodTitle = String(p.title || p.name || '').trim();
     const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
-    const shortsMapping = getShortsImageMapping(prodTitle, prodSlug) || getShortsImageMapping(prodSlug) || getShortsImageMapping(prodId);
 
     const rawMainImage = camisetaMapping
       ? camisetaMapping.defaultImage
-      : (shortsMapping
-          ? shortsMapping.defaultImage
-          : (p.image || (Array.isArray(p.images) && p.images[0]) || ''));
-    const cleanMainImage = (camisetaMapping || shortsMapping) ? (camisetaMapping ? camisetaMapping.defaultImage : shortsMapping.defaultImage) : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+      : (p.image || (Array.isArray(p.images) && p.images[0]) || '');
+    const cleanMainImage = camisetaMapping ? camisetaMapping.defaultImage : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
 
     const rawImagesList = camisetaMapping
       ? camisetaMapping.images
-      : (shortsMapping
-          ? shortsMapping.images
-          : (Array.isArray(p.images) && p.images.length > 0
-              ? p.images
-              : (rawMainImage ? [rawMainImage] : [])));
-    const cleanImagesList = (camisetaMapping || shortsMapping)
-      ? (camisetaMapping ? camisetaMapping.images : shortsMapping.images)
+      : (Array.isArray(p.images) && p.images.length > 0
+          ? p.images
+          : (rawMainImage ? [rawMainImage] : []));
+    const cleanImagesList = camisetaMapping
+      ? camisetaMapping.images
       : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
 
     const rawColors = Array.isArray(p.colors) && p.colors.length > 0
       ? p.colors
       : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }];
 
-    let cleanColors = rawColors.map((c: any, cIdx: number) => {
+    const cleanColors = rawColors.map((c: any, cIdx: number) => {
       const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
         ? c.images
         : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
@@ -1047,16 +1040,6 @@ export class DatabaseManager {
           finalFeatured = match.image;
           finalVariantImages = [match.image];
         }
-      } else if (shortsMapping) {
-        const match = shortsMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
       }
 
       return {
@@ -1073,34 +1056,9 @@ export class DatabaseManager {
       };
     });
 
-    if (shortsMapping) {
-      cleanColors = shortsMapping.variants.map((v, vIdx) => {
-        const existing = rawColors.find((c: any) =>
-          (c.color && (c.color.toLowerCase() === v.colorKey.toLowerCase() || c.color.toLowerCase().includes(v.colorKey.toLowerCase()))) ||
-          (c.colorName && c.colorName.toLowerCase().includes(v.colorName.toLowerCase()))
-        ) || rawColors[vIdx];
-
-        return {
-          id: existing?.id || `${prodId}-var-${vIdx + 1}`,
-          color: v.colorKey,
-          colorName: v.colorName,
-          colorHex: v.colorHex,
-          image: v.image,
-          featuredImage: v.image,
-          images: [v.image],
-          sku: existing?.sku || `MM-SHO-${String(vIdx + 1).padStart(3, '0')}`,
-          stockCount: existing?.stockCount ?? 20,
-          sizes: existing?.sizes || ['P', 'M', 'G', 'GG', 'XG'],
-        };
-      });
-    }
-
     return {
       ...p,
       id: prodId,
-      title: shortsMapping ? shortsMapping.title : (p.title || p.name || 'Produto Streetwear'),
-      name: shortsMapping ? shortsMapping.title : (p.name || p.title || 'Produto Streetwear'),
-      slug: shortsMapping ? shortsMapping.slug : (p.slug || prodSlug),
       image: cleanMainImage || (cleanImagesList[0] || ''),
       images: cleanImagesList.length > 0 ? cleanImagesList : (cleanMainImage ? [cleanMainImage] : []),
       colors: cleanColors,
@@ -1117,33 +1075,27 @@ export class DatabaseManager {
     const d = (item.data && typeof item.data === 'object') ? item.data : {};
     const prodId = String(item.id || d.id || `prod-${Date.now()}`);
     const prodSlug = String(item.slug || d.slug || '').trim();
-    const prodTitle = String(item.title || d.title || item.name || d.name || '').trim();
     const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
-    const shortsMapping = getShortsImageMapping(prodTitle, prodSlug) || getShortsImageMapping(prodSlug) || getShortsImageMapping(prodId);
     
     const rawMainImage = camisetaMapping
       ? camisetaMapping.defaultImage
-      : (shortsMapping
-          ? shortsMapping.defaultImage
-          : (item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || ''));
-    const cleanMainImage = (camisetaMapping || shortsMapping) ? (camisetaMapping ? camisetaMapping.defaultImage : shortsMapping.defaultImage) : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+      : (item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '');
+    const cleanMainImage = camisetaMapping ? camisetaMapping.defaultImage : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
 
     const rawImagesList = camisetaMapping
       ? camisetaMapping.images
-      : (shortsMapping
-          ? shortsMapping.images
-          : (Array.isArray(item.images) && item.images.length > 0
-              ? item.images
-              : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : []))));
-    const cleanImagesList = (camisetaMapping || shortsMapping)
-      ? (camisetaMapping ? camisetaMapping.images : shortsMapping.images)
+      : (Array.isArray(item.images) && item.images.length > 0
+          ? item.images
+          : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : [])));
+    const cleanImagesList = camisetaMapping
+      ? camisetaMapping.images
       : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
 
     const rawColors = Array.isArray(item.colors) && item.colors.length > 0
       ? item.colors
       : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
 
-    let cleanColors = rawColors.map((c: any, cIdx: number) => {
+    const cleanColors = rawColors.map((c: any, cIdx: number) => {
       const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
         ? c.images
         : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
@@ -1164,16 +1116,6 @@ export class DatabaseManager {
           finalFeatured = match.image;
           finalVariantImages = [match.image];
         }
-      } else if (shortsMapping) {
-        const match = shortsMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
       }
 
       return {
@@ -1190,32 +1132,10 @@ export class DatabaseManager {
       };
     });
 
-    if (shortsMapping) {
-      cleanColors = shortsMapping.variants.map((v, vIdx) => {
-        const existing = rawColors.find((c: any) =>
-          (c.color && (c.color.toLowerCase() === v.colorKey.toLowerCase() || c.color.toLowerCase().includes(v.colorKey.toLowerCase()))) ||
-          (c.colorName && c.colorName.toLowerCase().includes(v.colorName.toLowerCase()))
-        ) || rawColors[vIdx];
-
-        return {
-          id: existing?.id || `${prodId}-var-${vIdx + 1}`,
-          color: v.colorKey,
-          colorName: v.colorName,
-          colorHex: v.colorHex,
-          image: v.image,
-          featuredImage: v.image,
-          images: [v.image],
-          sku: existing?.sku || `MM-SHO-${String(vIdx + 1).padStart(3, '0')}`,
-          stockCount: existing?.stockCount ?? 20,
-          sizes: existing?.sizes || ['P', 'M', 'G', 'GG', 'XG'],
-        };
-      });
-    }
-
     return {
       id: prodId,
-      slug: shortsMapping ? shortsMapping.slug : String(item.slug || d.slug || (item.title ? item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
-      title: shortsMapping ? shortsMapping.title : (item.title || d.title || 'Produto Streetwear'),
+      slug: String(item.slug || d.slug || (item.title ? item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
+      title: item.title || d.title || 'Produto Streetwear',
       subtitle: item.subtitle || d.subtitle || '',
       description: item.description || d.description || '',
       price: typeof item.price === 'number' ? item.price : parseFloat(item.price || d.price || 0),
@@ -6075,7 +5995,7 @@ export const couponRateLimiter = new RateLimiter(60 * 1000, 30, 'coupons');
 export const newsletterRateLimiter = new RateLimiter(60 * 1000, 10, 'newsletter');
 export const reviewRateLimiter = new RateLimiter(10 * 60 * 1000, 15, 'reviews');
 
-app.use(compression({ threshold: 512 }));
+app.use(compression({ threshold: 512 }) as unknown as express.RequestHandler);
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ limit: '15mb', extended: true }));
 app.use(cookieParser(SESSION_SECRET));
