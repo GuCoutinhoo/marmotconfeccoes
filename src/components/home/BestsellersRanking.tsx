@@ -25,32 +25,32 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
   }
 
   return (
-    <section className="py-12 sm:py-14 lg:py-16 bg-white border-b border-[#E4E4E7]">
+    <section className="py-8 sm:py-10 lg:py-12 bg-white border-b border-[#E4E4E7]">
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
+            <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1">
               <Trophy className="w-3.5 h-3.5" />
               <span>FAVORITOS DA COMUNIDADE</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#18181B]">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">
               OS MAIS PROCURADOS
             </h2>
-            <p className="text-xs sm:text-sm text-[#52525B] mt-1 max-w-lg">
+            <p className="text-xs sm:text-[13px] text-[#52525B] mt-1 max-w-lg">
               As peças com maior índice de recompra e destaque pela durabilidade da malha pesada.
             </p>
           </div>
 
           <button
             onClick={() => onNavigate('shop')}
-            className="text-xs sm:text-sm font-bold uppercase text-[#B45309] hover:text-[#18181B] hover:underline flex items-center gap-1.5 cursor-pointer"
+            className="text-xs sm:text-[13px] font-bold uppercase text-[#B45309] hover:text-[#18181B] hover:underline flex items-center gap-1.5 cursor-pointer"
           >
             Ver Todo o Catálogo <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* 8 Bestsellers Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {isProductsEmpty ? (
             Array.from({ length: 8 }).map((_, idx) => (
               <div key={`bs-skel-${idx}`} className="flex flex-col h-full">

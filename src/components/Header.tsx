@@ -249,7 +249,7 @@ export const Header: React.FC<HeaderProps> = ({
       >
         <div 
           className={`w-full flex items-center justify-between gap-2 sm:gap-4 transition-all duration-500 ease-in-out ${
-            isScrolled ? 'h-[56px] sm:h-[60px]' : 'h-[68px] sm:h-[72px]'
+            isScrolled ? 'h-[52px] sm:h-[54px]' : 'h-[62px] sm:h-[66px]'
           }`}
         >
           

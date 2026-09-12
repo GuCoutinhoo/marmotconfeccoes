@@ -15,15 +15,15 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
   return (
     <section
       id="editorial-lookbook"
-      className="py-6 sm:py-10 lg:py-14 bg-[#ffffff] select-none"
+      className="py-5 sm:py-7 lg:py-10 bg-[#ffffff] select-none"
     >
-      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 space-y-4 sm:space-y-6">
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 space-y-3.5 sm:space-y-4.5">
         {/* =========================================================================
             1. BANNER PRINCIPAL: DROP 03 (BUILT FOR THE STREETS)
            ========================================================================= */}
         <div
           onClick={() => onNavigate('shop')}
-          className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1916/821] w-full min-h-[220px] sm:min-h-[340px] md:min-h-[460px] lg:min-h-[560px] transition-all duration-300 shadow-sm hover:shadow-md"
+          className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1916/821] w-full min-h-[190px] sm:min-h-[290px] md:min-h-[390px] lg:min-h-[480px] transition-all duration-300 shadow-sm hover:shadow-md"
         >
           <picture className="w-full h-full block">
             <source srcSet={drop3Webp} type="image/webp" />
@@ -58,7 +58,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
           >
             <button
               type="button"
-              className="inline-flex items-center gap-2 sm:gap-3 px-3 sm:px-6 md:px-8 py-1.5 sm:py-2.5 md:py-3.5 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
+              className="inline-flex items-center gap-2 sm:gap-2.5 px-3 sm:px-5 md:px-7 py-1.5 sm:py-2 md:py-2.5 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
             >
               <span>EXPLORAR O DROP</span>
               <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
@@ -69,11 +69,11 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
         {/* =========================================================================
             2. GRID INFERIOR: LOOK 01 & LOOK 02
            ========================================================================= */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-5">
           {/* LOOK 01: OVERSIZED ESSENTIALS */}
           <div
             onClick={() => onNavigate('shop')}
-            className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1672/941] w-full min-h-[190px] sm:min-h-[260px] md:min-h-[320px] transition-all duration-300 shadow-sm hover:shadow-md"
+            className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1672/941] w-full min-h-[160px] sm:min-h-[220px] md:min-h-[270px] transition-all duration-300 shadow-sm hover:shadow-md"
           >
             <picture className="w-full h-full block">
               <source srcSet={look1Webp} type="image/webp" />
@@ -108,7 +108,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-5 md:px-7 py-1.5 sm:py-2.5 md:py-3 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 md:px-6 py-1 sm:py-2 md:py-2.5 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
               >
                 <span>EXPLORAR</span>
                 <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
@@ -119,7 +119,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
           {/* LOOK 02: UTILITY SERIES */}
           <div
             onClick={() => onNavigate('shop')}
-            className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1672/941] w-full min-h-[190px] sm:min-h-[260px] md:min-h-[320px] transition-all duration-300 shadow-sm hover:shadow-md"
+            className="relative group cursor-pointer overflow-hidden rounded-[2px] bg-[#111216] aspect-[1672/941] w-full min-h-[160px] sm:min-h-[220px] md:min-h-[270px] transition-all duration-300 shadow-sm hover:shadow-md"
           >
             <picture className="w-full h-full block">
               <source srcSet={look2Webp} type="image/webp" />
@@ -154,7 +154,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 sm:gap-2.5 px-3 sm:px-5 md:px-7 py-1.5 sm:py-2.5 md:py-3 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 md:px-6 py-1 sm:py-2 md:py-2.5 bg-black/80 hover:bg-white text-white hover:text-black border border-white/60 hover:border-white text-[10px] sm:text-xs md:text-sm font-mono font-medium uppercase tracking-[0.16em] sm:tracking-[0.2em] transition-all duration-200 cursor-pointer shadow-xl backdrop-blur-sm group/btn rounded-[1px]"
               >
                 <span>EXPLORAR</span>
                 <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 transition-transform duration-200 group-hover/btn:translate-x-1" />

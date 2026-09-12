@@ -378,7 +378,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
           className="absolute top-1 sm:top-1.5 md:top-2 left-1/2 -translate-x-1/2 w-full max-w-[1740px] px-4 sm:px-6 pointer-events-none select-none overflow-hidden flex justify-center"
         >
-          <span className="font-black text-[68px] sm:text-[105px] md:text-[140px] lg:text-[170px] xl:text-[195px] leading-none text-white/[0.065] tracking-[-0.035em] whitespace-nowrap">
+          <span className="font-black text-[60px] sm:text-[90px] md:text-[120px] lg:text-[145px] xl:text-[170px] leading-none text-white/[0.065] tracking-[-0.035em] whitespace-nowrap">
             NEW DROP
           </span>
         </motion.div>
@@ -387,23 +387,23 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
       {/* =========================================================================
           CONTEÚDO DA SEÇÃO
          ========================================================================= */}
-      <div className="relative z-10 w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 pt-7 sm:pt-9 md:pt-11">
+      <div className="relative z-10 w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 pt-5 sm:pt-7 md:pt-8">
         {/* CABEÇALHO */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-8 sm:mb-10 lg:mb-12">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-5 sm:mb-6 lg:mb-8">
           <div className="max-w-xl">
             {/* Tag + DIRETO DO ATELIÊ */}
-            <div className="flex items-center gap-1.5 text-[10.5px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-[#E5A00D] mb-1">
+            <div className="flex items-center gap-1.5 text-[10px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.22em] text-[#E5A00D] mb-1">
               <span>+</span>
               <span>DIRETO DO ATELIÊ</span>
             </div>
 
             {/* Título Principal */}
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[38px] font-black uppercase tracking-tight text-white leading-none">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-white leading-none">
               ÚLTIMOS LANÇAMENTOS
             </h2>
 
             {/* Subtítulo */}
-            <p className="text-zinc-300 text-xs sm:text-[13.5px] font-normal tracking-wide mt-2">
+            <p className="text-zinc-300 text-xs sm:text-[13px] font-normal tracking-wide mt-1.5">
               Novas peças. Tiragem limitada. Feitas para não passar despercebidas.
             </p>
           </div>
@@ -465,7 +465,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                   delay: isMobile ? 0.15 + index * 0.04 : 0.2 + index * 0.05,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="group relative w-[250px] sm:w-[265px] md:w-[275px] lg:w-[285px] shrink-0 snap-start bg-white rounded-[3px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.14)] hover:shadow-[0_14px_32px_rgba(0,0,0,0.22)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+                className="group relative w-[225px] sm:w-[240px] md:w-[250px] lg:w-[260px] shrink-0 snap-start bg-white rounded-[3px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.14)] hover:shadow-[0_14px_32px_rgba(0,0,0,0.22)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between cursor-pointer"
                 onClick={() => handleCardClick(item)}
               >
                 {/* ÁREA DA FOTO (fundo escuro sem bordas visíveis) */}
@@ -508,34 +508,34 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                 </div>
 
                 {/* ÁREA DE INFORMAÇÕES */}
-                <div className="px-4 py-3.5 flex flex-col justify-between bg-white text-[#141312] flex-1">
+                <div className="px-3.5 py-3 flex flex-col justify-between bg-white text-[#141312] flex-1">
                   <div>
                     {/* Categoria */}
-                    <span className="block text-[9px] sm:text-[9.5px] font-mono font-semibold uppercase tracking-[0.2em] text-neutral-400 mb-0.5">
+                    <span className="block text-[8.5px] sm:text-[9px] font-mono font-semibold uppercase tracking-[0.2em] text-neutral-400 mb-0.5">
                       {item.categoryName}
                     </span>
 
                     {/* Título do Produto */}
-                    <h3 className="text-[13.5px] sm:text-[14px] font-bold text-neutral-900 tracking-tight leading-snug line-clamp-1 group-hover:text-black transition-colors">
+                    <h3 className="text-[12.5px] sm:text-[13px] font-bold text-neutral-900 tracking-tight leading-snug line-clamp-1 group-hover:text-black transition-colors">
                       {item.title}
                     </h3>
 
                     {/* Preços */}
-                    <div className="flex flex-col gap-0.5 mt-2">
-                      <div className="text-[15.5px] sm:text-[16px] font-black text-neutral-900 tracking-tight leading-tight">
+                    <div className="flex flex-col gap-0.5 mt-1.5">
+                      <div className="text-[14.5px] sm:text-[15px] font-black text-neutral-900 tracking-tight leading-tight">
                         R$ {item.price.toFixed(2).replace('.', ',')}
                       </div>
-                      <div className="text-[10px] sm:text-[10.5px] text-neutral-500 font-normal leading-tight">
+                      <div className="text-[9.5px] sm:text-[10px] text-neutral-500 font-normal leading-tight">
                         {item.installments}
                       </div>
-                      <div className="text-[10.5px] sm:text-[11px] font-bold text-[#D97706] leading-tight mt-0.5">
+                      <div className="text-[10px] sm:text-[10.5px] font-bold text-[#D97706] leading-tight mt-0.5">
                         {item.checkoutNote}
                       </div>
                     </div>
                   </div>
 
                   {/* Cores e Contagem */}
-                  <div className="flex items-center justify-between pt-2.5 mt-2.5 border-t border-neutral-100">
+                  <div className="flex items-center justify-between pt-2 mt-2 border-t border-neutral-100">
                     <div className="flex items-center gap-1.5">
                       {item.colors.map((c, i) => (
                         <span
@@ -546,7 +546,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                         />
                       ))}
                     </div>
-                    <span className="text-[9.5px] sm:text-[10px] text-neutral-400 font-mono font-medium">
+                    <span className="text-[9px] sm:text-[9.5px] text-neutral-400 font-mono font-medium">
                       {item.colorCountText}
                     </span>
                   </div>
@@ -557,8 +557,8 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         </div>
 
         {/* RODAPÉ INFERIOR: Exatamente no fundo claro como na referência */}
-        <div className="pt-3 pb-6 sm:pb-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-neutral-300/80 pt-3">
+        <div className="pt-2 pb-4 sm:pb-6">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-t border-neutral-300/80 pt-2.5">
             {/* MARMOT • EST. 2018 */}
             <div className="flex items-center gap-2">
               <span className="font-mono font-bold tracking-[0.25em] text-[10px] sm:text-[10.5px] uppercase text-neutral-900">

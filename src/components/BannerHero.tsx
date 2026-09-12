@@ -10,7 +10,7 @@ const HERO_IMAGE = '/hero-v2.png';
 export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
   return (
     <section 
-      className="relative w-full bg-[#0B0B0E] text-white overflow-hidden -mt-[68px] sm:-mt-[72px]"
+      className="relative w-full bg-[#0B0B0E] text-white overflow-hidden -mt-[62px] sm:-mt-[66px]"
       style={{ height: 'calc(100dvh + 24px)', minHeight: '740px', maxHeight: '1200px' }}
     >
       {/* Full Bleed Background Image - Spanning 100% width and height behind header */}

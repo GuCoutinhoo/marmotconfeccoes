@@ -142,10 +142,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
       </div>
 
       {/* 2. Product Info Section */}
-      <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1 space-y-3">
+      <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 space-y-2">
         <div>
           {/* Collection / Subcategory */}
-          <div className="flex items-center justify-between text-[11px] text-[#71717A] uppercase tracking-wider mb-1 font-mono">
+          <div className="flex items-center justify-between text-[10px] sm:text-[10.5px] text-[#71717A] uppercase tracking-wider mb-0.5 font-mono">
             <span>{product.subcategory || product.collection}</span>
             {product.fabricWeight && (
               <span className="text-[#52525B] font-bold">{product.fabricWeight}</span>
@@ -155,26 +155,26 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           {/* Title */}
           <h3
             onClick={() => onProductClick(product.id)}
-            className="text-[13px] sm:text-sm font-bold text-[#18181B] group-hover:text-[#B45309] transition-colors cursor-pointer line-clamp-2 min-h-[2.5em] leading-[1.25]"
+            className="text-xs sm:text-[13px] font-bold text-[#18181B] group-hover:text-[#B45309] transition-colors cursor-pointer line-clamp-2 min-h-[2.4em] leading-[1.25]"
           >
             {product.title}
           </h3>
         </div>
 
         {/* Price & Installments */}
-        <div className="pt-1 border-t border-[#E4E4E7] space-y-1">
+        <div className="pt-1 border-t border-[#E4E4E7] space-y-0.5">
           <div className="flex items-baseline gap-2">
-            <span className="text-sm sm:text-base font-black text-[#18181B]">
+            <span className="text-[13.5px] sm:text-[15px] font-black text-[#18181B]">
               R$ {effectivePrice.toFixed(2).replace('.', ',')}
             </span>
             {product.promoPrice && (
-              <span className="text-xs text-[#71717A] line-through">
+              <span className="text-[11px] text-[#71717A] line-through">
                 R$ {product.price.toFixed(2).replace('.', ',')}
               </span>
             )}
           </div>
 
-          <div className="text-[11px] text-[#52525B] flex flex-col leading-[1.45]">
+          <div className="text-[10.5px] sm:text-[11px] text-[#52525B] flex flex-col leading-[1.4]">
             <span>
               ou <strong>{installmentCount}x de R$ {installmentValue.toFixed(2).replace('.', ',')}</strong> sem juros
             </span>
@@ -183,7 +183,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
 
           {/* Color Indicators */}
           {product.colors && product.colors.length > 0 && (
-            <div className="flex items-center gap-1.5 pt-2">
+            <div className="flex items-center gap-1.5 pt-1.5">
               {product.colors.map((c, idx) => {
                 const variantImg = (c.images && c.images.length > 0)
                   ? c.images[0]

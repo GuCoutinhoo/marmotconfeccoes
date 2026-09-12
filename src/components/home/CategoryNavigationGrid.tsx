@@ -208,7 +208,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     <section
       id="category-showcase-section"
       ref={sectionRef}
-      className="pt-6 sm:pt-8 lg:pt-9 pb-8 sm:pb-10 lg:pb-12 bg-[#F6F5F2] border-b border-[#E4E1D8] select-none overflow-hidden relative"
+      className="pt-5 sm:pt-7 lg:pt-8 pb-6 sm:pb-8 lg:pb-10 bg-[#F6F5F2] border-b border-[#E4E1D8] select-none overflow-hidden relative"
     >
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* ========================================================= */}
@@ -224,26 +224,26 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               : { opacity: 0, y: 14 }
           }
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-5 sm:mb-6"
+          className="mb-4 sm:mb-5"
         >
           {/* Eyebrow tag com bullet amarelo */}
-          <div className="flex items-center gap-2 mb-2 sm:mb-2.5">
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
             <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
-            <span className="text-[10.5px] sm:text-[11.5px] font-mono font-bold uppercase tracking-[0.2em] text-[#CA8A04]">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#CA8A04]">
               SILHUETAS STREETWEAR // MARMOT ARCHIVE
             </span>
           </div>
 
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             {/* Bloco Título + Divisor Vertical + Descrição */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 lg:gap-8">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-[48px] xl:text-[54px] font-black uppercase tracking-[-0.03em] text-[#0B0B0E] leading-[0.88] whitespace-pre-line">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 lg:gap-7">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[48px] font-black uppercase tracking-[-0.03em] text-[#0B0B0E] leading-[0.88] whitespace-pre-line">
                 {'COMPRE POR\nCATEGORIA'}
               </h2>
 
-              <div className="hidden sm:block w-px h-12 sm:h-14 lg:h-16 bg-zinc-300 shrink-0" />
+              <div className="hidden sm:block w-px h-10 sm:h-12 lg:h-14 bg-zinc-300 shrink-0" />
 
-              <p className="text-xs sm:text-[13.5px] lg:text-[14.5px] text-zinc-600 font-normal leading-relaxed max-w-[340px]">
+              <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-zinc-600 font-normal leading-relaxed max-w-[340px]">
                 Modelagens autorais desenvolvidas para caimento estruturado, tecidos pesados e acabamento de ateliê.
               </p>
             </div>
@@ -317,7 +317,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               delay: 0.08,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="group relative lg:col-span-5 w-full h-[520px] sm:h-[580px] lg:h-auto min-h-[520px] lg:min-h-[680px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col justify-end"
+            className="group relative lg:col-span-5 w-full h-[460px] sm:h-[510px] lg:h-auto min-h-[460px] lg:min-h-[590px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col justify-end"
           >
             {/* Foto Editorial de Fundo */}
             <img
@@ -343,40 +343,40 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-35% to-transparent pointer-events-none" />
 
             {/* Bottom Content: Traço Amarelo + Título + Heavyweight + Tags + VER CATEGORIA e Seta */}
-            <div className="relative z-20 p-5 sm:p-7 lg:p-8">
+            <div className="relative z-20 p-4 sm:p-6 lg:p-7">
               {/* Traço Amarelo Assinatura */}
-              <div className="w-12 h-[3.5px] bg-[#F4C400] rounded-full mb-3" />
+              <div className="w-10 h-[3px] bg-[#F4C400] rounded-full mb-2.5" />
 
               {/* Nome da Categoria em Tipografia Imponente */}
-              <h3 className="text-3xl sm:text-4xl lg:text-[44px] xl:text-[48px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md">
+              <h3 className="text-2xl sm:text-3xl lg:text-[38px] xl:text-[42px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md">
                 {featuredItem.name}
               </h3>
 
               {/* Tagline / Especificação de Fit */}
               {featuredItem.tagline && (
-                <p className="text-xs sm:text-sm font-semibold text-white/95 mt-2.5 drop-shadow-sm leading-snug">
+                <p className="text-xs sm:text-[13px] font-semibold text-white/95 mt-2 drop-shadow-sm leading-snug">
                   {featuredItem.tagline}
                 </p>
               )}
 
               {/* Subcategorias */}
               {featuredItem.subcategoriesText && (
-                <p className="text-[11px] sm:text-xs font-mono text-zinc-300 mt-1 tracking-wide drop-shadow-xs">
+                <p className="text-[10.5px] sm:text-xs font-mono text-zinc-300 mt-1 tracking-wide drop-shadow-xs">
                   {featuredItem.subcategoriesText}
                 </p>
               )}
 
               {/* Linha Inferior: VER CATEGORIA ─────── ( ↗ ) */}
-              <div className="flex items-center justify-between mt-5 pt-3.5 border-t border-white/20 text-white">
-                <div className="flex items-center gap-3 flex-1 mr-4">
-                  <span className="text-xs font-mono font-bold uppercase tracking-[0.16em] text-white/90 whitespace-nowrap">
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/20 text-white">
+                <div className="flex items-center gap-2.5 flex-1 mr-4">
+                  <span className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-white/90 whitespace-nowrap">
                     VER CATEGORIA
                   </span>
                   <div className="h-px bg-white/30 flex-1 max-w-[170px]" />
                 </div>
 
-                <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0">
-                  <ArrowUpRight className="w-5 h-5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0">
+                  <ArrowUpRight className="w-4.5 h-4.5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </div>
               </div>
             </div>
@@ -385,7 +385,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
           {/* ======================================================================= */}
           {/* GRADE 2x2 (DIREITA): 4 CARDS EDITORIAIS                                  */}
           {/* ======================================================================= */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5">
             {gridItems.map((item, idx) => (
               <motion.article
                 key={`grid-${item.id}-${item.number}-${idx}`}
@@ -403,7 +403,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                   delay: 0.14 + idx * 0.07,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="group relative h-[290px] sm:h-[315px] lg:h-[330px] xl:h-[340px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_16px_32px_rgba(0,0,0,0.16)] transition-all duration-300 flex flex-col justify-end"
+                className="group relative h-[255px] sm:h-[275px] lg:h-[285px] xl:h-[290px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_16px_32px_rgba(0,0,0,0.16)] transition-all duration-300 flex flex-col justify-end"
               >
                 {/* Foto Editorial de Fundo */}
                 <img
@@ -429,25 +429,25 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 via-35% to-transparent pointer-events-none" />
 
                 {/* Bottom Content: Traço Amarelo + Título + Subcategorias + Botão Circular com Seta */}
-                <div className="relative z-20 p-4 sm:p-5 lg:p-6 flex items-end justify-between gap-3">
-                  <div className="space-y-1 min-w-0 flex-1">
+                <div className="relative z-20 p-3.5 sm:p-4 lg:p-5 flex items-end justify-between gap-3">
+                  <div className="space-y-0.5 min-w-0 flex-1">
                     {/* Traço Amarelo */}
-                    <div className="w-8 h-[3px] bg-[#F4C400] rounded-full mb-2" />
+                    <div className="w-7 h-[2.5px] bg-[#F4C400] rounded-full mb-1.5" />
 
                     {/* Nome da Categoria */}
-                    <h3 className="text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md truncate">
+                    <h3 className="text-lg sm:text-xl lg:text-[22px] xl:text-[24px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md truncate">
                       {item.name}
                     </h3>
 
                     {/* Subcategorias / Descrição */}
-                    <p className="text-[11px] sm:text-xs font-mono text-zinc-300 tracking-wide drop-shadow-xs line-clamp-1">
+                    <p className="text-[10.5px] sm:text-[11.5px] font-mono text-zinc-300 tracking-wide drop-shadow-xs line-clamp-1">
                       {item.subcategoriesText}
                     </p>
                   </div>
 
                   {/* Botão Circular com Seta Editorial */}
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0 self-end">
-                    <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0 self-end">
+                    <ArrowUpRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </div>
                 </div>
               </motion.article>

@@ -20,25 +20,25 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   };
 
   return (
-    <footer className="bg-white border-t border-[#E4E4E7] text-[#18181B] pt-12 pb-8">
+    <footer className="bg-white border-t border-[#E4E4E7] text-[#18181B] pt-8 sm:pt-10 pb-6">
       {/* Newsletter Section */}
-      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-12">
-        <div className="bg-[#111113] border border-[#111113] p-7 sm:p-8 md:p-10 rounded-[2px] flex flex-col md:flex-row items-start md:items-end justify-between gap-7 relative overflow-hidden text-white">
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-8 sm:mb-9">
+        <div className="bg-[#111113] border border-[#111113] p-5 sm:p-6 md:p-8 rounded-[2px] flex flex-col md:flex-row items-start md:items-end justify-between gap-6 relative overflow-hidden text-white">
           <div className="relative z-10 max-w-xl">
-            <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#F4C400] mb-2 block">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-[#F4C400] mb-1.5 block">
               CLUBE MARMOT // ATELIER DROPS
             </span>
-            <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight mb-2 text-white">
+            <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mb-1.5 text-white">
               RECEBA DROPS EXCLUSIVOS E 10% OFF NO PRIMEIRO PEDIDO
             </h3>
-            <p className="text-sm text-zinc-400 leading-relaxed font-medium">
+            <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed font-medium">
               Assine nossa lista para ter acesso prioritário a reposições de estoque, lotes autorais e cupons exclusivos.
             </p>
           </div>
 
           <div className="relative z-10 w-full md:w-auto min-w-[320px]">
             {subscribed ? (
-              <div className="bg-[#FEF3C7] border border-[#FDE68A] p-4 rounded-xl flex items-center gap-3 text-xs text-[#92400E] font-bold">
+              <div className="bg-[#FEF3C7] border border-[#FDE68A] p-3.5 rounded-xl flex items-center gap-3 text-xs text-[#92400E] font-bold">
                 <Check className="w-5 h-5 shrink-0" />
                 <span>Inscrição confirmada! Use o cupom <strong className="font-mono text-black">MARMOT10</strong> no checkout.</span>
               </div>
@@ -50,11 +50,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Seu e-mail..."
                   required
-                  className="bg-white border border-zinc-600 text-sm px-4 py-3.5 rounded-[2px] text-[#18181B] focus:outline-none focus:border-[#F4C400] placeholder-[#71717A] flex-1"
+                  className="bg-white border border-zinc-600 text-xs sm:text-sm px-3.5 py-2.5 sm:py-3 rounded-[2px] text-[#18181B] focus:outline-none focus:border-[#F4C400] placeholder-[#71717A] flex-1"
                 />
                 <button
                   type="submit"
-                  className="bg-[#F4C400] text-[#111113] font-black text-xs uppercase tracking-wider px-6 py-3.5 rounded-[2px] hover:bg-[#ffd21a] transition-colors flex items-center justify-center gap-2 shrink-0"
+                  className="bg-[#F4C400] text-[#111113] font-black text-xs uppercase tracking-wider px-5 py-2.5 sm:py-3 rounded-[2px] hover:bg-[#ffd21a] transition-colors flex items-center justify-center gap-2 shrink-0 cursor-pointer"
                 >
                   Cadastrar <ArrowRight className="w-4 h-4" />
                 </button>
@@ -65,11 +65,11 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Main Footer Navigation Columns */}
-      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-14 border-b border-[#E4E4E7]">
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-[#E4E4E7]">
         {/* Brand Column */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-3.5">
           <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => onNavigate('home')}>
-            <span className="text-lg font-black tracking-[0.14em] uppercase text-[#18181B]">
+            <span className="text-base sm:text-lg font-black tracking-[0.14em] uppercase text-[#18181B]">
               MARMOT <span className="text-zinc-400">CONFECÇÕES</span>
             </span>
           </div>
@@ -78,13 +78,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             Ateliê autoral de confecção de moda streetwear. Peças heavyweight produzidas em São Paulo com foco em caimento encorpado, gramaturas nobres e durabilidade extrema.
           </p>
 
-          <div className="flex items-center gap-3 text-[#71717A] pt-2">
+          <div className="flex items-center gap-2.5 text-[#71717A] pt-1">
             <a
               href="https://instagram.com"
               target="_blank"
               rel="noreferrer"
               aria-label="Instagram"
-              className="p-2.5 bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-colors"
+              className="p-2 bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-colors"
             >
               <Instagram className="w-4 h-4" />
             </a>
@@ -93,7 +93,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               target="_blank"
               rel="noreferrer"
               aria-label="YouTube"
-              className="p-2.5 bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-colors"
+              className="p-2 bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] text-[#52525B] hover:text-[#18181B] hover:border-[#18181B] transition-colors"
             >
               <Youtube className="w-4 h-4" />
             </a>
@@ -102,8 +102,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Categories Navigation */}
         <div>
-          <h4 className="text-xs font-black uppercase tracking-wider text-[#18181B] mb-4">Catálogo</h4>
-          <ul className="space-y-2.5 text-xs text-[#52525B] font-medium">
+          <h4 className="text-xs font-black uppercase tracking-wider text-[#18181B] mb-3">Catálogo</h4>
+          <ul className="space-y-2 text-xs text-[#52525B] font-medium">
             <li><button onClick={() => onNavigate('shop', 'oversized')} className="hover:text-[#18181B] transition-colors">Camisetas Oversized</button></li>
             <li><button onClick={() => onNavigate('shop', 'moletons')} className="hover:text-[#18181B] transition-colors">Hoodies & Moletons</button></li>
             <li><button onClick={() => onNavigate('shop', 'cargos')} className="hover:text-[#18181B] transition-colors">Calças Cargo & Táticas</button></li>
@@ -115,8 +115,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Customer Help Navigation */}
         <div>
-          <h4 className="text-xs font-black uppercase tracking-wider text-[#18181B] mb-4">Atendimento</h4>
-          <ul className="space-y-2.5 text-xs text-[#52525B] font-medium">
+          <h4 className="text-xs font-black uppercase tracking-wider text-[#18181B] mb-3">Atendimento</h4>
+          <ul className="space-y-2 text-xs text-[#52525B] font-medium">
             <li><button onClick={() => onNavigate('tracking')} className="hover:text-[#18181B] transition-colors text-[#B45309] font-bold">Rastrear Pedido</button></li>
             <li><button onClick={() => onNavigate('institutional', 'faq')} className="hover:text-[#18181B] transition-colors">Dúvidas Frequentes (FAQ)</button></li>
             <li><button onClick={() => onNavigate('institutional', 'trocas')} className="hover:text-[#18181B] transition-colors">Trocas & Devoluções (30 Dias)</button></li>
@@ -127,8 +127,8 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         {/* Institutional & Legal */}
         <div>
-          <h4 className="text-xs font-black uppercase tracking-wider text-[#18181B] mb-4">Institucional</h4>
-          <ul className="space-y-2.5 text-xs text-[#52525B] font-medium">
+          <h4 className="text-xs font-black uppercase tracking-wider text-[#18181B] mb-3">Institucional</h4>
+          <ul className="space-y-2 text-xs text-[#52525B] font-medium">
             <li><button onClick={() => onNavigate('institutional', 'sobre')} className="hover:text-[#18181B] transition-colors">Manifesto Marmot</button></li>
             <li><button onClick={() => onNavigate('institutional', 'termos')} className="hover:text-[#18181B] transition-colors">Termos de Compra</button></li>
             <li><button onClick={() => onNavigate('institutional', 'privacidade')} className="hover:text-[#18181B] transition-colors">Política de Privacidade</button></li>
@@ -138,7 +138,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Bottom Bar Payment Seals & Copyright */}
-      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-[#71717A]">
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-5 text-xs text-[#71717A]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-1.5 text-[#52525B] font-medium">
             <Lock className="w-3.5 h-3.5 text-[#B45309]" /> Checkout Seguro <strong className="text-[#18181B]">InfinitePay</strong>

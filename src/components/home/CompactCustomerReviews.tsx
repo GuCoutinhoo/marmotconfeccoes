@@ -30,15 +30,15 @@ export const CompactCustomerReviews: React.FC = () => {
   ];
 
   return (
-    <section className="py-12 sm:py-14 lg:py-16 bg-[#F8F9FA] border-b border-[#E4E4E7]">
+    <section className="py-8 sm:py-10 lg:py-12 bg-[#F8F9FA] border-b border-[#E4E4E7]">
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
           <div>
-            <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1.5">
+            <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1">
               <MessageSquareQuote className="w-3.5 h-3.5" />
               <span>PROVA SOCIAL REAL</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">
+            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#18181B]">
               AVALIAÇÕES DE COMPRADORES
             </h2>
           </div>
@@ -51,11 +51,11 @@ export const CompactCustomerReviews: React.FC = () => {
         </div>
 
         {/* Compact Review Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-7 xl:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {reviews.map((rev, idx) => (
             <div
               key={idx}
-              className="bg-white border border-[#DCDCE0] p-5 sm:p-6 rounded-[2px] space-y-3 hover:border-[#18181B] transition-colors"
+              className="bg-white border border-[#DCDCE0] p-4 sm:p-5 rounded-[2px] space-y-2.5 hover:border-[#18181B] transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex text-[#B45309] gap-0.5">
@@ -71,11 +71,11 @@ export const CompactCustomerReviews: React.FC = () => {
                 )}
               </div>
 
-              <p className="text-xs sm:text-sm text-[#18181B] leading-relaxed italic">
+              <p className="text-xs sm:text-[13px] text-[#18181B] leading-relaxed italic">
                 "{rev.comment}"
               </p>
 
-              <div className="pt-3 border-t border-[#E4E4E7] flex items-center justify-between text-[11px]">
+              <div className="pt-2.5 border-t border-[#E4E4E7] flex items-center justify-between text-[11px]">
                 <div>
                   <span className="font-bold text-[#18181B] block">{rev.author}</span>
                   <span className="text-[10px] text-[#71717A]">{rev.location}</span>
