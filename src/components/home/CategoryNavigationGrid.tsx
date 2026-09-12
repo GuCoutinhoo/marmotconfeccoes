@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
-import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import {
   getStoredCategoryImage,
@@ -29,64 +29,64 @@ const CATEGORY_EDITORIAL_ITEMS: CategoryEditorialItem[] = [
     slug: 'camisetas',
     number: '01',
     name: 'CAMISETAS',
-    tagline: 'Heavyweight 260g & Boxy Fit',
-    subcategoriesText: 'Graphic Tees • Basic Essential • Acid Wash',
-    image: '/categories/categoria-camisetas.png?v=20260907_v4_ultrahd',
+    tagline: 'ESSENCIAL NO SEU ESTILO',
+    subcategoriesText: 'Graphic Tees • Heavyweight 260g • Acid Wash',
+    image: '/categories/categoria-camisetas.png',
     fallbackImage: '/categoria camiseta.png',
-    objectPosition: 'center 8%',
+    objectPosition: 'center 14%',
   },
   {
     id: 'moletons',
     slug: 'moletons',
     number: '02',
     name: 'MOLETONS',
-    tagline: 'Hoodies Densos 400g/m²',
+    tagline: 'CONFORTO URBANO',
     subcategoriesText: 'Hoodies • Zip Hoodie • Crewneck',
-    image: '/categories/categoria-moletons.png?v=20260907_v4_ultrahd',
+    image: '/categories/categoria-moletons.png',
     fallbackImage: '/categoria moletom.png',
-    objectPosition: 'center 2%',
+    objectPosition: 'center 8%',
   },
   {
     id: 'jaquetas',
     slug: 'jaquetas',
     number: '03',
     name: 'JAQUETAS',
-    tagline: 'Puffers & Varsity Outerwear',
+    tagline: 'PROTEÇÃO COM ATITUDE',
     subcategoriesText: 'Puffers • Windbreakers • Work Jacket',
-    image: '/categories/categoria-jaquetas.png?v=20260907_v4_ultrahd',
+    image: '/categories/categoria-jaquetas.png',
     fallbackImage: '/categoria jaqueta.png',
-    objectPosition: 'center 4%',
+    objectPosition: 'center 14%',
   },
   {
     id: 'calcas',
     slug: 'calcas',
     number: '04',
     name: 'CALÇAS',
-    tagline: 'Baggy Denim & Wide Leg',
+    tagline: 'LIBERDADE EM MOVIMENTO',
     subcategoriesText: 'Baggy • Wide Leg • Cargo • Track Pants',
-    image: '/categories/categoria-calcas.png?v=20260907_v4_ultrahd',
+    image: '/categories/categoria-calcas.png',
     fallbackImage: '/categoria calca.png',
-    objectPosition: 'center 30%',
+    objectPosition: 'center 35%',
   },
   {
     id: 'shorts',
     slug: 'shorts',
     number: '05',
     name: 'SHORTS',
-    tagline: 'Mesh Basketball & Sweat Shorts',
+    tagline: 'VERÃO SEM LIMITES',
     subcategoriesText: 'Cargo • Denim • Esportivos',
-    image: '/categories/categoria-shorts.png?v=20260907_v4_ultrahd',
+    image: '/categories/categoria-shorts.png',
     fallbackImage: '/categoria shorts.png',
-    objectPosition: 'center 3%',
+    objectPosition: 'center 15%',
   },
   {
     id: 'tenis',
     slug: 'tenis',
     number: '06',
     name: 'TÊNIS',
-    tagline: 'Sneakers Chunky & Solados Tratorados',
-    subcategoriesText: 'Chunky Platform • Retro Runner • Chunky Slides',
-    image: '/categories/categoria-tenis.png?v=20260907_v4_ultrahd',
+    tagline: 'PASSOS DE ATITUDE',
+    subcategoriesText: 'Sneakers Chunky • Retro Runner',
+    image: '/categories/categoria-tenis.png',
     fallbackImage: '/categoria tenis.png',
     objectPosition: 'center 62%',
   },
@@ -95,9 +95,9 @@ const CATEGORY_EDITORIAL_ITEMS: CategoryEditorialItem[] = [
     slug: 'acessorios',
     number: '07',
     name: 'ACESSÓRIOS',
-    tagline: 'Bags Táticas, Correntes & EDC',
+    tagline: 'DETALHES QUE DEFINEM',
     subcategoriesText: 'Bags Táticas • Correntes • Headwear',
-    image: '/categories/categoria-acessorios.png?v=20260907_v4_ultrahd',
+    image: '/categories/categoria-acessorios.png',
     fallbackImage: '/categoria acessorios.png',
     objectPosition: 'center 18%',
   },
@@ -193,22 +193,119 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     return item.image;
   };
 
-  // Card em destaque à esquerda (1 grande)
-  const featuredItem = CATEGORY_EDITORIAL_ITEMS[activeOffset % totalCategories];
+  // 5 itens visíveis no layout harmônico de 3 colunas (idêntico à imagem de referência)
+  const item0 = CATEGORY_EDITORIAL_ITEMS[activeOffset % totalCategories]; // Coluna 1 (01 CAMISETAS - Tall Hero)
+  const item1 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 1) % totalCategories]; // Coluna 2 Topo (02 MOLETONS)
+  const item2 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 2) % totalCategories]; // Coluna 3 Topo (03 JAQUETAS)
+  const item3 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 3) % totalCategories]; // Coluna 2 Base (04 CALÇAS)
+  const item4 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 4) % totalCategories]; // Coluna 3 Base (05 SHORTS)
 
-  // 4 cards da grade à direita (2x2)
-  const gridItems = [
-    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 1) % totalCategories],
-    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 2) % totalCategories],
-    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 3) % totalCategories],
-    CATEGORY_EDITORIAL_ITEMS[(activeOffset + 4) % totalCategories],
-  ];
+  const renderCategoryCard = (
+    item: CategoryEditorialItem,
+    isTallHero: boolean = false,
+    delay: number = 0.08
+  ) => {
+    return (
+      <motion.article
+        key={`cat-${item.id}-${item.number}`}
+        onClick={() => onNavigate('shop', item.slug)}
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 22, scale: 0.98 }}
+        animate={
+          isSectionInView
+            ? { opacity: 1, y: 0, scale: 1 }
+            : shouldReduceMotion
+            ? { opacity: 1 }
+            : { opacity: 0, y: 22, scale: 0.98 }
+        }
+        transition={{
+          duration: 0.5,
+          delay,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+        className={`group relative rounded-[3px] overflow-hidden bg-[#111113] border border-[#27272A] hover:border-zinc-500 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.22)] transition-all duration-300 flex flex-col justify-end w-full ${
+          isTallHero
+            ? 'w-full h-[480px] sm:h-[530px] lg:h-full min-h-[480px] lg:min-h-[680px] xl:min-h-[720px] 2xl:min-h-[750px]'
+            : 'h-[290px] sm:h-[315px] lg:h-[335px] xl:h-[350px] 2xl:h-[365px]'
+        }`}
+      >
+        {/* Marca d'água superior esquerda no Card 01 / Destaque principal */}
+        {isTallHero && (
+          <div className="absolute top-5 left-5 sm:top-6 sm:left-6 z-20 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.24em] leading-tight pointer-events-none select-none">
+            <p className="font-bold text-[#F4C400]">MARMOT</p>
+            <p className="text-zinc-300">URBAN SUPPLY</p>
+            <p className="text-zinc-400">EST. 2018</p>
+          </div>
+        )}
+
+        {/* Foto Editorial de Fundo */}
+        <img
+          src={getCardImage(item)}
+          alt={item.name}
+          loading={isTallHero ? 'eager' : 'lazy'}
+          decoding="async"
+          referrerPolicy="no-referrer"
+          draggable={false}
+          style={{
+            objectPosition: item.objectPosition || 'center 15%',
+            transformOrigin: 'center 15%',
+          }}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.98] contrast-[1.03] select-none"
+          onError={(e) => {
+            if (e.currentTarget.src !== item.fallbackImage) {
+              e.currentTarget.src = item.fallbackImage;
+            }
+          }}
+        />
+
+        {/* Gradiente de Iluminação Editorial */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/45 via-35% to-transparent pointer-events-none" />
+
+        {/* Conteúdo Inferior: Número + Traço Horizontal + Título + Tagline + Botão Circular ( → ) */}
+        <div
+          className={`relative z-20 flex items-end justify-between gap-3 ${
+            isTallHero ? 'p-5 sm:p-6 lg:p-7 xl:p-8' : 'p-4 sm:p-5 lg:p-5.5 xl:p-6'
+          }`}
+        >
+          <div className="space-y-0.5 min-w-0 flex-1">
+            {/* Número + Linha de Ateliê em Amarelo Assinatura */}
+            <div className="flex items-center gap-2.5 mb-1.5 sm:mb-2">
+              <span className="font-mono text-xs sm:text-[13px] font-bold tracking-[0.2em] text-[#F4C400]">
+                {item.number}
+              </span>
+              <div className="w-7 sm:w-9 h-[2px] bg-[#F4C400] rounded-full" />
+            </div>
+
+            {/* Nome da Categoria em Tipografia Imponente Branca */}
+            <h3
+              className={`font-black text-white uppercase tracking-tight leading-none drop-shadow-md ${
+                isTallHero
+                  ? 'text-3xl sm:text-4xl lg:text-[34px] xl:text-[40px]'
+                  : 'text-xl sm:text-2xl lg:text-[24px] xl:text-[27px]'
+              }`}
+            >
+              {item.name}
+            </h3>
+
+            {/* Subtítulo / Tagline */}
+            <p className="text-[10px] sm:text-[11px] font-mono font-semibold uppercase tracking-[0.22em] text-zinc-300 mt-2 sm:mt-2.5 drop-shadow-xs">
+              {item.tagline}
+            </p>
+          </div>
+
+          {/* Botão Circular com Seta Direita Horizontal ( → ) em Amarelo */}
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-[#F4C400]/70 bg-black/30 backdrop-blur-xs flex items-center justify-center text-[#F4C400] group-hover:border-[#F4C400] group-hover:bg-[#F4C400] group-hover:text-[#0B0B0E] transition-all duration-300 shadow-md shrink-0 self-end mb-0.5">
+            <ArrowRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2] transition-transform duration-300 group-hover:translate-x-1" />
+          </div>
+        </div>
+      </motion.article>
+    );
+  };
 
   return (
     <section
       id="category-showcase-section"
       ref={sectionRef}
-      className="pt-5 sm:pt-7 lg:pt-8 pb-6 sm:pb-8 lg:pb-10 bg-[#F6F5F2] border-b border-[#E4E1D8] select-none overflow-hidden relative"
+      className="py-8 sm:py-10 lg:py-12 xl:py-14 bg-[#F6F5F2] border-b border-[#E4E1D8] select-none overflow-hidden relative"
     >
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* ========================================================= */}
@@ -224,32 +321,30 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               : { opacity: 0, y: 14 }
           }
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-4 sm:mb-5"
+          className="mb-6 sm:mb-7 lg:mb-8"
         >
           {/* Eyebrow tag com bullet amarelo */}
-          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+          <div className="flex items-center gap-2 mb-2 sm:mb-2.5">
             <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
-            <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.2em] text-[#CA8A04]">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.22em] text-[#CA8A04]">
               SILHUETAS STREETWEAR // MARMOT ARCHIVE
             </span>
           </div>
 
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            {/* Bloco Título + Divisor Vertical + Descrição */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 lg:gap-7">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[48px] font-black uppercase tracking-[-0.03em] text-[#0B0B0E] leading-[0.88] whitespace-pre-line">
-                {'COMPRE POR\nCATEGORIA'}
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-6">
+            {/* Bloco Título em 1 linha + Descrição em baixo sem quebrar linha */}
+            <div className="flex flex-col gap-1.5 sm:gap-2">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[38px] xl:text-[44px] font-black uppercase tracking-[-0.03em] text-[#0B0B0E] leading-none whitespace-nowrap">
+                COMPRE POR CATEGORIA
               </h2>
 
-              <div className="hidden sm:block w-px h-10 sm:h-12 lg:h-14 bg-zinc-300 shrink-0" />
-
-              <p className="text-xs sm:text-[13px] lg:text-[13.5px] text-zinc-600 font-normal leading-relaxed max-w-[340px]">
+              <p className="text-xs sm:text-[13px] lg:text-[14px] text-zinc-600 font-normal leading-normal whitespace-normal sm:whitespace-nowrap">
                 Modelagens autorais desenvolvidas para caimento estruturado, tecidos pesados e acabamento de ateliê.
               </p>
             </div>
 
             {/* Canto direito: Ver todo o catálogo + Contador 01 / 07 + Controles < > */}
-            <div className="flex items-center gap-4 sm:gap-6 shrink-0 self-start lg:self-center">
+            <div className="flex items-center gap-4 sm:gap-6 shrink-0 self-start lg:self-end pb-1">
               <button
                 type="button"
                 onClick={() => onNavigate('shop')}
@@ -262,7 +357,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               {/* Contador de categorias: 01 / 07 */}
               <div className="flex items-center text-xs sm:text-sm font-mono pl-1 sm:pl-2">
                 <span className="font-bold text-black text-sm sm:text-base">
-                  {featuredItem.number}
+                  {item0.number}
                 </span>
                 <span className="text-zinc-400 mx-1">/</span>
                 <span className="text-zinc-400 font-medium">07</span>
@@ -295,163 +390,21 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
         </motion.div>
 
         {/* ========================================================================= */}
-        {/* GRADE BENTO EXATA: 1 CARD DESTAQUE (ESQUERDA) + GRADE 2x2 (DIREITA)       */}
+        {/* GRADE MASTER REBALANCEADA: 1 CARD DESTAQUE (4 COLS) + GRADE 2x2 (8 COLS)   */}
         {/* ========================================================================= */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
-          {/* ======================================================================= */}
-          {/* CARD 1: DESTAQUE PRINCIPAL (ESQUERDA - CAMISETAS OU ATIVA)              */}
-          {/* ======================================================================= */}
-          <motion.article
-            key={`featured-${featuredItem.id}-${featuredItem.number}`}
-            onClick={() => onNavigate('shop', featuredItem.slug)}
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 28, scale: 0.98 }}
-            animate={
-              isSectionInView
-                ? { opacity: 1, y: 0, scale: 1 }
-                : shouldReduceMotion
-                ? { opacity: 1 }
-                : { opacity: 0, y: 28, scale: 0.98 }
-            }
-            transition={{
-              duration: 0.52,
-              delay: 0.08,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            className="group relative lg:col-span-5 w-full h-[460px] sm:h-[510px] lg:h-auto min-h-[460px] lg:min-h-[590px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_20px_40px_rgba(0,0,0,0.18)] transition-all duration-300 flex flex-col justify-end"
-          >
-            {/* Foto Editorial de Fundo */}
-            <img
-              src={getCardImage(featuredItem)}
-              alt={featuredItem.name}
-              loading="eager"
-              decoding="async"
-              referrerPolicy="no-referrer"
-              draggable={false}
-              style={{
-                objectPosition: featuredItem.objectPosition || 'center 8%',
-                transformOrigin: 'center 15%',
-              }}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.98] contrast-[1.03] saturate-[1.05] select-none"
-              onError={(e) => {
-                if (e.currentTarget.src !== featuredItem.fallbackImage) {
-                  e.currentTarget.src = featuredItem.fallbackImage;
-                }
-              }}
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-6 xl:gap-7 items-stretch">
+          {/* COLUNA 1: CARD 01 (HERO TALL - 4 COLS) */}
+          <div className="lg:col-span-4 h-full flex flex-col">
+            {renderCategoryCard(item0, true, 0.08)}
+          </div>
 
-            {/* Gradientes para Legibilidade Editorial */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 via-35% to-transparent pointer-events-none" />
-
-            {/* Bottom Content: Traço Amarelo + Título + Heavyweight + Tags + VER CATEGORIA e Seta */}
-            <div className="relative z-20 p-4 sm:p-6 lg:p-7">
-              {/* Traço Amarelo Assinatura */}
-              <div className="w-10 h-[3px] bg-[#F4C400] rounded-full mb-2.5" />
-
-              {/* Nome da Categoria em Tipografia Imponente */}
-              <h3 className="text-2xl sm:text-3xl lg:text-[38px] xl:text-[42px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md">
-                {featuredItem.name}
-              </h3>
-
-              {/* Tagline / Especificação de Fit */}
-              {featuredItem.tagline && (
-                <p className="text-xs sm:text-[13px] font-semibold text-white/95 mt-2 drop-shadow-sm leading-snug">
-                  {featuredItem.tagline}
-                </p>
-              )}
-
-              {/* Subcategorias */}
-              {featuredItem.subcategoriesText && (
-                <p className="text-[10.5px] sm:text-xs font-mono text-zinc-300 mt-1 tracking-wide drop-shadow-xs">
-                  {featuredItem.subcategoriesText}
-                </p>
-              )}
-
-              {/* Linha Inferior: VER CATEGORIA ─────── ( ↗ ) */}
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/20 text-white">
-                <div className="flex items-center gap-2.5 flex-1 mr-4">
-                  <span className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-white/90 whitespace-nowrap">
-                    VER CATEGORIA
-                  </span>
-                  <div className="h-px bg-white/30 flex-1 max-w-[170px]" />
-                </div>
-
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0">
-                  <ArrowUpRight className="w-4.5 h-4.5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </div>
-              </div>
-            </div>
-          </motion.article>
-
-          {/* ======================================================================= */}
-          {/* GRADE 2x2 (DIREITA): 4 CARDS EDITORIAIS                                  */}
-          {/* ======================================================================= */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5">
-            {gridItems.map((item, idx) => (
-              <motion.article
-                key={`grid-${item.id}-${item.number}-${idx}`}
-                onClick={() => onNavigate('shop', item.slug)}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 28, scale: 0.98 }}
-                animate={
-                  isSectionInView
-                    ? { opacity: 1, y: 0, scale: 1 }
-                    : shouldReduceMotion
-                    ? { opacity: 1 }
-                    : { opacity: 0, y: 28, scale: 0.98 }
-                }
-                transition={{
-                  duration: 0.52,
-                  delay: 0.14 + idx * 0.07,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="group relative h-[255px] sm:h-[275px] lg:h-[285px] xl:h-[290px] rounded-[3px] overflow-hidden bg-[#121214] border border-zinc-300/80 hover:border-zinc-900 cursor-pointer shadow-sm hover:shadow-[0_16px_32px_rgba(0,0,0,0.16)] transition-all duration-300 flex flex-col justify-end"
-              >
-                {/* Foto Editorial de Fundo */}
-                <img
-                  src={getCardImage(item)}
-                  alt={item.name}
-                  loading="lazy"
-                  decoding="async"
-                  referrerPolicy="no-referrer"
-                  draggable={false}
-                  style={{
-                    objectPosition: item.objectPosition || 'center top',
-                    transformOrigin: 'center 15%',
-                  }}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out brightness-[0.98] contrast-[1.03] saturate-[1.05] select-none"
-                  onError={(e) => {
-                    if (e.currentTarget.src !== item.fallbackImage) {
-                      e.currentTarget.src = item.fallbackImage;
-                    }
-                  }}
-                />
-
-                {/* Gradientes para Legibilidade Editorial */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 via-35% to-transparent pointer-events-none" />
-
-                {/* Bottom Content: Traço Amarelo + Título + Subcategorias + Botão Circular com Seta */}
-                <div className="relative z-20 p-3.5 sm:p-4 lg:p-5 flex items-end justify-between gap-3">
-                  <div className="space-y-0.5 min-w-0 flex-1">
-                    {/* Traço Amarelo */}
-                    <div className="w-7 h-[2.5px] bg-[#F4C400] rounded-full mb-1.5" />
-
-                    {/* Nome da Categoria */}
-                    <h3 className="text-lg sm:text-xl lg:text-[22px] xl:text-[24px] font-black text-white uppercase tracking-tight leading-none drop-shadow-md truncate">
-                      {item.name}
-                    </h3>
-
-                    {/* Subcategorias / Descrição */}
-                    <p className="text-[10.5px] sm:text-[11.5px] font-mono text-zinc-300 tracking-wide drop-shadow-xs line-clamp-1">
-                      {item.subcategoriesText}
-                    </p>
-                  </div>
-
-                  {/* Botão Circular com Seta Editorial */}
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-white/40 flex items-center justify-center text-white group-hover:bg-white group-hover:text-black group-hover:border-white transition-all duration-300 shadow-md shrink-0 self-end">
-                    <ArrowUpRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </div>
-                </div>
-              </motion.article>
-            ))}
+          {/* GRADE 2x2 (DIREITA): 4 CARDS AMPLOS, FORTES E RESPIRADOS (8 COLS) */}
+          {/* 02 MOLETONS (topo-esq), 03 JAQUETAS (topo-dir), 04 CALÇAS (base-esq), 05 SHORTS (base-dir) */}
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
+            {renderCategoryCard(item1, false, 0.12)}
+            {renderCategoryCard(item2, false, 0.16)}
+            {renderCategoryCard(item3, false, 0.20)}
+            {renderCategoryCard(item4, false, 0.24)}
           </div>
         </div>
       </div>
