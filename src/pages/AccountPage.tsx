@@ -29,6 +29,8 @@ import {
   EyeOff,
   Sparkles,
   RefreshCw,
+  Rocket,
+  ArrowLeft,
 } from 'lucide-react';
 import { Address } from '../types';
 import { validateAndFetchCep, normalizeCep, formatCep, isValidCepFormat } from '../services/cepService';
@@ -108,6 +110,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -123,6 +126,8 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [regCpf, setRegCpf] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showRegConfirmPassword, setShowRegConfirmPassword] = useState(false);
 
   // Forgot / Reset Password Form
   const [forgotEmail, setForgotEmail] = useState('');
@@ -130,6 +135,8 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [resetCode, setResetCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
   const [previewCode, setPreviewCode] = useState<string | null>(null);
 
   // Verify Email Form
@@ -147,6 +154,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [currentPass, setCurrentPass] = useState('');
   const [newPass, setNewPass] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
+  const [showCurrentPass, setShowCurrentPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [changingPass, setChangingPass] = useState(false);
 
   // Address Modal State
@@ -555,449 +565,839 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   // -------------------------------------------------------------
   if (!user) {
     return (
-      <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-12 px-4 sm:px-6">
-        <div className="max-w-xl mx-auto space-y-6">
-          <Breadcrumb items={[{ label: 'Autenticação de Conta' }]} />
+      <div className="min-h-screen w-full bg-[#0C0C0F] lg:bg-white flex flex-col lg:flex-row selection:bg-[#F4C400] selection:text-black">
+        {/* LEFT COLUMN: Atelier Brand Identity & Editorial Showcase with Model on the Right */}
+        <div className="w-full lg:w-1/2 min-h-[480px] lg:min-h-screen relative flex flex-col justify-between bg-[#0C0C0F] text-white p-7 sm:p-10 lg:p-12 xl:p-16 2xl:p-20 select-none overflow-hidden shrink-0">
+          {/* Background Image: positioned so the model is concentrated on the right (occupying ~35-40% width) */}
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <img
+              src="/login_cadastro_v2.png"
+              alt="MARMOT Streetwear Editorial"
+              className="w-full h-full object-cover object-[85%_center] lg:object-[90%_center] brightness-[0.98] contrast-[1.03]"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (!target.src.includes('login_cadastro.png')) {
+                  target.src = '/login_cadastro.png';
+                } else if (!target.src.includes('look-1.webp')) {
+                  target.src = '/look-1.webp';
+                }
+              }}
+            />
+            
+            {/* Horizontal Gradient Overlay: Deep black on the left behind texts/cards, smoothly fading to 100% transparent in direction of the model */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0C0C0F] via-[#0C0C0F]/90 via-[42%] to-transparent to-[75%]" />
+            
+            {/* Subtle vertical vignette at the bottom for footer line and text contrast */}
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0C0C0F]/90 via-[#0C0C0F]/30 to-transparent" />
+          </div>
 
-          {/* Main Auth Card */}
-          <div className="auth-panel bg-white border border-[#DCDCE0] rounded-[2px] p-6 sm:p-8 space-y-6">
-            {/* Header Tabs */}
-            <div className="flex border-b border-[#E4E4E7] pb-3 gap-4 text-xs font-black uppercase tracking-wider">
-              <button
-                onClick={() => {
-                  setAuthMode('login');
-                  setAuthError(null);
-                }}
-                className={`pb-2 border-b-2 transition-all cursor-pointer ${
-                  authMode === 'login'
-                    ? 'border-[#18181B] text-[#18181B]'
-                    : 'border-transparent text-[#71717A] hover:text-[#18181B]'
-                }`}
-              >
-                Entrar
-              </button>
-
-              <button
-                onClick={() => {
-                  setAuthMode('register');
-                  setAuthError(null);
-                }}
-                className={`pb-2 border-b-2 transition-all cursor-pointer ${
-                  authMode === 'register'
-                    ? 'border-[#18181B] text-[#18181B]'
-                    : 'border-transparent text-[#71717A] hover:text-[#18181B]'
-                }`}
-              >
-                Criar Conta
-              </button>
-
-              <button
-                onClick={() => {
-                  setAuthMode('forgot');
-                  setAuthError(null);
-                }}
-                className={`pb-2 border-b-2 transition-all cursor-pointer ${
-                  authMode === 'forgot'
-                    ? 'border-[#18181B] text-[#18181B]'
-                    : 'border-transparent text-[#71717A] hover:text-[#18181B]'
-                }`}
-              >
-                Recuperar Senha
-              </button>
+          {/* TOP: Brand Header (Clickable to return to store) */}
+          <div 
+            onClick={() => onNavigate('home')}
+            className="relative z-10 space-y-3.5 cursor-pointer group w-fit max-w-[320px] sm:max-w-[350px]"
+            title="Voltar para a página inicial"
+          >
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-[#F4C400]/40 text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-[#F4C400] font-bold shadow-xs">
+              <Sparkles className="w-3 h-3 text-[#F4C400] shrink-0" />
+              <span>MARMOT ATELIER 2026</span>
             </div>
 
-            {/* Error Message Alert */}
-            {authError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 p-3.5 rounded-xl text-xs space-y-2">
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                  <span className="leading-relaxed">{authError}</span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tighter text-white drop-shadow-sm group-hover:text-[#F4C400] transition-colors">
+              MARMOT
+            </h2>
+
+            {/* Description */}
+            <p className="text-xs sm:text-[13px] text-[#D4D4D8] leading-relaxed">
+              Streetwear autoral com modelagens oversized, alta gramatura e tiragens limitadas.
+            </p>
+
+            {/* Subtle Divider Line */}
+            <div className="w-10 h-[1px] bg-white/25 pt-0.5" />
+          </div>
+
+          {/* MIDDLE: Member Perks (Centered vertically with generous editorial spacing) */}
+          <div className="relative z-10 my-auto py-4 sm:py-6 lg:py-8 w-full max-w-[330px] sm:max-w-[360px]">
+            <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-[#F4C400] font-bold flex items-center gap-2 mb-8 sm:mb-10 lg:mb-11">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F4C400]" />
+              Vantagens de Membro
+            </p>
+
+            {/* Lista Vertical Editorial com espaçamento generoso */}
+            <div className="w-full">
+              {/* Benefício 1 */}
+              <div className="flex items-start gap-4">
+                <Rocket className="w-4 h-4 text-[#F4C400] shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider leading-snug">
+                    Acesso Antecipado aos Drops
+                  </h4>
+                  <p className="text-[11px] sm:text-xs text-[#A1A1AA] leading-relaxed">
+                    Garanta prioridade de estoque em lançamentos limitados.
+                  </p>
                 </div>
-                {(authError.toLowerCase().includes('confirm') || authError.toLowerCase().includes('ativar')) && (
-                  <div className="pt-1 flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const target = loginEmail || regEmail;
-                        setPendingConfirmEmail(target);
-                        setAuthMode('awaiting_confirmation');
-                        setAuthError(null);
-                      }}
-                      className="text-xs font-bold text-[#B45309] hover:underline flex items-center gap-1 uppercase tracking-wider cursor-pointer"
-                    >
-                      Verificar E-mail / Reenviar Link &rarr;
-                    </button>
-                  </div>
-                )}
               </div>
-            )}
 
-            {/* Preview Verification Code helper banner */}
-            {previewCode && (
-              <div className="bg-[#FEF3C7] border border-[#FDE68A] text-[#18181B] p-4 rounded-xl text-xs space-y-1">
-                <p className="font-bold text-[#B45309] flex items-center gap-1.5 uppercase tracking-wider">
-                  <Sparkles className="w-4 h-4" /> Código de Teste Emitido:
-                </p>
-                <p className="text-lg font-mono font-black text-[#18181B] tracking-widest">{previewCode}</p>
-                <p className="text-[10px] text-[#71717A]">
-                  Insira o código acima para completar a validação instantânea da conta.
-                </p>
+              {/* Divisória horizontal sutil com amplo respiro */}
+              <div className="h-[1px] bg-white/[0.08] w-full my-9 sm:my-11 lg:my-12" />
+
+              {/* Benefício 2 */}
+              <div className="flex items-start gap-4">
+                <Truck className="w-4 h-4 text-white/70 shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider leading-snug">
+                    Rastreio em Tempo Real
+                  </h4>
+                  <p className="text-[11px] sm:text-xs text-[#A1A1AA] leading-relaxed">
+                    Acompanhe seu envio do checkout até a entrega com segurança.
+                  </p>
+                </div>
               </div>
-            )}
 
-            {/* TAB 1: LOGIN */}
-            {authMode === 'login' && (
-              <form onSubmit={handleLoginSubmit} className="space-y-4">
-                <div>
-                  <label className="text-[11px] font-bold text-[#71717A] block mb-1">E-mail</label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      placeholder="seuemail@exemplo.com"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
-                    <Mail className="w-4 h-4 text-[#A1A1AA] absolute right-3.5 top-3.5" />
-                  </div>
+              {/* Divisória horizontal sutil com amplo respiro */}
+              <div className="h-[1px] bg-white/[0.08] w-full my-9 sm:my-11 lg:my-12" />
+
+              {/* Benefício 3 */}
+              <div className="flex items-start gap-4">
+                <ShieldCheck className="w-4 h-4 text-white/70 shrink-0 mt-0.5" />
+                <div className="space-y-2">
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider leading-snug">
+                    Checkout em 1-Clique
+                  </h4>
+                  <p className="text-[11px] sm:text-xs text-[#A1A1AA] leading-relaxed">
+                    Endereços, categorias e pagamento via InfinitePay.
+                  </p>
                 </div>
-
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[11px] font-bold text-[#71717A]">Senha</label>
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode('forgot')}
-                      className="text-[11px] text-[#B45309] hover:underline cursor-pointer"
-                    >
-                      Esqueceu a senha?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-3.5 text-[#A1A1AA] hover:text-[#18181B] cursor-pointer"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={authLoading}
-                  className="w-full bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                >
-                  {authLoading ? 'AUTENTICANDO...' : 'ENTRAR NA CONTA'} <ArrowRight className="w-4 h-4" />
-                </button>
-              </form>
-            )}
-
-            {/* TAB 2: REGISTER */}
-            {authMode === 'register' && (
-              <form onSubmit={handleRegisterSubmit} className="space-y-4">
-                <div>
-                  <label className="text-[11px] font-bold text-[#71717A] block mb-1">Nome Completo</label>
-                  <input
-                    type="text"
-                    value={regName}
-                    onChange={(e) => setRegName(e.target.value)}
-                    placeholder="Ex: Roberto Sampaio"
-                    required
-                    className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-bold text-[#71717A] block mb-1">E-mail</label>
-                    <input
-                      type="email"
-                      value={regEmail}
-                      onChange={(e) => setRegEmail(e.target.value)}
-                      placeholder="roberto@email.com"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-[#71717A] block mb-1">Telefone WhatsApp</label>
-                    <input
-                      type="text"
-                      value={regPhone}
-                      onChange={(e) => setRegPhone(e.target.value)}
-                      placeholder="(11) 98888-7777"
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-[#71717A] block mb-1">CPF (Opcional)</label>
-                  <input
-                    type="text"
-                    value={regCpf}
-                    onChange={(e) => setRegCpf(e.target.value)}
-                    placeholder="000.000.000-00"
-                    className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[11px] font-bold text-[#71717A] block mb-1">Senha (Mín. 6 caracteres)</label>
-                    <input
-                      type="password"
-                      value={regPassword}
-                      onChange={(e) => setRegPassword(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-bold text-[#71717A] block mb-1">Confirmar Senha</label>
-                    <input
-                      type="password"
-                      value={regConfirmPassword}
-                      onChange={(e) => setRegConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={authLoading}
-                  className="w-full bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                >
-                  {authLoading ? 'CADASTRANDO...' : 'CRIAR MINHA CONTA'}
-                </button>
-              </form>
-            )}
-
-            {/* TAB 3: FORGOT & RESET PASSWORD */}
-            {authMode === 'forgot' && (
-              <div>
-                {resetStep === 1 ? (
-                  <form onSubmit={handleForgotSubmit} className="space-y-4">
-                    <p className="text-xs text-[#71717A]">
-                      Digite seu e-mail cadastrado. Emitiremos um código de segurança para redefinição de senha.
-                    </p>
-
-                    <div>
-                      <label className="text-[11px] font-bold text-[#71717A] block mb-1">E-mail Cadastrado</label>
-                      <input
-                        type="email"
-                        value={forgotEmail}
-                        onChange={(e) => setForgotEmail(e.target.value)}
-                        placeholder="seuemail@exemplo.com"
-                        required
-                        className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={authLoading}
-                      className="w-full bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {authLoading ? 'PROCESSANDO...' : 'ENVIAR CÓDIGO DE RECUPERAÇÃO'}
-                    </button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleResetSubmit} className="space-y-4">
-                    <p className="text-xs text-[#71717A]">
-                      Insira o código de 6 dígitos e defina a sua nova senha.
-                    </p>
-
-                    <div>
-                      <label className="text-[11px] font-bold text-[#71717A] block mb-1">Código de 6 Dígitos</label>
-                      <input
-                        type="text"
-                        value={resetCode}
-                        onChange={(e) => setResetCode(e.target.value)}
-                        placeholder="Ex: 849201"
-                        required
-                        className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] font-mono focus:outline-none focus:border-[#18181B]"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">Nova Senha</label>
-                        <input
-                          type="password"
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="Mín. 6 caracteres"
-                          required
-                          className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="text-[11px] font-bold text-[#71717A] block mb-1">Confirmar Nova Senha</label>
-                        <input
-                          type="password"
-                          value={confirmNewPassword}
-                          onChange={(e) => setConfirmNewPassword(e.target.value)}
-                          placeholder="••••••••"
-                          required
-                          className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={authLoading}
-                      className="w-full bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {authLoading ? 'ATUALIZANDO...' : 'CONFIRMAR NOVA SENHA'}
-                    </button>
-                  </form>
-                )}
               </div>
-            )}
+            </div>
+          </div>
 
-            {/* TAB 4: EMAIL VERIFICATION (MANUAL CODE) */}
-            {authMode === 'verify' && (
-              <form onSubmit={handleVerifySubmit} className="space-y-4">
-                <p className="text-xs text-[#71717A]">
-                  Insira o código de 6 dígitos para validar a titularidade da conta para <strong>{verifyTargetEmail}</strong>.
-                </p>
+          {/* BOTTOM: Signature / Rodapé no fim da coluna */}
+          <div className="relative z-10 w-full flex items-center justify-between text-[11px] text-[#A1A1AA] pt-4 max-w-[330px] sm:max-w-[360px]">
+            <span className="font-mono tracking-wider text-[#A1A1AA]">MODA AUTORAL BRASIL</span>
+            <span className="font-mono text-[#F4C400] font-bold tracking-wider">ED. OFICIAL</span>
+          </div>
+        </div>
 
-                <div>
-                  <label className="text-[11px] font-bold text-[#71717A] block mb-1">Código de Validação</label>
-                  <input
-                    type="text"
-                    value={verifyCode}
-                    onChange={(e) => setVerifyCode(e.target.value)}
-                    placeholder="000000"
-                    maxLength={6}
-                    required
-                    className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-center text-lg font-mono font-black text-[#B45309] tracking-widest focus:outline-none focus:border-[#18181B]"
-                  />
-                </div>
+        {/* RIGHT COLUMN: Interactive Authentication Form (Full Screen Half) */}
+        <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-between bg-white text-[#18181B] p-6 sm:p-10 md:p-12 lg:p-12 xl:p-16 2xl:p-20 relative overflow-y-auto">
+          
+          {/* Top Bar with Return to Store button & security indicator */}
+          <div className="w-full max-w-[500px] mx-auto flex items-center justify-between pb-4 border-b border-[#F4F4F5]">
+            <button
+              type="button"
+              onClick={() => onNavigate('home')}
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#71717A] hover:text-[#18181B] transition-colors py-2 px-3 -ml-3 rounded-xl hover:bg-[#F4F4F5] cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Voltar para a Loja</span>
+            </button>
 
-                <div className="flex gap-2">
+            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-[#71717A]">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="hidden sm:inline">Ambiente Criptografado</span>
+              <span className="sm:hidden">Seguro</span>
+            </div>
+          </div>
+
+          {/* Form Core Container */}
+          <div className="w-full max-w-[500px] mx-auto my-auto py-6 sm:py-8 space-y-6">
+              
+              {/* Form Header & Segmented Pill Switcher */}
+              <div className="space-y-6">
+                {/* Segmented Mode Selector */}
+                <div className="grid grid-cols-3 p-1.5 bg-[#F4F4F5] border border-[#E4E4E7]/80 rounded-2xl gap-1">
                   <button
                     type="button"
-                    onClick={handleResend}
-                    className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase px-4 py-3 rounded-xl cursor-pointer"
+                    onClick={() => {
+                      setAuthMode('login');
+                      setAuthError(null);
+                    }}
+                    className={`py-2.5 px-2 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer select-none text-xs ${
+                      authMode === 'login'
+                        ? 'bg-white text-[#18181B] shadow-xs font-black'
+                        : 'text-[#71717A] hover:text-[#18181B] font-medium'
+                    }`}
                   >
-                    Reenviar Código
+                    <Lock className="w-3.5 h-3.5 shrink-0" />
+                    <span>Entrar</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('register');
+                      setAuthError(null);
+                    }}
+                    className={`py-2.5 px-2 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer select-none text-xs ${
+                      authMode === 'register'
+                        ? 'bg-white text-[#18181B] shadow-xs font-black'
+                        : 'text-[#71717A] hover:text-[#18181B] font-medium'
+                    }`}
+                  >
+                    <User className="w-3.5 h-3.5 shrink-0" />
+                    <span>Criar Conta</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('forgot');
+                      setAuthError(null);
+                    }}
+                    className={`py-2.5 px-2 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer select-none text-xs ${
+                      authMode === 'forgot'
+                        ? 'bg-white text-[#18181B] shadow-xs font-black'
+                        : 'text-[#71717A] hover:text-[#18181B] font-medium'
+                    }`}
+                  >
+                    <KeyRound className="w-3.5 h-3.5 shrink-0" />
+                    <span>Recuperar</span>
+                  </button>
+                </div>
+
+                {/* Dynamic Title / Subtitle based on authMode */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-[0.2em] text-[#71717A] uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#18181B]" />
+                    {authMode === 'login' && 'Autenticação de Membro'}
+                    {authMode === 'register' && 'Novo Registro no Atelier'}
+                    {authMode === 'forgot' && 'Segurança & Credenciais'}
+                    {authMode === 'verify' && 'Confirmação de Identidade'}
+                    {authMode === 'awaiting_confirmation' && 'Link de Validação'}
+                  </div>
+
+                  <h1 className="text-2xl sm:text-3xl font-black uppercase text-[#18181B] tracking-tight">
+                    {authMode === 'login' && 'Acessar Minha Conta'}
+                    {authMode === 'register' && 'Criar Conta na Marmot'}
+                    {authMode === 'forgot' && (resetStep === 1 ? 'Recuperação de Acesso' : 'Definir Nova Senha')}
+                    {authMode === 'verify' && 'Validar E-mail'}
+                    {authMode === 'awaiting_confirmation' && 'Confirmação Pendente'}
+                  </h1>
+
+                  <p className="text-xs sm:text-[13px] text-[#71717A] leading-relaxed">
+                    {authMode === 'login' && 'Insira suas credenciais para gerenciar seus pedidos, rastreios e benefícios exclusivos.'}
+                    {authMode === 'register' && 'Cadastre-se em menos de 1 minuto para drops antecipados e checkout em 1-clique.'}
+                    {authMode === 'forgot' && (resetStep === 1
+                      ? 'Informe o e-mail da sua conta para emitirmos o código de segurança.'
+                      : 'Insira o código recebido por e-mail e crie uma nova senha de acesso.')}
+                    {authMode === 'verify' && 'Digite o código de 6 dígitos emitido para sua caixa de entrada.'}
+                    {authMode === 'awaiting_confirmation' && 'Quase lá! Enviamos o link de ativação da conta para você.'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Error Message Alert */}
+              {authError && (
+                <div className="bg-red-50/90 border border-red-200 text-red-700 p-3.5 rounded-2xl text-xs space-y-2 animate-in fade-in">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                    <span className="leading-relaxed font-medium">{authError}</span>
+                  </div>
+                  {(authError.toLowerCase().includes('confirm') || authError.toLowerCase().includes('ativar')) && (
+                    <div className="pt-1 flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const target = loginEmail || regEmail;
+                          setPendingConfirmEmail(target);
+                          setAuthMode('awaiting_confirmation');
+                          setAuthError(null);
+                        }}
+                        className="text-xs font-bold text-[#B45309] hover:underline flex items-center gap-1 uppercase tracking-wider cursor-pointer"
+                      >
+                        Verificar E-mail / Reenviar Link &rarr;
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Preview Verification Code helper banner */}
+              {previewCode && (
+                <div className="bg-[#FEF3C7] border border-[#FDE68A] text-[#18181B] p-4 rounded-2xl text-xs space-y-1.5">
+                  <p className="font-bold text-[#B45309] flex items-center gap-1.5 uppercase tracking-wider font-mono text-[10px]">
+                    <Sparkles className="w-4 h-4 text-[#B45309]" /> Código de Teste Emitido:
+                  </p>
+                  <p className="text-xl font-mono font-black text-[#18181B] tracking-widest">{previewCode}</p>
+                  <p className="text-[11px] text-[#71717A]">
+                    Insira o código acima para completar a validação instantânea da conta.
+                  </p>
+                </div>
+              )}
+
+              {/* TAB 1: LOGIN */}
+              {authMode === 'login' && (
+                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                  <div>
+                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      Endereço de E-mail
+                    </label>
+                    <div className="relative flex items-center group">
+                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <Mail className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="email"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        placeholder="seuemail@exemplo.com"
+                        required
+                        autoComplete="email"
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 sm:py-3.5 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B]">
+                        Senha de Acesso
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setAuthMode('forgot');
+                          setAuthError(null);
+                        }}
+                        className="text-[11px] font-medium text-[#71717A] hover:text-[#18181B] hover:underline cursor-pointer transition-colors"
+                      >
+                        Esqueceu a senha?
+                      </button>
+                    </div>
+                    <div className="relative flex items-center group">
+                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <Lock className="w-4 h-4" />
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                        autoComplete="current-password"
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-11 py-3 sm:py-3.5 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1.5 rounded-lg transition-colors cursor-pointer"
+                        title={showPassword ? 'Ocultar senha' : 'Exibir senha'}
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs pt-1">
+                    <label className="flex items-center gap-2 text-[#71717A] hover:text-[#18181B] cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="w-4 h-4 rounded border-[#D4D4D8] text-[#18181B] focus:ring-[#18181B] cursor-pointer accent-[#18181B]"
+                      />
+                      <span className="text-[11px] font-medium">Lembrar deste dispositivo</span>
+                    </label>
+                    <span className="text-[10px] font-mono text-[#71717A] flex items-center gap-1.5 bg-[#F4F4F5] px-2 py-0.5 rounded-md border border-[#E4E4E7]/60">
+                      <ShieldCheck className="w-3 h-3 text-emerald-600" /> SSL 256-bit
+                    </span>
+                  </div>
 
                   <button
                     type="submit"
                     disabled={authLoading}
-                    className="flex-1 bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-extrabold text-xs uppercase py-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {authLoading ? 'VERIFICANDO...' : 'CONFIRMAR E-MAIL'}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* TAB 5: AWAITING SUPABASE EMAIL CONFIRMATION LINK */}
-            {authMode === 'awaiting_confirmation' && (
-              <div className="space-y-6 py-2">
-                <div className="mx-auto w-16 h-16 bg-[#FEF3C7] border border-[#FDE68A] rounded-2xl flex items-center justify-center text-[#B45309] shadow-xs">
-                  <Mail className="w-8 h-8" />
-                </div>
-
-                <div className="text-center space-y-2.5">
-                  <h3 className="text-xl sm:text-2xl font-black uppercase text-[#18181B] tracking-tight">
-                    Verifique seu e-mail
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#71717A]">
-                    Enviamos um link de confirmação para:
-                  </p>
-                  <div className="bg-[#F8F9FA] border border-[#E4E4E7] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-mono font-bold text-[#B45309] break-all max-w-sm mx-auto">
-                    {pendingConfirmEmail || regEmail}
-                  </div>
-                  <p className="text-xs text-[#71717A] pt-1">
-                    Clique no link enviado para ativar sua conta na MARMOT.
-                  </p>
-                </div>
-
-                {resendStatusMsg && (
-                  <div className={`p-3 rounded-xl text-xs text-center font-mono border ${
-                    resendStatusMsg.includes('sucesso') 
-                      ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
-                      : 'bg-red-50 border-red-200 text-red-700'
-                  }`}>
-                    {resendStatusMsg}
-                  </div>
-                )}
-
-                <div className="space-y-4 pt-1">
-                  <button
-                    type="button"
-                    onClick={handleResendPendingConfirm}
-                    disabled={authLoading || resendCooldown > 0}
-                    className="w-full bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] hover:border-[#18181B]/50 text-[#18181B] disabled:opacity-50 font-bold text-xs uppercase py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                    className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 sm:py-4 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2.5 disabled:opacity-50 cursor-pointer group"
                   >
                     {authLoading ? (
-                      <span>Reenviando link...</span>
-                    ) : resendCooldown > 0 ? (
-                      <span>Reenviar e-mail ({resendCooldown}s)</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>AUTENTICANDO...</span>
+                      </div>
                     ) : (
-                      <span>Reenviar e-mail de confirmação</span>
+                      <>
+                        <span>ENTRAR NA MINHA CONTA</span>
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </>
                     )}
                   </button>
 
-                  <div className="pt-2 border-t border-[#E4E4E7] text-center space-y-2">
-                    <p className="text-xs text-[#71717A]">Já confirmou seu e-mail?</p>
-                    <div className="flex gap-2">
+                  <div className="relative flex py-1.5 items-center justify-center">
+                    <div className="flex-grow border-t border-[#E4E4E7]" />
+                    <span className="flex-shrink mx-3 text-[10px] font-mono text-[#A1A1AA] uppercase tracking-widest">
+                      Novo Membro?
+                    </span>
+                    <div className="flex-grow border-t border-[#E4E4E7]" />
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('register');
+                      setAuthError(null);
+                    }}
+                    className="w-full py-3 px-4 rounded-xl border border-[#E4E4E7] hover:border-[#18181B] bg-[#FAFAFB] hover:bg-white text-xs font-bold uppercase tracking-wider text-[#18181B] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                  >
+                    <User className="w-3.5 h-3.5 text-[#71717A]" />
+                    <span>Cadastre-se Gratuitamente</span>
+                  </button>
+                </form>
+              )}
+
+              {/* TAB 2: REGISTER */}
+              {authMode === 'register' && (
+                <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+                  <div>
+                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      Nome Completo
+                    </label>
+                    <div className="relative flex items-center group">
+                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <User className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={regName}
+                        onChange={(e) => setRegName(e.target.value)}
+                        placeholder="Ex: Gabriel Santos"
+                        required
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                        E-mail
+                      </label>
+                      <div className="relative flex items-center group">
+                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Mail className="w-4 h-4" />
+                        </div>
+                        <input
+                          type="email"
+                          value={regEmail}
+                          onChange={(e) => setRegEmail(e.target.value)}
+                          placeholder="seuemail@exemplo.com"
+                          required
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                        WhatsApp / Celular
+                      </label>
+                      <div className="relative flex items-center group">
+                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Phone className="w-4 h-4" />
+                        </div>
+                        <input
+                          type="text"
+                          value={regPhone}
+                          onChange={(e) => setRegPhone(e.target.value)}
+                          placeholder="(11) 99999-8888"
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      CPF <span className="text-[#A1A1AA] font-normal lowercase">(opcional para nota fiscal)</span>
+                    </label>
+                    <div className="relative flex items-center group">
+                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <CreditCard className="w-4 h-4" />
+                      </div>
+                      <input
+                        type="text"
+                        value={regCpf}
+                        onChange={(e) => setRegCpf(e.target.value)}
+                        placeholder="000.000.000-00"
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                        Senha
+                      </label>
+                      <div className="relative flex items-center group">
+                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Lock className="w-4 h-4" />
+                        </div>
+                        <input
+                          type={showRegPassword ? 'text' : 'password'}
+                          value={regPassword}
+                          onChange={(e) => setRegPassword(e.target.value)}
+                          placeholder="••••••••"
+                          required
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegPassword(!showRegPassword)}
+                          className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                          title={showRegPassword ? 'Ocultar' : 'Exibir'}
+                        >
+                          {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                        Confirmar Senha
+                      </label>
+                      <div className="relative flex items-center group">
+                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Lock className="w-4 h-4" />
+                        </div>
+                        <input
+                          type={showRegConfirmPassword ? 'text' : 'password'}
+                          value={regConfirmPassword}
+                          onChange={(e) => setRegConfirmPassword(e.target.value)}
+                          placeholder="••••••••"
+                          required
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
+                          className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                          title={showRegConfirmPassword ? 'Ocultar' : 'Exibir'}
+                        >
+                          {showRegConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4 text-[11px] text-[#71717A] pt-0.5">
+                    <span className="flex items-center gap-1.5 font-mono text-[10px]">
+                      <CheckCircle2 className={`w-3.5 h-3.5 ${regPassword.length >= 6 ? 'text-emerald-600' : 'text-[#A1A1AA]'}`} />
+                      MÍN. 6 CARACTERES
+                    </span>
+                    <span className="flex items-center gap-1.5 font-mono text-[10px]">
+                      <CheckCircle2 className={`w-3.5 h-3.5 ${regPassword && regPassword === regConfirmPassword ? 'text-emerald-600' : 'text-[#A1A1AA]'}`} />
+                      SENHAS COINCIDEM
+                    </span>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer group"
+                  >
+                    {authLoading ? 'CADASTRANDO...' : 'CRIAR MINHA CONTA MARMOT'}
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </button>
+
+                  <div className="text-center pt-1">
+                    <p className="text-xs text-[#71717A]">
+                      Já possui uma conta na MARMOT?{' '}
                       <button
                         type="button"
                         onClick={() => {
                           setAuthMode('login');
-                          setLoginEmail(pendingConfirmEmail || regEmail);
                           setAuthError(null);
                         }}
-                        className="flex-1 bg-[#F4C400] hover:bg-[#E5B500] text-[#0B0B0E] font-extrabold text-xs uppercase py-3 rounded-xl transition-all cursor-pointer shadow-xs"
+                        className="font-bold text-[#18181B] hover:underline cursor-pointer"
                       >
-                        Ir para o Login
+                        Fazer login &rarr;
                       </button>
+                    </p>
+                  </div>
+                </form>
+              )}
+
+              {/* TAB 3: FORGOT & RESET PASSWORD */}
+              {authMode === 'forgot' && (
+                <div>
+                  {resetStep === 1 ? (
+                    <form onSubmit={handleForgotSubmit} className="space-y-4">
+                      <div>
+                        <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                          E-mail Cadastrado
+                        </label>
+                        <div className="relative flex items-center group">
+                          <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                            <Mail className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="email"
+                            value={forgotEmail}
+                            onChange={(e) => setForgotEmail(e.target.value)}
+                            placeholder="seuemail@exemplo.com"
+                            required
+                            className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3.5 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                          />
+                        </div>
+                      </div>
 
                       <button
-                        type="button"
-                        onClick={() => {
-                          setAuthMode('register');
-                          setAuthError(null);
-                        }}
-                        className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase px-4 py-3 rounded-xl transition-all cursor-pointer"
+                        type="submit"
+                        disabled={authLoading}
+                        className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 sm:py-4 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer group"
                       >
-                        Alterar E-mail
+                        {authLoading ? 'ENVIANDO CÓDIGO...' : 'ENVIAR CÓDIGO DE RECUPERAÇÃO'}
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </button>
+
+                      <div className="text-center pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAuthMode('login');
+                            setAuthError(null);
+                          }}
+                          className="text-xs font-bold text-[#71717A] hover:text-[#18181B] hover:underline cursor-pointer flex items-center justify-center gap-1 mx-auto"
+                        >
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                          <span>Lembrou seus dados? Voltar ao login</span>
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <form onSubmit={handleResetSubmit} className="space-y-4">
+                      <div>
+                        <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                          Código de 6 Dígitos
+                        </label>
+                        <div className="relative flex items-center group">
+                          <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                            <KeyRound className="w-4 h-4" />
+                          </div>
+                          <input
+                            type="text"
+                            value={resetCode}
+                            onChange={(e) => setResetCode(e.target.value)}
+                            placeholder="000000"
+                            maxLength={6}
+                            required
+                            className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3.5 rounded-xl text-center text-lg font-mono font-black text-[#18181B] tracking-widest transition-all outline-none shadow-2xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div>
+                          <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                            Nova Senha
+                          </label>
+                          <div className="relative flex items-center group">
+                            <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                              <Lock className="w-4 h-4" />
+                            </div>
+                            <input
+                              type={showResetPassword ? 'text' : 'password'}
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              placeholder="Mín. 6 caracteres"
+                              required
+                              className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowResetPassword(!showResetPassword)}
+                              className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                              title={showResetPassword ? 'Ocultar' : 'Exibir'}
+                            >
+                              {showResetPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                            Confirmar Nova Senha
+                          </label>
+                          <div className="relative flex items-center group">
+                            <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                              <Lock className="w-4 h-4" />
+                            </div>
+                            <input
+                              type={showResetConfirmPassword ? 'text' : 'password'}
+                              value={confirmNewPassword}
+                              onChange={(e) => setConfirmNewPassword(e.target.value)}
+                              placeholder="••••••••"
+                              required
+                              className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowResetConfirmPassword(!showResetConfirmPassword)}
+                              className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                              title={showResetConfirmPassword ? 'Ocultar' : 'Exibir'}
+                            >
+                              {showResetConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={authLoading}
+                        className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 sm:py-4 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer group"
+                      >
+                        {authLoading ? 'ATUALIZANDO...' : 'CONFIRMAR NOVA SENHA'}
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              {/* TAB 4: EMAIL VERIFICATION (MANUAL CODE) */}
+              {authMode === 'verify' && (
+                <form onSubmit={handleVerifySubmit} className="space-y-4">
+                  <p className="text-xs text-[#71717A] leading-relaxed">
+                    Insira o código de 6 dígitos para validar a titularidade da conta para{' '}
+                    <strong className="text-[#18181B]">{verifyTargetEmail}</strong>.
+                  </p>
+
+                  <div>
+                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      Código de Validação
+                    </label>
+                    <input
+                      type="text"
+                      value={verifyCode}
+                      onChange={(e) => setVerifyCode(e.target.value)}
+                      placeholder="000000"
+                      maxLength={6}
+                      required
+                      className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 px-4 py-3.5 rounded-xl text-center text-2xl font-mono font-black text-[#18181B] tracking-widest outline-none transition-all shadow-2xs"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={handleResend}
+                      className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase px-5 py-3.5 rounded-xl cursor-pointer transition-colors"
+                    >
+                      Reenviar Código
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={authLoading}
+                      className="flex-1 bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      {authLoading ? 'VERIFICANDO...' : 'CONFIRMAR E-MAIL'}
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* TAB 5: AWAITING SUPABASE EMAIL CONFIRMATION LINK */}
+              {authMode === 'awaiting_confirmation' && (
+                <div className="space-y-6 py-2">
+                  <div className="mx-auto w-16 h-16 bg-[#FEF3C7] border border-[#FDE68A] rounded-2xl flex items-center justify-center text-[#B45309] shadow-xs">
+                    <Mail className="w-8 h-8" />
+                  </div>
+
+                  <div className="text-center space-y-2.5">
+                    <h3 className="text-xl sm:text-2xl font-black uppercase text-[#18181B] tracking-tight">
+                      Verifique seu e-mail
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#71717A]">
+                      Enviamos um link de confirmação para:
+                    </p>
+                    <div className="bg-[#F8F9FA] border border-[#E4E4E7] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-mono font-bold text-[#18181B] break-all max-w-sm mx-auto">
+                      {pendingConfirmEmail || regEmail}
+                    </div>
+                    <p className="text-xs text-[#71717A] pt-1">
+                      Clique no link enviado para ativar sua conta na MARMOT.
+                    </p>
+                  </div>
+
+                  {resendStatusMsg && (
+                    <div className={`p-3.5 rounded-xl text-xs text-center font-mono border ${
+                      resendStatusMsg.includes('sucesso') 
+                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                        : 'bg-red-50 border-red-200 text-red-700'
+                    }`}>
+                      {resendStatusMsg}
+                    </div>
+                  )}
+
+                  <div className="space-y-4 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleResendPendingConfirm}
+                      disabled={authLoading || resendCooldown > 0}
+                      className="w-full bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] hover:border-[#18181B]/50 text-[#18181B] disabled:opacity-50 font-bold text-xs uppercase py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      {authLoading ? (
+                        <span>Reenviando link...</span>
+                      ) : resendCooldown > 0 ? (
+                        <span>Reenviar e-mail ({resendCooldown}s)</span>
+                      ) : (
+                        <span>Reenviar e-mail de confirmação</span>
+                      )}
+                    </button>
+
+                    <div className="pt-2 border-t border-[#E4E4E7] text-center space-y-2">
+                      <p className="text-xs text-[#71717A]">Já confirmou seu e-mail?</p>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAuthMode('login');
+                            setLoginEmail(pendingConfirmEmail || regEmail);
+                            setAuthError(null);
+                          }}
+                          className="flex-1 bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all cursor-pointer shadow-xs"
+                        >
+                          Ir para o Login
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAuthMode('register');
+                            setAuthError(null);
+                          }}
+                          className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase px-4 py-3.5 rounded-xl transition-all cursor-pointer"
+                        >
+                          Alterar E-mail
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Bottom Security Assurance Badges */}
+            <div className="w-full max-w-[500px] mx-auto pt-4 border-t border-[#F4F4F5] grid grid-cols-3 gap-2 text-center text-[10px] sm:text-[11px] font-mono text-[#71717A]">
+              <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#FAFAFB] border border-[#E4E4E7]/60">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate">SSL 256-bit</span>
               </div>
-            )}
+              <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#FAFAFB] border border-[#E4E4E7]/60">
+                <Lock className="w-3.5 h-3.5 text-[#71717A] shrink-0" />
+                <span className="truncate">Supabase Auth</span>
+              </div>
+              <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#FAFAFB] border border-[#E4E4E7]/60">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span className="truncate">InfinitePay</span>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
   // -------------------------------------------------------------
   // VIEW: AUTHENTICATED USER DASHBOARD (MINHA CONTA)
@@ -1430,54 +1830,116 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
             {/* TAB: SECURITY / CHANGE PASSWORD */}
             {activeTab === 'security' && (
               <div className="space-y-6">
-                <h2 className="text-base font-black uppercase text-[#18181B] border-b border-[#E4E4E7] pb-4">
-                  Segurança & Alteração de Senha
-                </h2>
+                <div>
+                  <h2 className="text-base font-black uppercase text-[#18181B] tracking-tight">
+                    Segurança & Alteração de Senha
+                  </h2>
+                  <p className="text-xs text-[#71717A] mt-1">
+                    Mantenha sua conta protegida atualizando sua senha periodicamente.
+                  </p>
+                </div>
 
                 <form onSubmit={handleChangePassword} className="space-y-4 max-w-lg">
                   <div>
-                    <label className="text-[11px] font-bold text-[#71717A] block mb-1">Senha Atual</label>
-                    <input
-                      type="password"
-                      value={currentPass}
-                      onChange={(e) => setCurrentPass(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
+                    <label className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#71717A] block mb-1.5">
+                      Senha Atual
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3.5 text-[#A1A1AA] pointer-events-none">
+                        <Lock className="w-4 h-4" />
+                      </div>
+                      <input
+                        type={showCurrentPass ? 'text' : 'password'}
+                        value={currentPass}
+                        onChange={(e) => setCurrentPass(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-2 focus:ring-[#18181B]/5 pl-10 pr-11 py-3.5 rounded-xl text-xs font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPass(!showCurrentPass)}
+                        className="absolute right-3.5 text-[#A1A1AA] hover:text-[#18181B] transition-colors p-1 cursor-pointer"
+                        title={showCurrentPass ? 'Ocultar' : 'Exibir'}
+                      >
+                        {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-[#71717A] block mb-1">Nova Senha (Mín. 6 caracteres)</label>
-                    <input
-                      type="password"
-                      value={newPass}
-                      onChange={(e) => setNewPass(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
+                    <label className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#71717A] block mb-1.5">
+                      Nova Senha (Mínimo de 6 caracteres)
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3.5 text-[#A1A1AA] pointer-events-none">
+                        <Lock className="w-4 h-4" />
+                      </div>
+                      <input
+                        type={showNewPass ? 'text' : 'password'}
+                        value={newPass}
+                        onChange={(e) => setNewPass(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-2 focus:ring-[#18181B]/5 pl-10 pr-11 py-3.5 rounded-xl text-xs font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPass(!showNewPass)}
+                        className="absolute right-3.5 text-[#A1A1AA] hover:text-[#18181B] transition-colors p-1 cursor-pointer"
+                        title={showNewPass ? 'Ocultar' : 'Exibir'}
+                      >
+                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-[#71717A] block mb-1">Confirmar Nova Senha</label>
-                    <input
-                      type="password"
-                      value={confirmPass}
-                      onChange={(e) => setConfirmPass(e.target.value)}
-                      placeholder="••••••••"
-                      required
-                      className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-3 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
-                    />
+                    <label className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#71717A] block mb-1.5">
+                      Confirmar Nova Senha
+                    </label>
+                    <div className="relative flex items-center">
+                      <div className="absolute left-3.5 text-[#A1A1AA] pointer-events-none">
+                        <Lock className="w-4 h-4" />
+                      </div>
+                      <input
+                        type={showConfirmPass ? 'text' : 'password'}
+                        value={confirmPass}
+                        onChange={(e) => setConfirmPass(e.target.value)}
+                        placeholder="••••••••"
+                        required
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-2 focus:ring-[#18181B]/5 pl-10 pr-11 py-3.5 rounded-xl text-xs font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPass(!showConfirmPass)}
+                        className="absolute right-3.5 text-[#A1A1AA] hover:text-[#18181B] transition-colors p-1 cursor-pointer"
+                        title={showConfirmPass ? 'Ocultar' : 'Exibir'}
+                      >
+                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
 
-                  <button
-                    type="submit"
-                    disabled={changingPass}
-                    className="bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-extrabold text-xs uppercase px-6 py-3.5 rounded-xl transition-all shadow-xs cursor-pointer"
-                  >
-                    {changingPass ? 'ALTERANDO...' : 'CONFIRMAR NOVA SENHA'}
-                  </button>
+                  <div className="pt-2">
+                    <button
+                      type="submit"
+                      disabled={changingPass}
+                      className="bg-[#18181B] hover:bg-black text-white font-extrabold text-xs uppercase tracking-widest px-7 py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {changingPass ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>ATUALIZANDO...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span>CONFIRMAR NOVA SENHA</span>
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </form>
               </div>
             )}

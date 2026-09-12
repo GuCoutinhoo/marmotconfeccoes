@@ -34,7 +34,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     price: 149.90,
     installments: 'ou 3x de R$ 49,97 sem juros',
     checkoutNote: 'R$ 142,41 no PIX (5% OFF)',
-    image: '/uploads/products/prod-cam-001/c2ba729e5e82964f.webp',
+    image: '/Camiseta Contrast Stitch - Preto.png',
     colors: [
       { name: 'Preto Washed', hex: '#1C1C1E' },
       { name: 'Areia Off-White', hex: '#EBE6DC' },
@@ -79,7 +79,7 @@ const CANONICAL_DROP_ITEMS: DropProductItem[] = [
     price: 189.90,
     installments: 'ou 3x de R$ 63,30 sem juros',
     checkoutNote: 'R$ 180,41 no PIX (5% OFF)',
-    image: '/uploads/products/prod-cam-002/2ee03cad62dbcb11.webp',
+    image: '/Camiseta Double Layer - Bege e Marrom.png',
     colors: [
       { name: 'Marrom / Bege', hex: '#4A3B32' },
       { name: 'Areia', hex: '#DCD4C6' },

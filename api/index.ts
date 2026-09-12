@@ -24,6 +24,7 @@ import {
   type InfinitePayCheckoutItem,
 } from '../src/server/infinitePayClient';
 import { IS_TEST_MODE } from '../src/server/runtime-flags';
+import { getCamisetaImageMapping } from '../src/data/camisetaImageMappings';
 
 export { IS_TEST_MODE };
 
@@ -995,15 +996,22 @@ export class DatabaseManager {
   public sanitizeProduct(p: any): Product {
     if (!p) return {} as Product;
     const prodId = String(p.id || `prod-${Date.now()}`);
-    const rawMainImage = p.image || (Array.isArray(p.images) && p.images[0]) || '';
-    const cleanMainImage = saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+    const prodSlug = String(p.slug || '').trim();
+    const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
 
-    const rawImagesList = Array.isArray(p.images) && p.images.length > 0
-      ? p.images
-      : (rawMainImage ? [rawMainImage] : []);
-    const cleanImagesList = rawImagesList.map((img: string, idx: number) =>
-      saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`)
-    );
+    const rawMainImage = camisetaMapping
+      ? camisetaMapping.defaultImage
+      : (p.image || (Array.isArray(p.images) && p.images[0]) || '');
+    const cleanMainImage = camisetaMapping ? camisetaMapping.defaultImage : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+
+    const rawImagesList = camisetaMapping
+      ? camisetaMapping.images
+      : (Array.isArray(p.images) && p.images.length > 0
+          ? p.images
+          : (rawMainImage ? [rawMainImage] : []));
+    const cleanImagesList = camisetaMapping
+      ? camisetaMapping.images
+      : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
 
     const rawColors = Array.isArray(p.colors) && p.colors.length > 0
       ? p.colors
@@ -1019,14 +1027,29 @@ export class DatabaseManager {
       const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
       const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
 
+      let finalFeatured = cleanFeatured || cleanMainImage;
+      let finalVariantImages = cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]);
+
+      if (camisetaMapping) {
+        const match = camisetaMapping.variants.find(
+          (v) =>
+            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
+            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
+        );
+        if (match) {
+          finalFeatured = match.image;
+          finalVariantImages = [match.image];
+        }
+      }
+
       return {
         id: c.id,
         color: c.color || 'default',
         colorName: c.colorName || 'Cor Única',
         colorHex: c.colorHex || '#000000',
-        image: cleanFeatured || cleanMainImage,
-        featuredImage: cleanFeatured || cleanMainImage,
-        images: cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]),
+        image: finalFeatured,
+        featuredImage: finalFeatured,
+        images: finalVariantImages,
         sku: c.sku,
         stockCount: c.stockCount,
         sizes: c.sizes,
@@ -1051,14 +1074,22 @@ export class DatabaseManager {
     if (!item) return {} as Product;
     const d = (item.data && typeof item.data === 'object') ? item.data : {};
     const prodId = String(item.id || d.id || `prod-${Date.now()}`);
+    const prodSlug = String(item.slug || d.slug || '').trim();
+    const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
     
-    const rawMainImage = item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '';
-    const cleanMainImage = saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+    const rawMainImage = camisetaMapping
+      ? camisetaMapping.defaultImage
+      : (item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '');
+    const cleanMainImage = camisetaMapping ? camisetaMapping.defaultImage : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
 
-    const rawImagesList = Array.isArray(item.images) && item.images.length > 0
-      ? item.images
-      : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : []));
-    const cleanImagesList = rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
+    const rawImagesList = camisetaMapping
+      ? camisetaMapping.images
+      : (Array.isArray(item.images) && item.images.length > 0
+          ? item.images
+          : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : [])));
+    const cleanImagesList = camisetaMapping
+      ? camisetaMapping.images
+      : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
 
     const rawColors = Array.isArray(item.colors) && item.colors.length > 0
       ? item.colors
@@ -1072,14 +1103,29 @@ export class DatabaseManager {
       const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
       const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
 
+      let finalFeatured = cleanFeatured || cleanMainImage;
+      let finalVariantImages = cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]);
+
+      if (camisetaMapping) {
+        const match = camisetaMapping.variants.find(
+          (v) =>
+            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
+            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
+        );
+        if (match) {
+          finalFeatured = match.image;
+          finalVariantImages = [match.image];
+        }
+      }
+
       return {
         id: c.id,
         color: c.color || 'default',
         colorName: c.colorName || 'Cor Única',
         colorHex: c.colorHex || '#000000',
-        image: cleanFeatured || cleanMainImage,
-        featuredImage: cleanFeatured || cleanMainImage,
-        images: cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]),
+        image: finalFeatured,
+        featuredImage: finalFeatured,
+        images: finalVariantImages,
         sku: c.sku,
         stockCount: c.stockCount,
         sizes: c.sizes,

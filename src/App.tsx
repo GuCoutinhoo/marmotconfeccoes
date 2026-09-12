@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { ToastProvider } from './context/ToastContext';
@@ -91,6 +91,10 @@ export function AppContent() {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
 
   const { products } = useStore();
+  const { user } = useAuth();
+
+  // Hide the global store Header and Footer on login/auth screen
+  const isLoginPage = (currentPage === 'account' && !user) || currentPage === 'auth-confirm';
 
   // Listen to popstate (browser back / forward)
   useEffect(() => {
@@ -147,16 +151,18 @@ export function AppContent() {
 
   return (
     <div className="marmot-editorial min-h-screen bg-[#F8F9FA] text-[#18181B] flex flex-col font-sans selection:bg-[#F4C400] selection:text-black">
-      {/* Persistent Header */}
-      <Header
-        onNavigate={handleNavigate}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        currentPage={currentPage}
-        currentCategory={pageParam}
-      />
+      {/* Persistent Header - Hidden when on dedicated full-screen login / auth */}
+      {!isLoginPage && (
+        <Header
+          onNavigate={handleNavigate}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          currentPage={currentPage}
+          currentCategory={pageParam}
+        />
+      )}
 
       {/* Main Page Body with non-blocking Suspense boundaries */}
-      <main className="flex-1">
+      <main className={isLoginPage ? 'flex-1 flex flex-col' : 'flex-1'}>
         <Suspense fallback={<PageLoadingFallback />}>
           {currentPage === 'home' && (
             <HomePage
@@ -207,8 +213,8 @@ export function AppContent() {
         </Suspense>
       </main>
 
-      {/* Persistent Footer */}
-      <Footer onNavigate={handleNavigate} />
+      {/* Persistent Footer - Hidden on dedicated login / auth page */}
+      {!isLoginPage && <Footer onNavigate={handleNavigate} />}
 
       {/* Global Slide-Over MiniCart */}
       <MiniCart onNavigate={handleNavigate} />

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, Category, Address, Order, CartItem, ProductVariant } from '../types';
+import { getCamisetaImageMapping } from '../data/camisetaImageMappings';
 
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
@@ -62,20 +63,41 @@ export function mapSupabaseRowToProduct(row: any): Product {
   if (!row) return {} as Product;
   const d = (row.data && typeof row.data === 'object') ? row.data : {};
 
-  const primaryImg = row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || '';
-  const allImagesList = Array.isArray(row.images) && row.images.length > 0
-    ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
-    : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : []));
+  const rowId = String(row.id || d.id || '').trim();
+  const rowSlug = String(row.slug || d.slug || '').trim();
+  const camisetaMapping = getCamisetaImageMapping(rowId) || getCamisetaImageMapping(rowSlug);
+
+  const primaryImg = camisetaMapping
+    ? camisetaMapping.defaultImage
+    : (row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || '');
+  const allImagesList = camisetaMapping
+    ? camisetaMapping.images
+    : (Array.isArray(row.images) && row.images.length > 0
+        ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
+        : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : [])));
 
   const rawColors = Array.isArray(row.colors) && row.colors.length > 0
     ? row.colors
     : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
 
   const cleanColors = rawColors.map((c: any) => {
-    const variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
+    let variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
       ? c.images
       : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
-    const featured = c.featuredImage || variantImages[0] || c.image || primaryImg;
+    let featured = c.featuredImage || variantImages[0] || c.image || primaryImg;
+
+    if (camisetaMapping) {
+      const match = camisetaMapping.variants.find(
+        (v) =>
+          (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
+          (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
+      );
+      if (match) {
+        featured = match.image;
+        variantImages = [match.image];
+      }
+    }
+
     return {
       id: c.id,
       color: c.color || 'default',

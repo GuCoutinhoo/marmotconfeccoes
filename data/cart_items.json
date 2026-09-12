@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "id": "cart-1789222146227-lf63y",
+    "userId": "beabb474-a37a-4653-bb78-b6d2ce626e61",
+    "productId": "prod-cam-001",
+    "selectedSize": "G",
+    "selectedColor": {
+      "color": "black",
+      "colorName": "Preto",
+      "colorHex": "#121212",
+      "image": "/uploads/products/prod-cam-001/8badc748448e13dc.webp"
+    },
+    "quantity": 1,
+    "createdAt": "2026-09-12T14:09:06.227Z",
+    "updatedAt": "2026-09-12T14:09:06.227Z"
+  }
+]
