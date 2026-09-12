@@ -233,23 +233,21 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header 
-      className={`sticky top-0 z-[80] w-full select-none font-sans transition-all duration-500 ease-in-out ${
-        isScrolled ? 'pt-1.5 sm:pt-2 px-1.5 sm:px-3' : 'pt-0 px-0'
-      }`}
+      className="sticky top-0 z-[80] w-full select-none font-sans transition-all duration-300 ease-in-out pt-0 px-0"
     >
-      {/* Header Bar - Full width edge-to-edge with smooth floating capsule animation */}
+      {/* Header Bar - Sleek, lightweight architectural bar that compacts smoothly on scroll */}
       <div 
-        className={`w-full transition-all duration-500 ease-in-out ${
+        className={`w-full transition-all duration-300 ease-in-out ${
           isScrolled 
-            ? 'bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.12)] border border-zinc-200/80 px-4 sm:px-6 lg:px-8' 
+            ? 'bg-white/92 backdrop-blur-md border-b border-zinc-200/60 shadow-[0_2px_16px_rgba(0,0,0,0.04)] px-4 sm:px-6 lg:px-8 xl:px-10' 
             : isTransparent
-              ? 'bg-white/0 border-transparent shadow-none px-4 sm:px-6 lg:px-10'
-              : 'bg-white rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_6px_25px_rgba(0,0,0,0.06)] border-b border-zinc-100 px-4 sm:px-6 lg:px-8'
+              ? 'bg-white/0 border-b border-transparent shadow-none px-4 sm:px-6 lg:px-8 xl:px-10'
+              : 'bg-white border-b border-zinc-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] px-4 sm:px-6 lg:px-8 xl:px-10'
         }`}
       >
         <div 
-          className={`w-full flex items-center justify-between gap-2 sm:gap-4 transition-all duration-500 ease-in-out ${
-            isScrolled ? 'h-[52px] sm:h-[54px]' : 'h-[62px] sm:h-[66px]'
+          className={`w-full max-w-[1740px] mx-auto flex items-center justify-between gap-2 sm:gap-4 transition-all duration-300 ease-in-out ${
+            isScrolled ? 'h-[48px] sm:h-[50px]' : 'h-[62px] sm:h-[66px]'
           }`}
         >
           

@@ -16,20 +16,15 @@ const SHORTS_DATA = [
         color: 'black',
         colorName: 'Preto',
         colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        featuredImage: '/Shorts Cargo Baggy - cor preto.png',
+        images: ['/Shorts Cargo Baggy - cor preto.png']
       },
       {
-        color: 'sand_beige',
-        colorName: 'Bege areia',
-        colorHex: '#D2B48C',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'verde-oliva',
+        colorName: 'Verde Oliva',
+        colorHex: '#556B2F',
+        featuredImage: '/Shorts Cargo Baggy - cor verde oliva.png',
+        images: ['/Shorts Cargo Baggy - cor verde oliva.png']
       }
     ],
     features: [
@@ -42,44 +37,38 @@ const SHORTS_DATA = [
     ]
   },
   {
-    name: 'Shorts Carpenter',
-    slug: 'shorts-carpenter',
+    name: 'Shorts Mesh Sport',
+    slug: 'shorts-mesh-sport',
     sku: 'MM-SHO-002',
-    price: 259.90,
+    price: 229.90,
     promoPrice: null,
     colors: [
-      {
-        color: 'brown',
-        colorName: 'Marrom',
-        colorHex: '#5C4033',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
       {
         color: 'black',
         colorName: 'Preto',
         colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        featuredImage: '/Shorts Mesh Sport - cor preto.png',
+        images: ['/Shorts Mesh Sport - cor preto.png']
+      },
+      {
+        color: 'offwhite',
+        colorName: 'Off White',
+        colorHex: '#F5F5F0',
+        featuredImage: '/Shorts Mesh Sport - cor off white.png',
+        images: ['/Shorts Mesh Sport - cor off white.png']
       }
     ],
     features: [
-      'Modelagem reta e ampla',
-      'Bolsos utilitários',
-      'Alça lateral inspirada em ferramentas',
-      'Costuras reforçadas',
-      'Tecido resistente',
-      'Estética workwear'
+      'Mesh duplo premium respirável',
+      'Cós elástico com cordão ajustável',
+      'Modelagem esportiva oversized',
+      'Toque macio e leveza extrema',
+      'Perfeito para o dia a dia e lifestyle'
     ]
   },
   {
-    name: 'Shorts Double Knee',
-    slug: 'shorts-double-knee',
+    name: 'Shorts Baggy Denim',
+    slug: 'shorts-baggy-denim',
     sku: 'MM-SHO-003',
     price: 269.90,
     promoPrice: null,
@@ -88,28 +77,23 @@ const SHORTS_DATA = [
         color: 'black',
         colorName: 'Preto',
         colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        featuredImage: '/Shorts Baggy Denim - cor preto.png',
+        images: ['/Shorts Baggy Denim - cor preto.png']
       },
       {
-        color: 'beige',
+        color: 'bege',
         colorName: 'Bege',
-        colorHex: '#C8AD7F',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        colorHex: '#D2B48C',
+        featuredImage: '/Shorts Baggy Denim - cor bege.png',
+        images: ['/Shorts Baggy Denim - cor bege.png']
       }
     ],
     features: [
-      'Painéis reforçados na parte frontal',
-      'Costuras aparentes',
-      'Tecido encorpado',
-      'Modelagem larga',
-      'Construção robusta',
-      'Inspiração em roupas de trabalho'
+      'Denim 100% algodão 13oz encorpado',
+      'Modelagem ultra baggy autêntica',
+      'Passantes reforçados para cinto',
+      'Bolsos profundos utilitários',
+      'Acabamento premium Marmot Atelier'
     ]
   },
   {
@@ -120,73 +104,92 @@ const SHORTS_DATA = [
     promoPrice: null,
     colors: [
       {
-        color: 'washed_blue',
-        colorName: 'Azul lavado',
-        colorHex: '#4B6B94',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'preto-lavado',
+        colorName: 'Preto Lavado',
+        colorHex: '#2B2B2B',
+        featuredImage: '/Shorts Denim Washed - cor preto lavado.png',
+        images: ['/Shorts Denim Washed - cor preto lavado.png']
       },
       {
-        color: 'washed_black',
-        colorName: 'Preto lavado',
-        colorHex: '#2B2B2B',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'azul-claro',
+        colorName: 'Azul Claro',
+        colorHex: '#87CEEB',
+        featuredImage: '/Shorts Denim Washed - cor azul claro.png',
+        images: ['/Shorts Denim Washed - cor azul claro.png']
       }
     ],
     features: [
-      'Jeans pesado',
-      'Lavagem envelhecida',
-      'Efeito desbotado',
-      'Modelagem baggy',
-      'Barra ampla',
-      'Visual vintage e streetwear'
+      'Denim com lavagem estonada artesanal',
+      'Toque macio pré-encolhido',
+      'Corte reto streetwear relaxado',
+      'Costuras reforçadas em linha contrastante',
+      'Visual vintage atemporal'
     ]
   },
   {
-    name: 'Shorts Denim Distressed',
-    slug: 'shorts-denim-distressed',
+    name: 'Shorts Distressed',
+    slug: 'shorts-distressed',
     sku: 'MM-SHO-005',
     price: 269.90,
     promoPrice: null,
     colors: [
       {
-        color: 'acid_black',
-        colorName: 'Preto estonado',
-        colorHex: '#333333',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'black',
+        colorName: 'Preto',
+        colorHex: '#121212',
+        featuredImage: '/Shorts Distressed - cor preto.png',
+        images: ['/Shorts Distressed - cor preto.png']
       },
       {
-        color: 'light_blue',
-        colorName: 'Azul claro lavado',
-        colorHex: '#7B9EB8',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'jeans-claro',
+        colorName: 'Jeans Claro',
+        colorHex: '#99BADD',
+        featuredImage: '/Shorts Distressed - cor jeans claro.png',
+        images: ['/Shorts Distressed - cor jeans claro.png']
       }
     ],
     features: [
-      'Jeans com áreas desgastadas',
-      'Rasgos e pontos propositalmente puídos',
-      'Barra com acabamento bruto',
-      'Lavagem irregular',
-      'Modelagem ampla',
-      'Estética grunge'
+      'Jeans com detalhes puídos e desfiados manuais',
+      'Barra desfiada com acabamento seguro',
+      'Lavagem irregular de alto contraste',
+      'Modelagem ampla urbana',
+      'Estética grunge contemporânea'
     ]
   },
   {
     name: 'Shorts Parachute',
     slug: 'shorts-parachute',
     sku: 'MM-SHO-006',
+    price: 239.90,
+    promoPrice: null,
+    colors: [
+      {
+        color: 'black',
+        colorName: 'Preto',
+        colorHex: '#121212',
+        featuredImage: '/Shorts Parachute - cor preto.png',
+        images: ['/Shorts Parachute - cor preto.png']
+      },
+      {
+        color: 'verde-oliva',
+        colorName: 'Verde Oliva',
+        colorHex: '#556B2F',
+        featuredImage: '/Shorts Parachute - cor verde oliva.png',
+        images: ['/Shorts Parachute - cor verde oliva.png']
+      }
+    ],
+    features: [
+      'Tecido parachute leve e resistente ao vento',
+      'Ajustadores elásticos elásticos e tankas',
+      'Modelagem volumosa funcional',
+      'Bolsos embutidos com zíper invertido',
+      'Secagem ultra rápida'
+    ]
+  },
+  {
+    name: 'Shorts Tech Nylon',
+    slug: 'shorts-tech-nylon',
+    sku: 'MM-SHO-007',
     price: 249.90,
     promoPrice: null,
     colors: [
@@ -194,239 +197,173 @@ const SHORTS_DATA = [
         color: 'black',
         colorName: 'Preto',
         colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        featuredImage: '/Shorts Tech Nylon - cor preto.png',
+        images: ['/Shorts Tech Nylon - cor preto.png']
       },
       {
-        color: 'olive_green',
-        colorName: 'Verde oliva',
-        colorHex: '#4A5340',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'cinza',
+        colorName: 'Cinza',
+        colorHex: '#708090',
+        featuredImage: '/Shorts Tech Nylon - cor cinza.png',
+        images: ['/Shorts Tech Nylon - cor cinza.png']
       }
     ],
     features: [
-      'Modelagem muito ampla',
-      'Tecido leve e técnico',
-      'Bolsos funcionais',
-      'Cintura ajustável',
-      'Cordões ou reguladores',
-      'Visual inspirado nos anos 2000'
+      'Nylon ripstop técnico hidro-repelente',
+      'Bolsos laterais com puxadores em cordão',
+      'Construção anatômica ergonômica',
+      'Cós em ribana elástica com cordão',
+      'Visual techwear refinado'
     ]
   },
   {
-    name: 'Shorts Nylon Utility',
-    slug: 'shorts-nylon-utility',
-    sku: 'MM-SHO-007',
-    price: 239.90,
-    promoPrice: null,
-    colors: [
-      {
-        color: 'graphite',
-        colorName: 'Grafite',
-        colorHex: '#3E424B',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
-      },
-      {
-        color: 'black',
-        colorName: 'Preto',
-        colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
-      }
-    ],
-    features: [
-      'Nylon leve',
-      'Bolsos utilitários',
-      'Cintura com ajuste',
-      'Construção funcional',
-      'Modelagem relaxada',
-      'Visual esportivo e técnico'
-    ]
-  },
-  {
-    name: 'Shorts Tactical',
-    slug: 'shorts-tactical',
+    name: 'Shorts Flame',
+    slug: 'shorts-flame',
     sku: 'MM-SHO-008',
-    price: 279.90,
+    price: 259.90,
     promoPrice: null,
     colors: [
       {
         color: 'black',
         colorName: 'Preto',
         colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        featuredImage: '/Shorts Flame - cor preto.png',
+        images: ['/Shorts Flame - cor preto.png']
       },
       {
-        color: 'lead',
-        colorName: 'Chumbo',
-        colorHex: '#2E3440',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'offwhite',
+        colorName: 'Off White',
+        colorHex: '#F5F5F0',
+        featuredImage: '/Shorts Flame - cor off white.png',
+        images: ['/Shorts Flame - cor off white.png']
       }
     ],
     features: [
-      'Bolsos modulares',
-      'Fivelas e straps',
-      'Tecido resistente',
-      'Modelagem ampla',
-      'Detalhes inspirados em equipamento militar',
-      'Visual técnico e agressivo'
+      'Estampa gráfica lateral exclusiva Flame motif',
+      'Tecido encorpado de alta gramatura',
+      'Caimento estruturado baggy',
+      'Bolsos laterais reforçados',
+      'Destaque no streetwear internacional'
     ]
   },
   {
-    name: 'Shorts Multi Pocket',
-    slug: 'shorts-multi-pocket',
+    name: 'Shorts Minimal',
+    slug: 'shorts-minimal',
     sku: 'MM-SHO-009',
-    price: 269.90,
+    price: 219.90,
     promoPrice: null,
     colors: [
       {
         color: 'black',
         colorName: 'Preto',
         colorHex: '#121212',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        featuredImage: '/Shorts Minimal - cor preto.png',
+        images: ['/Shorts Minimal - cor preto.png']
       },
       {
-        color: 'military_green',
-        colorName: 'Verde militar',
-        colorHex: '#3F4839',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'bege',
+        colorName: 'Bege',
+        colorHex: '#D2B48C',
+        featuredImage: '/Shorts Minimal - cor bege.png',
+        images: ['/Shorts Minimal - cor bege.png']
       }
     ],
     features: [
-      'Grande quantidade de bolsos',
-      'Compartimentos frontais e laterais',
-      'Bolsos sobrepostos',
-      'Modelagem baggy',
-      'Construção utilitária',
-      'Visual streetwear maximalista'
+      'Design clean sem detalhes excessivos',
+      'Silhueta minimalista elegante',
+      'Algodão peletizado com toque aveludado',
+      'Cós discreto com acabamento embutido',
+      'Peça coringa para composição de looks'
     ]
   },
   {
-    name: 'Shorts Panel Construction',
-    slug: 'shorts-panel-construction',
+    name: 'Shorts Panel',
+    slug: 'shorts-panel',
     sku: 'MM-SHO-010',
-    price: 279.90,
+    price: 259.90,
     promoPrice: null,
     colors: [
       {
-        color: 'black_graphite',
-        colorName: 'Preto + Grafite',
-        colorHex: '#1A1D20',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'black',
+        colorName: 'Preto',
+        colorHex: '#121212',
+        featuredImage: '/Shorts Panel - cor preto.png',
+        images: ['/Shorts Panel - cor preto.png']
       },
       {
-        color: 'beige_brown',
-        colorName: 'Bege + Marrom',
-        colorHex: '#8B6D53',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'caqui',
+        colorName: 'Caqui',
+        colorHex: '#C3B091',
+        featuredImage: '/Shorts Panel - cor caqui.png',
+        images: ['/Shorts Panel - cor caqui.png']
       }
     ],
     features: [
-      'Recortes geométricos',
-      'Painéis sobrepostos',
-      'Costuras aparentes',
-      'Construção arquitetônica',
-      'Modelagem ampla',
-      'Visual experimental'
+      'Painéis geométricos recortados e costurados',
+      'Blocos de tecido contrastantes sutis',
+      'Modelagem intermediária confortável',
+      'Pespontos pesados resistentes',
+      'Identidade arquitetônica streetwear'
     ]
   },
   {
-    name: 'Shorts Patchwork',
-    slug: 'shorts-patchwork',
+    name: 'Shorts Graphic',
+    slug: 'shorts-graphic',
     sku: 'MM-SHO-011',
-    price: 289.90,
+    price: 249.90,
     promoPrice: null,
     colors: [
       {
-        color: 'black_grey',
-        colorName: 'Preto + Cinza',
-        colorHex: '#2A2D34',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'black',
+        colorName: 'Preto',
+        colorHex: '#121212',
+        featuredImage: '/Shorts Graphic - cor preto.png',
+        images: ['/Shorts Graphic - cor preto.png']
       },
       {
-        color: 'brown_beige',
-        colorName: 'Marrom + Bege',
-        colorHex: '#7A5C43',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'marrom',
+        colorName: 'Marrom',
+        colorHex: '#5C4033',
+        featuredImage: '/Shorts Graphic - cor marrom.png',
+        images: ['/Shorts Graphic - cor marrom.png']
       }
     ],
     features: [
-      'Painéis de tecidos diferentes',
-      'Variação de textura',
-      'Recortes irregulares',
-      'Costuras visíveis',
-      'Modelagem relaxada',
-      'Estética artesanal e experimental'
+      'Grafismos tipográficos em silk de alto relevo',
+      'Composição equilibrada editorial',
+      'Tecido moletom leve não felpado',
+      'Cintura alta confortável',
+      'Edição limitada de lançamento'
     ]
   },
   {
-    name: 'Shorts Raw Hem',
-    slug: 'shorts-raw-hem',
+    name: 'Shorts Side Stripe',
+    slug: 'shorts-side-stripe',
     sku: 'MM-SHO-012',
     price: 239.90,
     promoPrice: null,
     colors: [
       {
-        color: 'washed_black',
-        colorName: 'Preto lavado',
-        colorHex: '#2E2E2E',
-        featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'black',
+        colorName: 'Preto',
+        colorHex: '#121212',
+        featuredImage: '/Shorts Side Stripe - cor preto.png',
+        images: ['/Shorts Side Stripe - cor preto.png']
       },
       {
-        color: 'washed_grey',
-        colorName: 'Cinza lavado',
-        colorHex: '#5A5A5A',
-        featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        color: 'offwhite',
+        colorName: 'Off White',
+        colorHex: '#F5F5F0',
+        featuredImage: '/Shorts Side Stripe - cor off white.png',
+        images: ['/Shorts Side Stripe - cor off white.png']
       }
     ],
     features: [
-      'Barra propositalmente sem acabamento tradicional',
-      'Fios e bordas aparentes',
-      'Costuras expostas',
-      'Modelagem larga',
-      'Visual desconstruído',
-      'Estética grunge e streetwear'
+      'Faixa lateral contrastante costurada',
+      'Inspiração nos clássicos track shorts',
+      'Fendas laterais para mobilidade',
+      'Bolsos frontais com forro em mesh',
+      'Visual retrô esportivo'
     ]
   },
   {
@@ -441,88 +378,74 @@ const SHORTS_DATA = [
         colorName: 'Preto',
         colorHex: '#121212',
         featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        images: ['https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80']
       },
       {
         color: 'charcoal',
         colorName: 'Cinza chumbo',
-        colorHex: '#333842',
+        colorHex: '#36454F',
         featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        images: ['https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80']
       }
     ],
     features: [
-      'Pregas frontais',
-      'Pernas extremamente largas',
-      'Cintura estruturada',
-      'Caimento fluido',
-      'Comprimento próximo aos joelhos',
-      'Visual sofisticado com influência streetwear'
+      'Prega frontal dupla elegante',
+      'Alfaiataria desconstruída streetwear',
+      'Pernas super amplas',
+      'Caimento fluído estruturado',
+      'Bolsos faca refinados'
     ]
   },
   {
     name: 'Shorts Track Oversized',
     slug: 'shorts-track-oversized',
     sku: 'MM-SHO-014',
-    price: 229.90,
+    price: 249.90,
     promoPrice: null,
     colors: [
       {
-        color: 'black_offwhite',
+        color: 'black_white',
         colorName: 'Preto + Off White',
-        colorHex: '#181818',
+        colorHex: '#121212',
         featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        images: ['https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80']
       },
       {
         color: 'brown_beige',
         colorName: 'Marrom + Bege',
-        colorHex: '#6A4E36',
+        colorHex: '#5C4033',
         featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        images: ['https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80']
       }
     ],
     features: [
-      'Inspiração em roupas esportivas',
-      'Modelagem oversized',
-      'Tecido leve',
-      'Faixas ou recortes laterais',
-      'Cintura elástica',
-      'Visual retrô esportivo'
+      'Nylon acetinado com brilho suave',
+      'Recortes geométricos laterais',
+      'Bolsos com zíper invisível',
+      'Elástico largo na cintura',
+      'Visual athleisure contemporâneo'
     ]
   },
   {
     name: 'Shorts Corduroy Baggy',
     slug: 'shorts-corduroy-baggy',
     sku: 'MM-SHO-015',
-    price: 269.90,
+    price: 279.90,
     promoPrice: null,
     colors: [
       {
         color: 'dark_brown',
         colorName: 'Marrom escuro',
-        colorHex: '#422E1E',
+        colorHex: '#4A3525',
         featuredImage: 'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80'
-        ]
+        images: ['https://images.unsplash.com/photo-1565084888279-aca607ecce0c?auto=format&fit=crop&w=1000&q=80']
       },
       {
         color: 'black',
         colorName: 'Preto',
         colorHex: '#121212',
         featuredImage: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
-        images: [
-          'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80'
-        ]
+        images: ['https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80']
       }
     ],
     features: [
@@ -541,208 +464,180 @@ async function run() {
   const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
   const authRes = await sb.auth.signInWithPassword({ email: 'admin@marmot.com', password: process.env.ADMIN_PASSWORD || '' });
   if (authRes.error || !authRes.data.session) {
-    console.error('Falha de autenticação Admin:', authRes.error);
-    process.exit(1);
-  }
-  const sbAdmin = createClient(SUPABASE_URL, SUPABASE_KEY, {
-    global: { headers: { Authorization: 'Bearer ' + authRes.data.session.access_token } }
-  });
+    console.error('Falha de autenticação Admin no Supabase (esperado se senha não fornecida no env):', authRes.error?.message);
+    console.log('Procedendo com a sincronização do catálogo e arquivos locais...');
+  } else {
+    const sbAdmin = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      global: { headers: { Authorization: 'Bearer ' + authRes.data.session.access_token } }
+    });
 
-  console.log('=== 2. REMOVENDO REGISTROS ANTIGOS DA CATEGORIA SHORTS ===');
-  await sbAdmin.from('products').delete().eq('category', 'shorts');
-  const { data: countBefore } = await sbAdmin.from('products').select('id').eq('category', 'shorts');
-  console.log('Shorts restantes após limpeza:', countBefore?.length || 0);
+    console.log('=== 2. REMOVENDO REGISTROS ANTIGOS DA CATEGORIA SHORTS ===');
+    await sbAdmin.from('products').delete().eq('category', 'shorts');
 
-  console.log('=== 3. CADASTRANDO OS 15 SHORTS NO SUPABASE COM 2 CORES CADA (30 VARIANTES) ===');
-  const insertedShorts = [];
+    console.log('=== 3. CADASTRANDO OS SHORTS NO SUPABASE ===');
+    for (let i = 0; i < SHORTS_DATA.length; i++) {
+      const item = SHORTS_DATA[i];
+      const id = `prod-sho-${String(i + 1).padStart(3, '0')}`;
+      const descriptionText = item.features.join('\n');
 
-  for (let i = 0; i < SHORTS_DATA.length; i++) {
-    const item = SHORTS_DATA[i];
-    const id = `prod-sho-${String(i + 1).padStart(3, '0')}`;
-    const descriptionText = item.features.join('\n');
+      const colorsPayload = item.colors.map(c => ({
+        color: c.color,
+        colorName: c.colorName,
+        colorHex: c.colorHex,
+        featuredImage: c.featuredImage,
+        images: c.images,
+        image: c.featuredImage
+      }));
 
-    const colorsPayload = item.colors.map(c => ({
-      color: c.color,
-      colorName: c.colorName,
-      colorHex: c.colorHex,
-      featuredImage: c.featuredImage,
-      images: c.images,
-      image: c.featuredImage
-    }));
+      const defaultImg = colorsPayload[0].featuredImage;
+      const allImages = [...new Set(colorsPayload.flatMap(c => c.images))];
 
-    const defaultImg = colorsPayload[0].featuredImage;
-    const allImages = [...new Set(colorsPayload.flatMap(c => c.images))];
+      const fullProductObj = {
+        id,
+        slug: item.slug,
+        title: item.name,
+        subtitle: item.features[0] || 'Shorts Streetwear',
+        description: descriptionText,
+        price: item.price,
+        promoPrice: item.promoPrice,
+        category: 'shorts',
+        subcategory: 'Shorts',
+        collection: 'Coleção Marmot Summer & Cargo 2026',
+        tags: ['Shorts', 'Bermudas', 'Streetwear', 'Destaque'],
+        rating: 5.0,
+        reviewCount: 12 + (i % 12),
+        stockCount: 25 + (i % 10),
+        sku: item.sku,
+        sizes: ['P', 'M', 'G', 'GG', 'XG'],
+        colors: colorsPayload,
+        image: defaultImg,
+        images: allImages,
+        details: item.features,
+        careInstructions: [
+          'Lavar em água fria no ciclo delicado',
+          'Não alvejar nem centrifugar em alta rotação',
+          'Secar à sombra em varal'
+        ],
+        composition: ['100% Algodão Heavyweight / Ripstop Encorpado'],
+        weight: 0.45,
+        height: 4,
+        width: 26,
+        length: 32,
+        isNewRelease: true,
+        isBestSeller: i < 3,
+        featured: true,
+        status: 'active',
+        createdAt: new Date().toISOString()
+      };
 
-    const fullProductObj = {
-      id,
-      slug: item.slug,
-      title: item.name,
-      subtitle: item.features[0] || 'Shorts Streetwear',
-      description: descriptionText,
-      price: item.price,
-      promoPrice: item.promoPrice,
-      category: 'shorts',
-      subcategory: 'Shorts',
-      collection: 'Coleção Marmot Summer & Cargo 2026',
-      tags: ['Shorts', 'Bermudas', 'Streetwear', 'Destaque'],
-      rating: 5.0,
-      reviewCount: 12 + (i % 12),
-      stockCount: 25 + (i % 10),
-      sku: item.sku,
-      sizes: ['P', 'M', 'G', 'GG', 'XG'],
-      colors: colorsPayload,
-      image: defaultImg,
-      images: allImages,
-      details: item.features,
-      careInstructions: [
-        'Lavar em água fria no ciclo delicado',
-        'Não alvejar nem centrifugar em alta rotação',
-        'Secar à sombra em varal'
-      ],
-      composition: ['100% Algodão Heavyweight / Ripstop Encorpado'],
-      weight: 0.45,
-      height: 4,
-      width: 26,
-      length: 32,
-      isNewRelease: true,
-      isBestSeller: i < 3,
-      featured: true,
-      status: 'active',
-      createdAt: new Date().toISOString()
-    };
+      const row = {
+        id,
+        slug: item.slug,
+        title: item.name,
+        subtitle: item.features[0],
+        description: descriptionText,
+        price: item.price,
+        promo_price: item.promoPrice,
+        category: 'shorts',
+        subcategory: 'Shorts',
+        collection: 'Coleção Marmot Summer & Cargo 2026',
+        tags: ['Shorts', 'Bermudas', 'Streetwear'],
+        rating: 5.0,
+        review_count: 12 + (i % 12),
+        stock_count: 25 + (i % 10),
+        sku: item.sku,
+        sizes: ['P', 'M', 'G', 'GG', 'XG'],
+        colors: colorsPayload,
+        image: defaultImg,
+        images: allImages,
+        details: item.features,
+        care_instructions: fullProductObj.careInstructions,
+        composition: fullProductObj.composition,
+        weight: fullProductObj.weight,
+        height: fullProductObj.height,
+        width: fullProductObj.width,
+        length: fullProductObj.length,
+        is_new_release: true,
+        is_best_seller: i < 3,
+        featured: true,
+        status: 'active',
+        data: fullProductObj,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
 
-    const row = {
-      id,
-      slug: item.slug,
-      title: item.name,
-      subtitle: item.features[0],
-      description: descriptionText,
-      price: item.price,
-      promo_price: item.promoPrice,
-      category: 'shorts',
-      subcategory: 'Shorts',
-      collection: 'Coleção Marmot Summer & Cargo 2026',
-      tags: ['Shorts', 'Bermudas', 'Streetwear'],
-      rating: 5.0,
-      review_count: 12 + (i % 12),
-      stock_count: 25 + (i % 10),
-      sku: item.sku,
-      sizes: ['P', 'M', 'G', 'GG', 'XG'],
-      colors: colorsPayload,
-      image: defaultImg,
-      images: allImages,
-      details: item.features,
-      care_instructions: fullProductObj.careInstructions,
-      composition: fullProductObj.composition,
-      weight: fullProductObj.weight,
-      height: fullProductObj.height,
-      width: fullProductObj.width,
-      length: fullProductObj.length,
-      is_new_release: true,
-      is_best_seller: i < 3,
-      featured: true,
-      status: 'active',
-      data: fullProductObj,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-
-    const { error: insErr } = await sbAdmin.from('products').insert(row);
-    if (insErr) {
-      console.error(`Erro ao inserir ${item.name}:`, insErr);
-    } else {
-      console.log(`   ✓ [${i + 1}/${SHORTS_DATA.length}] Cadastrado: ${item.name} (ID: ${id}) -> Cores: ${item.colors.map(c => c.colorName).join(' / ')}`);
-      insertedShorts.push(fullProductObj);
+      const { error: insErr } = await sbAdmin.from('products').insert(row);
+      if (insErr) {
+        console.error(`Erro ao inserir ${item.name}:`, insErr.message);
+      } else {
+        console.log(`   ✓ [${i + 1}/${SHORTS_DATA.length}] Cadastrado: ${item.name} (${id})`);
+      }
     }
   }
 
-  console.log('=== 4. ATUALIZANDO CATEGORIA SHORTS NO SUPABASE ===');
-  const { data: catSho } = await sbAdmin.from('categories').select('*').eq('id', 'shorts').single();
-  if (catSho) {
-    const updatedData = { ...catSho.data, productCount: 15 };
-    await sbAdmin.from('categories').update({
-      product_count: 15,
-      data: updatedData,
-      updated_at: new Date().toISOString()
-    }).eq('id', 'shorts');
-    console.log('Categoria Shorts atualizada para product_count = 15 no Supabase.');
-  }
-
-  console.log('=== 5. SINCRONIZANDO ARQUIVOS LOCAIS E CATÁLOGO ===');
-  const { data: allDbProds } = await sbAdmin.from('products').select('*').order('created_at', { ascending: true });
-  console.log('Total de produtos no banco após inserção dos shorts:', allDbProds?.length);
-
-  const formattedAll = allDbProds.map(p => {
-    if (p.data) return p.data;
-    return {
-      id: p.id,
-      slug: p.slug,
-      title: p.title,
-      subtitle: p.subtitle || '',
-      description: p.description,
-      price: p.price,
-      promoPrice: p.promo_price,
-      category: p.category,
-      subcategory: p.subcategory || 'Shorts',
-      collection: p.collection || 'Coleção Marmot Atelier',
-      tags: p.tags || ['Streetwear'],
-      rating: p.rating || 5.0,
-      reviewCount: p.review_count || 0,
-      stockCount: p.stock_count || 20,
-      sku: p.sku,
-      sizes: p.sizes || ['P', 'M', 'G', 'GG', 'XG'],
-      colors: p.colors || [],
-      image: p.image,
-      images: p.images || [p.image],
-      details: p.details || [],
-      careInstructions: p.care_instructions || [],
-      composition: p.composition || ['Algodão / Ripstop'],
-      weight: p.weight || 0.45,
-      height: p.height || 4,
-      width: p.width || 26,
-      length: p.length || 32,
-      isNewRelease: p.is_new_release ?? true,
-      isBestSeller: p.is_best_seller ?? false,
-      featured: p.featured ?? true,
-      status: p.status || 'active',
-      createdAt: p.created_at
-    };
-  });
-
-  fs.writeFileSync('data/store_products.json', JSON.stringify(formattedAll, null, 2), 'utf8');
-  fs.writeFileSync('data/products.json', JSON.stringify(formattedAll, null, 2), 'utf8');
-
-  // Part 1
-  const part1Code = 'import { Product } from \'../types\';\n\nexport const CATALOG_90_PRODUCTS_PART1: Product[] = ' + JSON.stringify(formattedAll, null, 2) + ';\n';
-  fs.writeFileSync('src/data/catalog90ProductsPart1.ts', part1Code, 'utf8');
-
-  // Update store_categories.json
-  if (fs.existsSync('data/store_categories.json')) {
-    const cats = JSON.parse(fs.readFileSync('data/store_categories.json', 'utf8'));
-    cats.forEach(c => {
-      if (c.id === 'shorts' || c.slug === 'shorts') {
-        c.productCount = 15;
-      }
+  console.log('=== 4. SINCRONIZANDO ARQUIVOS LOCAIS ===');
+  const storeProductsPath = 'data/store_products.json';
+  if (fs.existsSync(storeProductsPath)) {
+    const existing = JSON.parse(fs.readFileSync(storeProductsPath, 'utf8'));
+    const others = existing.filter(p => p.category !== 'shorts');
+    
+    const formattedShorts = SHORTS_DATA.map((item, i) => {
+      const id = `prod-sho-${String(i + 1).padStart(3, '0')}`;
+      const colorsPayload = item.colors.map(c => ({
+        color: c.color,
+        colorName: c.colorName,
+        colorHex: c.colorHex,
+        featuredImage: c.featuredImage,
+        images: c.images,
+        image: c.featuredImage
+      }));
+      return {
+        id,
+        slug: item.slug,
+        title: item.name,
+        subtitle: item.features[0] || 'Shorts Streetwear',
+        description: item.features.join('\n'),
+        price: item.price,
+        promoPrice: item.promoPrice,
+        category: 'shorts',
+        subcategory: 'Shorts',
+        collection: 'Coleção Marmot Summer & Cargo 2026',
+        tags: ['Shorts', 'Bermudas', 'Streetwear', 'Destaque'],
+        rating: 5.0,
+        reviewCount: 12 + (i % 12),
+        stockCount: 25 + (i % 10),
+        sku: item.sku,
+        sizes: ['P', 'M', 'G', 'GG', 'XG'],
+        colors: colorsPayload,
+        image: colorsPayload[0].featuredImage,
+        images: colorsPayload.map(c => c.featuredImage),
+        details: item.features,
+        careInstructions: [
+          'Lavar em água fria no ciclo delicado',
+          'Não alvejar nem centrifugar em alta rotação',
+          'Secar à sombra em varal'
+        ],
+        composition: ['100% Algodão Heavyweight / Ripstop Encorpado'],
+        weight: 0.45,
+        height: 4,
+        width: 26,
+        length: 32,
+        isNewRelease: true,
+        isBestSeller: i < 3,
+        featured: true,
+        status: 'active',
+        createdAt: new Date().toISOString()
+      };
     });
-    fs.writeFileSync('data/store_categories.json', JSON.stringify(cats, null, 2), 'utf8');
+
+    const finalCatalog = [...others, ...formattedShorts];
+    fs.writeFileSync(storeProductsPath, JSON.stringify(finalCatalog, null, 2), 'utf8');
+    fs.writeFileSync('data/products.json', JSON.stringify(finalCatalog, null, 2), 'utf8');
+
+    const part1Code = 'import { Product } from \'../types\';\n\nexport const CATALOG_90_PRODUCTS_PART1: Product[] = ' + JSON.stringify(finalCatalog, null, 2) + ';\n';
+    fs.writeFileSync('src/data/catalog90ProductsPart1.ts', part1Code, 'utf8');
+    console.log(`✓ Sincronizados ${finalCatalog.length} produtos em store_products.json, products.json e catalog90ProductsPart1.ts`);
   }
-
-  console.log('=== 6. AUDITORIA FINAL DE PERSISTÊNCIA NO BANCO DE DADOS ===');
-  const { data: shortsInDb } = await sbAdmin.from('products').select('id, title, slug, price, colors').eq('category', 'shorts');
-  console.log(`TOTAL DE PRODUTOS NA CATEGORIA SHORTS NO BANCO: ${shortsInDb?.length}`);
-  let totalColorVariants = 0;
-  shortsInDb?.forEach((s, idx) => {
-    const colorNames = s.colors?.map(c => c.colorName).join(' / ') || 'N/A';
-    totalColorVariants += (s.colors?.length || 0);
-    console.log(`${idx + 1}. ${s.title} | ID: ${s.id} | Slug: ${s.slug} | Cores: [${colorNames}]`);
-  });
-  console.log(`TOTAL DE OPÇÕES DE CORES PERSISTIDAS: ${totalColorVariants}`);
-
-  const { data: allTotals } = await sbAdmin.from('products').select('category');
-  const summary = {};
-  allTotals?.forEach(p => { summary[p.category] = (summary[p.category] || 0) + 1; });
-  console.log('DISTRIBUIÇÃO GERAL POR CATEGORIA NO BANCO:', summary);
-  console.log('TOTAL GERAL NO BANCO:', allTotals?.length);
 }
 
 run();
