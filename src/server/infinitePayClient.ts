@@ -95,8 +95,8 @@ export function getInfinitePayConfigurationStatus() {
 
 export function assertInfinitePayConfiguration(): string {
   const status = getInfinitePayConfigurationStatus();
-  if (!status.configured) {
-    throw new InfinitePayClientError('A InfinitePay ainda não foi configurada no servidor.', 'INFINITEPAY_NOT_CONFIGURED');
+  if (!status.configured) { /* Subtituir por "A InfinitePay ainda não foi configurada no servidor." a frase abaixo*/
+    throw new InfinitePayClientError('Site em fase de desenvolvimento.', 'INFINITEPAY_NOT_CONFIGURED');
   }
   if (!status.handleValid) {
     throw new InfinitePayClientError('INFINITEPAY_HANDLE possui formato inválido.', 'INFINITEPAY_INVALID_HANDLE');
