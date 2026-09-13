@@ -4,6 +4,7 @@ import { ShoppingBag, Star, ShieldCheck, Sparkles, ArrowRight, Eye, Check } from
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
 import { getValidProductImageUrl, handleProductImageError } from '../../utils/imageUtils';
+import { MarmotPrice, MarmotBadge } from '../ui/MarmotElements';
 
 interface SingleProductSpotlightProps {
   products: Product[];
@@ -16,10 +17,9 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   onQuickView,
   onNavigate,
 }) => {
-  const { addToCart, openMiniCart } = useCart();
+  const { addToCart } = useCart();
   const { showToast } = useToast();
 
-  // Priority: Jaqueta Varsity Oversized as requested by the user
   const product = products.find((p) => p.slug === 'jaqueta-varsity-oversized')
     || products.find((p) => p.title.toLowerCase().includes('varsity') && p.category === 'jaquetas')
     || products.find((p) => p.slug.includes('varsity'))
@@ -33,7 +33,6 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   );
   const [added, setAdded] = useState(false);
 
-  // Synchronize size and color whenever the featured product changes
   useEffect(() => {
     if (product) {
       if (product.sizes?.length) {
@@ -47,7 +46,6 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
 
   if (!product) return null;
 
-  // Use the color-specific image if available, else standard product images
   const rawProductImage = selectedColor?.image || selectedColor?.featuredImage || product.images?.[0] || product.image;
   const productImage = getValidProductImageUrl(rawProductImage, product.category, product.id);
 
@@ -55,137 +53,138 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
     const success = addToCart(product, selectedSize, selectedColor);
     if (success) {
       setAdded(true);
-      setTimeout(() => setAdded(false), 2500);
+      setTimeout(() => setAdded(false), 2200);
     }
   };
 
   const effectivePrice = product.promoPrice || product.price;
 
   return (
-    <section className="py-7 sm:py-8 lg:py-9 bg-[#F8F9FA] border-b border-[#E4E4E7] relative overflow-hidden">
+    <section className="py-10 sm:py-12 lg:py-14 bg-[#FAFAFA] border-b border-zinc-200/90 select-none overflow-hidden relative">
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 relative z-10">
-        <div className="flex items-center justify-between mb-3">
-          <div className="inline-flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-widest text-[#B45309]">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>DESTAQUE DE ATELIÊ // SIGNATURE PIECE</span>
+        {/* Top Header info */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
+            <span className="text-[10px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.24em] text-zinc-500">
+              DESTAQUE DE ATELIÊ // SIGNATURE PIECE
+            </span>
           </div>
-          <span className="text-[11px] font-mono text-[#71717A] uppercase">
+          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest hidden sm:inline">
             SKU #{product.sku || 'MM-JAQ-017'}
           </span>
         </div>
 
-        {/* Split Layout: Image Left | Details Right */}
-        <div className="bg-white border border-[#DCDCE0] rounded-[3px] overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch shadow-xs">
-          {/* Left Side: Product Image fills the full height and width of the left section */}
-          <div className="lg:col-span-5 relative w-full h-[460px] sm:h-[540px] lg:h-auto min-h-[460px] sm:min-h-[540px] lg:min-h-full bg-[#18181B] border-b lg:border-b-0 lg:border-r border-[#DCDCE0] group overflow-hidden flex flex-col">
+        {/* Split Architectural Container: Image Left | Details Right */}
+        <div className="bg-white border border-zinc-200/90 rounded-[2px] overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch shadow-xs">
+          {/* Left Side: Product Image */}
+          <div className="lg:col-span-5 relative w-full h-[460px] sm:h-[540px] lg:h-auto min-h-[460px] sm:min-h-[540px] lg:min-h-full bg-[#111113] border-b lg:border-b-0 lg:border-r border-zinc-200 group overflow-hidden flex flex-col">
             <img
               src={productImage}
               alt={product.title}
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover object-top sm:object-center group-hover:scale-105 transition-transform duration-700 select-none flex-1"
+              className="w-full h-full object-cover object-top sm:object-center group-hover:scale-[1.02] transition-transform duration-700 select-none flex-1"
               onError={(e) => handleProductImageError(e, product.category, product.id)}
             />
+
             {/* Badges */}
             <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5 pointer-events-none">
-              <span className="bg-[#18181B]/95 text-white text-[10px] font-black uppercase px-2.5 py-1 rounded-[2px] tracking-wider shadow-sm backdrop-blur-sm">
-                {product.category === 'jaquetas' ? 'OUTERWEAR ATELIER 2026' : 'SIGNATURE PIECE'}
-              </span>
-              <span className="bg-[#F4C400] text-[#0B0B0E] text-[10px] font-black uppercase px-2.5 py-0.5 rounded-[2px] tracking-wider w-fit shadow-sm">
+              <MarmotBadge variant="new">
+                {product.category === 'jaquetas' ? 'OUTERWEAR ATELIER' : 'SIGNATURE PIECE'}
+              </MarmotBadge>
+              <MarmotBadge variant="sale">
                 MODELAGEM OVERSIZED
-              </span>
+              </MarmotBadge>
             </div>
 
+            {/* Quick View */}
             <button
+              type="button"
               onClick={() => onQuickView(product)}
-              className="absolute bottom-4 right-4 bg-white/95 hover:bg-[#18181B] hover:text-white border border-[#DCDCE0] text-[#18181B] px-3 py-1.5 rounded-[2px] backdrop-blur-md transition-colors flex items-center gap-1.5 text-[11px] font-bold uppercase cursor-pointer shadow-sm z-10"
+              className="absolute bottom-4 right-4 bg-white/95 hover:bg-[#0B0B0E] hover:text-white border border-zinc-300 text-[#0B0B0E] px-3.5 py-2 rounded-[2px] backdrop-blur-xs transition-colors flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.14em] cursor-pointer shadow-xs z-10"
             >
-              <Eye className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Espiada Rápida</span>
+              <Eye className="w-3.5 h-3.5" />
+              <span>Espiada Rápida</span>
             </button>
           </div>
 
-          {/* Right Side: Product Details & Purchase CTA matching exact layout */}
-          <div className="lg:col-span-7 p-6 sm:p-8 lg:p-9 xl:p-10 flex flex-col justify-between">
+          {/* Right Side: Product Details */}
+          <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between">
             <div>
               {/* Category Breadcrumb */}
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-[#B45309] uppercase tracking-wider mb-2">
+              <div className="flex items-center gap-2 text-[10.5px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2">
                 <span>{product.category}</span>
                 <span>•</span>
                 <span>{product.subcategory}</span>
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-[#18181B] leading-tight mb-2">
+              <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-[#0B0B0E] leading-tight mb-2.5">
                 {product.title}
               </h2>
 
               {/* Rating */}
-              <div className="flex items-center gap-2.5 mb-5">
-                <div className="flex text-[#D97706] gap-1">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex text-zinc-900 gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 ${
-                        i < Math.floor(product.rating || 5) ? 'fill-current' : 'opacity-30'
+                      className={`w-3.5 h-3.5 ${
+                        i < Math.floor(product.rating || 5) ? 'fill-current text-[#0B0B0E]' : 'opacity-25'
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-sm font-bold text-[#18181B]">{(product.rating || 5.0).toFixed(1)}</span>
-                <span className="text-sm text-[#71717A]">({product.reviewCount || 30} avaliações verificadas)</span>
+                <span className="text-xs font-bold text-[#0B0B0E]">{(product.rating || 5.0).toFixed(1)}</span>
+                <span className="text-xs text-zinc-400">({product.reviewCount || 30} avaliações)</span>
               </div>
 
-              {/* Description Lines */}
-              <div className="space-y-1.5 text-[13px] sm:text-sm text-[#52525B] font-medium mb-6">
+              {/* Description */}
+              <div className="space-y-1 text-[13px] text-zinc-600 font-normal mb-5 leading-relaxed">
                 {product.description
                   .split('\n')
                   .filter(Boolean)
                   .map((line, idx) => (
-                    <p key={idx} className="leading-snug">{line}</p>
+                    <p key={idx}>{line}</p>
                   ))}
               </div>
 
-              {/* Key Specs Card */}
-              <div className="border border-[#DCDCE0] rounded-[2px] p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white mb-6">
+              {/* Integrated Editorial Specs (No heavy administrative box) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-zinc-100 mb-6">
                 <div>
-                  <span className="text-[#71717A] text-[10px] uppercase font-bold tracking-wider block mb-1">
-                    Construção
+                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400 block mb-1 font-semibold">
+                    CONSTRUÇÃO
                   </span>
-                  <span className="font-bold text-[#18181B] text-sm block">
+                  <span className="text-xs sm:text-[13px] font-bold text-[#0B0B0E] block tracking-tight">
                     {product.category === 'jaquetas' ? 'Mangas Contrastantes & Punhos Listrados' : '400g/m² Heavyweight'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#71717A] text-[10px] uppercase font-bold tracking-wider block mb-1">
-                    Modelagem
+                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400 block mb-1 font-semibold">
+                    MODELAGEM
                   </span>
-                  <span className="font-bold text-[#18181B] text-sm block">
+                  <span className="text-xs sm:text-[13px] font-bold text-[#0B0B0E] block tracking-tight">
                     {product.category === 'jaquetas' ? 'Varsity Oversized Boxy' : 'Oversized Estruturado'}
                   </span>
                 </div>
               </div>
 
-              {/* Price Box */}
-              <div className="flex items-baseline flex-wrap gap-3 mb-5">
-                <span className="text-2xl sm:text-3xl font-black text-[#18181B]">
-                  R$ {effectivePrice.toFixed(2).replace('.', ',')}
-                </span>
-                {product.promoPrice && (
-                  <span className="text-sm font-bold text-[#71717A] line-through">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                  </span>
-                )}
-                <span className="text-xs text-[#B45309] font-mono font-bold">
-                  PIX ou cartão na InfinitePay
-                </span>
+              {/* Price Block */}
+              <div className="mb-6">
+                <MarmotPrice
+                  price={effectivePrice}
+                  originalPrice={product.promoPrice ? product.price : undefined}
+                  size="lg"
+                />
               </div>
 
               {/* Color Selector */}
               {product.colors && product.colors.length > 0 && (
                 <div className="mb-5">
-                  <label className="text-xs font-bold uppercase text-[#18181B] block mb-2">
-                    Cor: <span className="font-bold">{selectedColor?.colorName || selectedColor?.color}</span>
+                  <label className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600 block mb-2">
+                    COR SELECIONADA: <strong className="text-[#0B0B0E] font-sans font-extrabold">{selectedColor?.colorName || selectedColor?.color}</strong>
                   </label>
                   <div className="flex flex-wrap items-center gap-2">
                     {product.colors.map((c) => {
@@ -195,15 +194,14 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                           key={c.colorHex || c.colorName || c.color}
                           type="button"
                           onClick={() => setSelectedColor(c)}
-                          title={c.colorName || c.color}
-                          className={`h-9 px-3.5 rounded-[2px] text-xs font-bold uppercase transition-all flex items-center gap-2 border cursor-pointer ${
+                          className={`h-8.5 px-3 rounded-[2px] text-xs font-bold uppercase transition-all flex items-center gap-2 border cursor-pointer ${
                             isSelected
-                              ? 'bg-[#18181B] text-white border-[#18181B] shadow-sm font-black'
-                              : 'bg-[#F4F4F5] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B]'
+                              ? 'bg-[#0B0B0E] text-white border-[#0B0B0E] shadow-2xs'
+                              : 'bg-[#F4F4F5] text-zinc-700 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
                           }`}
                         >
                           <span
-                            className="w-3 h-3 rounded-full border border-black/20 shrink-0"
+                            className="w-2.5 h-2.5 rounded-full border border-white/20 shrink-0"
                             style={{ backgroundColor: c.colorHex || '#121212' }}
                           />
                           <span>{c.colorName || c.color}</span>
@@ -216,18 +214,19 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
 
               {/* Size Selector */}
               <div className="mb-6">
-                <label className="text-xs font-bold uppercase text-[#18181B] block mb-2">
-                  Selecione o Tamanho: <span className="font-bold">{selectedSize}</span>
+                <label className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600 block mb-2">
+                  TAMANHO: <strong className="text-[#0B0B0E] font-sans font-extrabold">{selectedSize}</strong>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {(product.sizes || ['P', 'M', 'G', 'GG', 'XG']).map((sz) => (
                     <button
                       key={sz}
+                      type="button"
                       onClick={() => setSelectedSize(sz)}
-                      className={`w-10 h-10 rounded-[2px] text-xs font-bold uppercase transition-colors border cursor-pointer ${
+                      className={`w-10 h-10 rounded-[2px] font-mono font-bold text-xs uppercase transition-all border cursor-pointer ${
                         selectedSize === sz
-                          ? 'bg-[#18181B] text-white border-[#18181B] shadow-sm font-black'
-                          : 'bg-[#F4F4F5] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B]'
+                          ? 'bg-[#0B0B0E] text-[#F4C400] border-[#0B0B0E] shadow-2xs'
+                          : 'bg-white text-zinc-700 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
                       }`}
                     >
                       {sz}
@@ -237,13 +236,14 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-5">
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
                 <button
+                  type="button"
                   onClick={handleAddToCart}
-                  className={`flex-1 py-3.5 sm:py-4 px-6 rounded-[2px] font-black text-xs sm:text-sm uppercase tracking-wider transition-colors flex items-center justify-center gap-2.5 cursor-pointer ${
+                  className={`flex-1 py-3.5 px-6 rounded-[2px] font-black text-xs sm:text-[13px] uppercase tracking-[0.14em] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
                     added
                       ? 'bg-emerald-600 text-white'
-                      : 'bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500]'
+                      : 'bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] active:scale-[0.99]'
                   }`}
                 >
                   {added ? (
@@ -258,17 +258,19 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => onNavigate('product', product.id)}
-                  className="py-3.5 sm:py-4 px-6 rounded-[2px] bg-white border border-[#DCDCE0] text-[#18181B] hover:bg-[#F4F4F5] hover:border-[#18181B] font-bold text-xs sm:text-sm uppercase tracking-wider transition-colors flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+                  className="py-3.5 px-6 rounded-[2px] bg-white border border-zinc-300 hover:border-[#0B0B0E] text-[#0B0B0E] font-bold text-xs uppercase tracking-[0.14em] transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
                 >
-                  Ver Detalhes <ArrowRight className="w-4 h-4" />
+                  <span>Ver Detalhes</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
-            {/* Bottom Guarantee Banner */}
-            <div className="flex items-center gap-2 text-xs text-[#71717A] pt-3">
-              <ShieldCheck className="w-4 h-4 text-[#B45309] shrink-0" />
+            {/* Bottom Guarantee Assurance */}
+            <div className="flex items-center gap-2 text-xs text-zinc-500 pt-3 border-t border-zinc-100">
+              <ShieldCheck className="w-4 h-4 text-zinc-700 shrink-0" />
               <span>Garantia de caimento autoral • Troca grátis em até 30 dias • Envio direto de São Paulo</span>
             </div>
           </div>
@@ -277,4 +279,3 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
     </section>
   );
 };
-

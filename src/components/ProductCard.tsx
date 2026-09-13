@@ -1,21 +1,29 @@
 import React, { useState, memo, useCallback } from 'react';
 import { Product } from '../types';
-import { Heart, Eye, ShoppingBag, Check } from 'lucide-react';
+import { Eye, Check, ArrowRight } from 'lucide-react';
 import { useWishlist } from '../context/WishlistContext';
 import { useCart } from '../context/CartContext';
-import { useToast } from '../context/ToastContext';
 import { getValidProductImageUrl, handleProductImageError, getProductCardImageFraming } from '../utils/imageUtils';
+import { MarmotPrice, MarmotBadge, MarmotFavoriteButton, MarmotColorSwatches } from './ui/MarmotElements';
 
 interface ProductCardProps {
   product: Product;
   onQuickView: (product: Product) => void;
   onProductClick: (productId: string) => void;
+  priorityBadge?: string;
+  variant?: 'standard' | 'editorial';
+  hideNewReleaseBadge?: boolean;
+  editorialIndex?: number;
 }
 
 const ProductCardComponent: React.FC<ProductCardProps> = ({
   product,
   onQuickView,
   onProductClick,
+  priorityBadge,
+  variant = 'standard',
+  hideNewReleaseBadge = false,
+  editorialIndex,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [hoveredColorImage, setHoveredColorImage] = useState<string | null>(null);
@@ -37,23 +45,44 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   const displayImage = getValidProductImageUrl(rawDisplay, product.category, product.id);
 
   const effectivePrice = product.promoPrice || product.price;
-  const installmentCount = 3;
-  const installmentValue = effectivePrice / installmentCount;
+  const pixPrice = effectivePrice * 0.95;
+  const installmentValue = effectivePrice / 6;
 
   const handleQuickAddSize = useCallback((e: React.MouseEvent, size: string) => {
     e.stopPropagation();
     const added = addToCart(product, size, product.colors[0], 1);
     if (added) {
       setAddedSize(size);
-      setTimeout(() => setAddedSize(null), 1800);
+      setTimeout(() => setAddedSize(null), 1600);
     }
   }, [addToCart, product]);
 
+  // Unified single-badge priority logic to eliminate clutter
+  const discountPercent = product.promoPrice && product.price > product.promoPrice
+    ? Math.round(((product.price - product.promoPrice) / product.price) * 100)
+    : null;
+
+  const isEditorial = variant === 'editorial';
+
   return (
-    <article className="group relative flex flex-col bg-white border border-[#DCDCE0] rounded-[2px] overflow-hidden transition-[border-color,box-shadow] duration-200 hover:border-[#A1A1AA] hover:shadow-[0_12px_30px_rgba(24,24,27,0.07)]">
-      {/* 1. Image Container with Aspect Ratio */}
+    <article
+      id={`product-card-${product.id}`}
+      className={`group relative flex flex-col bg-white rounded-[3px] overflow-hidden transition-all duration-300 select-none ${
+        isEditorial
+          ? 'border border-[#E4E1D8] hover:border-[#0B0B0E] shadow-[0_4px_16px_rgba(0,0,0,0.04)] hover:shadow-[0_22px_44px_rgba(0,0,0,0.12)]'
+          : 'border border-zinc-200/90 hover:border-[#0B0B0E] hover:shadow-[0_14px_34px_rgba(0,0,0,0.08)]'
+      }`}
+    >
+      {/* Yellow Atelier Accent Line at top on hover for editorial cards */}
+      {isEditorial && (
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-transparent group-hover:bg-[#F4C400] transition-colors duration-300 z-30 pointer-events-none" />
+      )}
+
+      {/* 1. Image Container (Vertical Editorial Ratio 3:4) */}
       <div 
-        className="relative aspect-[3/4] w-full bg-[#F4F4F5] overflow-hidden cursor-pointer"
+        className={`relative aspect-[3/4] w-full overflow-hidden cursor-pointer ${
+          isEditorial ? 'bg-[#EFECE6] border-b border-[#E6E3DB]' : 'bg-[#F4F4F5]'
+        }`}
         onClick={() => onProductClick(product.id)}
       >
         <img
@@ -62,158 +91,217 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"
-          className={`w-full h-full transition-transform duration-500 ease-out ${getProductCardImageFraming(product.category)}`}
+          className={`w-full h-full transition-transform duration-700 ease-out group-hover:scale-[1.03] ${getProductCardImageFraming(product.category)}`}
           onError={(e) => handleProductImageError(e, product.category, product.id)}
           onMouseEnter={() => !hoveredColorImage && images.length > 1 && setCurrentImageIndex(1)}
           onMouseLeave={() => !hoveredColorImage && setCurrentImageIndex(0)}
         />
 
-        {/* Minimalist Top Badges */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
-          {product.isNewRelease && (
-            <span className="bg-[#18181B] text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-[2px] tracking-wider">
-              NOVO DROP
-            </span>
-          )}
-          {product.promoPrice && (
-            <span className="bg-[#DC2626] text-white font-black text-[10px] uppercase px-2.5 py-1 rounded-[2px] tracking-wider">
-              -{Math.round(((product.price - product.promoPrice) / product.price) * 100)}% OFF
-            </span>
-          )}
-          {product.isBestSeller && !product.isNewRelease && (
-            <span className="bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] font-bold text-[10px] uppercase px-2.5 py-1 rounded-[2px] tracking-wider">
-              MAIS PROCURADO
-            </span>
+        {/* Top Badges (Curated, editorial index + status) */}
+        <div className="absolute top-3 left-3 flex items-center gap-1.5 z-10 pointer-events-none">
+          {isEditorial ? (
+            <>
+              {editorialIndex !== undefined && (
+                <div className="flex items-center gap-1 bg-[#0B0B0E]/90 text-white backdrop-blur-xs px-2 py-0.5 rounded-[2px] border border-black/20 shadow-2xs font-mono text-[10px] font-bold tracking-[0.16em]">
+                  <span className="text-[#F4C400] text-[11px] font-black">
+                    {editorialIndex < 10 ? `0${editorialIndex}` : editorialIndex}
+                  </span>
+                  <span className="text-zinc-500 font-light">//</span>
+                  <span className="text-zinc-300 text-[8.5px] tracking-[0.2em]">DROP</span>
+                </div>
+              )}
+              {priorityBadge ? (
+                <MarmotBadge variant="rank">{priorityBadge}</MarmotBadge>
+              ) : discountPercent ? (
+                <span className="inline-flex items-center justify-center h-[20px] px-2 text-[9.5px] font-mono font-bold uppercase tracking-[0.14em] rounded-[2px] bg-[#0B0B0E] text-[#F4C400] border border-[#0B0B0E] shadow-2xs">
+                  -{discountPercent}%
+                </span>
+              ) : null}
+            </>
+          ) : (
+            <>
+              {priorityBadge ? (
+                <MarmotBadge variant="rank">{priorityBadge}</MarmotBadge>
+              ) : discountPercent ? (
+                <MarmotBadge variant="sale">-{discountPercent}% OFF</MarmotBadge>
+              ) : (!hideNewReleaseBadge && product.isNewRelease) ? (
+                <MarmotBadge variant="new">NOVO DROP</MarmotBadge>
+              ) : product.isBestSeller ? (
+                <MarmotBadge variant="limited">MAIS BUSCADO</MarmotBadge>
+              ) : null}
+            </>
           )}
         </div>
 
-        {/* Wishlist Heart Button */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleWishlist(product);
-          }}
-          className={`absolute top-3 right-3 z-20 p-2.5 rounded-full transition-all cursor-pointer ${
-            isFavorite
-              ? 'bg-[#18181B] text-[#F4C400] shadow-md'
-              : 'bg-white/90 text-[#52525B] hover:bg-white hover:text-black shadow-sm'
-          }`}
-          aria-label="Favoritar produto"
-        >
-          <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-current' : ''}`} />
-        </button>
+        {/* Favorite Button (Refined, discrete circle with Marmot hover) */}
+        <div className="absolute top-3 right-3 z-20">
+          <MarmotFavoriteButton
+            isFavorite={isFavorite}
+            onClick={() => toggleWishlist(product)}
+            size="md"
+            className={isEditorial ? 'bg-white/90 hover:bg-[#0B0B0E] text-zinc-700 hover:text-[#F4C400] border border-black/10 hover:border-[#0B0B0E] shadow-2xs' : ''}
+          />
+        </div>
 
-        {/* Quick Size Selector Overlay on Hover */}
-        <div className="absolute bottom-3 left-3 right-3 z-20 opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 space-y-2 pointer-events-none group-hover:pointer-events-auto">
-          {/* Quick sizes pills */}
-          <div className="bg-white/95 border border-[#D4D4D8] p-2 rounded-[2px] flex items-center justify-between gap-1 shadow-md">
-            <span className="text-[10px] font-mono font-bold uppercase text-[#71717A] px-1 hidden sm:inline">
-              Tam:
-            </span>
-            <div className="flex items-center justify-between flex-1 gap-1">
-              {(product.sizes || ['P', 'M', 'G', 'GG']).slice(0, 5).map((sz) => (
-                <button
-                  key={sz}
-                  onClick={(e) => handleQuickAddSize(e, sz)}
-                  className={`flex-1 py-1 px-1.5 rounded-[2px] text-[10px] font-bold uppercase transition-colors cursor-pointer ${
-                    addedSize === sz
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-[#F4F4F5] hover:bg-[#18181B] hover:text-white text-[#18181B]'
-                  }`}
-                  title={`Adicionar tamanho ${sz}`}
-                >
-                  {addedSize === sz ? <Check className="w-3 h-3 mx-auto" /> : sz}
-                </button>
-              ))}
+        {/* Quick Interaction Bar (Slides up seamlessly on hover) */}
+        <div className="absolute bottom-3 left-3 right-3 z-20 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-250 ease-out space-y-1.5 pointer-events-none group-hover:pointer-events-auto">
+          {/* Quick Sizes Selector */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className={`p-1.5 rounded-[2px] flex items-center justify-between gap-1 shadow-md backdrop-blur-xs ${
+              isEditorial ? 'bg-[#0B0B0E]/95 border border-zinc-700' : 'bg-white/95 border border-zinc-200/90'
+            }`}>
+              <div className="flex items-center justify-between w-full gap-1">
+                {product.sizes.slice(0, 5).map((sz) => (
+                  <button
+                    key={sz}
+                    type="button"
+                    onClick={(e) => handleQuickAddSize(e, sz)}
+                    className={`flex-1 py-1 px-1 rounded-[2px] text-[9.5px] font-mono font-bold uppercase transition-all duration-150 cursor-pointer ${
+                      isEditorial
+                        ? addedSize === sz
+                          ? 'bg-[#F4C400] text-[#0B0B0E]'
+                          : 'bg-zinc-800 hover:bg-[#F4C400] hover:text-[#0B0B0E] text-zinc-100'
+                        : addedSize === sz
+                          ? 'bg-[#0B0B0E] text-[#F4C400]'
+                          : 'bg-zinc-100 hover:bg-[#0B0B0E] hover:text-white text-zinc-900'
+                    }`}
+                    title={`Adicionar tamanho ${sz}`}
+                  >
+                    {addedSize === sz ? <Check className={`w-3 h-3 mx-auto ${isEditorial ? 'text-[#0B0B0E] stroke-[3]' : ''}`} /> : sz}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Quick View Button */}
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onQuickView(product);
             }}
-            className="w-full bg-white/95 hover:bg-[#18181B] hover:text-white text-[#18181B] border border-[#D4D4D8] text-[11px] font-bold uppercase tracking-wider py-2 px-3 rounded-[2px] flex items-center justify-center gap-1.5 transition-colors shadow-sm cursor-pointer"
+            className={`w-full text-[10.5px] font-bold uppercase tracking-[0.16em] py-2 px-3 rounded-[2px] flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer group/qv ${
+              isEditorial
+                ? 'bg-white hover:bg-[#0B0B0E] text-[#0B0B0E] hover:text-[#F4C400] border border-zinc-300 hover:border-[#0B0B0E]'
+                : 'bg-white/95 hover:bg-[#0B0B0E] hover:text-white text-[#0B0B0E] border border-zinc-300'
+            }`}
           >
-            <Eye className="w-3.5 h-3.5" /> Espiada Rápida
+            <Eye className="w-3.5 h-3.5 group-hover/qv:text-[#F4C400] transition-colors" />
+            <span>Espiada Rápida</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Product Info Section */}
-      <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 space-y-2">
-        <div>
-          {/* Collection / Subcategory */}
-          <div className="flex items-center justify-between text-[10px] sm:text-[10.5px] text-[#71717A] uppercase tracking-wider mb-0.5 font-mono">
-            <span>{product.subcategory || product.collection}</span>
+      {/* 2. Product Info (Consistent Editorial Layout) */}
+      <div className={`flex flex-col justify-between flex-1 ${isEditorial ? 'bg-[#FAF9F6] p-4 sm:p-5 gap-3.5 relative' : 'p-3.5 sm:p-4 gap-2.5'}`}>
+        <div className="space-y-1.5">
+          {/* Editorial Micro-Label (Category + Weight + Yellow Atelier Accent) */}
+          <div className="flex items-center justify-between gap-2 text-[10px] sm:text-[10.5px] text-zinc-400 uppercase tracking-[0.2em] font-mono leading-none">
+            <div className="flex items-center gap-2 min-w-0">
+              {isEditorial && (
+                <div className="w-3.5 h-[2px] bg-[#F4C400] shrink-0 rounded-full" />
+              )}
+              <span className={`truncate ${isEditorial ? 'font-bold text-zinc-500 tracking-[0.22em]' : ''}`}>
+                {product.subcategory || product.category}
+              </span>
+            </div>
             {product.fabricWeight && (
-              <span className="text-[#52525B] font-bold">{product.fabricWeight}</span>
+              <span className={`shrink-0 ${
+                isEditorial 
+                  ? 'font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-zinc-500 bg-black/5 border border-black/5 px-1.5 py-0.5 rounded-[2px]'
+                  : 'text-zinc-500 font-medium ml-1.5'
+              }`}>
+                {product.fabricWeight}
+              </span>
             )}
           </div>
 
-          {/* Title */}
+          {/* Product Title (More prominent, strong typography) */}
           <h3
             onClick={() => onProductClick(product.id)}
-            className="text-xs sm:text-[13px] font-bold text-[#18181B] group-hover:text-[#B45309] transition-colors cursor-pointer line-clamp-2 min-h-[2.4em] leading-[1.25]"
+            className={`font-black uppercase tracking-tight text-[#0B0B0E] group-hover:text-zinc-700 transition-colors cursor-pointer line-clamp-2 leading-[1.25] ${
+              isEditorial
+                ? 'text-[15px] sm:text-[16px] min-h-[2.5em] pt-0.5 tracking-[-0.02em]'
+                : 'text-[13px] sm:text-[14px] min-h-[2.4em]'
+            }`}
           >
             {product.title}
           </h3>
         </div>
 
-        {/* Price & Installments */}
-        <div className="pt-1 border-t border-[#E4E4E7] space-y-0.5">
-          <div className="flex items-baseline gap-2">
-            <span className="text-[13.5px] sm:text-[15px] font-black text-[#18181B]">
-              R$ {effectivePrice.toFixed(2).replace('.', ',')}
-            </span>
-            {product.promoPrice && (
-              <span className="text-[11px] text-[#71717A] line-through">
-                R$ {product.price.toFixed(2).replace('.', ',')}
-              </span>
+        {/* Price Block & Color Swatches */}
+        <div className={`pt-3 ${isEditorial ? 'border-t border-[#EAE7DF] space-y-2.5' : 'border-t border-zinc-100/90 space-y-2'}`}>
+          {isEditorial ? (
+            <div className="flex flex-col gap-1">
+              {/* Primary Price + Strikethrough if on promo */}
+              <div className="flex items-baseline gap-2">
+                <span className="text-[18px] sm:text-[19px] font-black text-[#0B0B0E] tracking-tight leading-none">
+                  R$ {effectivePrice.toFixed(2).replace('.', ',')}
+                </span>
+                {product.promoPrice && product.price > product.promoPrice && (
+                  <span className="text-xs text-zinc-400 line-through font-mono font-normal">
+                    R$ {product.price.toFixed(2).replace('.', ',')}
+                  </span>
+                )}
+              </div>
+
+              {/* PIX with clear atelier benefit */}
+              <div className="text-[11.5px] sm:text-[12px] font-medium text-zinc-700 flex items-center gap-1.5">
+                <span className="text-[#0B0B0E] font-bold">R$ {pixPrice.toFixed(2).replace('.', ',')}</span>
+                <span className="text-zinc-300">•</span>
+                <span className="inline-flex items-center gap-1 text-[#8A5E00] font-bold text-[10px] uppercase tracking-wider bg-[#FEF9C3] border border-[#FDE047]/60 px-1.5 py-0.5 rounded-[2px]">
+                  <span className="w-1 h-1 bg-[#F4C400] rounded-full" />
+                  5% no PIX
+                </span>
+              </div>
+
+              {/* Installment subtle and secondary */}
+              <p className="text-[10.5px] font-mono text-zinc-400 font-normal">
+                ou 6x de R$ {installmentValue.toFixed(2).replace('.', ',')} sem juros
+              </p>
+            </div>
+          ) : (
+            <MarmotPrice
+              price={effectivePrice}
+              originalPrice={product.promoPrice ? product.price : undefined}
+              size="sm"
+            />
+          )}
+
+          {/* Color Indicators + Atelier Circle Arrow for Editorial */}
+          <div className="flex items-center justify-between pt-0.5">
+            {product.colors && product.colors.length > 0 ? (
+              <MarmotColorSwatches
+                colors={product.colors}
+                onSelectColor={(c) => {
+                  const img = (c.images && c.images.length > 0) ? c.images[0] : (c.featuredImage || c.image || null);
+                  if (img) setHoveredColorImage(img);
+                }}
+                onHoverColor={(c) => {
+                  if (c) {
+                    const img = (c.images && c.images.length > 0) ? c.images[0] : (c.featuredImage || c.image || null);
+                    if (img) setHoveredColorImage(img);
+                  } else {
+                    setHoveredColorImage(null);
+                  }
+                }}
+              />
+            ) : <div />}
+
+            {/* Marmot Circular Arrow Button (matching CategoryNavigationGrid) */}
+            {isEditorial && (
+              <button
+                type="button"
+                onClick={() => onProductClick(product.id)}
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-zinc-300 bg-white group-hover:border-[#0B0B0E] group-hover:bg-[#0B0B0E] text-zinc-700 group-hover:text-[#F4C400] flex items-center justify-center transition-all duration-300 cursor-pointer shadow-2xs shrink-0"
+                aria-label="Ver detalhes do produto"
+                title="Ver detalhes do produto"
+              >
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2] transition-transform duration-300 group-hover:translate-x-0.5" />
+              </button>
             )}
           </div>
-
-          <div className="text-[10.5px] sm:text-[11px] text-[#52525B] flex flex-col leading-[1.4]">
-            <span>
-              ou <strong>{installmentCount}x de R$ {installmentValue.toFixed(2).replace('.', ',')}</strong> sem juros
-            </span>
-            <span className="text-[#B45309] font-semibold">PIX ou cartão na InfinitePay</span>
-          </div>
-
-          {/* Color Indicators */}
-          {product.colors && product.colors.length > 0 && (
-            <div className="flex items-center gap-1.5 pt-1.5">
-              {product.colors.map((c, idx) => {
-                const variantImg = (c.images && c.images.length > 0)
-                  ? c.images[0]
-                  : (c.featuredImage || c.image || null);
-
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (variantImg) setHoveredColorImage(variantImg);
-                    }}
-                    onMouseEnter={() => {
-                      if (variantImg) setHoveredColorImage(variantImg);
-                    }}
-                    onMouseLeave={() => {
-                      setHoveredColorImage(null);
-                    }}
-                    className="w-3.5 h-3.5 rounded-full border border-[#D4D4D8] hover:scale-125 hover:border-black transition-transform duration-100 shadow-sm cursor-pointer"
-                    style={{ backgroundColor: c.colorHex }}
-                    title={c.colorName}
-                  />
-                );
-              })}
-              <span className="text-[10px] text-[#71717A] font-mono ml-1">
-                {product.colors.length} {product.colors.length > 1 ? 'cores' : 'cor'}
-              </span>
-            </div>
-          )}
         </div>
       </div>
     </article>
@@ -221,4 +309,3 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
 };
 
 export const ProductCard = memo(ProductCardComponent);
-

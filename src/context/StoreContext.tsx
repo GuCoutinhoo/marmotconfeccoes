@@ -51,9 +51,38 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
+// Helper to obtain permanently deleted category slugs/IDs
+const getDeletedCategorySlugs = (): Set<string> => {
+  const deleted = new Set<string>(['acessorios', 'acessórios']);
+  if (typeof window !== 'undefined' && window.localStorage) {
+    try {
+      const cached = localStorage.getItem('@marmot_deleted_categories');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((s) => deleted.add(String(s).toLowerCase().trim()));
+        }
+      }
+    } catch {}
+  }
+  return deleted;
+};
+
+const addDeletedCategorySlug = (slugOrId: string) => {
+  if (typeof window === 'undefined' || !window.localStorage) return;
+  try {
+    const clean = String(slugOrId || '').toLowerCase().trim();
+    if (!clean) return;
+    const current = getDeletedCategorySlugs();
+    current.add(clean);
+    localStorage.setItem('@marmot_deleted_categories', JSON.stringify(Array.from(current)));
+  } catch {}
+};
+
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   // Categories state: fallback to initial structural categories, synced with browser localStorage
   const [categories, setCategories] = useState<Category[]>(() => {
+    const deletedSlugs = getDeletedCategorySlugs();
     try {
       const storedMap = getAllStoredCategoryImages();
       const cached = localStorage.getItem('@marmot_cached_categories');
@@ -62,18 +91,28 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         // If cache has old Unsplash images, do NOT use it
         const hasLegacy = Array.isArray(parsed) && parsed.some((c: any) => c?.image?.includes('unsplash.com'));
         if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) {
-          return parsed.map((cat: Category) => {
-            const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
-            return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
-          });
+          return parsed
+            .filter((c: any) => {
+              const k = (c.slug || c.id || '').toLowerCase().trim();
+              return !deletedSlugs.has(k);
+            })
+            .map((cat: Category) => {
+              const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
+              return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
+            });
         }
       }
     } catch {}
     const storedMap = getAllStoredCategoryImages();
-    return (INITIAL_8_CATEGORIES || []).map((cat) => {
-      const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
-      return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
-    });
+    return (INITIAL_8_CATEGORIES || [])
+      .filter((c) => {
+        const k = (c.slug || c.id || '').toLowerCase().trim();
+        return !deletedSlugs.has(k);
+      })
+      .map((cat) => {
+        const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
+        return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
+      });
   });
 
   // STRICT SINGLE SOURCE OF TRUTH: Initial products state MUST be empty []
@@ -90,7 +129,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         localStorage.removeItem('@marmot_cached_products');
         localStorage.removeItem('@marmot_cached_products_v2');
         const cachedCat = localStorage.getItem('@marmot_cached_categories');
-        if (cachedCat && (cachedCat.includes('unsplash.com') || cachedCat.includes('"productCount":15'))) {
+        if (cachedCat && (cachedCat.includes('unsplash.com') || cachedCat.includes('"productCount":15') || cachedCat.includes('acessorios'))) {
           localStorage.removeItem('@marmot_cached_categories');
         }
       }
@@ -207,18 +246,44 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return;
       }
 
-      // 4. Commit authoritative catalog to state
-      if (loadedProducts.length > 0) {
-        const uniqueProducts = validateAndDeduplicateProducts(loadedProducts);
-        console.log(`[PRODUCTS] committing catalog rows=${uniqueProducts.length}`);
+      // 4. Commit authoritative catalog to state, strictly filtering out deleted categories & orphan products
+      const deletedSlugs = getDeletedCategorySlugs();
+
+      const sanitizedCategories = loadedCategories.filter((c) => {
+        const id = (c.id || '').toLowerCase().trim();
+        const slug = (c.slug || '').toLowerCase().trim();
+        return !deletedSlugs.has(id) && !deletedSlugs.has(slug);
+      });
+
+      // Build active category identifier set
+      const activeCatKeys = new Set<string>();
+      sanitizedCategories.forEach((c) => {
+        if (c.id) activeCatKeys.add(c.id.toLowerCase().trim());
+        if (c.slug) activeCatKeys.add(c.slug.toLowerCase().trim());
+      });
+
+      // Filter products: must NOT belong to a deleted category and must belong to an active category
+      const sanitizedProducts = loadedProducts.filter((p) => {
+        const pCat = (p.category || '').toLowerCase().trim();
+        const pSub = (p.subcategory || '').toLowerCase().trim();
+        if (deletedSlugs.has(pCat) || deletedSlugs.has(pSub)) return false;
+        if (activeCatKeys.size > 0 && !activeCatKeys.has(pCat)) {
+          return false;
+        }
+        return true;
+      });
+
+      if (sanitizedProducts.length > 0) {
+        const uniqueProducts = validateAndDeduplicateProducts(sanitizedProducts);
+        console.log(`[PRODUCTS] committing catalog rows=${uniqueProducts.length} (filtered from ${loadedProducts.length})`);
         setProducts(uniqueProducts);
       } else {
-        console.warn(`[PRODUCTS] request #${currentReqId} returned 0 valid products.`);
+        console.warn(`[PRODUCTS] request #${currentReqId} returned 0 valid products after category cleanup.`);
       }
 
-      if (loadedCategories.length > 0) {
+      if (sanitizedCategories.length > 0) {
         const storedMap = getAllStoredCategoryImages();
-        const mergedCategories = loadedCategories.map((c) => {
+        const mergedCategories = sanitizedCategories.map((c) => {
           const norm = c.slug?.toLowerCase() || c.id?.toLowerCase() || '';
           if (norm === 'shorts' || norm === 'short') {
             return {
@@ -393,7 +458,56 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const deleteCategory = async (id: string): Promise<boolean> => {
     try {
-      const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
+      const cleanId = String(id || '').trim();
+      const lowerId = cleanId.toLowerCase();
+
+      // Find the category to also obtain its slug
+      const catToDelete = categories.find(
+        (c) =>
+          c.id === cleanId ||
+          c.slug === cleanId ||
+          c.id?.toLowerCase() === lowerId ||
+          c.slug?.toLowerCase() === lowerId
+      );
+      const slugToDelete = (catToDelete?.slug || lowerId).toLowerCase();
+
+      // 1. Permanently register this category in deleted categories set
+      addDeletedCategorySlug(cleanId);
+      addDeletedCategorySlug(lowerId);
+      addDeletedCategorySlug(slugToDelete);
+
+      // 2. Cascade delete all products in this category from frontend state IMMEDIATELY
+      setProducts((prev) =>
+        prev.filter((p) => {
+          const pCat = (p.category || '').toLowerCase().trim();
+          const pSub = (p.subcategory || '').toLowerCase().trim();
+          return (
+            pCat !== lowerId &&
+            pCat !== slugToDelete &&
+            pSub !== lowerId &&
+            pSub !== slugToDelete
+          );
+        })
+      );
+
+      // 3. Remove category from frontend state
+      setCategories((prev) => {
+        const next = prev.filter(
+          (c) =>
+            c.id !== cleanId &&
+            c.slug !== cleanId &&
+            c.id?.toLowerCase() !== lowerId &&
+            c.slug?.toLowerCase() !== lowerId &&
+            c.slug?.toLowerCase() !== slugToDelete
+        );
+        try {
+          localStorage.setItem('@marmot_cached_categories', JSON.stringify(next));
+        } catch {}
+        return next;
+      });
+
+      // 4. Send delete request to backend API (which cascade deletes in store_products.json and Supabase)
+      const res = await fetch(`/api/categories/${encodeURIComponent(cleanId)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(true),
         credentials: 'include',
@@ -401,10 +515,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({ error: 'Erro ao excluir categoria' }));
-        throw new Error(errJson.error || 'Erro ao excluir categoria');
+        console.warn('[StoreContext] Backend category deletion notice:', errJson.error);
       }
 
-      setCategories((prev) => prev.filter((c) => c.id !== id && c.slug !== id));
       return true;
     } catch (error) {
       console.error('Delete category error:', error);

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
+import { MarmotPrice, MarmotBadge } from '../components/ui/MarmotElements';
 
 interface ProductDetailPageProps {
   productId: string;
@@ -78,105 +79,97 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+    setSelectedImageIndex(0);
     if (product) {
-      setSelectedColor(product.colors?.[0] || { color: 'black', colorName: 'Preto Ônix', colorHex: '#121212' });
-      setSelectedSize(product.sizes?.[0] || 'M');
-      setSelectedImageIndex(0);
+      if (product.colors?.length) {
+        setSelectedColor(product.colors[0]);
+      }
+      if (product.sizes?.length) {
+        setSelectedSize(product.sizes[0]);
+      }
       loadProductReviews(product.id);
     }
-  }, [product?.id]);
+  }, [productId, product?.id]);
 
-  useEffect(() => {
-    if (user?.name && !newReviewName) {
-      setNewReviewName(user.name);
-    }
-  }, [user]);
-
-  const { addToCart, openMiniCart } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
   const { showToast } = useToast();
 
   if (!product) {
     return (
-      <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-24 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-10 h-10 border-2 border-[#B45309] border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs uppercase tracking-widest text-[#71717A]">Carregando produto...</p>
-        </div>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
+        <h2 className="text-xl font-black uppercase text-[#0B0B0E] mb-2">Peça não encontrada</h2>
+        <p className="text-xs text-zinc-500 mb-4">O item solicitado não está disponível no catálogo atual.</p>
+        <button
+          onClick={() => onNavigate('shop')}
+          className="bg-[#0B0B0E] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-[2px]"
+        >
+          Ver Todo o Catálogo
+        </button>
       </div>
     );
   }
 
   const isFavorite = isInWishlist(product.id);
 
-  // Dynamic Image Gallery tied to the selected Color Variant
   const images = React.useMemo(() => {
-    let rawList: string[] = [];
-    const primaryProductImage = product.image || (product.images && product.images.length > 0 ? product.images[0] : '');
-
-    // 1. If the selected color has its own gallery of images
-    if (selectedColor?.images && Array.isArray(selectedColor.images) && selectedColor.images.length > 0) {
-      rawList = selectedColor.images;
-    } else if (selectedColor?.featuredImage || selectedColor?.image) {
-      rawList = [selectedColor.featuredImage || selectedColor.image!];
-    } else if (product.images && product.images.length > 0) {
-      rawList = primaryProductImage && product.images[0] !== primaryProductImage
-        ? [primaryProductImage, ...product.images.filter(x => x !== primaryProductImage)]
-        : product.images;
-    } else if (primaryProductImage) {
-      rawList = [primaryProductImage];
+    const list: string[] = [];
+    if (selectedColor?.image) list.push(selectedColor.image);
+    if (selectedColor?.featuredImage) list.push(selectedColor.featuredImage);
+    if (product.images && product.images.length > 0) {
+      product.images.forEach((img) => {
+        if (!list.includes(img)) list.push(img);
+      });
     }
-
-    if (rawList.length === 0) {
-      return [getValidProductImageUrl(null, product.category, product.id)];
+    if (product.image && !list.includes(product.image)) {
+      list.push(product.image);
     }
+    return list.length > 0
+      ? list.map((url) => getValidProductImageUrl(url, product.category, product.id))
+      : [getValidProductImageUrl(product.image, product.category, product.id)];
+  }, [product, selectedColor]);
 
-    return rawList.map((img, idx) =>
-      getValidProductImageUrl(img, product.category, `${product.id}-${idx}`)
-    );
-  }, [selectedColor, product]);
-
-  const handleSelectColor = (colorVariant: ProductVariant) => {
-    setSelectedColor(colorVariant);
+  const handleSelectColor = (variant: ProductVariant) => {
+    setSelectedColor(variant);
     setSelectedImageIndex(0);
   };
 
-  const effectivePrice = product.promoPrice || product.price;
-  const installmentCount = 6;
-  const installmentValue = effectivePrice / installmentCount;
-
   const handleAddToCart = () => {
-    setIsAddedRecently(true);
-    setTimeout(() => setIsAddedRecently(false), 1200);
-    addToCart(product, selectedSize, selectedColor, quantity);
+    const success = addToCart(product, selectedSize, selectedColor, quantity);
+    if (success) {
+      setIsAddedRecently(true);
+      setTimeout(() => setIsAddedRecently(false), 2000);
+    }
   };
 
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     showToast(
-      isFavorite ? 'Removido dos Favoritos' : 'Adicionado aos Favoritos',
-      product.title,
-      'info'
+      isFavorite ? 'Item removido dos favoritos' : 'Item salvo nos favoritos!',
+      isFavorite ? 'info' : 'success'
     );
   };
 
   const handleShare = () => {
     if (navigator.share) {
-      navigator.share({
-        title: product.title,
-        text: `Confira ${product.title} na Marmot Confecções:`,
-        url: window.location.href,
-      });
+      navigator
+        .share({
+          title: `MARMOT - ${product.title}`,
+          text: product.subtitle,
+          url: window.location.href,
+        })
+        .catch(() => {});
     } else {
       navigator.clipboard.writeText(window.location.href);
-      showToast('Link copiado!', 'Endereço da peça copiado para a área de transferência.', 'info');
+      showToast('Link copiado para a área de transferência!', 'success');
     }
   };
 
   const handleAddReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newReviewName || !newReviewTitle || !newReviewComment) {
-      showToast('Atenção', 'Preencha todos os campos da avaliação.', 'error');
+    if (!newReviewName.trim() || !newReviewComment.trim()) {
+      showToast('Preencha seu nome e comentário', 'error');
       return;
     }
 
@@ -201,13 +194,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         setIsReviewFormOpen(false);
         setNewReviewTitle('');
         setNewReviewComment('');
-        showToast('Avaliação enviada!', 'Obrigado por compartilhar seu feedback.', 'success');
+        showToast('Avaliação enviada com sucesso!', 'success');
       } else {
         const err = await res.json();
-        showToast('Aviso', err.error || 'Erro ao registrar avaliação.', 'error');
+        showToast(err.error || 'Erro ao registrar avaliação.', 'error');
       }
     } catch {
-      showToast('Erro', 'Não foi possível enviar a avaliação.', 'error');
+      showToast('Não foi possível enviar a avaliação.', 'error');
     }
   };
 
@@ -215,9 +208,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     .filter((p) => p.id !== product?.id)
     .slice(0, 4);
 
+  const effectivePrice = product.promoPrice || product.price;
+
   return (
-    <div className="bg-[#FAFAFA] text-[#18181B] min-h-screen py-5 sm:py-8">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+    <div className="bg-[#FAFAFA] text-[#0B0B0E] min-h-screen py-6 sm:py-8 select-none">
+      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <Breadcrumb
           items={[
             { label: 'Início', onClick: () => onNavigate('home') },
@@ -229,36 +224,35 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
         {/* Product Main Display Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mt-6 mb-10 items-start">
-          {/* 1. Left Column: Gallery (7 cols) */}
+          {/* 1. Left Column: Dominant Gallery (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Image */}
-            <div className="relative aspect-[3/4] sm:aspect-[2/3] bg-[#F4F4F5] border border-[#DCDCE0] rounded-[2px] overflow-hidden group">
+            <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-[#111113] border border-zinc-200/90 rounded-[2px] overflow-hidden group">
               <img
                 src={images[selectedImageIndex] || images[0]}
                 alt={product.title}
                 referrerPolicy="no-referrer"
                 onError={(e) => handleProductImageError(e, product.category, `${product.id}-${selectedImageIndex}`)}
-                className="w-full h-full object-cover object-[center_top] transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                className="w-full h-full object-cover object-top sm:object-center transition-transform duration-500 ease-out group-hover:scale-[1.02] select-none"
               />
 
               {/* Minimal Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+              <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
                 {product.isNewRelease && (
-                  <span className="bg-[#18181B] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-[2px]">
-                    NOVO DROP
-                  </span>
+                  <MarmotBadge variant="new">NOVO DROP</MarmotBadge>
                 )}
                 {product.promoPrice && (
-                  <span className="bg-[#DC2626] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-[2px]">
+                  <MarmotBadge variant="sale">
                     -{Math.round(((product.price - product.promoPrice) / product.price) * 100)}% OFF
-                  </span>
+                  </MarmotBadge>
                 )}
               </div>
 
               {/* Share Button */}
               <button
+                type="button"
                 onClick={handleShare}
-                className="absolute top-4 right-4 p-3 bg-white/80 hover:bg-[#18181B] hover:text-white rounded-full border border-[#E4E4E7] text-[#18181B] transition-all backdrop-blur-md shadow-md cursor-pointer"
+                className="absolute top-4 right-4 p-2.5 bg-white/90 hover:bg-[#0B0B0E] hover:text-white rounded-full border border-zinc-200 text-[#0B0B0E] transition-all backdrop-blur-xs shadow-xs cursor-pointer"
                 title="Compartilhar Peça"
               >
                 <Share2 className="w-4 h-4" />
@@ -267,15 +261,16 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
             {/* Thumbnail Navigation */}
             {images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+              <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none">
                 {images.map((img, idx) => (
                   <button
                     key={idx}
+                    type="button"
                     onClick={() => setSelectedImageIndex(idx)}
-                    className={`relative w-20 h-24 sm:w-24 sm:h-32 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-[#F4F4F5] ${
+                    className={`relative w-20 h-24 sm:w-24 sm:h-28 rounded-[2px] overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-zinc-100 ${
                       selectedImageIndex === idx
-                        ? 'border-[#18181B] shadow-md scale-95'
-                        : 'border-[#E4E4E7] opacity-70 hover:opacity-100'
+                        ? 'border-[#0B0B0E] shadow-xs'
+                        : 'border-zinc-200 opacity-60 hover:opacity-100'
                     }`}
                   >
                     <img
@@ -283,7 +278,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       alt={`Miniatura ${idx + 1}`}
                       referrerPolicy="no-referrer"
                       onError={(e) => handleProductImageError(e, product.category, `${product.id}-thumb-${idx}`)}
-                      className="w-full h-full object-cover object-[center_top]"
+                      className="w-full h-full object-cover object-top"
                     />
                   </button>
                 ))}
@@ -295,90 +290,77 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           <div className="lg:col-span-5 space-y-6">
             <div>
               {/* Category & Collection */}
-              <div className="flex items-center justify-between text-xs font-mono text-[#71717A] uppercase tracking-wider mb-2">
-                <span>{product.collection || 'Drop 04 // Essenciais'}</span>
-                <span>SKU: {product.sku}</span>
+              <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-2">
+                <span>{product.collection || 'DROP 003 // ESSENCIAIS'}</span>
+                <span>SKU: {product.sku || `MM-${product.id.slice(0, 8).toUpperCase()}`}</span>
               </div>
 
               {/* Title */}
-              <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B] leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-[#0B0B0E] leading-tight">
                 {product.title}
               </h1>
 
               {/* Subtitle / Spec */}
-              <p className="text-xs sm:text-sm text-[#52525B] mt-1.5 font-medium">
-                {product.subtitle || 'Malha Heavyweight Boxy Fit'}
+              <p className="text-xs sm:text-[13px] text-zinc-500 mt-1.5 font-normal leading-relaxed">
+                {product.subtitle || 'Malha Heavyweight Boxy Fit com caimento estruturado'}
               </p>
 
               {/* Rating & Social Proof */}
-              <div className="flex items-center gap-3 mt-3">
-                <div className="flex text-[#F59E0B]">
+              <div className="flex items-center gap-2.5 mt-3">
+                <div className="flex text-zinc-900 gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-4 h-4 ${
-                        i < Math.floor(product.rating) ? 'fill-current' : 'opacity-30'
+                      className={`w-3.5 h-3.5 ${
+                        i < Math.floor(product.rating || 5) ? 'fill-current text-[#0B0B0E]' : 'opacity-25'
                       }`}
                     />
                   ))}
                 </div>
-                <span className="text-xs font-bold text-[#18181B]">{product.rating.toFixed(1)}</span>
-                <span className="text-xs text-[#71717A]">
+                <span className="text-xs font-bold text-[#0B0B0E]">{(product.rating || 5).toFixed(1)}</span>
+                <span className="text-xs text-zinc-400">
                   ({reviewsList.length} avaliações verificadas)
                 </span>
               </div>
             </div>
 
             {/* Price & Installments Card */}
-            <div className="p-5 bg-white border border-[#DCDCE0] rounded-[2px] space-y-3">
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-2xl sm:text-3xl font-black text-[#18181B]">
-                      R$ {effectivePrice.toFixed(2).replace('.', ',')}
-                    </span>
-                    {product.promoPrice && (
-                      <span className="text-sm font-bold text-[#71717A] line-through">
-                        R$ {product.price.toFixed(2).replace('.', ',')}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-[#52525B] mt-1">
-                    em até <strong>{installmentCount}x de R$ {installmentValue.toFixed(2).replace('.', ',')}</strong> sem juros no cartão
-                  </p>
-                </div>
-
-                <span className="text-right text-[10px] font-mono font-bold text-[#92400E] uppercase tracking-wider">
-                  PIX ou cartão na InfinitePay
-                </span>
-              </div>
+            <div className="p-5 bg-white border border-zinc-200/90 rounded-[2px]">
+              <MarmotPrice
+                price={effectivePrice}
+                originalPrice={product.promoPrice ? product.price : undefined}
+                size="lg"
+              />
             </div>
 
             {/* Color Swatch Selector */}
             {product.colors && product.colors.length > 0 && (
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#71717A] block">
-                  Cor: <span className="text-[#18181B] font-extrabold">{selectedColor.colorName}</span>
+                <label className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600 block">
+                  COR: <span className="text-[#0B0B0E] font-sans font-extrabold">{selectedColor.colorName || selectedColor.color}</span>
                 </label>
-                <div className="flex items-center gap-3">
-                  {product.colors.map((c, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => handleSelectColor(c)}
-                      className={`p-1 rounded-full border-2 cursor-pointer select-none touch-manipulation active:scale-90 transition-transform duration-75 ${
-                        selectedColor.colorName === c.colorName
-                          ? 'border-[#18181B] scale-110'
-                          : 'border-transparent opacity-70 hover:opacity-100'
-                      }`}
-                      title={c.colorName}
-                    >
-                      <span
-                        className="w-7 h-7 rounded-full block border border-black/10 shadow-sm"
-                        style={{ backgroundColor: c.colorHex }}
-                      />
-                    </button>
-                  ))}
+                <div className="flex items-center gap-2.5">
+                  {product.colors.map((c, idx) => {
+                    const isSelected = (selectedColor.colorHex || selectedColor.color) === (c.colorHex || c.color);
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleSelectColor(c)}
+                        className={`p-0.5 rounded-full border-2 cursor-pointer transition-all ${
+                          isSelected
+                            ? 'border-[#0B0B0E] scale-105'
+                            : 'border-transparent opacity-70 hover:opacity-100'
+                        }`}
+                        title={c.colorName || c.color}
+                      >
+                        <span
+                          className="w-7 h-7 rounded-full block border border-black/15 shadow-2xs"
+                          style={{ backgroundColor: c.colorHex || '#121212' }}
+                        />
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -386,28 +368,28 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             {/* Size Selector */}
             <div className="space-y-2.5">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#71717A]">
-                  Tamanho (Modelagem Boxy)
+                <label className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600">
+                  TAMANHO: <strong className="text-[#0B0B0E] font-sans font-extrabold">{selectedSize}</strong>
                 </label>
                 <button
                   type="button"
                   onClick={() => setIsSizeGuideOpen(true)}
-                  className="text-xs text-[#B45309] hover:underline font-bold flex items-center gap-1.5 cursor-pointer active:scale-95 transition-transform duration-75"
+                  className="text-xs text-[#0B0B0E] hover:underline font-bold flex items-center gap-1.5 cursor-pointer"
                 >
                   <Ruler className="w-3.5 h-3.5" /> Guia de Medidas
                 </button>
               </div>
 
-              <div className="grid grid-cols-5 gap-2.5">
+              <div className="grid grid-cols-5 gap-2">
                 {(product.sizes || ['P', 'M', 'G', 'GG', 'XG']).map((sz) => (
                   <button
                     key={sz}
                     type="button"
                     onClick={() => setSelectedSize(sz)}
-                    className={`py-3 rounded-xl text-xs font-black uppercase border cursor-pointer select-none touch-manipulation active:scale-95 transition-all duration-75 ${
+                    className={`py-3 rounded-[2px] text-xs font-mono font-bold uppercase border cursor-pointer transition-all ${
                       selectedSize === sz
-                        ? 'bg-[#18181B] text-white border-[#18181B] shadow-md scale-[1.02]'
-                        : 'bg-[#F8F9FA] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B] active:bg-[#E4E4E7]'
+                        ? 'bg-[#0B0B0E] text-[#F4C400] border-[#0B0B0E] shadow-2xs'
+                        : 'bg-white text-zinc-700 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
                     }`}
                   >
                     {sz}
@@ -416,12 +398,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               </div>
 
               {/* Model Measurement Aid */}
-              <p className="text-[11px] text-[#71717A] pt-1">
-                💡 O modelo mede 1,84m, pesa 78kg e veste tamanho <strong>G</strong>.
+              <p className="text-[11px] text-zinc-500 pt-1 font-mono">
+                O modelo mede 1,84m, pesa 78kg e veste tamanho <strong>G</strong>.
               </p>
 
               {product.stockCount <= 8 && (
-                <p className="text-xs text-amber-600 font-mono font-bold">
+                <p className="text-xs text-amber-700 font-mono font-bold">
                   Restam apenas {product.stockCount} unidades no ateliê!
                 </p>
               )}
@@ -431,23 +413,23 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-3">
                 {/* Quantity Box */}
-                <div className="flex items-center bg-[#F8F9FA] border border-[#E4E4E7] rounded-xl p-1 shrink-0">
+                <div className="flex items-center bg-white border border-zinc-200 rounded-[2px] p-0.5 shrink-0">
                   <button
                     type="button"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-2.5 text-[#71717A] hover:text-[#18181B] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#18181B] transition-transform duration-75"
+                    className="p-2 text-zinc-600 hover:text-[#0B0B0E] cursor-pointer"
                     aria-label="Diminuir quantidade"
                   >
-                    <Minus className="w-4 h-4" />
+                    <Minus className="w-3.5 h-3.5" />
                   </button>
-                  <span className="w-8 text-center font-bold text-xs text-[#18181B] select-none">{quantity}</span>
+                  <span className="w-7 text-center font-mono font-bold text-xs text-[#0B0B0E]">{quantity}</span>
                   <button
                     type="button"
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-2.5 text-[#71717A] hover:text-[#18181B] cursor-pointer select-none touch-manipulation active:scale-90 active:text-[#18181B] transition-transform duration-75"
+                    className="p-2 text-zinc-600 hover:text-[#0B0B0E] cursor-pointer"
                     aria-label="Aumentar quantidade"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
 
@@ -455,10 +437,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className={`flex-1 font-black text-xs uppercase tracking-widest py-4 px-6 rounded-xl transition-all duration-75 flex items-center justify-center gap-2.5 shadow-md cursor-pointer select-none touch-manipulation active:scale-95 ${
+                  className={`flex-1 font-black text-xs sm:text-[13px] uppercase tracking-[0.14em] py-3.5 sm:py-4 px-6 rounded-[2px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
                     isAddedRecently
-                      ? 'bg-emerald-600 text-white shadow-emerald-500/20'
-                      : 'bg-[#F4C400] hover:bg-[#E5B500] text-[#0B0B0E]'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-[#F4C400] hover:bg-[#E5B500] text-[#0B0B0E] active:scale-[0.99]'
                   }`}
                 >
                   {isAddedRecently ? (
@@ -478,10 +460,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                 <button
                   type="button"
                   onClick={handleToggleWishlist}
-                  className={`p-4 rounded-xl border transition-all duration-75 cursor-pointer select-none touch-manipulation active:scale-90 ${
+                  className={`p-3.5 sm:p-4 rounded-[2px] border transition-all cursor-pointer ${
                     isFavorite
-                      ? 'bg-[#18181B] text-white border-[#18181B]'
-                      : 'bg-[#F8F9FA] text-[#71717A] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B]'
+                      ? 'bg-[#0B0B0E] text-[#F4C400] border-[#0B0B0E]'
+                      : 'bg-white text-zinc-600 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
                   }`}
                   title="Salvar nos Favoritos"
                 >
@@ -503,30 +485,30 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             />
 
             {/* Trust Assurances */}
-            <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#E4E4E7] text-xs text-[#71717A]">
+            <div className="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-200 text-xs text-zinc-600">
               <div className="flex items-center gap-2">
-                <Truck className="w-4 h-4 text-[#B45309]" />
+                <Truck className="w-4 h-4 text-zinc-700 shrink-0" />
                 <span>Frete Grátis acima de R$ 399</span>
               </div>
               <div className="flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-[#B45309]" />
+                <RotateCcw className="w-4 h-4 text-zinc-700 shrink-0" />
                 <span>1ª Troca Grátis em até 30 dias</span>
               </div>
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#B45309]" />
-                <span>Ateliê em São Paulo</span>
+                <ShieldCheck className="w-4 h-4 text-zinc-700 shrink-0" />
+                <span>Ateliê Próprio em São Paulo</span>
               </div>
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-[#B45309]" />
-                <span>Pagamento 100% Seguro</span>
+                <Lock className="w-4 h-4 text-zinc-700 shrink-0" />
+                <span>Checkout 100% Criptografado</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* 3. Product Specifications & Care Tabs */}
-        <div className="my-12 sm:my-14 bg-white border border-[#DCDCE0] rounded-[2px] p-6 md:p-8 space-y-6">
-          <div className="flex border-b border-[#E4E4E7] gap-6 overflow-x-auto scrollbar-none pb-2">
+        <div className="my-12 sm:my-14 bg-white border border-zinc-200/90 rounded-[2px] p-6 md:p-8 space-y-6">
+          <div className="flex border-b border-zinc-200 gap-6 overflow-x-auto scrollbar-none pb-2">
             {[
               { id: 'details', label: 'Especificações & Detalhes' },
               { id: 'measurements', label: 'Tabela de Medidas (cm)' },
@@ -535,11 +517,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             ].map((tab) => (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`pb-3 text-xs font-black uppercase tracking-wider border-b-2 whitespace-nowrap transition-all cursor-pointer ${
                   activeTab === tab.id
-                    ? 'border-[#18181B] text-[#18181B]'
-                    : 'border-transparent text-[#71717A] hover:text-[#18181B]'
+                    ? 'border-[#0B0B0E] text-[#0B0B0E]'
+                    : 'border-transparent text-zinc-400 hover:text-zinc-700'
                 }`}
               >
                 {tab.label}
@@ -549,8 +532,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Tab 1: Details */}
           {activeTab === 'details' && (
-            <div className="space-y-4 text-xs text-[#52525B] leading-relaxed">
-              <p className="text-sm font-medium text-[#18181B] whitespace-pre-line leading-relaxed">
+            <div className="space-y-4 text-xs text-zinc-600 leading-relaxed">
+              <p className="text-sm font-normal text-[#0B0B0E] whitespace-pre-line leading-relaxed">
                 {product.description}
               </p>
               <ul className="space-y-2 pt-2">
@@ -559,10 +542,10 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                   'Modelagem Boxy Fit exclusiva com ombros rebaixados',
                   'Gola canelada de 3cm pespontada',
                   'Tecido pré-encolhido que não deforma após lavagens',
-                  'Confeccionado artesanalmente em São Paulo'
+                  'Confeccionado artesanalmente em São Paulo',
                 ]).map((d: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-[#B45309] shrink-0 mt-0.5" />
+                    <Check className="w-3.5 h-3.5 text-[#0B0B0E] shrink-0 mt-0.5" />
                     <span>{d}</span>
                   </li>
                 ))}
@@ -573,12 +556,12 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* Tab 2: Measurements */}
           {activeTab === 'measurements' && (
             <div className="space-y-4">
-              <p className="text-xs text-[#71717A]">
+              <p className="text-xs text-zinc-500 font-mono">
                 Medidas tiradas com a peça plana em centímetros (tolerância de até 1,5cm):
               </p>
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-left">
-                  <thead className="bg-[#F4F4F5] text-[#18181B] uppercase font-mono">
+                  <thead className="bg-zinc-100 text-[#0B0B0E] uppercase font-mono">
                     <tr>
                       <th className="p-3">Tamanho</th>
                       <th className="p-3">Tórax (Largura)</th>
@@ -587,41 +570,41 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       <th className="p-3">Manga</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E4E4E7] text-[#18181B]">
+                  <tbody className="divide-y divide-zinc-200 text-[#0B0B0E]">
                     <tr>
                       <td className="p-3 font-bold">P</td>
-                      <td className="p-3">56 cm</td>
-                      <td className="p-3">71 cm</td>
-                      <td className="p-3">52 cm</td>
-                      <td className="p-3">22 cm</td>
+                      <td className="p-3 font-mono">56 cm</td>
+                      <td className="p-3 font-mono">71 cm</td>
+                      <td className="p-3 font-mono">52 cm</td>
+                      <td className="p-3 font-mono">22 cm</td>
                     </tr>
                     <tr>
                       <td className="p-3 font-bold">M</td>
-                      <td className="p-3">59 cm</td>
-                      <td className="p-3">74 cm</td>
-                      <td className="p-3">55 cm</td>
-                      <td className="p-3">23 cm</td>
+                      <td className="p-3 font-mono">59 cm</td>
+                      <td className="p-3 font-mono">74 cm</td>
+                      <td className="p-3 font-mono">55 cm</td>
+                      <td className="p-3 font-mono">23 cm</td>
                     </tr>
                     <tr>
                       <td className="p-3 font-bold">G</td>
-                      <td className="p-3">62 cm</td>
-                      <td className="p-3">77 cm</td>
-                      <td className="p-3">58 cm</td>
-                      <td className="p-3">24 cm</td>
+                      <td className="p-3 font-mono">62 cm</td>
+                      <td className="p-3 font-mono">77 cm</td>
+                      <td className="p-3 font-mono">58 cm</td>
+                      <td className="p-3 font-mono">24 cm</td>
                     </tr>
                     <tr>
                       <td className="p-3 font-bold">GG</td>
-                      <td className="p-3">65 cm</td>
-                      <td className="p-3">80 cm</td>
-                      <td className="p-3">61 cm</td>
-                      <td className="p-3">25 cm</td>
+                      <td className="p-3 font-mono">65 cm</td>
+                      <td className="p-3 font-mono">80 cm</td>
+                      <td className="p-3 font-mono">61 cm</td>
+                      <td className="p-3 font-mono">25 cm</td>
                     </tr>
                     <tr>
                       <td className="p-3 font-bold">XG</td>
-                      <td className="p-3">68 cm</td>
-                      <td className="p-3">83 cm</td>
-                      <td className="p-3">64 cm</td>
-                      <td className="p-3">26 cm</td>
+                      <td className="p-3 font-mono">68 cm</td>
+                      <td className="p-3 font-mono">83 cm</td>
+                      <td className="p-3 font-mono">64 cm</td>
+                      <td className="p-3 font-mono">26 cm</td>
                     </tr>
                   </tbody>
                 </table>
@@ -631,15 +614,15 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Tab 3: Care */}
           {activeTab === 'care' && (
-            <div className="space-y-3 text-xs text-[#52525B]">
-              <p className="font-bold text-[#18181B]">Para manter sua peça com aspecto de nova por anos:</p>
+            <div className="space-y-3 text-xs text-zinc-600">
+              <p className="font-bold text-[#0B0B0E]">Para manter sua peça com aspecto original de ateliê:</p>
               <ul className="space-y-2 list-disc list-inside">
                 {(product.careInstructions || [
                   'Lavar na máquina em ciclo suave com água fria',
-                  'Lavar preferencialmente do avesso para proteger o acabamento',
+                  'Lavar preferencialmente do avesso para proteger a fibra',
                   'Não usar alvejantes ou produtos à base de cloro',
                   'Secar no varal à sombra (evite secadora para máxima durabilidade)',
-                  'Passar do avesso em temperatura média'
+                  'Passar do avesso em temperatura média',
                 ]).map((c: string, idx: number) => (
                   <li key={idx}>{c}</li>
                 ))}
@@ -649,35 +632,39 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Tab 4: Shipping */}
           {activeTab === 'shipping' && (
-            <div className="space-y-4 text-xs text-[#52525B] leading-relaxed">
+            <div className="space-y-4 text-xs text-zinc-600 leading-relaxed">
               <p>
-                <strong className="text-[#18181B]">Expedição Rápida:</strong> Pedidos com pagamento aprovado até as 14h são postados em até 24h úteis direto do nosso ateliê em São Paulo.
+                <strong className="text-[#0B0B0E]">Expedição Rápida:</strong> Pedidos com pagamento aprovado até as 14h são postados em até 24h úteis direto do ateliê em São Paulo.
               </p>
               <p>
-                <strong className="text-[#18181B]">1ª Troca Grátis (30 dias):</strong> Se o tamanho não ficar perfeito, você tem 30 dias corridos para solicitar a troca sem nenhum custo de frete.
+                <strong className="text-[#0B0B0E]">1ª Troca Grátis (30 dias):</strong> Se o tamanho não ficar perfeito, você tem 30 dias corridos para solicitar a troca sem nenhum custo de frete.
               </p>
               <p>
-                <strong className="text-[#18181B]">Frete Grátis:</strong> Válido automaticamente para todo o Brasil em compras acima de R$ 399.
+                <strong className="text-[#0B0B0E]">Frete Grátis:</strong> Válido automaticamente para todo o Brasil em compras acima de R$ 399.
               </p>
             </div>
           )}
         </div>
 
         {/* 4. Customer Reviews Section */}
-        <div className="my-16 space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#E4E4E7] pb-6">
+        <div className="my-14 space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-200 pb-5">
             <div>
-              <span className="text-xs font-mono font-bold text-[#B45309] uppercase tracking-wider block mb-1">
-                PROVA SOCIAL
-              </span>
-              <h2 className="text-2xl font-black uppercase text-[#18181B]">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
+                <span className="text-[10px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.24em] text-zinc-500">
+                  PROVA SOCIAL // FEEDBACK REAL
+                </span>
+              </div>
+              <h2 className="text-2xl font-black uppercase text-[#0B0B0E] leading-none">
                 AVALIAÇÕES DE QUEM COMPROU
               </h2>
             </div>
 
             <button
+              type="button"
               onClick={() => setIsReviewFormOpen(!isReviewFormOpen)}
-              className="bg-[#F8F9FA] hover:bg-[#18181B] hover:text-white border border-[#E4E4E7] text-[#18181B] font-bold text-xs uppercase px-5 py-3 rounded-xl transition-all cursor-pointer shadow-xs"
+              className="bg-white hover:bg-[#0B0B0E] hover:text-white border border-zinc-300 text-[#0B0B0E] font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-[2px] transition-all cursor-pointer shadow-2xs self-start sm:self-end"
             >
               {isReviewFormOpen ? 'Fechar Formulário' : 'Escrever Avaliação'}
             </button>
@@ -685,17 +672,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
           {/* Form to submit review */}
           {isReviewFormOpen && (
-            <form onSubmit={handleAddReview} className="bg-white border border-[#E4E4E7] p-6 rounded-2xl space-y-4 animate-fadeIn shadow-xs">
-              <h3 className="text-xs font-bold uppercase text-[#18181B]">Sua Avaliação sobre a Peça</h3>
+            <form onSubmit={handleAddReview} className="bg-white border border-zinc-200 p-6 rounded-[2px] space-y-4 shadow-xs">
+              <h3 className="text-xs font-black uppercase text-[#0B0B0E] tracking-wider">Sua Avaliação sobre a Peça</h3>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-[#71717A]">Sua Nota:</span>
-                <div className="flex text-[#F59E0B] cursor-pointer">
+                <span className="text-xs text-zinc-500 font-mono">Sua Nota:</span>
+                <div className="flex text-zinc-900 cursor-pointer">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
                       onClick={() => setNewReviewRating(star)}
-                      className={`w-5 h-5 ${star <= newReviewRating ? 'fill-current' : 'opacity-30'}`}
+                      className={`w-4 h-4 ${star <= newReviewRating ? 'fill-current text-[#0B0B0E]' : 'opacity-25'}`}
                     />
                   ))}
                 </div>
@@ -703,45 +690,45 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[11px] font-bold text-[#71717A] block mb-1">Seu Nome</label>
+                  <label className="text-[11px] font-mono font-bold text-zinc-600 block mb-1">Seu Nome</label>
                   <input
                     type="text"
                     value={newReviewName}
                     onChange={(e) => setNewReviewName(e.target.value)}
                     required
                     placeholder="Ex: Lucas Silva"
-                    className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
+                    className="w-full bg-zinc-50 border border-zinc-200 px-3.5 py-2.5 rounded-[2px] text-xs text-[#0B0B0E] focus:outline-none focus:border-[#0B0B0E]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-[#71717A] block mb-1">Título da Avaliação</label>
+                  <label className="text-[11px] font-mono font-bold text-zinc-600 block mb-1">Título da Avaliação</label>
                   <input
                     type="text"
                     value={newReviewTitle}
                     onChange={(e) => setNewReviewTitle(e.target.value)}
                     required
                     placeholder="Ex: Caimento perfeito, malha de alta gramatura"
-                    className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
+                    className="w-full bg-zinc-50 border border-zinc-200 px-3.5 py-2.5 rounded-[2px] text-xs text-[#0B0B0E] focus:outline-none focus:border-[#0B0B0E]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-[11px] font-bold text-[#71717A] block mb-1">Comentário Detalhado</label>
+                <label className="text-[11px] font-mono font-bold text-zinc-600 block mb-1">Comentário Detalhado</label>
                 <textarea
                   rows={3}
                   value={newReviewComment}
                   onChange={(e) => setNewReviewComment(e.target.value)}
                   required
                   placeholder="Conte como foi sua experiência com o caimento, tecido, acabamento e entrega..."
-                  className="w-full bg-[#F8F9FA] border border-[#E4E4E7] px-3.5 py-2.5 rounded-xl text-xs text-[#18181B] focus:outline-none focus:border-[#18181B]"
+                  className="w-full bg-zinc-50 border border-zinc-200 px-3.5 py-2.5 rounded-[2px] text-xs text-[#0B0B0E] focus:outline-none focus:border-[#0B0B0E]"
                 />
               </div>
 
               <button
                 type="submit"
-                className="bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-bold text-xs uppercase px-6 py-3 rounded-xl transition-colors shadow-xs cursor-pointer"
+                className="bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-black text-xs uppercase tracking-wider px-6 py-3 rounded-[2px] transition-colors shadow-xs cursor-pointer"
               >
                 Publicar Avaliação
               </button>
@@ -749,32 +736,32 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           )}
 
           {/* Reviews List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {reviewsList.map((rev: any, idx: number) => (
-              <div key={idx} className="bg-white border border-[#E4E4E7] p-6 rounded-2xl space-y-3 shadow-xs">
+              <div key={idx} className="bg-white border border-zinc-200 p-5 sm:p-6 rounded-[2px] space-y-3 shadow-2xs">
                 <div className="flex items-center justify-between">
-                  <div className="flex text-[#F59E0B] gap-0.5">
+                  <div className="flex text-zinc-900 gap-0.5">
                     {[...Array(rev.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                      <Star key={i} className="w-3.5 h-3.5 fill-current text-[#0B0B0E]" />
                     ))}
                   </div>
 
-                  <span className="inline-flex items-center gap-1 text-[10px] font-mono text-[#92400E] bg-[#FEF3C7] px-2 py-0.5 rounded">
-                    <CheckCircle2 className="w-3 h-3" /> Compra Verificada
+                  <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded-[2px]">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Compra Verificada
                   </span>
                 </div>
 
-                <h4 className="text-xs font-bold text-[#18181B] uppercase">
+                <h4 className="text-xs font-bold text-[#0B0B0E] uppercase">
                   {rev.title || 'Excelente qualidade'}
                 </h4>
 
-                <p className="text-xs text-[#52525B] leading-relaxed">
+                <p className="text-xs text-zinc-600 leading-relaxed">
                   "{rev.comment}"
                 </p>
 
-                <div className="pt-3 border-t border-[#E4E4E7] flex justify-between items-center text-[11px] text-[#71717A]">
-                  <span className="font-bold text-[#18181B]">{rev.userName}</span>
-                  <span className="font-mono">{rev.date || 'Recente'}</span>
+                <div className="pt-3 border-t border-zinc-100 flex justify-between items-center text-[11px] text-zinc-500 font-mono">
+                  <span className="font-bold text-[#0B0B0E]">{rev.userName}</span>
+                  <span>{rev.date || 'Recente'}</span>
                 </div>
               </div>
             ))}
@@ -782,17 +769,20 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
         </div>
 
         {/* 5. Related Products */}
-        <div className="my-16 space-y-8">
-          <div className="border-b border-[#E4E4E7] pb-4">
-            <span className="text-xs font-mono font-bold text-[#B45309] uppercase tracking-wider block mb-1">
-              RECOMENDAÇÕES DE ATELIÊ
-            </span>
-            <h2 className="text-2xl font-black uppercase text-[#18181B]">
+        <div className="my-14 space-y-6">
+          <div className="border-b border-zinc-200 pb-4">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
+              <span className="text-[10px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.24em] text-zinc-500">
+                RECOMENDAÇÕES DE ATELIÊ
+              </span>
+            </div>
+            <h2 className="text-2xl font-black uppercase text-[#0B0B0E] leading-none">
               COMPLETE O VISUAL
             </h2>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
             {relatedProducts.map((rel) => (
               <ProductCard
                 key={rel.id}

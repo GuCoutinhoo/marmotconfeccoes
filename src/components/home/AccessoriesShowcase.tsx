@@ -18,6 +18,10 @@ export const AccessoriesShowcase: React.FC<AccessoriesShowcaseProps> = ({
     (p) => p.category === 'acessorios' || p.category === 'bones'
   ).slice(0, 4);
 
+  if (accessories.length === 0) {
+    return null;
+  }
+
   return (
     <section className="py-16 bg-[#161616] border-b border-[#262626]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

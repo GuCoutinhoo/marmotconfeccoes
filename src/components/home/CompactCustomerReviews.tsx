@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, CheckCircle2, MessageSquareQuote } from 'lucide-react';
+import { Star, CheckCircle2 } from 'lucide-react';
 
 export const CompactCustomerReviews: React.FC = () => {
   const reviews = [
@@ -8,15 +8,15 @@ export const CompactCustomerReviews: React.FC = () => {
       location: 'São Paulo - SP',
       verified: true,
       rating: 5,
-      productName: 'T-Shirt Oversized Heavyweight 260g',
-      comment: 'A malha dessa t-shirt é surreal. Gola canelada grossa de 3cm que não deforma nem enrola após as lavagens.',
+      productName: 'T-Shirt Heavyweight 260g',
+      comment: 'A malha dessa t-shirt é de outro patamar. Gola canelada grossa de 3cm que não deforma nem enrola após as lavagens.',
     },
     {
       author: 'Matheus B. Sampaio',
       location: 'Curitiba - PR',
       verified: true,
       rating: 5,
-      productName: 'Hoodie Heavyweight 400g Marmot Black',
+      productName: 'Hoodie Heavyweight 400g',
       comment: 'Esquenta de verdade no inverno do sul. O capuz fica estruturado e volumoso sem ficar caído nos ombros.',
     },
     {
@@ -24,63 +24,65 @@ export const CompactCustomerReviews: React.FC = () => {
       location: 'Rio de Janeiro - RJ',
       verified: true,
       rating: 5,
-      productName: 'Calça Cargo Tactical Ripstop Black',
-      comment: 'Caimento impecável com tênis chunky. A barra com regulador em cordão permite usar solta ou estilo jogger.',
+      productName: 'Calça Cargo Tactical Ripstop',
+      comment: 'Caimento impecável com tênis chunky. A modelagem baggy veste com a silhueta exata do lookbook.',
     },
   ];
 
   return (
-    <section className="py-8 sm:py-10 lg:py-12 bg-[#F8F9FA] border-b border-[#E4E4E7]">
+    <section className="py-10 sm:py-12 lg:py-14 bg-[#FAFAFA] border-b border-zinc-200/90 select-none">
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1">
-              <MessageSquareQuote className="w-3.5 h-3.5" />
-              <span>PROVA SOCIAL REAL</span>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
+              <span className="text-[10px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.24em] text-zinc-500">
+                PROVA SOCIAL // FEEDBACK REAL
+              </span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#18181B]">
+            <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-[#0B0B0E] leading-none">
               AVALIAÇÕES DE COMPRADORES
             </h2>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-[#71717A] font-mono">
-            <span className="text-[#B45309] font-bold">4.9 / 5.0</span>
+          <div className="flex items-center gap-2 text-xs text-zinc-500 font-mono">
+            <span className="text-[#0B0B0E] font-bold">4.9 / 5.0</span>
             <span>•</span>
             <span>+1.400 Avaliações Verificadas</span>
           </div>
         </div>
 
         {/* Compact Review Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 lg:gap-5">
           {reviews.map((rev, idx) => (
             <div
               key={idx}
-              className="bg-white border border-[#DCDCE0] p-4 sm:p-5 rounded-[2px] space-y-2.5 hover:border-[#18181B] transition-colors"
+              className="bg-white border border-zinc-200/90 p-5 rounded-[2px] space-y-3 hover:border-zinc-400 transition-colors shadow-2xs"
             >
               <div className="flex items-center justify-between">
-                <div className="flex text-[#B45309] gap-0.5">
+                <div className="flex text-zinc-900 gap-0.5">
                   {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    <Star key={i} className="w-3.5 h-3.5 fill-current text-[#0B0B0E]" />
                   ))}
                 </div>
 
                 {rev.verified && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-[#B45309]">
-                    <CheckCircle2 className="w-3 h-3" /> Compra Verificada
+                  <span className="inline-flex items-center gap-1 text-[10px] font-mono font-bold text-zinc-700 bg-zinc-100 px-2 py-0.5 rounded-[2px]">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Compra Verificada
                   </span>
                 )}
               </div>
 
-              <p className="text-xs sm:text-[13px] text-[#18181B] leading-relaxed italic">
+              <p className="text-xs sm:text-[13px] text-zinc-800 leading-relaxed italic">
                 "{rev.comment}"
               </p>
 
-              <div className="pt-2.5 border-t border-[#E4E4E7] flex items-center justify-between text-[11px]">
+              <div className="pt-3 border-t border-zinc-100 flex items-center justify-between text-[11px]">
                 <div>
-                  <span className="font-bold text-[#18181B] block">{rev.author}</span>
-                  <span className="text-[10px] text-[#71717A]">{rev.location}</span>
+                  <span className="font-bold text-[#0B0B0E] block">{rev.author}</span>
+                  <span className="text-[10px] text-zinc-400 font-mono">{rev.location}</span>
                 </div>
-                <span className="text-[10px] text-[#52525B] font-mono text-right max-w-[150px] truncate">
+                <span className="text-[10px] text-zinc-500 font-mono text-right max-w-[150px] truncate">
                   {rev.productName}
                 </span>
               </div>

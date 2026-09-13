@@ -38,9 +38,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
           <div className="relative z-10 w-full md:w-auto min-w-[320px]">
             {subscribed ? (
-              <div className="bg-[#FEF3C7] border border-[#FDE68A] p-3.5 rounded-xl flex items-center gap-3 text-xs text-[#92400E] font-bold">
-                <Check className="w-5 h-5 shrink-0" />
-                <span>Inscrição confirmada! Use o cupom <strong className="font-mono text-black">MARMOT10</strong> no checkout.</span>
+              <div className="bg-emerald-950/80 border border-emerald-500/30 p-3.5 rounded-[2px] flex items-center gap-3 text-xs text-emerald-300 font-bold">
+                <Check className="w-5 h-5 shrink-0 text-emerald-400" />
+                <span>Inscrição confirmada! Use o cupom <strong className="font-mono text-[#F4C400]">MARMOT10</strong> no checkout.</span>
               </div>
             ) : (
               <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-2">
@@ -117,7 +117,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         <div>
           <h4 className="text-xs font-black uppercase tracking-wider text-[#18181B] mb-3">Atendimento</h4>
           <ul className="space-y-2 text-xs text-[#52525B] font-medium">
-            <li><button onClick={() => onNavigate('tracking')} className="hover:text-[#18181B] transition-colors text-[#B45309] font-bold">Rastrear Pedido</button></li>
+            <li><button onClick={() => onNavigate('tracking')} className="hover:text-[#18181B] transition-colors font-bold text-[#18181B]">Rastrear Pedido</button></li>
             <li><button onClick={() => onNavigate('institutional', 'faq')} className="hover:text-[#18181B] transition-colors">Dúvidas Frequentes (FAQ)</button></li>
             <li><button onClick={() => onNavigate('institutional', 'trocas')} className="hover:text-[#18181B] transition-colors">Trocas & Devoluções (30 Dias)</button></li>
             <li><button onClick={() => onNavigate('institutional', 'contato')} className="hover:text-[#18181B] transition-colors">Fale com o Ateliê</button></li>

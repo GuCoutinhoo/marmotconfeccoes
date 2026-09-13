@@ -94,7 +94,7 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
               <div>
                 <p className="text-xs font-bold uppercase text-[#71717A] tracking-wider mb-3">Navegar por Categoria</p>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  {['camisetas', 'oversized', 'moletons', 'cargos', 'jaquetas', 'tenis', 'bones', 'acessorios'].map((cat) => (
+                  {['camisetas', 'moletons', 'jaquetas', 'calcas', 'cargos', 'shorts', 'tenis'].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => {

@@ -14,14 +14,14 @@ export const EssentialsGrid: React.FC<EssentialsGridProps> = ({
   onQuickView,
   onNavigate,
 }) => {
-  // Select a mixed curation of essentials: camisetas, moletons, calças, tênis, acessórios
+  // Select a mixed curation of essentials: camisetas, moletons, calças, tênis, jaquetas
   const essentialTee = products.find((p) => p.category === 'camisetas') || products[0];
   const essentialHoodie = products.find((p) => p.category === 'moletons') || products[1];
   const essentialPant = products.find((p) => p.category === 'cargos' || p.category === 'calcas') || products[2];
   const essentialSneaker = products.find((p) => p.category === 'tenis') || products[3];
-  const essentialAccessory = products.find((p) => p.category === 'acessorios' || p.category === 'bones') || products[4];
+  const essentialOuterwear = products.find((p) => p.category === 'jaquetas' || p.category === 'shorts') || products[4];
 
-  const essentialsList = [essentialTee, essentialHoodie, essentialPant, essentialSneaker, essentialAccessory].filter(Boolean) as Product[];
+  const essentialsList = [essentialTee, essentialHoodie, essentialPant, essentialSneaker, essentialOuterwear].filter(Boolean) as Product[];
 
   return (
     <section className="py-20 bg-[#080808] border-b border-[#262626]">
@@ -36,7 +36,7 @@ export const EssentialsGrid: React.FC<EssentialsGridProps> = ({
               STREETWEAR ESSENTIALS
             </h2>
             <p className="text-xs text-[#777777] mt-1 max-w-xl">
-              Uma curadoria indispensável misturando camisetas, moletons, calças, tênis e acessórios de alta gramatura para o guarda-roupa definitivo.
+              Uma curadoria indispensável misturando camisetas, moletons, calças, tênis e jaquetas de alta gramatura para o guarda-roupa definitivo.
             </p>
           </div>
 

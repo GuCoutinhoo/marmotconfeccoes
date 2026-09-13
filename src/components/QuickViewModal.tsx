@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Product, ProductVariant } from '../types';
-import { X, Heart, ShoppingBag, Check, ShieldCheck, Ruler } from 'lucide-react';
+import { X, Heart, ShoppingBag, Check, Ruler } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { SizeGuideModal } from './SizeGuideModal';
 import { getValidProductImageUrl, handleProductImageError, getProductCardImageFraming } from '../utils/imageUtils';
+import { MarmotPrice, MarmotBadge } from './ui/MarmotElements';
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -23,7 +24,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
 
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'M');
   const [selectedColor, setSelectedColor] = useState<ProductVariant>(
-    product.colors?.[0] || { colorName: 'Obsidian Black', color: 'black', colorHex: '#121212' }
+    product.colors?.[0] || { colorName: 'Preto Ônix', color: 'black', colorHex: '#121212' }
   );
 
   // Dynamic gallery based on selected color
@@ -37,7 +38,7 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
       rawList = [selectedColor.featuredImage || selectedColor.image!];
     } else if (product.images && product.images.length > 0) {
       rawList = primaryProductImage && product.images[0] !== primaryProductImage
-        ? [primaryProductImage, ...product.images.filter(x => x !== primaryProductImage)]
+        ? [primaryProductImage, ...product.images.filter((x) => x !== primaryProductImage)]
         : product.images;
     } else if (primaryProductImage) {
       rawList = [primaryProductImage];
@@ -55,7 +56,6 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
   const [selectedImage, setSelectedImage] = useState<string>(images[0]);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
 
-  // Reset selected image when color variant changes
   const handleSelectColor = (c: ProductVariant) => {
     setSelectedColor(c);
     const variantImgs = (c.images && c.images.length > 0)
@@ -79,30 +79,33 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-        <div className="relative w-full max-w-4xl bg-white border border-[#E4E4E7] rounded-2xl text-[#18181B] overflow-hidden shadow-2xl max-h-[90vh] flex flex-col md:flex-row">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fadeIn select-none">
+        <div className="relative w-full max-w-4xl bg-white border border-zinc-200/90 rounded-[2px] text-[#0B0B0E] overflow-hidden shadow-2xl max-h-[90vh] flex flex-col md:flex-row">
           <button
+            type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-2 text-[#71717A] hover:text-[#18181B] bg-white/90 border border-[#E4E4E7] rounded-full transition-colors cursor-pointer shadow-sm"
+            className="absolute top-3.5 right-3.5 z-20 p-2 text-zinc-500 hover:text-[#0B0B0E] bg-white/90 border border-zinc-200 rounded-full transition-colors cursor-pointer shadow-2xs"
             aria-label="Fechar espiada rápida"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
 
           {/* Left Gallery */}
-          <div className="w-full md:w-1/2 p-4 sm:p-6 bg-[#F8F9FA] border-b md:border-b-0 md:border-r border-[#E4E4E7] flex flex-col justify-between">
-            <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-xl overflow-hidden border border-[#E4E4E7] mb-4 bg-[#F4F4F5] shadow-xs">
+          <div className="w-full md:w-1/2 p-4 sm:p-6 bg-[#FAFAFA] border-b md:border-b-0 md:border-r border-zinc-200 flex flex-col justify-between">
+            <div className="relative aspect-[3/4] sm:aspect-[4/5] rounded-[2px] overflow-hidden border border-zinc-200 mb-3 bg-[#111113]">
               <img
                 src={selectedImage || images[0]}
                 alt={product.title}
                 referrerPolicy="no-referrer"
                 onError={(e) => handleProductImageError(e, product.category, product.id)}
-                className={`w-full h-full transition-transform duration-300 ${getProductCardImageFraming(product.category)}`}
+                className={`w-full h-full object-cover object-top select-none ${getProductCardImageFraming(product.category)}`}
               />
               {product.promoPrice && (
-                <span className="absolute top-3 left-3 bg-[#F4C400] text-[#0B0B0E] text-[10px] font-black px-2.5 py-1 uppercase tracking-wider rounded shadow-xs">
-                  OFF {Math.round(((product.price - product.promoPrice) / product.price) * 100)}%
-                </span>
+                <div className="absolute top-3 left-3 pointer-events-none">
+                  <MarmotBadge variant="sale">
+                    OFF {Math.round(((product.price - product.promoPrice) / product.price) * 100)}%
+                  </MarmotBadge>
+                </div>
               )}
             </div>
 
@@ -112,17 +115,18 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
                 {images.map((img, idx) => (
                   <button
                     key={idx}
+                    type="button"
                     onClick={() => setSelectedImage(img)}
-                    className={`relative w-14 h-16 sm:w-16 sm:h-20 rounded-lg border overflow-hidden shrink-0 transition-all cursor-pointer bg-[#F4F4F5] ${
-                      (selectedImage || images[0]) === img ? 'border-[#18181B] ring-2 ring-[#18181B]/20' : 'border-[#E4E4E7] opacity-60 hover:opacity-100'
+                    className={`relative w-14 h-16 sm:w-16 sm:h-20 rounded-[2px] border overflow-hidden shrink-0 transition-all cursor-pointer bg-zinc-100 ${
+                      (selectedImage || images[0]) === img ? 'border-[#0B0B0E] shadow-xs' : 'border-zinc-200 opacity-60 hover:opacity-100'
                     }`}
                   >
-                    <img 
-                      src={img} 
-                      alt="" 
-                      referrerPolicy="no-referrer" 
+                    <img
+                      src={img}
+                      alt=""
+                      referrerPolicy="no-referrer"
                       onError={(e) => handleProductImageError(e, product.category, `${product.id}-${idx}`)}
-                      className="w-full h-full object-cover object-[center_top]" 
+                      className="w-full h-full object-cover object-top"
                     />
                   </button>
                 ))}
@@ -131,90 +135,85 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
           </div>
 
           {/* Right Info */}
-          <div className="w-full md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto">
+          <div className="w-full md:w-1/2 p-6 sm:p-7 flex flex-col justify-between overflow-y-auto">
             <div>
-              <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider font-bold text-[#71717A] mb-1">
-                <span>{product.collection}</span>
+              <div className="flex items-center gap-2 text-[10.5px] font-mono font-bold uppercase tracking-[0.2em] text-zinc-500 mb-1.5">
+                <span>{product.collection || 'DROP 003'}</span>
                 <span>•</span>
-                <span className="text-[#B45309]">{product.category}</span>
+                <span>{product.category}</span>
               </div>
 
-              <h2 className="text-xl font-bold tracking-tight text-[#18181B] mb-2">{product.title}</h2>
+              <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0B0B0E] leading-tight mb-2.5">
+                {product.title}
+              </h2>
 
               {/* Price */}
-              <div className="flex items-baseline gap-3 mb-4">
-                {product.promoPrice ? (
-                  <>
-                    <span className="text-2xl font-black text-[#18181B]">
-                      R$ {product.promoPrice.toFixed(2).replace('.', ',')}
-                    </span>
-                    <span className="text-sm text-[#71717A] line-through">
-                      R$ {product.price.toFixed(2).replace('.', ',')}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-2xl font-black text-[#18181B]">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                  </span>
-                )}
-                <span className="text-xs text-[#71717A]">
-                  ou 10x de R$ {(effectivePrice / 10).toFixed(2).replace('.', ',')}
-                </span>
+              <div className="mb-4">
+                <MarmotPrice
+                  price={effectivePrice}
+                  originalPrice={product.promoPrice ? product.price : undefined}
+                  size="md"
+                />
               </div>
 
-              <p className="text-xs sm:text-sm text-[#52525B] leading-relaxed mb-6 whitespace-pre-line line-clamp-4">
+              <p className="text-xs sm:text-[13px] text-zinc-600 leading-relaxed mb-5 line-clamp-3">
                 {product.description}
               </p>
 
               {/* Color Selector */}
               {product.colors && product.colors.length > 0 && (
-                <div className="mb-5">
-                  <p className="text-xs font-semibold text-[#52525B] mb-2">
-                    Cor: <span className="text-[#18181B] font-bold">{selectedColor.colorName}</span>
+                <div className="mb-4">
+                  <p className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600 mb-2">
+                    COR: <span className="text-[#0B0B0E] font-sans font-bold">{selectedColor.colorName || selectedColor.color}</span>
                   </p>
                   <div className="flex gap-2">
-                    {(product.colors || []).map((c) => (
-                      <button
-                        key={c.colorName}
-                        onClick={() => handleSelectColor(c)}
-                        className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer ${
-                          selectedColor.colorName === c.colorName
-                            ? 'border-[#18181B] ring-2 ring-[#18181B]/30 scale-110'
-                            : 'border-[#E4E4E7] hover:border-[#18181B]'
-                        }`}
-                        style={{ backgroundColor: c.colorHex }}
-                        title={c.colorName}
-                      >
-                        {selectedColor.colorName === c.colorName && (
-                          <Check className="w-3.5 h-3.5 text-white drop-shadow" />
-                        )}
-                      </button>
-                    ))}
+                    {product.colors.map((c) => {
+                      const isSelected = (selectedColor.colorHex || selectedColor.color) === (c.colorHex || c.color);
+                      return (
+                        <button
+                          key={c.colorHex || c.colorName || c.color}
+                          type="button"
+                          onClick={() => handleSelectColor(c)}
+                          className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer ${
+                            isSelected
+                              ? 'border-[#0B0B0E] scale-105'
+                              : 'border-transparent opacity-70 hover:opacity-100'
+                          }`}
+                          style={{ backgroundColor: c.colorHex }}
+                          title={c.colorName || c.color}
+                        >
+                          {isSelected && (
+                            <Check className="w-3 h-3 text-white drop-shadow-xs" />
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
 
               {/* Size Selector */}
-              <div className="mb-6">
+              <div className="mb-5">
                 <div className="flex justify-between items-center mb-2">
-                  <p className="text-xs font-semibold text-[#52525B]">Tamanho:</p>
+                  <p className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600">TAMANHO:</p>
                   <button
+                    type="button"
                     onClick={() => setIsSizeGuideOpen(true)}
-                    className="text-[11px] text-[#B45309] hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                    className="text-xs text-[#0B0B0E] hover:underline flex items-center gap-1 font-bold cursor-pointer"
                   >
                     <Ruler className="w-3 h-3" /> Guia de Medidas
                   </button>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {(product.sizes || ['Único']).map((sz) => (
+                  {(product.sizes || ['P', 'M', 'G', 'GG']).map((sz) => (
                     <button
                       key={sz}
                       type="button"
                       onClick={() => setSelectedSize(sz)}
-                      className={`px-3.5 py-2 text-xs font-bold rounded-lg border cursor-pointer select-none touch-manipulation active:scale-95 transition-all duration-75 ${
+                      className={`w-9 h-9 text-xs font-mono font-bold rounded-[2px] border cursor-pointer transition-all ${
                         selectedSize === sz
-                          ? 'bg-[#18181B] text-white border-[#18181B]'
-                          : 'bg-[#F4F4F5] text-[#52525B] border-[#E4E4E7] hover:border-[#18181B] hover:text-[#18181B] active:bg-[#E4E4E7]'
+                          ? 'bg-[#0B0B0E] text-[#F4C400] border-[#0B0B0E]'
+                          : 'bg-white text-zinc-700 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
                       }`}
                     >
                       {sz}
@@ -225,23 +224,24 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
             </div>
 
             {/* Actions */}
-            <div className="space-y-3 pt-4 border-t border-[#E4E4E7]">
+            <div className="space-y-2.5 pt-4 border-t border-zinc-200">
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className="flex-1 bg-[#F4C400] text-[#0B0B0E] font-extrabold text-xs uppercase tracking-wider py-3 px-4 rounded-xl hover:bg-[#E5B500] active:scale-95 transition-all duration-75 cursor-pointer select-none touch-manipulation flex items-center justify-center gap-2 shadow-sm"
+                  className="flex-1 bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] font-black text-xs uppercase tracking-[0.14em] py-3.5 px-4 rounded-[2px] transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs"
                 >
-                  <ShoppingBag className="w-4 h-4" /> Adicionar ao Carrinho
+                  <ShoppingBag className="w-4 h-4" />
+                  <span>Adicionar ao Carrinho</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => toggleWishlist(product)}
-                  className={`p-3 rounded-xl border transition-all duration-75 cursor-pointer select-none touch-manipulation active:scale-90 ${
+                  className={`p-3.5 rounded-[2px] border transition-all cursor-pointer ${
                     isFavorite
-                      ? 'bg-rose-50 text-rose-600 border-rose-200'
-                      : 'bg-white text-[#71717A] border-[#E4E4E7] hover:text-rose-600 hover:border-rose-200'
+                      ? 'bg-[#0B0B0E] text-[#F4C400] border-[#0B0B0E]'
+                      : 'bg-white text-zinc-600 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
                   }`}
                   aria-label="Adicionar aos favoritos"
                 >
@@ -250,13 +250,14 @@ export const QuickViewModal: React.FC<QuickViewModalProps> = ({
               </div>
 
               <button
+                type="button"
                 onClick={() => {
                   onClose();
                   onViewFullDetails(product.id);
                 }}
-                className="w-full text-center text-xs text-[#71717A] hover:text-[#18181B] underline py-1 cursor-pointer"
+                className="w-full text-center text-xs font-mono uppercase tracking-wider text-zinc-500 hover:text-[#0B0B0E] py-1 cursor-pointer transition-colors"
               >
-                Ver página completa do produto
+                Ver página completa do produto →
               </button>
             </div>
           </div>

@@ -124,23 +124,5 @@
     "order": 6,
     "active": true,
     "createdAt": "2026-08-15T17:16:26.408423+00:00"
-  },
-  {
-    "id": "acessorios",
-    "slug": "acessorios",
-    "name": "Acessórios",
-    "tagline": "Shoulder Bags, Correntes & Headwear",
-    "description": "Shoulder bags, correntes em aço inoxidável 316L, meias de algodão atoalhado e cintos.",
-    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80",
-    "subcategories": [
-      "Shoulder & Chest Bags",
-      "Correntes & Colares",
-      "Meias Atoalhadas",
-      "Cintos & Carteiras"
-    ],
-    "productCount": 15,
-    "order": 7,
-    "active": true,
-    "createdAt": "2026-08-15T17:16:26.618103+00:00"
   }
 ]

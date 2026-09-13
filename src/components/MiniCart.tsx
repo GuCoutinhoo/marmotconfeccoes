@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Truck, Tag, Sparkles } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Truck, Tag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { getValidProductImageUrl, handleProductImageError } from '../utils/imageUtils';
 
@@ -62,54 +62,58 @@ export const MiniCart: React.FC<MiniCartProps> = ({
   const freeShippingProgress = Math.min(100, (subtotal / freeShippingThreshold) * 100);
 
   return (
-    <div className="fixed inset-0 z-[120] flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-md bg-white border-l border-[#E4E4E7] text-[#18181B] h-full flex flex-col justify-between shadow-2xl">
+    <div className="fixed inset-0 z-[120] flex justify-end bg-black/60 backdrop-blur-xs animate-fadeIn select-none">
+      <div className="w-full max-w-md bg-white border-l border-zinc-200 text-[#0B0B0E] h-full flex flex-col justify-between shadow-2xl">
         {/* Header */}
-        <div className="p-5 border-b border-[#E4E4E7] flex items-center justify-between bg-[#F8F9FA]">
+        <div className="p-4 sm:p-5 border-b border-zinc-200 flex items-center justify-between bg-[#FAFAFA]">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-[#B45309]" />
-            <h3 className="text-sm font-black uppercase tracking-wider text-[#18181B]">Seu Carrinho ({cart.reduce((a, b) => a + b.quantity, 0)})</h3>
+            <ShoppingBag className="w-4 h-4 text-[#0B0B0E]" />
+            <h3 className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-[#0B0B0E]">
+              SEU CARRINHO ({cart.reduce((a, b) => a + b.quantity, 0)})
+            </h3>
           </div>
           <button
+            type="button"
             onClick={closeMiniCart}
-            className="p-1.5 text-[#71717A] hover:text-[#18181B] bg-white border border-[#E4E4E7] rounded-full transition-colors"
+            className="p-1.5 text-zinc-400 hover:text-[#0B0B0E] bg-white border border-zinc-200 rounded-full transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Free Shipping Meter */}
-        <div className="p-4 bg-[#F8F9FA] border-b border-[#E4E4E7]">
-          <div className="flex items-center justify-between text-xs mb-1.5 font-semibold">
-            <span className="flex items-center gap-1.5 text-[#52525B]">
-              <Truck className="w-4 h-4 text-[#B45309]" />
+        <div className="p-4 bg-zinc-50 border-b border-zinc-200">
+          <div className="flex items-center justify-between text-xs mb-1.5 font-mono">
+            <span className="flex items-center gap-1.5 text-zinc-600">
+              <Truck className="w-3.5 h-3.5 text-[#0B0B0E]" />
               {isFreeShippingEligible ? (
-                <strong className="text-emerald-700">Parabéns! Você ganhou Frete Grátis!</strong>
+                <strong className="text-emerald-700 font-sans font-bold">Frete Grátis Liberado!</strong>
               ) : (
-                <>Faltam <strong className="text-[#18181B]">R$ {freeShippingRemaining.toFixed(2).replace('.', ',')}</strong> para Frete Grátis</>
+                <>Faltam <strong className="text-[#0B0B0E]">R$ {freeShippingRemaining.toFixed(2).replace('.', ',')}</strong> para Frete Grátis</>
               )}
             </span>
           </div>
-          <div className="w-full h-2 bg-[#E4E4E7] rounded-full overflow-hidden border border-[#D4D4D8]">
+          <div className="w-full h-1.5 bg-zinc-200 rounded-[1px] overflow-hidden">
             <div
-              className="h-full bg-[#B45309] transition-all duration-500 rounded-full"
+              className="h-full bg-[#F4C400] transition-all duration-500 rounded-[1px]"
               style={{ width: `${freeShippingProgress}%` }}
             />
           </div>
         </div>
 
         {/* Cart Items List */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
           {cart.length === 0 ? (
-            <div className="text-center py-16 text-[#71717A] flex flex-col items-center">
-              <ShoppingBag className="w-12 h-12 stroke-1 mb-3 text-[#A1A1AA]" />
-              <p className="text-sm font-bold text-[#18181B] uppercase tracking-wider">Seu carrinho está vazio</p>
-              <p className="text-xs text-[#71717A] mt-1 max-w-xs">
-                Explore os drops e encontre peças exclusivas para o seu estilo.
+            <div className="text-center py-16 text-zinc-400 flex flex-col items-center">
+              <ShoppingBag className="w-10 h-10 stroke-1 mb-3 text-zinc-300" />
+              <p className="text-xs font-mono uppercase tracking-wider text-[#0B0B0E] font-bold">Seu carrinho está vazio</p>
+              <p className="text-xs text-zinc-500 mt-1 max-w-xs leading-relaxed">
+                Explore os drops e encontre peças com caimento encorpado para o seu estilo.
               </p>
               <button
+                type="button"
                 onClick={handleGoToCatalog}
-                className="mt-6 px-6 py-2.5 bg-[#F4C400] text-black text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#E5B500] transition-colors shadow-sm"
+                className="mt-6 px-6 py-2.5 bg-[#F4C400] text-[#0B0B0E] text-xs font-bold uppercase tracking-wider rounded-[2px] hover:bg-[#E5B500] transition-colors cursor-pointer"
               >
                 Explorar Catálogo
               </button>
@@ -125,57 +129,60 @@ export const MiniCart: React.FC<MiniCartProps> = ({
 
               return (
                 <div
-                  key={`${item.product.id}-${item.selectedSize}-${item.selectedColor.colorName}-${idx}`}
-                  className="flex gap-3 p-3 bg-[#F8F9FA] border border-[#E4E4E7] rounded-xl relative group"
+                  key={`${item.product.id}-${item.selectedSize}-${item.selectedColor?.colorName}-${idx}`}
+                  className="flex gap-3 p-3 bg-[#FAFAFA] border border-zinc-200/80 rounded-[2px] relative group"
                 >
                   <img
                     src={itemImage}
                     alt={item.product.title}
                     referrerPolicy="no-referrer"
                     onError={(e) => handleProductImageError(e, item.product.category, item.product.id)}
-                    className="w-20 h-24 object-cover object-[center_top] rounded-lg bg-[#E4E4E7] shrink-0"
+                    className="w-16 h-20 object-cover object-top rounded-[1px] bg-zinc-200 shrink-0"
                   />
 
                   <div className="flex-1 min-w-0 flex flex-col justify-between">
                     <div>
                       <div className="flex justify-between items-start gap-2">
-                        <h4 className="text-xs font-bold text-[#18181B] leading-tight line-clamp-2">
+                        <h4 className="text-xs font-black uppercase tracking-tight text-[#0B0B0E] leading-snug line-clamp-2">
                           {item.product.title}
                         </h4>
                         <button
-                          onClick={() => removeFromCart(item.product.id, item.selectedSize, item.selectedColor.colorName)}
-                          className="text-[#71717A] hover:text-red-500 p-0.5 transition-colors"
+                          type="button"
+                          onClick={() => removeFromCart(item.product.id, item.selectedSize, item.selectedColor?.colorName)}
+                          className="text-zinc-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
                           title="Remover item"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      <p className="text-[11px] text-[#71717A] mt-1">
-                        Tam: <strong className="text-[#18181B]">{item.selectedSize}</strong> | Cor: <strong className="text-[#18181B]">{item.selectedColor.colorName}</strong>
+                      <p className="text-[10.5px] font-mono text-zinc-500 mt-1">
+                        Tam: <strong className="text-[#0B0B0E]">{item.selectedSize}</strong> | Cor: <strong className="text-[#0B0B0E]">{item.selectedColor?.colorName}</strong>
                       </p>
                     </div>
 
-                    <div className="flex justify-between items-center mt-2">
+                    <div className="flex justify-between items-center mt-2 pt-2 border-t border-zinc-200/60">
                       {/* Quantity Stepper */}
-                      <div className="flex items-center border border-[#E4E4E7] rounded-lg bg-white">
+                      <div className="flex items-center border border-zinc-200 rounded-[1px] bg-white">
                         <button
-                          onClick={() => updateQuantity(item.product.id, item.selectedSize, item.selectedColor.colorName, item.quantity - 1)}
-                          className="p-1 text-[#71717A] hover:text-[#18181B]"
+                          type="button"
+                          onClick={() => updateQuantity(item.product.id, item.selectedSize, item.selectedColor?.colorName, item.quantity - 1)}
+                          className="px-1.5 py-0.5 text-zinc-500 hover:text-[#0B0B0E] cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
-                        <span className="px-2 text-xs font-bold text-[#18181B] font-mono">{item.quantity}</span>
+                        <span className="px-1.5 text-xs font-bold text-[#0B0B0E] font-mono">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.product.id, item.selectedSize, item.selectedColor.colorName, item.quantity + 1)}
-                          className="p-1 text-[#71717A] hover:text-[#18181B]"
+                          type="button"
+                          onClick={() => updateQuantity(item.product.id, item.selectedSize, item.selectedColor?.colorName, item.quantity + 1)}
+                          className="px-1.5 py-0.5 text-zinc-500 hover:text-[#0B0B0E] cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
 
                       <div className="text-right">
-                        <span className="text-xs font-black text-[#18181B]">
+                        <span className="text-xs font-mono font-bold text-[#0B0B0E]">
                           R$ {(itemPrice * item.quantity).toFixed(2).replace('.', ',')}
                         </span>
                       </div>
@@ -189,14 +196,18 @@ export const MiniCart: React.FC<MiniCartProps> = ({
 
         {/* Footer Summary */}
         {cart.length > 0 && (
-          <div className="p-5 border-t border-[#E4E4E7] bg-[#F8F9FA] space-y-3">
+          <div className="p-4 sm:p-5 border-t border-zinc-200 bg-[#FAFAFA] space-y-3">
             {/* Coupon Box */}
             {appliedCoupon ? (
-              <div className="flex items-center justify-between p-2.5 bg-[#FEF3C7] border border-[#FDE68A] rounded-lg text-xs">
-                <div className="flex items-center gap-1.5 text-[#92400E] font-bold">
-                  <Tag className="w-3.5 h-3.5" /> Cupom {appliedCoupon.code} (-R$ {discountAmount.toFixed(2).replace('.', ',')})
+              <div className="flex items-center justify-between p-2 bg-emerald-50 border border-emerald-200 rounded-[2px] text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-800 font-bold font-mono">
+                  <Tag className="w-3.5 h-3.5 text-emerald-600" /> {appliedCoupon.code} (-R$ {discountAmount.toFixed(2).replace('.', ',')})
                 </div>
-                <button onClick={removeCoupon} className="text-xs text-[#71717A] hover:text-[#18181B] underline">
+                <button
+                  type="button"
+                  onClick={removeCoupon}
+                  className="text-xs text-zinc-500 hover:text-[#0B0B0E] underline cursor-pointer"
+                >
                   Remover
                 </button>
               </div>
@@ -207,11 +218,11 @@ export const MiniCart: React.FC<MiniCartProps> = ({
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
                   placeholder="Cupom (ex: MARMOT10)"
-                  className="flex-1 bg-white border border-[#E4E4E7] text-xs px-3 py-2 rounded-lg text-[#18181B] focus:outline-none focus:border-[#18181B] uppercase font-mono placeholder-[#71717A]"
+                  className="flex-1 bg-white border border-zinc-200 text-xs px-3 py-2 rounded-[2px] text-[#0B0B0E] focus:outline-none focus:border-[#0B0B0E] uppercase font-mono placeholder-zinc-400"
                 />
                 <button
                   type="submit"
-                  className="bg-[#18181B] hover:bg-black text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors"
+                  className="bg-[#0B0B0E] hover:bg-zinc-800 text-white font-bold text-xs uppercase px-3 py-2 rounded-[2px] transition-colors cursor-pointer"
                 >
                   Aplicar
                 </button>
@@ -219,37 +230,32 @@ export const MiniCart: React.FC<MiniCartProps> = ({
             )}
 
             {/* Price Calculations */}
-            <div className="space-y-1.5 text-xs text-[#52525B] pt-1">
-              <div className="flex justify-between">
+            <div className="space-y-1 text-xs text-zinc-600 pt-1">
+              <div className="flex justify-between font-mono">
                 <span>Subtotal</span>
-                <span className="font-semibold text-[#18181B]">R$ {subtotal.toFixed(2).replace('.', ',')}</span>
+                <span className="font-bold text-[#0B0B0E]">R$ {subtotal.toFixed(2).replace('.', ',')}</span>
               </div>
               {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-700 font-bold">
-                  <span>Desconto Cupom</span>
+                <div className="flex justify-between text-emerald-700 font-mono font-bold">
+                  <span>Desconto</span>
                   <span>- R$ {discountAmount.toFixed(2).replace('.', ',')}</span>
                 </div>
               )}
-              <div className="flex justify-between text-sm font-black text-[#18181B] pt-2 border-t border-[#E4E4E7]">
-                <span>TOTAL</span>
-                <span className="text-[#B45309] text-base">R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
+              <div className="flex justify-between items-baseline text-sm font-black text-[#0B0B0E] pt-2 border-t border-zinc-200">
+                <span className="font-sans">TOTAL</span>
+                <span className="font-mono text-base text-[#0B0B0E]">R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
               </div>
             </div>
 
             {/* Checkout CTAs */}
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2 pt-1">
               <button
+                type="button"
                 onClick={handleGoToCheckout}
-                className="w-full bg-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase tracking-wider py-3.5 px-4 rounded-xl hover:bg-[#E5B500] transition-colors flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                className="w-full bg-[#F4C400] text-[#0B0B0E] font-black text-xs uppercase tracking-[0.14em] py-3.5 px-4 rounded-[2px] hover:bg-[#E5B500] transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
               >
-                Finalizar Compra <ArrowRight className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={handleGoToCheckout}
-                className="w-full bg-transparent hover:bg-white text-[#71717A] hover:text-[#18181B] font-semibold text-xs py-2 rounded-lg transition-colors text-center block"
-              >
-                Ver checkout detalhado
+                <span>Finalizar Compra</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>

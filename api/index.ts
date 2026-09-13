@@ -704,18 +704,6 @@ const INITIAL_CATEGORIES: Category[] = [
     active: true,
   },
   {
-    id: 'acessorios',
-    slug: 'acessorios',
-    name: 'Acessórios',
-    tagline: 'Bags, Meias & Detalhes',
-    description: 'Shoulder bags, meias atoalhadas, cintos táticos e chaveiros exclusivos.',
-    image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=800&q=80',
-    subcategories: ['Shoulder Bags', 'Meias Atoalhadas', 'Cintos Táticos'],
-    productCount: 15,
-    order: 6,
-    active: true,
-  },
-  {
     id: 'headwear',
     slug: 'headwear',
     name: 'Headwear',
@@ -1605,7 +1593,21 @@ export class DatabaseManager {
     sort?: string;
   }): Promise<Product[]> {
     await this.initialize();
-    let list = [...this.products];
+
+    // Filter out products belonging to deleted categories or not belonging to an active category
+    const activeCategorySlugs = new Set<string>();
+    this.categories.forEach((c) => {
+      if (c.id) activeCategorySlugs.add(c.id.toLowerCase().trim());
+      if (c.slug) activeCategorySlugs.add(c.slug.toLowerCase().trim());
+    });
+
+    let list = this.products.filter((p) => {
+      const pCat = (p.category || '').toLowerCase().trim();
+      const pSub = (p.subcategory || '').toLowerCase().trim();
+      if (pCat === 'acessorios' || pCat === 'acessórios' || pSub === 'acessorios') return false;
+      if (activeCategorySlugs.size > 0 && !activeCategorySlugs.has(pCat)) return false;
+      return true;
+    });
 
     if (!filters) return list;
 
@@ -2244,12 +2246,26 @@ export class DatabaseManager {
 
     const lowerId = cleanId.toLowerCase();
 
+    // Find category to identify both ID and slug for cascade removal
+    const targetCat = this.categories.find(
+      (c) =>
+        c.id === cleanId ||
+        c.slug === cleanId ||
+        c.id?.toLowerCase() === lowerId ||
+        c.slug?.toLowerCase() === lowerId
+    );
+    const catSlug = (targetCat?.slug || lowerId).toLowerCase();
+
     if (this.mode === 'supabase') {
-      const adminClient = await this.getRequiredSupabaseAdminClient('deleteCategory');
-      const { error } = await adminClient.from('categories').delete().or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-      if (error) {
-        console.error('[DB] Supabase category delete error:', error);
-        throw new Error(`Falha ao excluir categoria no Supabase: ${error.message}`);
+      try {
+        const adminClient = await this.getRequiredSupabaseAdminClient('deleteCategory');
+        const { error } = await adminClient.from('categories').delete().or(`id.eq.${cleanId},slug.eq.${cleanId}`);
+        if (error) {
+          console.error('[DB] Supabase category delete error:', error);
+        }
+        await adminClient.from('products').delete().or(`category.eq.${lowerId},category.eq.${catSlug}`);
+      } catch (sbErr: any) {
+        console.warn('[DB] Supabase admin client not available during category delete, updating local store:', sbErr?.message);
       }
     }
 
@@ -2257,12 +2273,23 @@ export class DatabaseManager {
       c.id !== cleanId && 
       c.slug !== cleanId &&
       c.id?.toLowerCase() !== lowerId &&
-      c.slug?.toLowerCase() !== lowerId
+      c.slug?.toLowerCase() !== lowerId &&
+      c.slug?.toLowerCase() !== catSlug
     );
     this.categories.forEach((c, idx) => {
       c.order = idx;
     });
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
+
+    // Cascade delete: remove all products belonging to this category
+    const initialCount = this.products.length;
+    this.products = this.products.filter((p) => {
+      const pCat = (p.category || '').toLowerCase();
+      const pSub = (p.subcategory || '').toLowerCase();
+      return pCat !== lowerId && pCat !== catSlug && pSub !== lowerId && pSub !== catSlug;
+    });
+    console.log(`[DB] Cascade deleted ${initialCount - this.products.length} products associated with deleted category '${cleanId}'`);
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
 
     return true;
   }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Product } from '../../types';
 import { ProductCard } from '../ProductCard';
 import { ProductSkeleton } from '../ProductSkeleton';
-import { Trophy, TrendingUp, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface BestsellersRankingProps {
   products: Product[];
@@ -17,7 +17,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
 }) => {
   const isProductsEmpty = !products || products.length === 0;
 
-  let bestsellers = products.filter((p) => p.isBestSeller || p.tags.includes('Mais Vendido'));
+  let bestsellers = products.filter((p) => p.isBestSeller || p.tags?.includes('Mais Vendido'));
   if (bestsellers.length < 8) {
     bestsellers = [...bestsellers, ...products.filter((p) => !bestsellers.includes(p))].slice(0, 8);
   } else {
@@ -25,32 +25,37 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
   }
 
   return (
-    <section className="py-8 sm:py-10 lg:py-12 bg-white border-b border-[#E4E4E7]">
+    <section className="py-10 sm:py-12 lg:py-14 bg-white border-b border-zinc-200/90 select-none">
       <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+        {/* SECTION HEADER */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-widest text-[#B45309] mb-1">
-              <Trophy className="w-3.5 h-3.5" />
-              <span>FAVORITOS DA COMUNIDADE</span>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
+              <span className="text-[10px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.24em] text-zinc-500">
+                CURADORIA // BESTSELLERS
+              </span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#18181B]">
+            <h2 className="text-2xl sm:text-3xl lg:text-[36px] font-black uppercase tracking-tight text-[#0B0B0E] leading-none">
               OS MAIS PROCURADOS
             </h2>
-            <p className="text-xs sm:text-[13px] text-[#52525B] mt-1 max-w-lg">
-              As peças com maior índice de recompra e destaque pela durabilidade da malha pesada.
+            <p className="text-xs sm:text-[13px] text-zinc-500 font-normal leading-relaxed mt-1.5 max-w-xl">
+              Peças com maior índice de recompra e destaque pela modelagem estruturada e malha de alta densidade.
             </p>
           </div>
 
           <button
+            type="button"
             onClick={() => onNavigate('shop')}
-            className="text-xs sm:text-[13px] font-bold uppercase text-[#B45309] hover:text-[#18181B] hover:underline flex items-center gap-1.5 cursor-pointer"
+            className="text-xs font-bold uppercase tracking-[0.14em] text-[#0B0B0E] hover:text-zinc-600 inline-flex items-center gap-1.5 cursor-pointer transition-colors group self-start sm:self-end pb-0.5"
           >
-            Ver Todo o Catálogo <ArrowRight className="w-4 h-4" />
+            <span>VER CATÁLOGO COMPLETO</span>
+            <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
         </div>
 
-        {/* 8 Bestsellers Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+        {/* 8 Bestsellers Grid (Unified Editorial Cards with 01, 02, 03... numbering) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5">
           {isProductsEmpty ? (
             Array.from({ length: 8 }).map((_, idx) => (
               <div key={`bs-skel-${idx}`} className="flex flex-col h-full">
@@ -59,16 +64,12 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
             ))
           ) : (
             bestsellers.map((product, index) => (
-              <div key={product.id} className="relative group flex flex-col h-full">
-                {/* Discrete Leaderboard Badge */}
-                <div className="absolute top-3 left-3 z-20 bg-white/95 text-[#B45309] font-mono font-black text-xs px-2.5 py-1 rounded-[2px] border border-[#DCDCE0] backdrop-blur-md flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3 text-[#B45309]" /> #{String(index + 1).padStart(2, '0')}
-                </div>
-
+              <div key={product.id} className="flex flex-col h-full">
                 <ProductCard
                   product={product}
                   onQuickView={onQuickView}
                   onProductClick={(id) => onNavigate('product', id)}
+                  priorityBadge={String(index + 1).padStart(2, '0')}
                 />
               </div>
             ))

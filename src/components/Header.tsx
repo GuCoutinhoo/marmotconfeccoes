@@ -16,6 +16,7 @@ import {
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
+import { useStore } from '../context/StoreContext';
 import { UserDropdown } from './UserDropdown';
 
 interface HeaderProps {
@@ -111,18 +112,6 @@ const NAV_ITEMS: NavCategory[] = [
       { name: 'Shorts Nylon Swim & Street', slug: 'shorts' },
     ],
   },
-  {
-    id: 'acessorios',
-    label: 'ACESSÓRIOS',
-    slug: 'acessorios',
-    hasSubmenu: true,
-    subcategories: [
-      { name: 'Shoulder & Chest Bags', slug: 'acessorios' },
-      { name: 'Bonés 5-Panel & Dad Hats', slug: 'acessorios' },
-      { name: 'Meias Atoalhadas Premium', slug: 'acessorios' },
-      { name: 'Correntes & Joalheria', slug: 'acessorios' },
-    ],
-  },
 ];
 
 export const Header: React.FC<HeaderProps> = ({
@@ -142,6 +131,19 @@ export const Header: React.FC<HeaderProps> = ({
   const { totalCartItems, openMiniCart } = useCart();
   const { wishlistCount } = useWishlist();
   const { user } = useAuth();
+  const { categories } = useStore();
+
+  // Dynamic filter: only show nav categories that exist in active categories catalog
+  const visibleNavItems = React.useMemo(() => {
+    return NAV_ITEMS.filter((item) => {
+      if (item.id === 'inicio' || item.id === 'catalogo') return true;
+      return categories.some(
+        (c) =>
+          (c.slug && c.slug.toLowerCase() === item.slug.toLowerCase()) ||
+          (c.id && c.id.toLowerCase() === item.id.toLowerCase())
+      );
+    });
+  }, [categories]);
 
   // Detect page scroll to animate header into floating island with smooth hysteresis
   useEffect(() => {
@@ -299,7 +301,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* CENTER: Navigation Links */}
           <nav className="hidden xl:flex items-center justify-center gap-5 2xl:gap-7 text-xs font-bold uppercase tracking-wider flex-1 px-2">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const active = isItemActive(item);
               const isOpen = activeHoverMenu === item.id;
 
@@ -563,7 +565,7 @@ export const Header: React.FC<HeaderProps> = ({
                   CATÁLOGO & COLEÇÕES
                 </span>
 
-                {NAV_ITEMS.map((item) => {
+                {visibleNavItems.map((item) => {
                   const isExpanded = expandedMobileCategory === item.id;
                   const active = isItemActive(item);
 

@@ -90,17 +90,6 @@ const CATEGORY_EDITORIAL_ITEMS: CategoryEditorialItem[] = [
     fallbackImage: '/categoria tenis.png',
     objectPosition: 'center 62%',
   },
-  {
-    id: 'acessorios',
-    slug: 'acessorios',
-    number: '07',
-    name: 'ACESSÓRIOS',
-    tagline: 'DETALHES QUE DEFINEM',
-    subcategoriesText: 'Bags Táticas • Correntes • Headwear',
-    image: '/categories/categoria-acessorios.png',
-    fallbackImage: '/categoria acessorios.png',
-    objectPosition: 'center 18%',
-  },
 ];
 
 export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ onNavigate }) => {
@@ -169,7 +158,19 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     };
   }, []);
 
-  const totalCategories = CATEGORY_EDITORIAL_ITEMS.length;
+  // Dinamicamente filtra para exibir apenas categorias que estão ativas na loja
+  const activeEditorialItems = React.useMemo(() => {
+    const filtered = CATEGORY_EDITORIAL_ITEMS.filter((item) =>
+      categories.some(
+        (c) =>
+          (c.slug && c.slug.toLowerCase() === item.slug.toLowerCase()) ||
+          (c.id && c.id.toLowerCase() === item.id.toLowerCase())
+      )
+    );
+    return filtered.length >= 5 ? filtered : CATEGORY_EDITORIAL_ITEMS;
+  }, [categories]);
+
+  const totalCategories = activeEditorialItems.length;
 
   const handlePrev = () => {
     setActiveOffset((prev) => (prev - 1 + totalCategories) % totalCategories);
@@ -194,11 +195,11 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   };
 
   // 5 itens visíveis no layout harmônico de 3 colunas (idêntico à imagem de referência)
-  const item0 = CATEGORY_EDITORIAL_ITEMS[activeOffset % totalCategories]; // Coluna 1 (01 CAMISETAS - Tall Hero)
-  const item1 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 1) % totalCategories]; // Coluna 2 Topo (02 MOLETONS)
-  const item2 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 2) % totalCategories]; // Coluna 3 Topo (03 JAQUETAS)
-  const item3 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 3) % totalCategories]; // Coluna 2 Base (04 CALÇAS)
-  const item4 = CATEGORY_EDITORIAL_ITEMS[(activeOffset + 4) % totalCategories]; // Coluna 3 Base (05 SHORTS)
+  const item0 = activeEditorialItems[activeOffset % totalCategories]; // Coluna 1 (01 CAMISETAS - Tall Hero)
+  const item1 = activeEditorialItems[(activeOffset + 1) % totalCategories]; // Coluna 2 Topo (02 MOLETONS)
+  const item2 = activeEditorialItems[(activeOffset + 2) % totalCategories]; // Coluna 3 Topo (03 JAQUETAS)
+  const item3 = activeEditorialItems[(activeOffset + 3) % totalCategories]; // Coluna 2 Base (04 CALÇAS)
+  const item4 = activeEditorialItems[(activeOffset + 4) % totalCategories]; // Coluna 3 Base (05 SHORTS)
 
   const renderCategoryCard = (
     item: CategoryEditorialItem,
