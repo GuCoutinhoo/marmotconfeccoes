@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { Product, Category, Address, Order, CartItem, ProductVariant } from '../types';
 import { getCamisetaImageMapping } from '../data/camisetaImageMappings';
 import { getShortsImageMapping, buildShortsProducts } from '../data/shortsImageMappings';
+import { getJaquetaImageMapping, applyJaquetaMapping } from '../data/jaquetaImageMappings';
 
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
@@ -68,21 +69,28 @@ export function mapSupabaseRowToProduct(row: any): Product {
   const rowSlug = String(row.slug || d.slug || '').trim();
   const camisetaMapping = getCamisetaImageMapping(rowId) || getCamisetaImageMapping(rowSlug);
   const shortsMapping = getShortsImageMapping(rowId) || getShortsImageMapping(rowSlug);
+  const jaquetaMapping = getJaquetaImageMapping(rowId) || getJaquetaImageMapping(rowSlug);
 
   const primaryImg = camisetaMapping
     ? camisetaMapping.defaultImage
     : shortsMapping
     ? shortsMapping.defaultImage
+    : jaquetaMapping
+    ? jaquetaMapping.defaultImage
     : (row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || '');
   const allImagesList = camisetaMapping
     ? camisetaMapping.images
     : shortsMapping
     ? shortsMapping.images
+    : jaquetaMapping
+    ? jaquetaMapping.images
     : (Array.isArray(row.images) && row.images.length > 0
         ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
         : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : [])));
 
-  const rawColors = Array.isArray(row.colors) && row.colors.length > 0
+  const rawColors = jaquetaMapping
+    ? jaquetaMapping.colors
+    : Array.isArray(row.colors) && row.colors.length > 0
     ? row.colors
     : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
 
@@ -228,8 +236,9 @@ export function validateAndDeduplicateProducts(products: Product[]): Product[] {
   for (const item of combined) {
     const cleanId = String(item.id || '').trim();
     if (!cleanId) continue;
+    const finalItem = applyJaquetaMapping(item);
     // Map ensures each unique id appears exactly once (latest or valid item)
-    byId.set(cleanId, item);
+    byId.set(cleanId, finalItem);
   }
 
   return Array.from(byId.values());

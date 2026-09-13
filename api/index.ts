@@ -25,6 +25,7 @@ import {
 } from '../src/server/infinitePayClient';
 import { IS_TEST_MODE } from '../src/server/runtime-flags';
 import { getCamisetaImageMapping } from '../src/data/camisetaImageMappings';
+import { getJaquetaImageMapping } from '../src/data/jaquetaImageMappings';
 
 export { IS_TEST_MODE };
 
@@ -986,22 +987,35 @@ export class DatabaseManager {
     const prodId = String(p.id || `prod-${Date.now()}`);
     const prodSlug = String(p.slug || '').trim();
     const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
+    const jaquetaMapping = getJaquetaImageMapping(prodId) || getJaquetaImageMapping(prodSlug);
 
     const rawMainImage = camisetaMapping
       ? camisetaMapping.defaultImage
+      : jaquetaMapping
+      ? jaquetaMapping.defaultImage
       : (p.image || (Array.isArray(p.images) && p.images[0]) || '');
-    const cleanMainImage = camisetaMapping ? camisetaMapping.defaultImage : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+    const cleanMainImage = camisetaMapping
+      ? camisetaMapping.defaultImage
+      : jaquetaMapping
+      ? jaquetaMapping.defaultImage
+      : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
 
     const rawImagesList = camisetaMapping
       ? camisetaMapping.images
+      : jaquetaMapping
+      ? jaquetaMapping.images
       : (Array.isArray(p.images) && p.images.length > 0
           ? p.images
           : (rawMainImage ? [rawMainImage] : []));
     const cleanImagesList = camisetaMapping
       ? camisetaMapping.images
+      : jaquetaMapping
+      ? jaquetaMapping.images
       : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
 
-    const rawColors = Array.isArray(p.colors) && p.colors.length > 0
+    const rawColors = jaquetaMapping
+      ? jaquetaMapping.colors
+      : Array.isArray(p.colors) && p.colors.length > 0
       ? p.colors
       : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }];
 
@@ -1064,22 +1078,35 @@ export class DatabaseManager {
     const prodId = String(item.id || d.id || `prod-${Date.now()}`);
     const prodSlug = String(item.slug || d.slug || '').trim();
     const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
+    const jaquetaMapping = getJaquetaImageMapping(prodId) || getJaquetaImageMapping(prodSlug);
     
     const rawMainImage = camisetaMapping
       ? camisetaMapping.defaultImage
+      : jaquetaMapping
+      ? jaquetaMapping.defaultImage
       : (item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '');
-    const cleanMainImage = camisetaMapping ? camisetaMapping.defaultImage : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+    const cleanMainImage = camisetaMapping
+      ? camisetaMapping.defaultImage
+      : jaquetaMapping
+      ? jaquetaMapping.defaultImage
+      : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
 
     const rawImagesList = camisetaMapping
       ? camisetaMapping.images
+      : jaquetaMapping
+      ? jaquetaMapping.images
       : (Array.isArray(item.images) && item.images.length > 0
           ? item.images
           : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : [])));
     const cleanImagesList = camisetaMapping
       ? camisetaMapping.images
+      : jaquetaMapping
+      ? jaquetaMapping.images
       : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
 
-    const rawColors = Array.isArray(item.colors) && item.colors.length > 0
+    const rawColors = jaquetaMapping
+      ? jaquetaMapping.colors
+      : Array.isArray(item.colors) && item.colors.length > 0
       ? item.colors
       : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
 

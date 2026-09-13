@@ -2845,16 +2845,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png"
-        ]
-      },
-      {
         "color": "verde-militar",
         "colorName": "Verde Militar",
         "colorHex": "#4B5320",
@@ -2863,12 +2853,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/verde-militar/01-87d91e20c02721f7.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-anorak/preto/01-45389339bd6149af.png"
     ],
     "details": [
       "Meio zíper frontal",
@@ -2925,16 +2925,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png"
-        ]
-      },
-      {
         "color": "verde",
         "colorName": "Verde",
         "colorHex": "#50633F",
@@ -2943,12 +2933,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/verde/01-009182d9b7de1e5f.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-bomber-oversized/preto/01-a44d302e05149a74.png"
     ],
     "details": [
       "Modelagem ampla e volumosa",
@@ -3084,16 +3084,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png"
-        ]
-      },
-      {
         "color": "verde",
         "colorName": "Verde",
         "colorHex": "#50633F",
@@ -3102,12 +3092,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/verde/01-a9935eb050035815.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-coach/preto/01-233b4f49bda08d23.png"
     ],
     "details": [
       "Gola simples dobrável",
@@ -3164,16 +3164,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png"
-        ]
-      },
-      {
         "color": "marrom",
         "colorName": "Marrom",
         "colorHex": "#6F513D",
@@ -3182,12 +3172,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/marrom/01-ea52f026e451f790.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-cropped-puffer/preto/01-78353baa563950a4.png"
     ],
     "details": [
       "Comprimento mais curto",
@@ -3244,16 +3244,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png"
-        ]
-      },
-      {
         "color": "azul",
         "colorName": "Azul",
         "colorHex": "#355C8A",
@@ -3262,12 +3252,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/azul/01-2a414e3604e28347.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-distressed/preto/01-bfcea5c0534d68b4.png"
     ],
     "details": [
       "Jeans pesado",
@@ -3324,16 +3324,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png"
-        ]
-      },
-      {
         "color": "azul",
         "colorName": "Azul",
         "colorHex": "#355C8A",
@@ -3342,12 +3332,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/azul/01-da3d1ece9bd6ebb4.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-denim-washed/preto/01-cd951165a4dcab4a.png"
     ],
     "details": [
       "Jeans encorpado",
@@ -3404,16 +3404,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png"
-        ]
-      },
-      {
         "color": "bege",
         "colorName": "Bege",
         "colorHex": "#C8B596",
@@ -3422,12 +3412,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/bege/01-4322036384868fa3.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-harrington/preto/01-35606ba52631fc85.png"
     ],
     "details": [
       "Comprimento curto",
@@ -3484,16 +3484,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png"
-        ]
-      },
-      {
         "color": "cinza",
         "colorName": "Cinza",
         "colorHex": "#7A7D80",
@@ -3502,12 +3492,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/cinza/01-4387f2e59c23e344.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-nylon-tech/preto/01-2ac20cbe6d3b8ee2.png"
     ],
     "details": [
       "Nylon de aparência técnica",
@@ -3640,16 +3640,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png"
-        ]
-      },
-      {
         "color": "cinza",
         "colorName": "Cinza",
         "colorHex": "#7A7D80",
@@ -3658,12 +3648,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/cinza/01-2734fd6dc9cfdf24.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-puffer-oversized/preto/01-b8ad35db071bf2bd.png"
     ],
     "details": [
       "Construção fortemente acolchoada",
@@ -3720,16 +3720,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png"
-        ]
-      },
-      {
         "color": "marrom-e-bege",
         "colorName": "Marrom e Bege",
         "colorHex": "#6F513D",
@@ -3738,12 +3728,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/marrom-e-bege/01-6d11d791e7693344.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-sherpa/preto/01-90b346571c0bc5ad.png"
     ],
     "details": [
       "Forro ou painéis em sherpa",
@@ -3800,16 +3800,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png"
-        ]
-      },
-      {
         "color": "chumbo",
         "colorName": "Chumbo",
         "colorHex": "#4A4E52",
@@ -3818,12 +3808,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/chumbo/01-737b7dfc4c0dc75b.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-tactical/preto/01-7b9515429e813139.png"
     ],
     "details": [
       "Bolsos modulares",
@@ -3880,16 +3880,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png"
-        ]
-      },
-      {
         "color": "marrom",
         "colorName": "Marrom",
         "colorHex": "#6F513D",
@@ -3898,12 +3888,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/marrom/01-2a051d5f904637e3.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-track/preto/01-347493164172e0cf.png"
     ],
     "details": [
       "Inspiração esportiva",
@@ -3960,16 +3960,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png"
-        ]
-      },
-      {
         "color": "marrom",
         "colorName": "Marrom",
         "colorHex": "#6F513D",
@@ -3978,12 +3968,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/marrom/01-71d622c5a6aad293.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-two-tone/preto/01-1769f2333387a08e.png"
     ],
     "details": [
       "Combinação de duas cores",
@@ -4040,16 +4040,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png"
-        ]
-      },
-      {
         "color": "verde",
         "colorName": "Verde",
         "colorHex": "#50633F",
@@ -4058,12 +4048,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png"
     ],
     "details": [
       "Vários bolsos funcionais",
@@ -4120,16 +4120,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png"
-        ]
-      },
-      {
         "color": "marrom",
         "colorName": "Marrom",
         "colorHex": "#6F513D",
@@ -4138,12 +4128,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png"
     ],
     "details": [
       "Inspiração universitária",
@@ -4200,16 +4200,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png"
-        ]
-      },
-      {
         "color": "grafite-e-verde",
         "colorName": "Grafite e Verde",
         "colorHex": "#4B4F52",
@@ -4218,12 +4208,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/grafite-e-verde/01-6c223d3b9ad7f151.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-windbreaker/preto/01-ec97a2e01b5f0a10.png"
     ],
     "details": [
       "Tecido leve e técnico",
@@ -4280,16 +4280,6 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "preto",
-        "colorName": "Preto",
-        "colorHex": "#171717",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
-        "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png"
-        ]
-      },
-      {
         "color": "marrom",
         "colorName": "Marrom",
         "colorHex": "#6F513D",
@@ -4298,12 +4288,22 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
         "images": [
           "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
         ]
+      },
+      {
+        "color": "preto",
+        "colorName": "Preto",
+        "colorHex": "#171717",
+        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+        "images": [
+          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png"
+        ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
+    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png",
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png"
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/marrom/01-8c16fe2f27cd40e5.png",
+      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-workwear/preto/01-37b86246eeaeddee.png"
     ],
     "details": [
       "Corte boxy",
