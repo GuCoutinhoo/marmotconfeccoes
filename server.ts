@@ -16,7 +16,7 @@ if ((process.env.MARMOT_TEST_MODE === 'true' || process.env.CI === 'true') && fs
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
-import { app } from './api/index';
+import { app } from './api/index.js';
 
 const PORT = 3000;
 

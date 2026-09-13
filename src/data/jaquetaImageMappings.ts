@@ -1,4 +1,4 @@
-import { ProductVariant } from '../types';
+import type { ProductVariant } from '../types.js';
 
 export interface JaquetaImageMapping {
   id: string;

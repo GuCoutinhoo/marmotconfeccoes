@@ -22,10 +22,10 @@ import {
   resolveInfinitePayWebhookUrl,
   sanitizeInfinitePayReceiptUrl,
   type InfinitePayCheckoutItem,
-} from '../src/server/infinitePayClient';
-import { IS_TEST_MODE } from '../src/server/runtime-flags';
-import { getCamisetaImageMapping } from '../src/data/camisetaImageMappings';
-import { getJaquetaImageMapping } from '../src/data/jaquetaImageMappings';
+} from '../src/server/infinitePayClient.js';
+import { IS_TEST_MODE } from '../src/server/runtime-flags.js';
+import { getCamisetaImageMapping } from '../src/data/camisetaImageMappings.js';
+import { getJaquetaImageMapping } from '../src/data/jaquetaImageMappings.js';
 
 export { IS_TEST_MODE };
 
