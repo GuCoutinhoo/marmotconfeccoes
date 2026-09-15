@@ -103,15 +103,18 @@
 
 .font-anton {
   font-family: 'Anton', 'Arial Black', Impact, sans-serif;
-  font-weight: 900;
 }
 
 .font-bebas {
-  font-family: 'Bebas Neue', 'Barlow Condensed', 'Anton', Impact, sans-serif;
+  font-family: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+}
+
+.font-barlow {
+  font-family: 'Barlow Condensed', 'Bebas Neue', sans-serif;
 }
 
 .marmot-category-card {
-  border-radius: 12px !important;
+  border-radius: 0px !important;
 }
 
 .marmot-category-btn {

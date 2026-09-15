@@ -359,9 +359,9 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               ease: [0.16, 1, 0.3, 1],
             }}
             onClick={() => handleCardClick(item.slug)}
-            className="marmot-category-card group relative shrink-0 aspect-[4/5.15] w-[80vw] sm:w-[48vw] md:w-[42vw] lg:w-[calc((100vw-32px-48px)/3.52)] xl:w-[calc((100vw-32px-48px)/3.52)] max-w-[500px] overflow-hidden bg-[#111113] cursor-pointer select-none"
+            className="marmot-category-card group relative shrink-0 aspect-[4/5.15] w-[80vw] sm:w-[48vw] md:w-[42vw] lg:w-[calc((100vw-32px-48px)/3.52)] xl:w-[calc((100vw-32px-48px)/3.52)] max-w-[500px] overflow-hidden bg-[#111113] cursor-pointer select-none rounded-none"
             style={{
-              borderRadius: '12px',
+              borderRadius: '0px',
             }}
           >
             {/* Imagem de Fundo com entrada suave scale 1.03 -> 1 */}
