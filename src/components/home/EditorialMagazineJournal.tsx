@@ -17,7 +17,7 @@ export const EditorialMagazineJournal: React.FC<EditorialMagazineJournalProps> =
       id="editorial-lookbook"
       className="py-5 sm:py-7 lg:py-10 bg-[#ffffff] select-none"
     >
-      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 space-y-3.5 sm:space-y-4.5">
+      <div className="w-full px-7 sm:px-8 space-y-3.5 sm:space-y-4.5">
         {/* =========================================================================
             1. BANNER PRINCIPAL: DROP 03 (BUILT FOR THE STREETS)
            ========================================================================= */}

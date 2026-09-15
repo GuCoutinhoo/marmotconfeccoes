@@ -6,6 +6,7 @@ import { BestsellersRanking } from '../components/home/BestsellersRanking';
 import { SingleProductSpotlight } from '../components/home/SingleProductSpotlight';
 import { EditorialMagazineJournal } from '../components/home/EditorialMagazineJournal';
 import { CompactCustomerReviews } from '../components/home/CompactCustomerReviews';
+import { MarmotFitSystem } from '../components/home/MarmotFitSystem';
 import { useStore } from '../context/StoreContext';
 import { Product } from '../types';
 
@@ -51,6 +52,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onQuickView }) =
 
       {/* 7. Avaliações Reais de Compradores */}
       <CompactCustomerReviews />
+
+      {/* 8. MARMOT FIT SYSTEM - Guia Visual Interativo de Caimento */}
+      <MarmotFitSystem
+        onNavigate={onNavigate}
+        onQuickView={onQuickView}
+        products={products}
+      />
 
       {/* O cadastro permanece no rodapé global para evitar duas chamadas idênticas em sequência. */}
     </div>

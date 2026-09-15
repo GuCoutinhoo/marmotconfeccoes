@@ -243,10 +243,10 @@ export const Header: React.FC<HeaderProps> = ({
       <div 
         className={`w-full transition-all duration-500 ease-in-out ${
           isScrolled 
-            ? 'bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.12)] border border-zinc-200/80 px-4 sm:px-6 lg:px-8' 
+            ? 'bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-full shadow-[0_12px_36px_rgba(0,0,0,0.12)] border border-zinc-200/80 px-6 sm:px-8' 
             : isTransparent
-              ? 'bg-white/0 border-transparent shadow-none px-4 sm:px-6 lg:px-10'
-              : 'bg-white rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_6px_25px_rgba(0,0,0,0.06)] border-b border-zinc-100 px-4 sm:px-6 lg:px-8'
+              ? 'bg-white/0 border-transparent shadow-none px-7 sm:px-8'
+              : 'bg-white rounded-b-[24px] sm:rounded-b-[30px] shadow-[0_6px_25px_rgba(0,0,0,0.06)] border-b border-zinc-100 px-7 sm:px-8'
         }`}
       >
         <div 

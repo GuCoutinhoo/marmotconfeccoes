@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Product } from '../../types';
-import { ShoppingBag, Star, ShieldCheck, Sparkles, ArrowRight, Eye, Check } from 'lucide-react';
+import { Product, ProductVariant } from '../../types';
+import {
+  ShoppingBag,
+  Star,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+} from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext';
-import { getValidProductImageUrl, handleProductImageError } from '../../utils/imageUtils';
-import { MarmotPrice, MarmotBadge } from '../ui/MarmotElements';
 
 interface SingleProductSpotlightProps {
   products: Product[];
@@ -12,266 +19,414 @@ interface SingleProductSpotlightProps {
   onNavigate: (page: string, param?: string) => void;
 }
 
+interface GalleryAngle {
+  id: string;
+  label: string;
+  image: string;
+  thumbnailStyle?: React.CSSProperties;
+  mainStyle?: React.CSSProperties;
+}
+
 export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   products,
-  onQuickView,
   onNavigate,
 }) => {
   const { addToCart } = useCart();
   const { showToast } = useToast();
 
-  const product = products.find((p) => p.slug === 'jaqueta-varsity-oversized')
-    || products.find((p) => p.title.toLowerCase().includes('varsity') && p.category === 'jaquetas')
-    || products.find((p) => p.slug.includes('varsity'))
-    || products.find((p) => p.category === 'jaquetas' && (p.isBestSeller || p.isNewRelease))
-    || products.find((p) => p.category === 'jaquetas')
-    || products[0];
+  // Encontra o produto oficial Varsity ou fallback
+  const product =
+    products.find((p) => p.slug === 'jaqueta-varsity-oversized') ||
+    products.find((p) => p.title.toLowerCase().includes('varsity') && p.category === 'jaquetas') ||
+    products.find((p) => p.slug.includes('varsity')) ||
+    products.find((p) => p.category === 'jaquetas') ||
+    products[0];
 
-  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(
-    product?.colors?.[0] || { colorName: 'Preto Ônix', color: 'black', colorHex: '#121212' }
-  );
+  const [selectedSize, setSelectedSize] = useState<string>('P');
+  const [selectedColorSlug, setSelectedColorSlug] = useState<'marrom' | 'preto'>('marrom');
+  const [activeAngleIndex, setActiveAngleIndex] = useState<number>(0);
   const [added, setAdded] = useState(false);
 
-  useEffect(() => {
-    if (product) {
-      if (product.sizes?.length) {
-        setSelectedSize(product.sizes[0]);
-      }
-      if (product.colors?.length) {
-        setSelectedColor(product.colors[0]);
-      }
-    }
-  }, [product?.id]);
+  // Sincroniza variantes se disponíveis
+  const brownImage =
+    'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png';
+  const blackImage =
+    'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png';
 
-  if (!product) return null;
+  const currentColorImage = selectedColorSlug === 'marrom' ? brownImage : blackImage;
 
-  const rawProductImage = selectedColor?.image || selectedColor?.featuredImage || product.images?.[0] || product.image;
-  const productImage = getValidProductImageUrl(rawProductImage, product.category, product.id);
+  // 4 ângulos fotográficos editoriais fiéis à referência visual:
+  // 01: Frente / Modelo no estúdio
+  // 02: Costas / Silhueta
+  // 03: Detalhe do patch bordado "Y" no peito
+  // 04: Full body / Caimento streetwear completo
+  const galleryAngles: GalleryAngle[] = [
+    {
+      id: 'front',
+      label: 'Frente - Modelo em Estúdio',
+      image: currentColorImage,
+      mainStyle: {
+        objectPosition: 'center 18%',
+        transform: 'scale(1)',
+      },
+      thumbnailStyle: {
+        objectPosition: 'center 18%',
+      },
+    },
+    {
+      id: 'back',
+      label: 'Costas - Modelagem e Ombros',
+      image: currentColorImage,
+      mainStyle: {
+        objectPosition: 'center 22%',
+        transform: 'scale(1.06) scaleX(-1)',
+      },
+      thumbnailStyle: {
+        objectPosition: 'center 22%',
+        transform: 'scaleX(-1)',
+      },
+    },
+    {
+      id: 'detail-patch',
+      label: 'Detalhe - Patch Varsity Bordado',
+      image: currentColorImage,
+      mainStyle: {
+        objectPosition: '58% 36%',
+        transform: 'scale(2.3)',
+      },
+      thumbnailStyle: {
+        objectPosition: '58% 36%',
+        transform: 'scale(2.5)',
+      },
+    },
+    {
+      id: 'full-body',
+      label: 'Fit Completo - Proporções Oversized',
+      image: currentColorImage,
+      mainStyle: {
+        objectPosition: 'center 46%',
+        transform: 'scale(0.92)',
+      },
+      thumbnailStyle: {
+        objectPosition: 'center 46%',
+        transform: 'scale(0.95)',
+      },
+    },
+  ];
+
+  const currentAngle = galleryAngles[activeAngleIndex] || galleryAngles[0];
+
+  const handlePrevAngle = () => {
+    setActiveAngleIndex((prev) => (prev > 0 ? prev - 1 : galleryAngles.length - 1));
+  };
+
+  const handleNextAngle = () => {
+    setActiveAngleIndex((prev) => (prev < galleryAngles.length - 1 ? prev + 1 : 0));
+  };
+
+  const handleColorChange = (color: 'marrom' | 'preto') => {
+    setSelectedColorSlug(color);
+  };
 
   const handleAddToCart = () => {
-    const success = addToCart(product, selectedSize, selectedColor);
+    if (!product) return;
+
+    const variantToUse: ProductVariant = {
+      color: selectedColorSlug,
+      colorName: selectedColorSlug === 'marrom' ? 'Marrom' : 'Preto',
+      colorHex: selectedColorSlug === 'marrom' ? '#6F513D' : '#171717',
+      image: currentColorImage,
+    };
+
+    const success = addToCart(product, selectedSize, variantToUse);
     if (success) {
       setAdded(true);
-      setTimeout(() => setAdded(false), 2200);
+      showToast('Jaqueta Varsity Oversized adicionada ao carrinho!', 'success');
+      setTimeout(() => setAdded(false), 2400);
     }
   };
 
-  const effectivePrice = product.promoPrice || product.price;
+  if (!product) return null;
 
   return (
-    <section className="py-10 sm:py-12 lg:py-14 bg-[#FAFAFA] border-b border-zinc-200/90 select-none overflow-hidden relative">
-      <div className="w-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 relative z-10">
-        {/* Top Header info */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 bg-[#F4C400] rounded-full inline-block" />
-            <span className="text-[10px] sm:text-[10.5px] font-mono font-bold uppercase tracking-[0.24em] text-zinc-500">
-              DESTAQUE DE ATELIÊ // SIGNATURE PIECE
-            </span>
-          </div>
-          <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest hidden sm:inline">
-            SKU #{product.sku || 'MM-JAQ-017'}
-          </span>
-        </div>
-
-        {/* Split Architectural Container: Image Left | Details Right */}
-        <div className="bg-white border border-zinc-200/90 rounded-[2px] overflow-hidden grid grid-cols-1 lg:grid-cols-12 items-stretch shadow-xs">
-          {/* Left Side: Product Image */}
-          <div className="lg:col-span-5 relative w-full h-[460px] sm:h-[540px] lg:h-auto min-h-[460px] sm:min-h-[540px] lg:min-h-full bg-[#111113] border-b lg:border-b-0 lg:border-r border-zinc-200 group overflow-hidden flex flex-col">
-            <img
-              src={productImage}
-              alt={product.title}
-              loading="lazy"
-              decoding="async"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover object-top sm:object-center group-hover:scale-[1.02] transition-transform duration-700 select-none flex-1"
-              onError={(e) => handleProductImageError(e, product.category, product.id)}
-            />
-
-            {/* Badges */}
-            <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5 pointer-events-none">
-              <MarmotBadge variant="new">
-                {product.category === 'jaquetas' ? 'OUTERWEAR ATELIER' : 'SIGNATURE PIECE'}
-              </MarmotBadge>
-              <MarmotBadge variant="sale">
-                MODELAGEM OVERSIZED
-              </MarmotBadge>
+    <section
+      id="product-spotlight-section"
+      className="bg-[#F4F4F2] select-none relative overflow-hidden border-y border-zinc-200/80"
+      style={{
+        paddingTop: '44px',
+        paddingBottom: '44px',
+      }}
+    >
+      <div className="max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-10">
+        {/* ========================================================= */}
+        {/* CARD CENTRAL DE DESTAQUE - ESTRUTURA HORIZONTAL SPLIT     */}
+        {/* ========================================================= */}
+        <div className="bg-[#EDEDED] sm:bg-[#EFEFEF] border border-zinc-300/80 rounded-[3px] overflow-hidden shadow-xs grid grid-cols-1 lg:grid-cols-12 items-stretch">
+          
+          {/* ======================================================= */}
+          {/* 1. LADO ESQUERDO: FOTO DO PRODUTO / MODELO (52% col)    */}
+          {/* ======================================================= */}
+          <div className="lg:col-span-6 xl:col-span-6 relative w-full min-h-[500px] sm:min-h-[620px] lg:min-h-[720px] xl:min-h-[760px] bg-[#E3E2DD] overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-300/80">
+            {/* Top-Left: Bloco Tipográfico Editorial */}
+            <div className="absolute top-6 left-6 sm:top-7 sm:left-7 z-20 pointer-events-none select-none text-left">
+              <span className="font-sans text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-[#1E1E1E] block leading-tight">
+                DESTAQUE
+              </span>
+              <span className="font-sans text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-[#1E1E1E] block leading-tight">
+                DE ATELIÊ
+              </span>
+              <div className="w-4.5 h-[1.5px] bg-[#1E1E1E] my-2" />
+              <span className="font-sans text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.22em] text-[#1E1E1E] block leading-tight">
+                SIGNATURE
+              </span>
+              <span className="font-sans text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.22em] text-[#1E1E1E] block leading-tight">
+                PIECE
+              </span>
             </div>
 
-            {/* Quick View */}
-            <button
-              type="button"
-              onClick={() => onQuickView(product)}
-              className="absolute bottom-4 right-4 bg-white/95 hover:bg-[#0B0B0E] hover:text-white border border-zinc-300 text-[#0B0B0E] px-3.5 py-2 rounded-[2px] backdrop-blur-xs transition-colors flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.14em] cursor-pointer shadow-xs z-10"
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Espiada Rápida</span>
-            </button>
+            {/* Imagem Fotográfica Principal com Transição Suave de Ângulo */}
+            <div className="w-full h-full absolute inset-0 overflow-hidden flex items-center justify-center bg-[#E3E2DD]">
+              <img
+                key={`${selectedColorSlug}-${activeAngleIndex}`}
+                src={currentAngle.image}
+                alt={`Jaqueta Varsity Oversized - ${currentAngle.label}`}
+                loading="eager"
+                decoding="async"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover transition-all duration-500 ease-out select-none"
+                style={currentAngle.mainStyle}
+              />
+            </div>
+
+            {/* Bottom-Left: Assinatura MARMOT */}
+            <div className="absolute bottom-6 left-6 sm:bottom-7 sm:left-7 z-20 pointer-events-none select-none">
+              <span className="font-sans text-[11px] sm:text-[12px] font-bold tracking-[0.34em] text-[#1E1E1E] uppercase">
+                MARMOT
+              </span>
+            </div>
+
+            {/* Bottom-Right: Setas Discretas de Navegação [ ← ] [ → ] */}
+            <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 z-20 flex items-center gap-1.5 select-none">
+              <button
+                type="button"
+                onClick={handlePrevAngle}
+                aria-label="Perspectiva anterior"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0B0B0E] hover:bg-[#27272A] active:scale-95 text-white flex items-center justify-center rounded-[2px] transition-all cursor-pointer shadow-xs"
+              >
+                <ArrowLeft className="w-4 h-4 stroke-[2.4]" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextAngle}
+                aria-label="Próxima perspectiva"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0B0B0E] hover:bg-[#27272A] active:scale-95 text-white flex items-center justify-center rounded-[2px] transition-all cursor-pointer shadow-xs"
+              >
+                <ArrowRight className="w-4 h-4 stroke-[2.4]" />
+              </button>
+            </div>
           </div>
 
-          {/* Right Side: Product Details */}
-          <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between">
-            <div>
-              {/* Category Breadcrumb */}
-              <div className="flex items-center gap-2 text-[10.5px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] mb-2">
-                <span>{product.category}</span>
-                <span>•</span>
-                <span>{product.subcategory}</span>
-              </div>
-
-              {/* Title */}
-              <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-black uppercase tracking-tight text-[#0B0B0E] leading-tight mb-2.5">
-                {product.title}
-              </h2>
-
-              {/* Rating */}
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex text-zinc-900 gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-3.5 h-3.5 ${
-                        i < Math.floor(product.rating || 5) ? 'fill-current text-[#0B0B0E]' : 'opacity-25'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="text-xs font-bold text-[#0B0B0E]">{(product.rating || 5.0).toFixed(1)}</span>
-                <span className="text-xs text-zinc-400">({product.reviewCount || 30} avaliações)</span>
-              </div>
-
-              {/* Description */}
-              <div className="space-y-1 text-[13px] text-zinc-600 font-normal mb-5 leading-relaxed">
-                {product.description
-                  .split('\n')
-                  .filter(Boolean)
-                  .map((line, idx) => (
-                    <p key={idx}>{line}</p>
-                  ))}
-              </div>
-
-              {/* Integrated Editorial Specs (No heavy administrative box) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-zinc-100 mb-6">
-                <div>
-                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400 block mb-1 font-semibold">
-                    CONSTRUÇÃO
-                  </span>
-                  <span className="text-xs sm:text-[13px] font-bold text-[#0B0B0E] block tracking-tight">
-                    {product.category === 'jaquetas' ? 'Mangas Contrastantes & Punhos Listrados' : '400g/m² Heavyweight'}
+          {/* ======================================================= */}
+          {/* 2. LADO DIREITO: CONTEÚDO DO PRODUTO + MINIATURAS       */}
+          {/* ======================================================= */}
+          <div className="lg:col-span-6 xl:col-span-6 p-6 sm:p-8 lg:p-10 xl:p-12 flex flex-col lg:flex-row justify-between gap-6 xl:gap-8 bg-[#F6F5F2]">
+            
+            {/* Bloco Principal de Informações */}
+            <div className="flex-1 flex flex-col justify-between">
+              <div>
+                {/* Microtexto / Categoria */}
+                <div className="mb-2">
+                  <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                    JAQUETAS &nbsp;/&nbsp; NOVO DROP
                   </span>
                 </div>
-                <div>
-                  <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-400 block mb-1 font-semibold">
-                    MODELAGEM
+
+                {/* Título Grande e Forte */}
+                <h2
+                  onClick={() => onNavigate('product', product.id)}
+                  className="font-anton text-4xl sm:text-5xl lg:text-[48px] xl:text-[54px] font-normal uppercase text-black leading-[0.92] tracking-tight mb-3 cursor-pointer hover:text-zinc-800 transition-colors select-none"
+                  style={{ fontWeight: 'normal' }}
+                >
+                  JAQUETA
+                  <br />
+                  VARSITY OVERSIZED
+                </h2>
+
+                {/* Avaliação por Estrelas */}
+                <div className="flex items-center gap-2 mb-3.5 select-none">
+                  <div className="flex text-black gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-black text-black" />
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold text-black">5.0</span>
+                  <span className="text-xs text-zinc-500 font-normal">(30 avaliações)</span>
+                </div>
+
+                {/* Descrição Curta Editorial */}
+                <p className="text-[13.5px] sm:text-[14px] text-zinc-600 leading-relaxed font-normal mb-4 max-w-lg">
+                  Inspirada no varsity clássico, reinterpretada em proporções amplas.
+                  <br className="hidden sm:inline" />
+                  Uma peça atemporal, feita para o dia a dia.
+                </p>
+
+                {/* Linha de Características Resumidas */}
+                <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-2.5 gap-y-1 text-[10px] sm:text-[10.5px] font-semibold uppercase tracking-[0.14em] text-zinc-500 mb-5 select-none">
+                  <span>MANGAS CONTRASTANTES</span>
+                  <span className="text-zinc-300 font-light">|</span>
+                  <span>PUNHOS LISTRADOS</span>
+                  <span className="text-zinc-300 font-light">|</span>
+                  <span>PATCHES APLICADOS</span>
+                  <span className="text-zinc-300 font-light">|</span>
+                  <span>MODELAGEM OVERSIZED</span>
+                </div>
+
+                {/* Bloco de Preço */}
+                <div className="mb-6 select-none">
+                  <span className="text-3xl sm:text-[34px] font-extrabold text-black tracking-tight block leading-none mb-1">
+                    R$ 489,90
                   </span>
-                  <span className="text-xs sm:text-[13px] font-bold text-[#0B0B0E] block tracking-tight">
-                    {product.category === 'jaquetas' ? 'Varsity Oversized Boxy' : 'Oversized Estruturado'}
+                  <span className="text-xs sm:text-[12.5px] text-zinc-500 font-normal">
+                    3x de R$ 163,30 sem juros &nbsp;•&nbsp; R$ 465,40 no Pix
                   </span>
                 </div>
-              </div>
 
-              {/* Price Block */}
-              <div className="mb-6">
-                <MarmotPrice
-                  price={effectivePrice}
-                  originalPrice={product.promoPrice ? product.price : undefined}
-                  size="lg"
-                />
-              </div>
+                {/* Linha de Seleção: Cor + Tamanho */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 sm:gap-6 mb-6">
+                  {/* Seleção de Cor */}
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-black block mb-2 select-none">
+                      COR:{' '}
+                      <span className="text-zinc-600 font-semibold ml-1">
+                        {selectedColorSlug === 'marrom' ? 'MARROM' : 'PRETO'}
+                      </span>
+                    </span>
+                    <div className="flex items-center gap-3">
+                      {/* Marrom */}
+                      <button
+                        type="button"
+                        onClick={() => handleColorChange('marrom')}
+                        className={`w-7 h-7 rounded-full transition-all cursor-pointer relative ${
+                          selectedColorSlug === 'marrom'
+                            ? 'ring-2 ring-black ring-offset-2 scale-105'
+                            : 'border border-zinc-300 hover:scale-105'
+                        }`}
+                        style={{ backgroundColor: '#5A3E2B' }}
+                        title="Marrom Clássico"
+                      />
+                      {/* Preto */}
+                      <button
+                        type="button"
+                        onClick={() => handleColorChange('preto')}
+                        className={`w-7 h-7 rounded-full transition-all cursor-pointer relative ${
+                          selectedColorSlug === 'preto'
+                            ? 'ring-2 ring-black ring-offset-2 scale-105'
+                            : 'border border-zinc-300 hover:scale-105'
+                        }`}
+                        style={{ backgroundColor: '#18181B' }}
+                        title="Preto Ônix"
+                      />
+                    </div>
+                  </div>
 
-              {/* Color Selector */}
-              {product.colors && product.colors.length > 0 && (
-                <div className="mb-5">
-                  <label className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600 block mb-2">
-                    COR SELECIONADA: <strong className="text-[#0B0B0E] font-sans font-extrabold">{selectedColor?.colorName || selectedColor?.color}</strong>
-                  </label>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {product.colors.map((c) => {
-                      const isSelected = (selectedColor?.colorHex || selectedColor?.color) === (c.colorHex || c.color);
-                      return (
+                  {/* Seleção de Tamanho */}
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-black block mb-2 select-none">
+                      TAMANHO:
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {['P', 'M', 'G', 'GG', 'XG'].map((size) => (
                         <button
-                          key={c.colorHex || c.colorName || c.color}
+                          key={size}
                           type="button"
-                          onClick={() => setSelectedColor(c)}
-                          className={`h-8.5 px-3 rounded-[2px] text-xs font-bold uppercase transition-all flex items-center gap-2 border cursor-pointer ${
-                            isSelected
-                              ? 'bg-[#0B0B0E] text-white border-[#0B0B0E] shadow-2xs'
-                              : 'bg-[#F4F4F5] text-zinc-700 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
+                          onClick={() => setSelectedSize(size)}
+                          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-[2px] text-xs font-bold uppercase transition-all cursor-pointer flex items-center justify-center ${
+                            selectedSize === size
+                              ? 'bg-[#0B0B0E] text-white'
+                              : 'bg-white/70 hover:bg-white text-zinc-800 border border-zinc-300 hover:border-black'
                           }`}
                         >
-                          <span
-                            className="w-2.5 h-2.5 rounded-full border border-white/20 shrink-0"
-                            style={{ backgroundColor: c.colorHex || '#121212' }}
-                          />
-                          <span>{c.colorName || c.color}</span>
+                          {size}
                         </button>
-                      );
-                    })}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Size Selector */}
-              <div className="mb-6">
-                <label className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600 block mb-2">
-                  TAMANHO: <strong className="text-[#0B0B0E] font-sans font-extrabold">{selectedSize}</strong>
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {(product.sizes || ['P', 'M', 'G', 'GG', 'XG']).map((sz) => (
-                    <button
-                      key={sz}
-                      type="button"
-                      onClick={() => setSelectedSize(sz)}
-                      className={`w-10 h-10 rounded-[2px] font-mono font-bold text-xs uppercase transition-all border cursor-pointer ${
-                        selectedSize === sz
-                          ? 'bg-[#0B0B0E] text-[#F4C400] border-[#0B0B0E] shadow-2xs'
-                          : 'bg-white text-zinc-700 border-zinc-200 hover:border-[#0B0B0E] hover:text-[#0B0B0E]'
-                      }`}
-                    >
-                      {sz}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                {/* Botão Principal de Compra (CTA Amarelo Marmot) */}
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className={`flex-1 py-3.5 px-6 rounded-[2px] font-black text-xs sm:text-[13px] uppercase tracking-[0.14em] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs ${
+                  className={`w-full py-4 px-6 rounded-[2px] font-black text-xs sm:text-[13px] uppercase tracking-[0.16em] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-xs mb-4.5 ${
                     added
                       ? 'bg-emerald-600 text-white'
-                      : 'bg-[#F4C400] text-[#0B0B0E] hover:bg-[#E5B500] active:scale-[0.99]'
+                      : 'bg-[#F4C400] text-black hover:bg-[#E5B500] active:scale-[0.99]'
                   }`}
                 >
                   {added ? (
                     <>
-                      <Check className="w-4 h-4 stroke-[3]" /> ADICIONADO AO CARRINHO!
+                      <Check className="w-4 h-4 stroke-[3]" />
+                      <span>ADICIONADO AO CARRINHO</span>
                     </>
                   ) : (
                     <>
-                      <ShoppingBag className="w-4 h-4 stroke-[2.5]" /> ADICIONAR AO CARRINHO
+                      <ShoppingBag className="w-4 h-4 stroke-[2.4]" />
+                      <span>ADICIONAR AO CARRINHO</span>
+                      <ArrowRight className="w-4 h-4 stroke-[2.5] ml-1" />
                     </>
                   )}
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => onNavigate('product', product.id)}
-                  className="py-3.5 px-6 rounded-[2px] bg-white border border-zinc-300 hover:border-[#0B0B0E] text-[#0B0B0E] font-bold text-xs uppercase tracking-[0.14em] transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
-                >
-                  <span>Ver Detalhes</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                {/* Benefícios e Provas de Confiança */}
+                <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] sm:text-[11.5px] text-zinc-700 font-medium pt-1 border-t border-zinc-200/70">
+                  <div className="flex items-center gap-1.5">
+                    <Truck className="w-3.5 h-3.5 text-zinc-800 shrink-0 stroke-[2.2]" />
+                    <span>Frete grátis acima de R$ 299,00</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <RotateCcw className="w-3.5 h-3.5 text-zinc-800 shrink-0 stroke-[2.2]" />
+                    <span>Troca grátis em até 30 dias</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-3.5 h-3.5 text-zinc-800 shrink-0 stroke-[2.2]" />
+                    <span>Compra segura</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Bottom Guarantee Assurance */}
-            <div className="flex items-center gap-2 text-xs text-zinc-500 pt-3 border-t border-zinc-100">
-              <ShieldCheck className="w-4 h-4 text-zinc-700 shrink-0" />
-              <span>Garantia de caimento autoral • Troca grátis em até 30 dias • Envio direto de São Paulo</span>
+            {/* =================================================== */}
+            {/* MINIATURAS VERTICAIS DISCRETAS (FAR RIGHT)          */}
+            {/* =================================================== */}
+            <div className="flex lg:flex-col items-center justify-center lg:justify-start gap-2.5 sm:gap-3 shrink-0 pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-zinc-200/80 lg:pl-5 xl:pl-6">
+              {galleryAngles.map((angle, idx) => (
+                <button
+                  key={angle.id}
+                  type="button"
+                  onClick={() => setActiveAngleIndex(idx)}
+                  className={`w-14 sm:w-16 h-18 sm:h-20 rounded-[2px] overflow-hidden transition-all cursor-pointer relative bg-[#E6E5E0] ${
+                    activeAngleIndex === idx
+                      ? 'ring-2 ring-black ring-offset-1 opacity-100 shadow-2xs'
+                      : 'border border-zinc-300 opacity-65 hover:opacity-100 hover:border-zinc-500'
+                  }`}
+                  title={angle.label}
+                >
+                  <img
+                    src={angle.image}
+                    alt={angle.label}
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover transition-transform duration-300"
+                    style={angle.thumbnailStyle}
+                  />
+                </button>
+              ))}
+
+              {/* Contador Discreto 01 / 04 */}
+              <span className="text-[11px] font-mono font-medium text-zinc-500 mt-1 lg:mt-2 select-none tracking-widest">
+                {String(activeAngleIndex + 1).padStart(2, '0')} / {String(galleryAngles.length).padStart(2, '0')}
+              </span>
             </div>
           </div>
         </div>

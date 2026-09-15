@@ -896,6 +896,7 @@ export class DatabaseManager {
       try {
         this.pgPool = new Pool({
           connectionString: dbUrl,
+          connectionTimeoutMillis: 3000,
           ssl: process.env.NODE_ENV === 'production' && !dbUrl.includes('localhost') ? { rejectUnauthorized: false } : undefined,
         });
         this.mode = 'postgres';
@@ -934,9 +935,10 @@ export class DatabaseManager {
 
   private async loadFromPostgres() {
     if (!this.pgPool) return;
-    const client = await this.pgPool.connect();
     try {
-      await client.query(`
+      const client = await this.pgPool.connect();
+      try {
+        await client.query(`
         CREATE TABLE IF NOT EXISTS store_categories (id VARCHAR(100) PRIMARY KEY, data JSONB NOT NULL);
         CREATE TABLE IF NOT EXISTS store_products (id VARCHAR(100) PRIMARY KEY, slug VARCHAR(255), data JSONB NOT NULL);
         CREATE TABLE IF NOT EXISTS store_users (id VARCHAR(100) PRIMARY KEY, email VARCHAR(255), data JSONB NOT NULL);
@@ -946,39 +948,43 @@ export class DatabaseManager {
         CREATE TABLE IF NOT EXISTS store_wishlist_items (id VARCHAR(100) PRIMARY KEY, user_id VARCHAR(100) NOT NULL, data JSONB NOT NULL);
       `);
 
-      const catRes = await client.query('SELECT data FROM store_categories');
-      if (catRes.rows.length === 0) {
-        this.categories = INITIAL_CATEGORIES;
-        for (const cat of INITIAL_CATEGORIES) {
-          await client.query('INSERT INTO store_categories (id, data) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING', [cat.id, JSON.stringify(cat)]);
+        const catRes = await client.query('SELECT data FROM store_categories');
+        if (catRes.rows.length === 0) {
+          this.categories = INITIAL_CATEGORIES;
+          for (const cat of INITIAL_CATEGORIES) {
+            await client.query('INSERT INTO store_categories (id, data) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING', [cat.id, JSON.stringify(cat)]);
+          }
+        } else {
+          this.categories = catRes.rows.map((r) => r.data);
         }
-      } else {
-        this.categories = catRes.rows.map((r) => r.data);
+
+        const prodRes = await client.query('SELECT data FROM store_products');
+        if (prodRes.rows.length === 0) {
+          this.products = [];
+        } else {
+          this.products = prodRes.rows.map((r) => r.data);
+        }
+
+        const userRes = await client.query('SELECT data FROM store_users');
+        this.users = userRes.rows.map((r) => r.data);
+
+        const orderRes = await client.query('SELECT data FROM store_orders');
+        this.orders = orderRes.rows.map((r) => r.data);
+
+        const couponRes = await client.query('SELECT data FROM store_coupons');
+        this.coupons = couponRes.rows.map((r) => r.data);
+
+        const cartRes = await client.query('SELECT data FROM store_cart_items');
+        this.cartItems = cartRes.rows.map((r) => r.data);
+
+        const wishRes = await client.query('SELECT data FROM store_wishlist_items');
+        this.wishlistItems = wishRes.rows.map((r) => r.data);
+      } finally {
+        client.release();
       }
-
-      const prodRes = await client.query('SELECT data FROM store_products');
-      if (prodRes.rows.length === 0) {
-        this.products = [];
-      } else {
-        this.products = prodRes.rows.map((r) => r.data);
-      }
-
-      const userRes = await client.query('SELECT data FROM store_users');
-      this.users = userRes.rows.map((r) => r.data);
-
-      const orderRes = await client.query('SELECT data FROM store_orders');
-      this.orders = orderRes.rows.map((r) => r.data);
-
-      const couponRes = await client.query('SELECT data FROM store_coupons');
-      this.coupons = couponRes.rows.map((r) => r.data);
-
-      const cartRes = await client.query('SELECT data FROM store_cart_items');
-      this.cartItems = cartRes.rows.map((r) => r.data);
-
-      const wishRes = await client.query('SELECT data FROM store_wishlist_items');
-      this.wishlistItems = wishRes.rows.map((r) => r.data);
-    } finally {
-      client.release();
+    } catch (err) {
+      console.warn('[DB] PostgreSQL connection unavailable, falling back to local file storage:', err);
+      this.mode = 'durable_file';
     }
   }
 

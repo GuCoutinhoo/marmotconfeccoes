@@ -31,7 +31,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
       </div>
 
       {/* Hero Content Container - Full Height Flex layout */}
-      <div className="relative z-10 w-full h-full max-w-[1740px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 flex flex-col justify-between pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-12">
+      <div className="relative z-10 w-full h-full px-7 sm:px-8 flex flex-col justify-between pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-12">
         {/* Main Composition: Left Title & CTA + Right Discreet Editorial Text */}
         <div className="flex-1 flex flex-col lg:flex-row lg:items-center justify-between gap-8 my-auto">
           
