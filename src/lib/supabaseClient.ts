@@ -1,8 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, Category, Address, Order, CartItem, ProductVariant } from '../types';
-import { getCamisetaImageMapping } from '../data/camisetaImageMappings';
-import { getShortsImageMapping, buildShortsProducts } from '../data/shortsImageMappings';
-import { getJaquetaImageMapping, applyJaquetaMapping } from '../data/jaquetaImageMappings';
 
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
@@ -58,71 +55,26 @@ export async function getAuthenticatedSupabaseClient() {
 }
 
 /**
- * Normalizes any Supabase Product record (whether snake_case columns, camelCase, or jsonb data payload)
- * into a typed frontend Product model.
+ * Maps the canonical columns from public.products into the frontend model.
+ * Legacy JSONB and static image mappings are intentionally ignored: Supabase is
+ * the only authority for every persistent product field.
  */
 export function mapSupabaseRowToProduct(row: any): Product {
   if (!row) return {} as Product;
-  const d = (row.data && typeof row.data === 'object') ? row.data : {};
-
-  const rowId = String(row.id || d.id || '').trim();
-  const rowSlug = String(row.slug || d.slug || '').trim();
-  const camisetaMapping = getCamisetaImageMapping(rowId) || getCamisetaImageMapping(rowSlug);
-  const shortsMapping = getShortsImageMapping(rowId) || getShortsImageMapping(rowSlug);
-  const jaquetaMapping = getJaquetaImageMapping(rowId) || getJaquetaImageMapping(rowSlug);
-
-  const primaryImg = camisetaMapping
-    ? camisetaMapping.defaultImage
-    : shortsMapping
-    ? shortsMapping.defaultImage
-    : jaquetaMapping
-    ? jaquetaMapping.defaultImage
-    : (row.image || (Array.isArray(row.images) && row.images[0]) || d.image || (Array.isArray(d.images) && d.images[0]) || '');
-  const allImagesList = camisetaMapping
-    ? camisetaMapping.images
-    : shortsMapping
-    ? shortsMapping.images
-    : jaquetaMapping
-    ? jaquetaMapping.images
-    : (Array.isArray(row.images) && row.images.length > 0
-        ? (primaryImg && row.images[0] !== primaryImg ? [primaryImg, ...row.images.filter((x: string) => x !== primaryImg)] : row.images)
-        : (primaryImg ? [primaryImg] : (Array.isArray(d.images) && d.images.length > 0 ? d.images : [])));
-
-  const rawColors = jaquetaMapping
-    ? jaquetaMapping.colors
-    : Array.isArray(row.colors) && row.colors.length > 0
-    ? row.colors
-    : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
+  const rowId = String(row.id || '').trim();
+  const rowSlug = String(row.slug || '').trim();
+  const storedImages = Array.isArray(row.images) ? row.images.filter((value: unknown) => typeof value === 'string' && value.trim()) : [];
+  const primaryImg = String(row.image || storedImages[0] || '').trim();
+  const allImagesList = primaryImg
+    ? [primaryImg, ...storedImages.filter((value: string) => value !== primaryImg)]
+    : storedImages;
+  const rawColors = Array.isArray(row.colors) ? row.colors : [];
 
   const cleanColors = rawColors.map((c: any) => {
     let variantImages: string[] = Array.isArray(c.images) && c.images.length > 0
       ? c.images
       : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
     let featured = c.featuredImage || variantImages[0] || c.image || primaryImg;
-
-    if (camisetaMapping) {
-      const match = camisetaMapping.variants.find(
-        (v) =>
-          (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-          (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-      );
-      if (match) {
-        featured = match.image;
-        variantImages = [match.image];
-      }
-    }
-
-    if (shortsMapping) {
-      const match = shortsMapping.variants.find(
-        (v) =>
-          (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-          (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-      );
-      if (match) {
-        featured = match.featuredImage || match.image;
-        variantImages = match.images;
-      }
-    }
 
     return {
       id: c.id,
@@ -139,44 +91,39 @@ export function mapSupabaseRowToProduct(row: any): Product {
   });
 
   return {
-    id: String(row.id || d.id || `prod-${Date.now()}`),
-    slug: String(row.slug || d.slug || (row.title ? row.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
-    title: row.title || d.title || 'Produto Streetwear',
-    subtitle: row.subtitle || d.subtitle || '',
-    description: row.description || d.description || '',
-    price: typeof row.price === 'number' ? row.price : parseFloat(row.price || d.price || 0),
-    promoPrice: row.promo_price !== undefined && row.promo_price !== null
-      ? parseFloat(row.promo_price)
-      : (d.promoPrice !== undefined && d.promoPrice !== null ? parseFloat(d.promoPrice) : undefined),
-    category: String(row.category || d.category || 'camisetas').toLowerCase().trim(),
-    subcategory: String(row.subcategory || d.subcategory || 'Essenciais').trim(),
-    collection: row.collection || d.collection || 'Vol. 04: Cyber Dystopia',
-    tags: Array.isArray(row.tags) ? row.tags : (Array.isArray(d.tags) ? d.tags : ['Lançamento']),
-    rating: typeof row.rating === 'number' ? row.rating : parseFloat(row.rating || d.rating || 5.0),
-    reviewCount: typeof row.review_count === 'number' ? row.review_count : parseInt(row.review_count || d.reviewCount || 0, 10),
-    stockCount: typeof row.stock_count === 'number'
-      ? row.stock_count
-      : (row.stock_count !== undefined && row.stock_count !== null
-          ? (parseInt(String(row.stock_count), 10) >= 0 ? parseInt(String(row.stock_count), 10) : 0)
-          : (typeof d?.stockCount === 'number' ? d.stockCount : 0)),
-    sku: row.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
-    sizes: Array.isArray(row.sizes) && row.sizes.length > 0 ? row.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
+    id: rowId,
+    slug: rowSlug,
+    title: String(row.title || ''),
+    subtitle: String(row.subtitle || ''),
+    description: String(row.description || ''),
+    price: Number(row.price),
+    promoPrice: row.promo_price !== undefined && row.promo_price !== null ? Number(row.promo_price) : undefined,
+    category: String(row.category || '').toLowerCase().trim(),
+    subcategory: String(row.subcategory || '').trim(),
+    collection: String(row.collection || ''),
+    tags: Array.isArray(row.tags) ? row.tags : [],
+    rating: Number(row.rating || 0),
+    reviewCount: Number(row.review_count || 0),
+    stockCount: Number(row.stock_count || 0),
+    sku: String(row.sku || ''),
+    sizes: Array.isArray(row.sizes) ? row.sizes : [],
     colors: cleanColors,
     image: primaryImg,
     images: allImagesList,
-    details: Array.isArray(row.details) ? row.details : (Array.isArray(d.details) ? d.details : ['100% Algodão Heavyweight']),
-    careInstructions: Array.isArray(row.care_instructions) ? row.care_instructions : (Array.isArray(d.careInstructions) ? d.careInstructions : ['Lavar em ciclo suave']),
-    composition: Array.isArray(row.composition) ? row.composition : (Array.isArray(d.composition) ? d.composition : ['100% Algodão']),
-    reviews: Array.isArray(row.reviews) ? row.reviews : (Array.isArray(d.reviews) ? d.reviews : []),
-    weight: typeof row.weight === 'number' ? row.weight : parseFloat(row.weight || d.weight || 0.35),
-    height: typeof row.height === 'number' ? row.height : parseFloat(row.height || d.height || 4),
-    width: typeof row.width === 'number' ? row.width : parseFloat(row.width || d.width || 20),
-    length: typeof row.length === 'number' ? row.length : parseFloat(row.length || d.length || 25),
-    isNewRelease: row.is_new_release !== undefined ? Boolean(row.is_new_release) : Boolean(d.isNewRelease),
-    isBestSeller: row.is_best_seller !== undefined ? Boolean(row.is_best_seller) : Boolean(d.isBestSeller),
-    featured: row.featured !== undefined ? Boolean(row.featured) : Boolean(d.featured),
-    status: (row.status || d.status || 'active') as any,
-    createdAt: row.created_at || d.createdAt || new Date().toISOString(),
+    details: Array.isArray(row.details) ? row.details : [],
+    careInstructions: Array.isArray(row.care_instructions) ? row.care_instructions : [],
+    composition: Array.isArray(row.composition) ? row.composition : [],
+    reviews: [],
+    weight: Number(row.weight || 0),
+    height: Number(row.height || 0),
+    width: Number(row.width || 0),
+    length: Number(row.length || 0),
+    isNewRelease: Boolean(row.is_new_release),
+    isBestSeller: Boolean(row.is_best_seller),
+    featured: Boolean(row.featured),
+    status: (row.status || 'active') as any,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
@@ -185,187 +132,57 @@ export function mapSupabaseRowToProduct(row: any): Product {
  */
 export function mapSupabaseRowToCategory(row: any): Category {
   if (!row) return {} as Category;
-  const d = (row.data && typeof row.data === 'object') ? row.data : {};
-  const slug = String(row.slug || d.slug || row.id || d.id || '').toLowerCase().trim();
-  const isShorts = slug === 'shorts' || slug === 'short' || row.id === 'shorts';
+  const slug = String(row.slug || row.id || '').toLowerCase().trim();
 
   return {
-    id: String(row.id || d.id || row.slug || d.slug || `cat-${Date.now()}`),
-    slug: isShorts ? 'shorts' : slug,
-    name: isShorts ? 'Shorts' : (row.name || d.name || 'Categoria'),
-    tagline: isShorts ? 'Shorts & Bermudas Streetwear Autênticos' : (row.tagline || d.tagline || ''),
-    description: isShorts ? 'Shorts e bermudas streetwear com modelagens baggy, parachute, denim e tech nylon.' : (row.description || d.description || ''),
-    image: isShorts ? '/categoria shorts.png' : (row.image || d.image || ''),
-    subcategories: isShorts ? ['Baggy Denim', 'Cargo Baggy', 'Parachute', 'Tech Nylon'] : (Array.isArray(row.subcategories) ? row.subcategories : (Array.isArray(d.subcategories) ? d.subcategories : ['Geral'])),
-    productCount: isShorts ? 11 : (typeof row.product_count === 'number' ? row.product_count : (typeof d.productCount === 'number' ? d.productCount : 0)),
-    order: typeof row.order === 'number' ? row.order : (typeof d.order === 'number' ? d.order : 0),
-    active: row.active !== undefined ? Boolean(row.active) : (d.active !== undefined ? Boolean(d.active) : true),
-    createdAt: row.created_at || d.createdAt || new Date().toISOString(),
+    id: String(row.id || row.slug || ''),
+    slug,
+    name: String(row.name || ''),
+    tagline: String(row.tagline || ''),
+    description: String(row.description || ''),
+    image: String(row.image || ''),
+    subcategories: Array.isArray(row.subcategories) ? row.subcategories : [],
+    productCount: Number(row.product_count || 0),
+    order: Number(row.order || 0),
+    active: row.active !== false,
+    createdAt: row.created_at,
   };
 }
-
-export const PRODUCT_SELECT_COLUMNS =
-  'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
-
-let supabaseProductFetchRequestId = 0;
 
 /**
  * Validates array of products and deduplicates by unique product.id using Map.
  * Discards any corrupted, null or missing-id records.
- * STRICT ENFORCEMENT: Discards all 15 old legacy shorts with unsplash images
- * and enforces the exact 11 authoritative shorts created from the user's images.
+ * This function never adds, rebuilds or overrides products.
  */
 export function validateAndDeduplicateProducts(products: Product[]): Product[] {
-  const authoritativeShorts = buildShortsProducts();
-  if (!Array.isArray(products) || products.length === 0) return authoritativeShorts;
-
-  const nonShorts = products.filter((item) => {
-    if (!item || typeof item !== 'object') return false;
-    const cat = String(item.category || '').toLowerCase().trim();
-    const subcat = String(item.subcategory || '').toLowerCase().trim();
-    const id = String(item.id || '').trim();
-    if (cat === 'shorts' || cat === 'short' || subcat === 'shorts' || id.startsWith('prod-sho-')) {
-      return false;
-    }
-    return true;
-  });
-
-  const combined = [...nonShorts, ...authoritativeShorts];
+  if (!Array.isArray(products)) return [];
   const byId = new Map<string, Product>();
 
-  for (const item of combined) {
+  for (const item of products) {
+    if (!item || typeof item !== 'object') continue;
     const cleanId = String(item.id || '').trim();
     if (!cleanId) continue;
-    const finalItem = applyJaquetaMapping(item);
-    // Map ensures each unique id appears exactly once (latest or valid item)
-    byId.set(cleanId, finalItem);
+    byId.set(cleanId, item);
   }
 
   return Array.from(byId.values());
 }
 
-/**
- * Executes a deterministic, reliable product query from Supabase.
- * - Enforces order('id', { ascending: true }) on all attempts and pages.
- * - Dynamic pagination supporting unlimited products without hardcoded range limits.
- * - Strict ALL-OR-NOTHING semantics: ANY failed batch in a multi-batch attempt discards the entire attempt.
- * - Controlled retry with limited backoff for transient network issues.
- * - Deduplication by unique product.id.
- */
-export async function fetchProductsFromSupabaseDirect(): Promise<{ products: Product[]; error?: any }> {
-  const reqId = ++supabaseProductFetchRequestId;
-  console.log(`[PRODUCTS] request #${reqId} started`);
-
-  const maxAttempts = 2;
-  let lastError: any = null;
-
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-    if (attempt > 1) {
-      console.log(`[PRODUCTS] request #${reqId} retry attempt ${attempt}/${maxAttempts}...`);
-      await new Promise((resolve) => setTimeout(resolve, 200 * attempt));
-    }
-
-    try {
-      // 1. Primary Query: Single deterministic fast query ordered by id
-      const { data, error } = await supabase
-        .from('products')
-        .select(PRODUCT_SELECT_COLUMNS)
-        .order('id', { ascending: true });
-
-      if (!error && data && Array.isArray(data)) {
-        const mapped = data.map(mapSupabaseRowToProduct);
-        const unique = validateAndDeduplicateProducts(mapped);
-        console.log(`[PRODUCTS] primary query success rows=${data.length}, unique=${unique.length}`);
-        return { products: unique };
-      }
-
-      if (error) {
-        lastError = error;
-        console.warn(`[PRODUCTS] request #${reqId} primary query notice:`, error.message || error);
-      }
-
-      // 2. Dynamic Batch Fallback with strict All-or-Nothing validation
-      console.log(`[PRODUCTS] request #${reqId} attempting dynamic sequential batches...`);
-      const pageSize = 60;
-      let page = 0;
-      let hasMore = true;
-      let batchFailed = false;
-      const allBatchRows: any[] = [];
-
-      while (hasMore) {
-        const from = page * pageSize;
-        const to = from + pageSize - 1;
-
-        const { data: pageData, error: pageError } = await supabase
-          .from('products')
-          .select(PRODUCT_SELECT_COLUMNS)
-          .order('id', { ascending: true })
-          .range(from, to);
-
-        if (pageError || !pageData || !Array.isArray(pageData)) {
-          console.warn(`[PRODUCTS] batch ${page} failed (${pageError?.message || 'invalid data'}) — discarding partial result`);
-          batchFailed = true;
-          lastError = pageError || new Error(`Batch ${page} returned invalid data`);
-          break; // Stop immediately; do NOT accept partial data!
-        }
-
-        console.log(`[PRODUCTS] batch ${page} rows=${pageData.length}`);
-        allBatchRows.push(...pageData);
-
-        if (pageData.length < pageSize) {
-          hasMore = false;
-        } else {
-          page++;
-        }
-      }
-
-      // ONLY accept the batch result if ALL batches succeeded without any error
-      if (!batchFailed && allBatchRows.length > 0) {
-        const mapped = allBatchRows.map(mapSupabaseRowToProduct);
-        const unique = validateAndDeduplicateProducts(mapped);
-        console.log(`[PRODUCTS] final unique rows=${unique.length} from all batches`);
-        return { products: unique };
-      }
-    } catch (err: any) {
-      lastError = err;
-      console.warn(`[PRODUCTS] request #${reqId} exception during attempt ${attempt}:`, err?.message || err);
-    }
-  }
-
-  // Graceful fallback to backend API if Supabase encounters a temporary issue
-  try {
-    console.log(`[PRODUCTS] request #${reqId} Supabase direct failed, checking backend /api/products...`);
-    const apiRes = await fetch('/api/products', { cache: 'no-store' });
-    if (apiRes.ok) {
-      const apiData = await apiRes.json();
-      if (apiData && Array.isArray(apiData.products) && apiData.products.length > 0) {
-        const unique = validateAndDeduplicateProducts(apiData.products);
-        console.log(`[PRODUCTS] request #${reqId} backend api fallback rows=${unique.length}`);
-        return { products: unique };
-      }
-    }
-  } catch (apiErr) {
-    console.warn(`[PRODUCTS] request #${reqId} backend api fallback failed:`, apiErr);
-  }
-
-  console.warn(`[PRODUCTS] request #${reqId} failed completely — preserving current state`);
-  return { products: [], error: lastError || new Error('Failed to load products from all sources') };
-}
-
 export const SUPABASE_STORAGE_BUCKET = 'product-images';
 
 /**
- * Uploads an image file or base64 to Supabase Storage 'product-images' bucket
- * or falls back to backend storage proxy. Preserves 100% of the original quality and resolution.
+ * Sends an image to the authenticated backend, which persists it in Supabase Storage.
  */
 export async function uploadProductImageToStorage(
   source: File | Blob | string,
   productId: string = 'general',
   customName?: string
 ): Promise<string> {
-  // If it's already an absolute or uploaded URL, return directly
-  if (typeof source === 'string' && (source.startsWith('http://') || source.startsWith('https://') || source.startsWith('/uploads/'))) {
+  if (typeof source === 'string' && (source.startsWith('http://') || source.startsWith('https://'))) {
     return source;
+  }
+  if (typeof source === 'string' && (source.startsWith('/uploads/') || source.startsWith('uploads/'))) {
+    throw new Error('Imagem local não é persistente. Envie o arquivo para o Supabase Storage.');
   }
 
   const cleanProdId = String(productId || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -413,38 +230,7 @@ export async function uploadProductImageToStorage(
   }
 
   const ext = customName && customName.includes('.') ? (customName.split('.').pop() || detectedExt) : detectedExt;
-  const filePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
-
-  // 1. First Attempt: Upload original file directly to Supabase Storage via Authenticated Supabase Client
-  if (blob) {
-    try {
-      const client = await getAuthenticatedSupabaseClient();
-      const { data: uploadData, error: uploadErr } = await client.storage
-        .from(SUPABASE_STORAGE_BUCKET)
-        .upload(filePath, blob, {
-          contentType,
-          cacheControl: '31536000',
-          upsert: true,
-        });
-
-      if (!uploadErr && uploadData) {
-        const { data: urlData } = client.storage
-          .from(SUPABASE_STORAGE_BUCKET)
-          .getPublicUrl(filePath);
-
-        if (urlData && urlData.publicUrl) {
-          console.log('[STORAGE] Upload concluído no Supabase Storage com qualidade original:', urlData.publicUrl);
-          return urlData.publicUrl;
-        }
-      } else if (uploadErr) {
-        console.warn('[STORAGE] Direct Supabase upload notice:', uploadErr.message);
-      }
-    } catch (err: any) {
-      console.warn('[STORAGE] Direct Supabase upload exception:', err?.message);
-    }
-  }
-
-  // 2. Second Attempt: Proxy upload to backend /api/upload preserving full resolution and bytes
+  // Product image mutations are backend-only; the browser never writes Storage directly.
   if (typeof window !== 'undefined') {
     try {
       let payloadDataUrl = '';
@@ -479,7 +265,6 @@ export async function uploadProductImageToStorage(
         if (res.ok) {
           const data = await res.json();
           if (data.success && data.url) {
-            console.log('[STORAGE] Upload via backend proxy preservando qualidade:', data.url);
             return data.url;
           }
         } else {
@@ -507,22 +292,15 @@ export async function deleteProductImageFromStorage(imageUrl: string): Promise<b
   }
 
   try {
-    const bucketToken = `/${SUPABASE_STORAGE_BUCKET}/`;
-    const idx = imageUrl.indexOf(bucketToken);
-    if (idx === -1) return false;
-
-    const storagePath = imageUrl.substring(idx + bucketToken.length).split('?')[0];
-    if (!storagePath) return false;
-
-    const { error } = await supabase.storage.from(SUPABASE_STORAGE_BUCKET).remove([storagePath]);
-    if (error) {
-      console.warn('[STORAGE] Aviso ao remover imagem antiga:', error.message);
-      return false;
-    }
-    console.log('[STORAGE] Imagem antiga removida do Storage:', storagePath);
-    return true;
+    const response = await fetch('/api/upload', {
+      method: 'DELETE',
+      headers: getClientAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify({ url: imageUrl }),
+    });
+    return response.ok;
   } catch (err: any) {
-    console.warn('[STORAGE] Exceção ao remover imagem antiga:', err?.message);
+    console.warn('[STORAGE] Não foi possível remover a imagem antiga:', err?.message);
     return false;
   }
 }
@@ -606,438 +384,6 @@ function getClientAuthHeaders(): Record<string, string> {
   }
   return headers;
 }
-
-/**
- * Inserts a new product into Supabase table 'products'.
- */
-export async function createProductInSupabase(productData: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
-  console.log('[PRODUCTS] Inserindo novo produto no Supabase via INSERT', productData.title);
-  try {
-    const sb = await getAuthenticatedSupabaseClient();
-    const title = productData.title?.trim() || 'Novo Produto';
-    const slug =
-      productData.slug?.trim() ||
-      title
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-') + `-${Date.now().toString().slice(-4)}`;
-
-    const id = productData.id || `prod-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
-    const price = typeof productData.price === 'number' ? productData.price : parseFloat(String(productData.price || 199.9));
-    const promoPrice = productData.promoPrice !== undefined && productData.promoPrice !== null ? parseFloat(String(productData.promoPrice)) : undefined;
-
-    const rawImages = Array.isArray(productData.images) && productData.images.length > 0
-      ? productData.images
-      : (productData.image ? [productData.image] : ['/placeholder-product.svg']);
-    const rawMainImage = rawImages[0];
-
-    const newProduct: Product = {
-      id,
-      slug,
-      title,
-      subtitle: productData.subtitle?.trim() || '',
-      description: productData.description?.trim() || '',
-      price: isNaN(price) ? 199.9 : price,
-      promoPrice: promoPrice && !isNaN(promoPrice) ? promoPrice : undefined,
-      category: productData.category || 'camisetas',
-      subcategory: productData.subcategory?.trim() || 'Essenciais',
-      collection: productData.collection?.trim() || 'Vol. 04: Cyber Dystopia',
-      tags: Array.isArray(productData.tags) ? productData.tags : ['Lançamento'],
-      rating: productData.rating || 5.0,
-      reviewCount: productData.reviewCount || 0,
-      stockCount: productData.stockCount !== undefined ? parseInt(String(productData.stockCount), 10) : 25,
-      sku: productData.sku?.trim() || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
-      sizes: Array.isArray(productData.sizes) && productData.sizes.length > 0 ? productData.sizes : ['P', 'M', 'G', 'GG'],
-      colors: Array.isArray(productData.colors) && productData.colors.length > 0 ? productData.colors : [
-        { color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' },
-      ],
-      image: rawMainImage,
-      images: rawImages,
-      details: Array.isArray(productData.details) ? productData.details : ['100% Algodão Heavyweight 260g/m²'],
-      careInstructions: Array.isArray(productData.careInstructions) ? productData.careInstructions : ['Lavar em ciclo suave', 'Secar na sombra'],
-      composition: Array.isArray(productData.composition) ? productData.composition : ['100% Algodão Heavyweight 260g/m²'],
-      reviews: [],
-      weight: Number(productData.weight || 0.35),
-      height: Number(productData.height || 4),
-      width: Number(productData.width || 20),
-      length: Number(productData.length || 25),
-      isNewRelease: Boolean(productData.isNewRelease),
-      isBestSeller: Boolean(productData.isBestSeller),
-      featured: Boolean(productData.featured),
-      status: (productData.status as any) || 'active',
-      createdAt: new Date().toISOString(),
-    };
-
-    const payload = buildProductSupabasePayload(newProduct);
-
-    // DIRECT INSERT ONLY with authenticated client
-    const { data, error } = await sb
-      .from('products')
-      .insert(payload)
-      .select()
-      .single();
-
-    if (error) {
-      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
-      if (isPermissionDenied) {
-        console.warn('[PRODUCTS] Direct Supabase INSERT restricted by RLS (is_admin). Delegando para API do servidor...');
-      } else {
-        console.warn('[PRODUCTS] Aviso no INSERT do Supabase:', error.message || error);
-      }
-
-      // Seamless fallback via server-side authoritative API endpoint
-      if (typeof window !== 'undefined') {
-        try {
-          const authHeaders = getClientAuthHeaders();
-          const apiRes = await fetch('/api/products', {
-            method: 'POST',
-            headers: authHeaders,
-            credentials: 'include',
-            body: JSON.stringify(newProduct),
-          });
-          if (apiRes.ok) {
-            const apiProduct = await apiRes.json();
-            if (apiProduct && apiProduct.id) {
-              console.log('[PRODUCTS] Produto criado com sucesso via API autoritativa:', apiProduct.id);
-              return { product: apiProduct };
-            }
-          }
-        } catch (apiErr) {
-          console.warn('[PRODUCTS] Fallback para POST /api/products falhou:', apiErr);
-        }
-      }
-
-      return { product: null, error };
-    }
-
-    const created = mapSupabaseRowToProduct(data || payload);
-    console.log('[PRODUCTS] Produto criado com sucesso via INSERT no Supabase:', created.id);
-    return { product: created };
-  } catch (err: any) {
-    console.warn('[PRODUCTS] Exceção ao criar produto no Supabase:', err?.message || err);
-    if (typeof window !== 'undefined') {
-      try {
-        const authHeaders = getClientAuthHeaders();
-        const apiRes = await fetch('/api/products', {
-          method: 'POST',
-          headers: authHeaders,
-          credentials: 'include',
-          body: JSON.stringify(productData),
-        });
-        if (apiRes.ok) {
-          const apiProduct = await apiRes.json();
-          if (apiProduct && apiProduct.id) {
-            return { product: apiProduct };
-          }
-        }
-      } catch {}
-    }
-    return { product: null, error: err };
-  }
-}
-
-/**
- * Updates an existing product in Supabase table 'products' using individual field UPDATE.
- * NEVER performs full upserts.
- */
-export async function updateProductInSupabase(id: string, updates: Partial<Product>): Promise<{ product: Product | null; error?: any }> {
-  console.log('[PRODUCTS] Atualizando produto no Supabase (individual UPDATE)', id);
-  try {
-    const sb = await getAuthenticatedSupabaseClient();
-    const cleanId = String(id).trim();
-    const patchPayload: Record<string, any> = {
-      updated_at: new Date().toISOString(),
-    };
-
-    if (updates.title !== undefined) patchPayload.title = updates.title.trim();
-    if (updates.slug !== undefined) patchPayload.slug = updates.slug.trim();
-    if (updates.subtitle !== undefined) patchPayload.subtitle = updates.subtitle.trim();
-    if (updates.description !== undefined) patchPayload.description = updates.description.trim();
-    if (updates.price !== undefined) patchPayload.price = parseFloat(String(updates.price));
-    if (updates.promoPrice !== undefined) {
-      patchPayload.promo_price = updates.promoPrice !== null && updates.promoPrice !== undefined ? parseFloat(String(updates.promoPrice)) : null;
-    }
-    if (updates.category !== undefined) patchPayload.category = String(updates.category).toLowerCase().trim();
-    if (updates.subcategory !== undefined) patchPayload.subcategory = updates.subcategory.trim();
-    if (updates.collection !== undefined) patchPayload.collection = updates.collection.trim();
-    if (updates.tags !== undefined) patchPayload.tags = updates.tags;
-    if (updates.rating !== undefined) patchPayload.rating = parseFloat(String(updates.rating));
-    if (updates.reviewCount !== undefined) patchPayload.review_count = parseInt(String(updates.reviewCount), 10);
-    if (updates.stockCount !== undefined) patchPayload.stock_count = parseInt(String(updates.stockCount), 10);
-    if (updates.sku !== undefined) patchPayload.sku = updates.sku.trim();
-    if (updates.sizes !== undefined) patchPayload.sizes = updates.sizes;
-    if (updates.colors !== undefined) patchPayload.colors = updates.colors;
-
-    // Strict image & images consistency: image MUST equal images[0]
-    if (updates.images !== undefined) {
-      const imgs = Array.isArray(updates.images) ? updates.images : (updates.images ? [updates.images] : []);
-      patchPayload.images = imgs;
-      patchPayload.image = imgs[0] || updates.image || '';
-    } else if (updates.image !== undefined) {
-      patchPayload.image = updates.image;
-      patchPayload.images = updates.image ? [updates.image] : [];
-    }
-
-    if (updates.details !== undefined) patchPayload.details = updates.details;
-    if (updates.careInstructions !== undefined) patchPayload.care_instructions = updates.careInstructions;
-    if (updates.composition !== undefined) patchPayload.composition = updates.composition;
-    if (updates.weight !== undefined) patchPayload.weight = parseFloat(String(updates.weight));
-    if (updates.height !== undefined) patchPayload.height = parseFloat(String(updates.height));
-    if (updates.width !== undefined) patchPayload.width = parseFloat(String(updates.width));
-    if (updates.length !== undefined) patchPayload.length = parseFloat(String(updates.length));
-    if (updates.isNewRelease !== undefined) patchPayload.is_new_release = Boolean(updates.isNewRelease);
-    if (updates.isBestSeller !== undefined) patchPayload.is_best_seller = Boolean(updates.isBestSeller);
-    if (updates.featured !== undefined) patchPayload.featured = Boolean(updates.featured);
-    if (updates.status !== undefined) patchPayload.status = updates.status;
-
-    // Individual UPDATE with authenticated client
-    const { data, error } = await sb
-      .from('products')
-      .update(patchPayload)
-      .eq('id', cleanId)
-      .select()
-      .single();
-
-    if (error) {
-      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
-      if (isPermissionDenied) {
-        console.warn('[PRODUCTS] Direct Supabase UPDATE restrito por RLS (is_admin). Delegando para API autoritativa do servidor...');
-      } else {
-        console.warn('[PRODUCTS] Aviso no UPDATE do Supabase:', error.message || error);
-      }
-
-      // Seamless fallback via server-side authoritative API endpoint
-      if (typeof window !== 'undefined') {
-        try {
-          const authHeaders = getClientAuthHeaders();
-          const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
-            method: 'PUT',
-            headers: authHeaders,
-            credentials: 'include',
-            body: JSON.stringify(updates),
-          });
-          if (apiRes.ok) {
-            const apiProduct = await apiRes.json();
-            if (apiProduct && apiProduct.id) {
-              console.log('[PRODUCTS] Produto atualizado com sucesso via API autoritativa:', apiProduct.id);
-              return { product: apiProduct };
-            }
-          }
-        } catch (apiErr) {
-          console.warn('[PRODUCTS] Fallback para PUT /api/products falhou:', apiErr);
-        }
-      }
-
-      return { product: null, error };
-    }
-
-    const updated = mapSupabaseRowToProduct(data);
-    console.log('[PRODUCTS] Produto atualizado com sucesso via UPDATE no Supabase:', updated.id);
-    return { product: updated };
-  } catch (err: any) {
-    console.warn('[PRODUCTS] Exceção ao atualizar produto no Supabase:', err?.message || err);
-    if (typeof window !== 'undefined') {
-      try {
-        const cleanId = String(id).trim();
-        const authHeaders = getClientAuthHeaders();
-        const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
-          method: 'PUT',
-          headers: authHeaders,
-          credentials: 'include',
-          body: JSON.stringify(updates),
-        });
-        if (apiRes.ok) {
-          const apiProduct = await apiRes.json();
-          if (apiProduct && apiProduct.id) {
-            return { product: apiProduct };
-          }
-        }
-      } catch {}
-    }
-    return { product: null, error: err };
-  }
-}
-
-/**
- * Updates stock count of a product in Supabase table 'products'.
- */
-export async function updateProductStockInSupabase(id: string, stockCount: number): Promise<{ product: Product | null; error?: any }> {
-  console.log('[PRODUCTS] atualizando produto no Supabase (estoque)', id, stockCount);
-  try {
-    const sb = await getAuthenticatedSupabaseClient();
-    const cleanId = String(id).trim();
-    const newStock = Math.max(0, parseInt(String(stockCount), 10));
-    const newStatus = newStock <= 0 ? 'out_of_stock' : 'active';
-
-    const { data, error } = await sb
-      .from('products')
-      .update({
-        stock_count: newStock,
-        status: newStatus,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', cleanId)
-      .select()
-      .single();
-
-    if (error) {
-      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
-      if (isPermissionDenied) {
-        console.warn('[PRODUCTS] Direct Supabase stock update restrito por RLS. Delegando para API do servidor...');
-      } else {
-        console.warn('[PRODUCTS] Aviso ao atualizar estoque no Supabase:', error.message || error);
-      }
-
-      if (typeof window !== 'undefined') {
-        try {
-          const authHeaders = getClientAuthHeaders();
-          const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}/stock`, {
-            method: 'PUT',
-            headers: authHeaders,
-            credentials: 'include',
-            body: JSON.stringify({ stockCount: newStock }),
-          });
-          if (apiRes.ok) {
-            const apiProduct = await apiRes.json();
-            if (apiProduct && apiProduct.id) {
-              return { product: apiProduct };
-            }
-          }
-        } catch (apiErr) {
-          console.warn('[PRODUCTS] Fallback para PUT /api/products/:id/stock falhou:', apiErr);
-        }
-      }
-
-      return { product: null, error };
-    }
-
-    const updated = mapSupabaseRowToProduct(data);
-    return { product: updated };
-  } catch (err: any) {
-    console.warn('[PRODUCTS] Exceção ao atualizar estoque no Supabase:', err?.message || err);
-    if (typeof window !== 'undefined') {
-      try {
-        const cleanId = String(id).trim();
-        const authHeaders = getClientAuthHeaders();
-        const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}/stock`, {
-          method: 'PUT',
-          headers: authHeaders,
-          credentials: 'include',
-          body: JSON.stringify({ stockCount: Math.max(0, parseInt(String(stockCount), 10)) }),
-        });
-        if (apiRes.ok) {
-          const apiProduct = await apiRes.json();
-          if (apiProduct && apiProduct.id) {
-            return { product: apiProduct };
-          }
-        }
-      } catch {}
-    }
-    return { product: null, error: err };
-  }
-}
-
-/**
- * Deletes a product from Supabase table 'products'.
- */
-export async function deleteProductInSupabase(id: string): Promise<{ success: boolean; error?: any }> {
-  console.log('[PRODUCTS] excluindo produto no Supabase', id);
-  try {
-    const sb = await getAuthenticatedSupabaseClient();
-    const cleanId = String(id).trim();
-    const { error } = await sb
-      .from('products')
-      .delete()
-      .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-
-    if (error) {
-      const isPermissionDenied = error.code === '42501' || String(error.message || '').includes('is_admin') || String(error.message || '').includes('permission denied');
-      if (isPermissionDenied) {
-        console.warn('[PRODUCTS] Direct Supabase DELETE restrito por RLS. Delegando para API do servidor...');
-      } else {
-        console.warn('[PRODUCTS] Aviso ao excluir no Supabase:', error.message || error);
-      }
-
-      if (typeof window !== 'undefined') {
-        try {
-          const authHeaders = getClientAuthHeaders();
-          const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
-            method: 'DELETE',
-            headers: authHeaders,
-            credentials: 'include',
-          });
-          if (apiRes.ok) {
-            return { success: true };
-          }
-        } catch (apiErr) {
-          console.warn('[PRODUCTS] Fallback para DELETE /api/products/:id falhou:', apiErr);
-        }
-      }
-
-      return { success: false, error };
-    }
-
-    console.log('[PRODUCTS] produto excluído com sucesso no Supabase:', cleanId);
-    return { success: true };
-  } catch (err: any) {
-    console.warn('[PRODUCTS] Exceção ao excluir produto no Supabase:', err?.message || err);
-    if (typeof window !== 'undefined') {
-      try {
-        const cleanId = String(id).trim();
-        const authHeaders = getClientAuthHeaders();
-        const apiRes = await fetch(`/api/products/${encodeURIComponent(cleanId)}`, {
-          method: 'DELETE',
-          headers: authHeaders,
-          credentials: 'include',
-        });
-        if (apiRes.ok) {
-          return { success: true };
-        }
-      } catch {}
-    }
-    return { success: false, error: err };
-  }
-}
-
-/**
- * Direct query to Supabase for categories with resilient backend fallback handling.
- */
-export async function fetchCategoriesFromSupabaseDirect(): Promise<{ categories: Category[]; error?: any }> {
-  try {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('order', { ascending: true });
-
-    if (!error && data && data.length > 0) {
-      const mapped = data.map(mapSupabaseRowToCategory);
-      return { categories: mapped };
-    }
-
-    if (error) {
-      console.warn('[Supabase Client Direct] Supabase direto reportou aviso:', error.message || error);
-    }
-  } catch (err: any) {
-    console.warn('[Supabase Client Direct] Supabase direto indisponível, acionando fallback:', err?.message || err);
-  }
-
-  // Graceful fallback: try fetching from backend /api/categories if direct Supabase connection fails
-  try {
-    const res = await fetch('/api/categories', { cache: 'no-store' });
-    if (res.ok) {
-      const apiCategories = await res.json();
-      if (Array.isArray(apiCategories) && apiCategories.length > 0) {
-        return { categories: apiCategories };
-      }
-    }
-  } catch (apiErr) {
-    console.warn('[Supabase Client Direct] Fallback via /api/categories falhou:', apiErr);
-  }
-
-  return { categories: [] };
-}
-
 /**
  * Normalizes any Supabase user_addresses row into a typed frontend Address model.
  */

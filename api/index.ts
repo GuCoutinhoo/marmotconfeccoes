@@ -24,8 +24,6 @@ import {
   type InfinitePayCheckoutItem,
 } from '../src/server/infinitePayClient.js';
 import { IS_TEST_MODE } from '../src/server/runtime-flags.js';
-import { getCamisetaImageMapping } from '../src/data/camisetaImageMappings.js';
-import { getJaquetaImageMapping } from '../src/data/jaquetaImageMappings.js';
 
 export { IS_TEST_MODE };
 
@@ -788,6 +786,9 @@ const EMAIL_LOGS_FILE = path.join(DATA_DIR, 'email_logs.json');
 const SHIPMENT_EVENTS_FILE = path.join(DATA_DIR, 'shipment_events.json');
 const CAMPAIGNS_FILE = path.join(DATA_DIR, 'campaign_records.json');
 
+const PRODUCT_SELECT_COLUMNS =
+  'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
+
 const INITIAL_STORE_SETTINGS: StoreSettingsData = {
   storeName: 'MARMOT Streetwear',
   contactEmail: 'contato@marmotstreetwear.com.br',
@@ -913,18 +914,16 @@ export class DatabaseManager {
   public async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    // Load local storage files as initial fallback
-    this.loadFromFiles();
+    // JSON files are fixtures for tests/local fallback only. In Supabase mode they
+    // must never seed or mask the authoritative product/catalog state.
+    // Product JSON is a test fixture only. In every normal runtime, products
+    // must be loaded from the authoritative database instead of the filesystem.
+    this.loadFromFiles(IS_TEST_MODE);
 
     if (this.mode === 'supabase' && this.supabase) {
-      // In Supabase mode, ensure authoritative catalog is loaded before marking initialization complete
-      try {
-        await this.loadFromSupabase();
-      } catch (err: any) {
-        console.warn('[DB] Supabase initial load notice:', err?.message || err);
-      }
+      await this.loadFromSupabase();
     } else if (this.mode === 'postgres' && this.pgPool) {
-      await this.loadFromPostgres().catch(() => {});
+      await this.loadFromPostgres();
     }
 
     try {
@@ -991,73 +990,41 @@ export class DatabaseManager {
   public sanitizeProduct(p: any): Product {
     if (!p) return {} as Product;
     const prodId = String(p.id || `prod-${Date.now()}`);
-    const prodSlug = String(p.slug || '').trim();
-    const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
-    const jaquetaMapping = getJaquetaImageMapping(prodId) || getJaquetaImageMapping(prodSlug);
+    const rawImages = Array.isArray(p.images) ? p.images.filter((image: unknown) => typeof image === 'string' && image.trim()) : [];
+    const requestedMainImage = typeof p.image === 'string' ? p.image.trim() : '';
+    const mainImage = requestedMainImage || rawImages[0] || '';
+    const images = rawImages.length > 0
+      ? (mainImage && rawImages[0] !== mainImage ? [mainImage, ...rawImages.filter((image: string) => image !== mainImage)] : rawImages)
+      : (mainImage ? [mainImage] : []);
 
-    const rawMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : (p.image || (Array.isArray(p.images) && p.images[0]) || '');
-    const cleanMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+    const assertPersistentImage = (value: unknown, field: string) => {
+      if (typeof value !== 'string' || !value) return;
+      if (!/^https:\/\//i.test(value) && this.mode === 'supabase') {
+        throw new Error(`PRODUCT_IMAGE_NOT_PERSISTENT: ${field} deve apontar para uma URL persistente do Storage.`);
+      }
+    };
+    assertPersistentImage(mainImage, 'image');
+    images.forEach((image: string, index: number) => assertPersistentImage(image, `images[${index}]`));
 
-    const rawImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : (Array.isArray(p.images) && p.images.length > 0
-          ? p.images
-          : (rawMainImage ? [rawMainImage] : []));
-    const cleanImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
-
-    const rawColors = jaquetaMapping
-      ? jaquetaMapping.colors
-      : Array.isArray(p.colors) && p.colors.length > 0
+    const rawColors = Array.isArray(p.colors) && p.colors.length > 0
       ? p.colors
       : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }];
-
     const cleanColors = rawColors.map((c: any, cIdx: number) => {
-      const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
-        ? c.images
-        : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
-      const cleanVariantImages = rawVariantImages.map((vImg: string, vIdx: number) =>
-        saveBase64ToUploads(vImg, `p-${prodId.slice(-6)}-c${cIdx}-v${vIdx}`)
-      );
-      const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
-      const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
-
-      let finalFeatured = cleanFeatured || cleanMainImage;
-      let finalVariantImages = cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]);
-
-      if (camisetaMapping) {
-        const match = camisetaMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
-      }
-
+      const variantImages: string[] = Array.isArray(c.images)
+        ? c.images.filter((image: unknown) => typeof image === 'string' && image.trim())
+        : [];
+      const featuredImage = String(c.featuredImage || c.image || variantImages[0] || mainImage || '');
+      const normalizedVariantImages = variantImages.length > 0 ? variantImages : (featuredImage ? [featuredImage] : []);
+      assertPersistentImage(featuredImage, `colors[${cIdx}].featuredImage`);
+      normalizedVariantImages.forEach((image, index) => assertPersistentImage(image, `colors[${cIdx}].images[${index}]`));
       return {
         id: c.id,
         color: c.color || 'default',
         colorName: c.colorName || 'Cor Única',
         colorHex: c.colorHex || '#000000',
-        image: finalFeatured,
-        featuredImage: finalFeatured,
-        images: finalVariantImages,
+        image: featuredImage,
+        featuredImage,
+        images: normalizedVariantImages,
         sku: c.sku,
         stockCount: c.stockCount,
         sizes: c.sizes,
@@ -1067,8 +1034,9 @@ export class DatabaseManager {
     return {
       ...p,
       id: prodId,
-      image: cleanMainImage || (cleanImagesList[0] || ''),
-      images: cleanImagesList.length > 0 ? cleanImagesList : (cleanMainImage ? [cleanMainImage] : []),
+      slug: String(p.slug || '').trim(),
+      image: mainImage,
+      images,
       colors: cleanColors,
       status: (p.status as any) || 'active',
       weight: p.weight && Number(p.weight) > 0 ? Number(p.weight) : (p.category === 'moletons' || p.category === 'jaquetas' ? 0.75 : p.category === 'calcas' ? 0.6 : 0.35),
@@ -1080,188 +1048,82 @@ export class DatabaseManager {
 
   private mapSupabaseProduct(item: any): Product {
     if (!item) return {} as Product;
-    const d = (item.data && typeof item.data === 'object') ? item.data : {};
-    const prodId = String(item.id || d.id || `prod-${Date.now()}`);
-    const prodSlug = String(item.slug || d.slug || '').trim();
-    const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
-    const jaquetaMapping = getJaquetaImageMapping(prodId) || getJaquetaImageMapping(prodSlug);
-    
-    const rawMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : (item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '');
-    const cleanMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
-
-    const rawImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : (Array.isArray(item.images) && item.images.length > 0
-          ? item.images
-          : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : [])));
-    const cleanImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
-
-    const rawColors = jaquetaMapping
-      ? jaquetaMapping.colors
-      : Array.isArray(item.colors) && item.colors.length > 0
-      ? item.colors
-      : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
-
-    const cleanColors = rawColors.map((c: any, cIdx: number) => {
-      const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
-        ? c.images
-        : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
-      const cleanVariantImages = rawVariantImages.map((vImg: string, vIdx: number) => saveBase64ToUploads(vImg, `p-${prodId.slice(-6)}-c${cIdx}-v${vIdx}`));
-      const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
-      const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
-
-      let finalFeatured = cleanFeatured || cleanMainImage;
-      let finalVariantImages = cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]);
-
-      if (camisetaMapping) {
-        const match = camisetaMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
-      }
-
-      return {
-        id: c.id,
-        color: c.color || 'default',
-        colorName: c.colorName || 'Cor Única',
-        colorHex: c.colorHex || '#000000',
-        image: finalFeatured,
-        featuredImage: finalFeatured,
-        images: finalVariantImages,
-        sku: c.sku,
-        stockCount: c.stockCount,
-        sizes: c.sizes,
-      };
+    return this.sanitizeProduct({
+      id: String(item.id || ''),
+      slug: String(item.slug || ''),
+      title: item.title || '',
+      subtitle: item.subtitle || '',
+      description: item.description || '',
+      price: Number(item.price),
+      promoPrice: item.promo_price === null || item.promo_price === undefined ? undefined : Number(item.promo_price),
+      category: String(item.category || '').toLowerCase().trim(),
+      subcategory: item.subcategory || '',
+      collection: item.collection || '',
+      tags: Array.isArray(item.tags) ? item.tags : [],
+      rating: Number(item.rating ?? 5),
+      reviewCount: Number(item.review_count ?? 0),
+      stockCount: Math.max(0, Number(item.stock_count ?? 0)),
+      sku: item.sku || '',
+      sizes: Array.isArray(item.sizes) ? item.sizes : [],
+      colors: Array.isArray(item.colors) ? item.colors : [],
+      image: item.image || '',
+      images: Array.isArray(item.images) ? item.images : [],
+      details: Array.isArray(item.details) ? item.details : [],
+      careInstructions: Array.isArray(item.care_instructions) ? item.care_instructions : [],
+      composition: Array.isArray(item.composition) ? item.composition : [],
+      reviews: Array.isArray(item.reviews) ? item.reviews : [],
+      weight: Number(item.weight ?? 0.35),
+      height: Number(item.height ?? 4),
+      width: Number(item.width ?? 20),
+      length: Number(item.length ?? 25),
+      isNewRelease: Boolean(item.is_new_release),
+      isBestSeller: Boolean(item.is_best_seller),
+      featured: Boolean(item.featured),
+      status: item.status || 'active',
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
     });
-
-    return {
-      id: prodId,
-      slug: String(item.slug || d.slug || (item.title ? item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
-      title: item.title || d.title || 'Produto Streetwear',
-      subtitle: item.subtitle || d.subtitle || '',
-      description: item.description || d.description || '',
-      price: typeof item.price === 'number' ? item.price : parseFloat(item.price || d.price || 0),
-      promoPrice: item.promo_price !== undefined && item.promo_price !== null
-        ? parseFloat(item.promo_price)
-        : (d.promoPrice !== undefined && d.promoPrice !== null ? parseFloat(d.promoPrice) : undefined),
-      category: String(item.category || d.category || 'camisetas').toLowerCase().trim(),
-      subcategory: String(item.subcategory || d.subcategory || 'Essenciais').trim(),
-      collection: item.collection || d.collection || 'Vol. 04: Cyber Dystopia',
-      tags: Array.isArray(item.tags) ? item.tags : (Array.isArray(d.tags) ? d.tags : ['Lançamento']),
-      rating: typeof item.rating === 'number' ? item.rating : parseFloat(item.rating || d.rating || 5.0),
-      reviewCount: typeof item.review_count === 'number' ? item.review_count : parseInt(item.review_count || d.reviewCount || 0, 10),
-      stockCount: typeof item.stock_count === 'number'
-        ? item.stock_count
-        : (item.stock_count !== undefined && item.stock_count !== null
-            ? (parseInt(String(item.stock_count), 10) >= 0 ? parseInt(String(item.stock_count), 10) : 0)
-            : (typeof d?.stockCount === 'number' ? d.stockCount : 0)),
-      sku: item.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
-      sizes: Array.isArray(item.sizes) && item.sizes.length > 0 ? item.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
-      colors: cleanColors,
-      image: cleanMainImage || (cleanImagesList[0] || ''),
-      images: cleanImagesList.length > 0 ? cleanImagesList : (cleanMainImage ? [cleanMainImage] : []),
-      details: Array.isArray(item.details) ? item.details : (Array.isArray(d.details) ? d.details : ['100% Algodão Heavyweight']),
-      careInstructions: Array.isArray(item.care_instructions) ? item.care_instructions : (Array.isArray(d.careInstructions) ? d.careInstructions : ['Lavar em ciclo suave']),
-      composition: Array.isArray(item.composition) ? item.composition : (Array.isArray(d.composition) ? d.composition : ['100% Algodão']),
-      reviews: Array.isArray(item.reviews) ? item.reviews : (Array.isArray(d.reviews) ? d.reviews : []),
-      weight: typeof item.weight === 'number' ? item.weight : parseFloat(item.weight || d.weight || 0.35),
-      height: typeof item.height === 'number' ? item.height : parseFloat(item.height || d.height || 4),
-      width: typeof item.width === 'number' ? item.width : parseFloat(item.width || d.width || 20),
-      length: typeof item.length === 'number' ? item.length : parseFloat(item.length || d.length || 25),
-      isNewRelease: item.is_new_release !== undefined ? Boolean(item.is_new_release) : Boolean(d.isNewRelease),
-      isBestSeller: item.is_best_seller !== undefined ? Boolean(item.is_best_seller) : Boolean(d.isBestSeller),
-      featured: item.featured !== undefined ? Boolean(item.featured) : Boolean(d.featured),
-      status: (item.status || d.status || 'active') as any,
-      createdAt: item.created_at || d.createdAt || new Date().toISOString(),
-    };
   }
 
   private mapSupabaseCategory(item: any): Category {
     if (!item) return {} as Category;
-    const d = (item.data && typeof item.data === 'object') ? item.data : {};
     return {
-      id: String(item.id || d.id || item.slug || d.slug || `cat-${Date.now()}`),
-      slug: String(item.slug || d.slug || item.name || d.name || '').toLowerCase().trim(),
-      name: item.name || d.name || 'Categoria',
-      tagline: item.tagline || d.tagline || '',
-      description: item.description || d.description || '',
-      image: item.image || d.image || '',
-      subcategories: Array.isArray(item.subcategories) ? item.subcategories : (Array.isArray(d.subcategories) ? d.subcategories : ['Geral']),
-      productCount: typeof item.product_count === 'number' ? item.product_count : (typeof d.productCount === 'number' ? d.productCount : 0),
-      order: typeof item.order === 'number' ? item.order : (typeof d.order === 'number' ? d.order : 0),
-      active: item.active !== undefined ? Boolean(item.active) : (d.active !== undefined ? Boolean(d.active) : true),
-      createdAt: item.created_at || d.createdAt || new Date().toISOString(),
+      id: String(item.id || ''),
+      slug: String(item.slug || '').toLowerCase().trim(),
+      name: item.name || '',
+      tagline: item.tagline || '',
+      description: item.description || '',
+      image: item.image || '',
+      subcategories: Array.isArray(item.subcategories) ? item.subcategories : [],
+      productCount: Number(item.product_count ?? 0),
+      order: Number(item.order ?? 0),
+      active: item.active !== false,
+      createdAt: item.created_at,
     };
   }
 
   private async loadFromSupabase() {
-    if (!this.supabase) return;
-    this.loadFromFiles();
+    if (!this.supabase) throw new Error('SUPABASE_NOT_CONFIGURED: cliente Supabase indisponível.');
 
     try {
       const { data: catData, error: catErr } = await this.supabase.from('categories').select('*').order('order', { ascending: true });
-      if (!catErr && catData && catData.length > 0) {
-        this.categories = catData.map((item: any) => this.mapSupabaseCategory(item));
-        this.writeJsonFile(CATEGORIES_FILE, this.categories);
-      } else if (!catErr && catData && catData.length === 0) {
-        for (const cat of this.categories) {
-          await this.supabase.from('categories').upsert({
-            id: cat.id,
-            slug: cat.slug,
-            name: cat.name,
-            tagline: cat.tagline,
-            description: cat.description,
-            image: cat.image,
-            subcategories: cat.subcategories,
-            product_count: cat.productCount,
-            order: cat.order,
-            active: cat.active,
-            data: cat,
-          });
-        }
+      if (catErr) {
+        throw new Error(`SUPABASE_CATEGORIES_READ_FAILED: ${catErr.message}`);
       }
+      this.categories = (catData || []).map((item: any) => this.mapSupabaseCategory(item));
 
       console.log('[PRODUCTS] Carregando catálogo completo do Supabase...');
-      const PRODUCT_SELECT_COLUMNS = 'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
       const { data: prodData, error: prodErr } = await this.supabase
         .from('products')
         .select(PRODUCT_SELECT_COLUMNS)
         .order('id', { ascending: true });
 
-      if (!prodErr && prodData && Array.isArray(prodData) && prodData.length > 0) {
-        const mapped = prodData.map((item: any) => this.mapSupabaseProduct(item));
-        const byId = new Map<string, Product>();
-        for (const p of mapped) {
-          if (p && p.id && String(p.id).trim().length > 0) {
-            byId.set(String(p.id).trim(), p);
-          }
-        }
-        const uniqueProducts = Array.from(byId.values());
-        this.products = uniqueProducts;
-        this.writeJsonFile(PRODUCTS_FILE, this.products);
-        console.log(`[PRODUCTS] ${this.products.length} produtos únicos carregados do Supabase com sucesso.`);
-      } else if (prodErr) {
-        console.warn('[PRODUCTS] aviso ao carregar do Supabase:', prodErr.message || prodErr);
+      if (prodErr) {
+        throw new Error(`SUPABASE_PRODUCTS_READ_FAILED: ${prodErr.message}`);
       }
+      const mapped = (prodData || []).map((item: any) => this.mapSupabaseProduct(item));
+      this.products = Array.from(new Map(mapped.filter((product) => product.id).map((product) => [product.id, product])).values());
+      console.log(`[PRODUCTS] ${this.products.length} produtos únicos carregados do Supabase com sucesso.`);
 
       const { data: ordersData, error: ordersErr } = await this.supabase.from('orders').select('*');
       if (!ordersErr && ordersData && ordersData.length > 0) {
@@ -1395,23 +1257,18 @@ export class DatabaseManager {
         }
       } catch {}
     } catch (err) {
-      console.warn('[DB] Supabase query notice, continuing with persistent cache:', err);
+      console.error('[DB] Supabase authoritative load failed:', err);
+      throw err;
     }
   }
 
-  private loadFromFiles() {
+  private loadFromFiles(loadProducts = true) {
     this.categories = this.readJsonFile(CATEGORIES_FILE, INITIAL_CATEGORIES);
-    const rawProds = this.readJsonFile(PRODUCTS_FILE, []);
-    let neededSanitization = false;
-    this.products = rawProds.map((p: any) => {
-      const sanitized = this.sanitizeProduct(p);
-      if (sanitized.image !== p.image || sanitized.images?.length !== p.images?.length) {
-        neededSanitization = true;
-      }
-      return sanitized;
-    });
-    if (neededSanitization) {
-      this.writeJsonFile(PRODUCTS_FILE, this.products);
+    if (loadProducts) {
+      const rawProds = this.readJsonFile(PRODUCTS_FILE, []);
+      this.products = rawProds.map((p: any) => this.sanitizeProduct(p));
+    } else {
+      this.products = [];
     }
     this.users = this.readJsonFile(USERS_FILE, []);
     this.orders = this.readJsonFile(ORDERS_FILE, []);
@@ -1467,7 +1324,7 @@ export class DatabaseManager {
     this.campaignRecords = this.readJsonFile(CAMPAIGNS_FILE, []);
 
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
+    if (loadProducts) this.writeJsonFile(PRODUCTS_FILE, this.products);
     this.writeJsonFile(USERS_FILE, this.users);
     this.writeJsonFile(ORDERS_FILE, this.orders);
     this.writeJsonFile(COUPONS_FILE, this.coupons);
@@ -1499,6 +1356,9 @@ export class DatabaseManager {
   }
 
   private writeJsonFile<T>(filePath: string, data: T): void {
+    if (this.mode === 'supabase' && !IS_TEST_MODE) {
+      return;
+    }
     try {
       const effectivePath = (IS_TEST_MODE && filePath.includes(DATA_DIR))
         ? path.join(os.tmpdir(), 'marmot-test-data', path.basename(filePath))
@@ -1610,6 +1470,87 @@ export class DatabaseManager {
   // ==========================================
   // PRODUCTS CRUD
   // ==========================================
+  private productToSupabasePayload(product: Product): Record<string, any> {
+    return {
+      id: product.id,
+      slug: product.slug,
+      title: product.title,
+      subtitle: product.subtitle || '',
+      description: product.description || '',
+      price: product.price,
+      promo_price: product.promoPrice ?? null,
+      category: product.category,
+      subcategory: product.subcategory || '',
+      collection: product.collection || '',
+      tags: product.tags || [],
+      rating: product.rating ?? 5,
+      review_count: product.reviewCount ?? 0,
+      stock_count: product.stockCount ?? 0,
+      sku: product.sku || '',
+      sizes: product.sizes || [],
+      colors: product.colors || [],
+      image: product.image || '',
+      images: product.images || [],
+      details: product.details || [],
+      care_instructions: product.careInstructions || [],
+      composition: product.composition || [],
+      weight: product.weight ?? 0.35,
+      height: product.height ?? 4,
+      width: product.width ?? 20,
+      length: product.length ?? 25,
+      is_new_release: Boolean(product.isNewRelease),
+      is_best_seller: Boolean(product.isBestSeller),
+      featured: Boolean(product.featured),
+      status: product.status || 'active',
+      data: null,
+    };
+  }
+
+  private validatePersistentProduct(product: Product): void {
+    if (!product.id?.trim()) throw new Error('PRODUCT_INVALID_ID: o ID do produto é obrigatório.');
+    if (!product.slug?.trim()) throw new Error('PRODUCT_INVALID_SLUG: o slug do produto é obrigatório.');
+    if (!product.title?.trim()) throw new Error('PRODUCT_INVALID_TITLE: o título do produto é obrigatório.');
+    if (!Number.isFinite(product.price) || product.price < 0) throw new Error('PRODUCT_INVALID_PRICE: o preço deve ser um número válido e não negativo.');
+    if (!Number.isInteger(product.stockCount) || product.stockCount < 0) throw new Error('PRODUCT_INVALID_STOCK: o estoque deve ser um inteiro não negativo.');
+  }
+
+  private async fetchAllProductsFromAuthoritativeStore(): Promise<Product[]> {
+    if (this.mode === 'supabase' && this.supabase) {
+      const { data, error } = await this.supabase
+        .from('products')
+        .select(PRODUCT_SELECT_COLUMNS)
+        .order('id', { ascending: true });
+      if (error) throw new Error(`SUPABASE_PRODUCTS_READ_FAILED: ${error.message}`);
+      const products = (data || []).map((row: any) => this.mapSupabaseProduct(row));
+      this.products = products;
+      return products;
+    }
+    if (IS_TEST_MODE) return [...this.products];
+    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
+  }
+
+  private async fetchProductFromAuthoritativeStore(idOrSlug: string): Promise<Product | null> {
+    const clean = String(idOrSlug || '').trim();
+    if (!clean) return null;
+    if (this.mode === 'supabase' && this.supabase) {
+      const readBy = async (column: 'id' | 'slug') => {
+        const { data, error } = await this.supabase!
+          .from('products')
+          .select(PRODUCT_SELECT_COLUMNS)
+          .eq(column, clean)
+          .maybeSingle();
+        if (error) throw new Error(`SUPABASE_PRODUCT_READ_FAILED: ${error.message}`);
+        return data ? this.mapSupabaseProduct(data) : null;
+      };
+      return (await readBy('id')) || (await readBy('slug'));
+    }
+    if (IS_TEST_MODE) {
+      const lower = clean.toLowerCase();
+      return this.products.find((product) => product.id?.toLowerCase() === lower || product.slug?.toLowerCase() === lower) || null;
+    }
+    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
+  }
+
   public async getProducts(filters?: any): Promise<Product[]> {
     return this.getAllProducts(filters);
   }
@@ -1626,21 +1567,12 @@ export class DatabaseManager {
     sort?: string;
   }): Promise<Product[]> {
     await this.initialize();
+    const authoritativeProducts = await this.fetchAllProductsFromAuthoritativeStore();
 
-    // Filter out products belonging to deleted categories or not belonging to an active category
-    const activeCategorySlugs = new Set<string>();
-    this.categories.forEach((c) => {
-      if (c.id) activeCategorySlugs.add(c.id.toLowerCase().trim());
-      if (c.slug) activeCategorySlugs.add(c.slug.toLowerCase().trim());
-    });
-
-    let list = this.products.filter((p) => {
-      const pCat = (p.category || '').toLowerCase().trim();
-      const pSub = (p.subcategory || '').toLowerCase().trim();
-      if (pCat === 'acessorios' || pCat === 'acessórios' || pSub === 'acessorios') return false;
-      if (activeCategorySlugs.size > 0 && !activeCategorySlugs.has(pCat)) return false;
-      return true;
-    });
+    // Never hide or rebuild persisted catalog rows implicitly. Storefront and
+    // admin consumers can request explicit filters, while the unfiltered API
+    // must expose the complete authoritative catalog.
+    let list = authoritativeProducts;
 
     if (!filters) return list;
 
@@ -1705,37 +1637,7 @@ export class DatabaseManager {
 
   public async getProductById(idOrSlug: string): Promise<Product | null> {
     await this.initialize();
-    if (!idOrSlug) return null;
-    const clean = String(idOrSlug).trim();
-    const lower = clean.toLowerCase();
-
-    let prod = this.products.find((p) => 
-      p.id === clean || 
-      p.slug === clean || 
-      p.id?.toLowerCase() === lower || 
-      p.slug?.toLowerCase() === lower
-    );
-
-    if (!prod && this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
-        try {
-          const { data, error } = await adminClient
-            .from('products')
-            .select('*')
-            .or(`id.eq.${clean},slug.eq.${clean}`)
-            .limit(1);
-
-          if (!error && data && data.length > 0) {
-            prod = this.mapSupabaseProduct(data[0]);
-            this.products.unshift(prod);
-            this.writeJsonFile(PRODUCTS_FILE, this.products);
-          }
-        } catch {}
-      }
-    }
-
-    return prod || null;
+    return this.fetchProductFromAuthoritativeStore(idOrSlug);
   }
 
   public async createProduct(productData: Partial<Product>): Promise<Product> {
@@ -1805,98 +1707,37 @@ export class DatabaseManager {
       status: (productData.status as any) || 'active',
       createdAt: new Date().toISOString(),
     });
+    this.validatePersistentProduct(newProduct);
 
-    // 1. Persistent local storage & active in-memory list (Always guaranteed)
-    this.products.unshift(newProduct);
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Synchronize to Supabase database with direct await
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('createProduct');
-        const { error } = await adminClient.from('products').insert({
-          id: newProduct.id,
-          slug: newProduct.slug,
-          title: newProduct.title,
-          subtitle: newProduct.subtitle,
-          description: newProduct.description,
-          price: newProduct.price,
-          promo_price: newProduct.promoPrice ?? null,
-          category: newProduct.category,
-          subcategory: newProduct.subcategory,
-          collection: newProduct.collection,
-          tags: newProduct.tags,
-          rating: newProduct.rating,
-          review_count: newProduct.reviewCount,
-          stock_count: newProduct.stockCount,
-          sku: newProduct.sku,
-          sizes: newProduct.sizes,
-          colors: newProduct.colors,
-          image: newProduct.image,
-          images: newProduct.images,
-          details: newProduct.details,
-          care_instructions: newProduct.careInstructions,
-          composition: newProduct.composition,
-          weight: newProduct.weight,
-          height: newProduct.height,
-          width: newProduct.width,
-          length: newProduct.length,
-          is_new_release: newProduct.isNewRelease,
-          is_best_seller: newProduct.isBestSeller,
-          featured: newProduct.featured,
-          status: newProduct.status,
-          data: null,
-        });
-
-        if (error) {
-          console.warn('[DB] Supabase product insert notice:', error.message);
-        } else {
-          console.log('[DB] Produto criado no Supabase com sucesso:', newProduct.id);
-        }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase insert exception:', sbErr?.message);
-        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
+      const adminClient = await this.getRequiredSupabaseAdminClient('createProduct');
+      const { data, error } = await adminClient
+        .from('products')
+        .insert(this.productToSupabasePayload(newProduct))
+        .select(PRODUCT_SELECT_COLUMNS)
+        .single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_INSERT_FAILED: ${error?.message || 'o banco não retornou o produto criado.'}`);
       }
+      const persisted = this.mapSupabaseProduct(data);
+      this.products = [persisted, ...this.products.filter((product) => product.id !== persisted.id)];
+      return persisted;
     }
 
+    if (!IS_TEST_MODE) {
+      throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para criar produtos.');
+    }
+    this.products.unshift(newProduct);
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return newProduct;
   }
 
   public async updateProduct(idOrSlug: string, updates: Partial<Product>): Promise<Product> {
     await this.initialize();
-    const clean = String(idOrSlug).trim();
-    const lower = clean.toLowerCase();
-
-    let idx = this.products.findIndex((p) => 
-      p.id === clean || 
-      p.slug === clean || 
-      p.id?.toLowerCase() === lower || 
-      p.slug?.toLowerCase() === lower
-    );
-
-    if (idx === -1 && this.mode === 'supabase' && this.supabase) {
-      const client = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (client) {
-        try {
-          const { data, error } = await client
-            .from('products')
-            .select('*')
-            .or(`id.eq.${clean},slug.eq.${clean}`)
-            .limit(1);
-          if (!error && data && data.length > 0) {
-            const loaded = this.mapSupabaseProduct(data[0]);
-            this.products.unshift(loaded);
-            idx = 0;
-          }
-        } catch {}
-      }
-    }
-
-    if (idx === -1) {
+    const current = await this.fetchProductFromAuthoritativeStore(idOrSlug);
+    if (!current) {
       throw new Error(`Produto não encontrado para "${idOrSlug}"`);
     }
-
-    const current = this.products[idx];
     const updatedProduct: Product = {
       ...current,
       ...updates,
@@ -1941,110 +1782,45 @@ export class DatabaseManager {
     }
 
     const cleanProduct = this.sanitizeProduct(updatedProduct);
+    this.validatePersistentProduct(cleanProduct);
 
-    // 1. Persistent local storage & in-memory update (Always guaranteed)
-    this.products[idx] = cleanProduct;
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Synchronize to Supabase database via direct UPDATE with await
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('updateProduct');
-        const updatePayload: Record<string, any> = {
-          updated_at: new Date().toISOString(),
-          data: null,
-        };
-        if (updates.title !== undefined) updatePayload.title = cleanProduct.title;
-        if (updates.slug !== undefined) updatePayload.slug = cleanProduct.slug;
-        if (updates.subtitle !== undefined) updatePayload.subtitle = cleanProduct.subtitle || '';
-        if (updates.description !== undefined) updatePayload.description = cleanProduct.description || '';
-        if (updates.price !== undefined) updatePayload.price = cleanProduct.price;
-        if (updates.promoPrice !== undefined) updatePayload.promo_price = cleanProduct.promoPrice ?? null;
-        if (updates.category !== undefined) updatePayload.category = cleanProduct.category;
-        if (updates.subcategory !== undefined) updatePayload.subcategory = cleanProduct.subcategory || 'Essenciais';
-        if (updates.collection !== undefined) updatePayload.collection = cleanProduct.collection || 'Vol. 04: Cyber Dystopia';
-        if (updates.tags !== undefined) updatePayload.tags = cleanProduct.tags || [];
-        if (updates.rating !== undefined) updatePayload.rating = cleanProduct.rating || 5.0;
-        if (updates.reviewCount !== undefined) updatePayload.review_count = cleanProduct.reviewCount || 0;
-        if (updates.stockCount !== undefined) updatePayload.stock_count = typeof cleanProduct.stockCount === 'number' ? cleanProduct.stockCount : 0;
-        if (updates.sku !== undefined) updatePayload.sku = cleanProduct.sku || '';
-        if (updates.sizes !== undefined) updatePayload.sizes = cleanProduct.sizes || ['P', 'M', 'G', 'GG'];
-        if (updates.colors !== undefined) updatePayload.colors = cleanProduct.colors || [];
-        if (updates.image !== undefined || updates.images !== undefined) {
-          updatePayload.image = cleanProduct.image || '';
-          updatePayload.images = cleanProduct.images || [];
-        }
-        if (updates.details !== undefined) updatePayload.details = cleanProduct.details || [];
-        if (updates.careInstructions !== undefined) updatePayload.care_instructions = cleanProduct.careInstructions || [];
-        if (updates.composition !== undefined) updatePayload.composition = cleanProduct.composition || [];
-        if (updates.weight !== undefined) updatePayload.weight = cleanProduct.weight || 0.35;
-        if (updates.height !== undefined) updatePayload.height = cleanProduct.height || 4;
-        if (updates.width !== undefined) updatePayload.width = cleanProduct.width || 20;
-        if (updates.length !== undefined) updatePayload.length = cleanProduct.length || 25;
-        if (updates.isNewRelease !== undefined) updatePayload.is_new_release = Boolean(cleanProduct.isNewRelease);
-        if (updates.isBestSeller !== undefined) updatePayload.is_best_seller = Boolean(cleanProduct.isBestSeller);
-        if (updates.featured !== undefined) updatePayload.featured = Boolean(cleanProduct.featured);
-        if (updates.status !== undefined) updatePayload.status = cleanProduct.status || 'active';
-
-        const { data: updateData, error } = await adminClient
-          .from('products')
-          .update(updatePayload)
-          .eq('id', cleanProduct.id)
-          .select()
-          .single();
-
-        if (error) {
-          console.error('[DB] Supabase product update error:', error.message);
-          throw new Error(`Falha no Supabase ao atualizar produto: ${error.message}`);
-        } else {
-          console.log('[DB] Produto atualizado no Supabase com sucesso via UPDATE:', cleanProduct.id);
-          if (updateData) {
-            cleanProduct.updatedAt = updateData.updated_at || cleanProduct.updatedAt;
-          }
-        }
-      } catch (sbErr: any) {
-        console.error('[DB] Supabase product update exception:', sbErr?.message || sbErr);
-        throw sbErr;
+      const adminClient = await this.getRequiredSupabaseAdminClient('updateProduct');
+      const updatePayload = this.productToSupabasePayload(cleanProduct);
+      delete updatePayload.id;
+      updatePayload.updated_at = new Date().toISOString();
+      const { data, error } = await adminClient
+        .from('products')
+        .update(updatePayload)
+        .eq('id', current.id)
+        .select(PRODUCT_SELECT_COLUMNS)
+        .single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_UPDATE_FAILED: ${error?.message || 'o banco não retornou o produto atualizado.'}`);
       }
+      const persisted = this.mapSupabaseProduct(data);
+      this.products = this.products.map((product) => product.id === persisted.id ? persisted : product);
+      return persisted;
     }
 
+    if (!IS_TEST_MODE) {
+      throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para atualizar produtos.');
+    }
+    const idx = this.products.findIndex((product) => product.id === current.id);
+    if (idx >= 0) this.products[idx] = cleanProduct;
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return cleanProduct;
   }
 
   public async updateProductStock(id: string, stockCount: number): Promise<Product> {
     await this.initialize();
-    const clean = String(id).trim();
-    const lower = clean.toLowerCase();
-
-    let idx = this.products.findIndex((p) => 
-      p.id === clean || 
-      p.slug === clean || 
-      p.id?.toLowerCase() === lower || 
-      p.slug?.toLowerCase() === lower
-    );
-
-    if (idx === -1 && this.mode === 'supabase' && this.supabase) {
-      const client = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (client) {
-        try {
-          const { data, error } = await client
-            .from('products')
-            .select('*')
-            .or(`id.eq.${clean},slug.eq.${clean}`)
-            .limit(1);
-          if (!error && data && data.length > 0) {
-            const loaded = this.mapSupabaseProduct(data[0]);
-            this.products.unshift(loaded);
-            idx = 0;
-          }
-        } catch {}
-      }
+    const current = await this.fetchProductFromAuthoritativeStore(id);
+    if (!current) throw new Error(`Produto #${id} não encontrado.`);
+    const parsedStock = Number(stockCount);
+    if (!Number.isInteger(parsedStock) || parsedStock < 0) {
+      throw new Error('PRODUCT_INVALID_STOCK: o estoque deve ser um inteiro não negativo.');
     }
-
-    if (idx === -1) throw new Error(`Produto #${id} não encontrado.`);
-
-    const current = this.products[idx];
-    const newStock = Math.max(0, parseInt(String(stockCount), 10));
+    const newStock = parsedStock;
     const status = newStock <= 0 ? 'out_of_stock' : current.status === 'out_of_stock' ? 'active' : current.status;
 
     const updated: Product = {
@@ -2053,29 +1829,28 @@ export class DatabaseManager {
       status: status as any,
     };
 
-    // 1. Save locally
-    this.products[idx] = updated;
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Sync to Supabase
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('updateProductStock');
-        const { error } = await adminClient.from('products').update({
+      const adminClient = await this.getRequiredSupabaseAdminClient('updateProductStock');
+      const { data, error } = await adminClient.from('products').update({
           stock_count: newStock,
           status: status,
           data: null,
-        }).eq('id', current.id);
-
-        if (error) {
-          console.warn('[DB] Supabase stock update notice:', error.message);
-        }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase stock update exception:', sbErr?.message);
-        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
+          updated_at: new Date().toISOString(),
+        }).eq('id', current.id).select(PRODUCT_SELECT_COLUMNS).single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_STOCK_UPDATE_FAILED: ${error?.message || 'o banco não retornou o estoque atualizado.'}`);
       }
+      const persisted = this.mapSupabaseProduct(data);
+      this.products = this.products.map((product) => product.id === persisted.id ? persisted : product);
+      return persisted;
     }
 
+    if (!IS_TEST_MODE) {
+      throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para atualizar estoque.');
+    }
+    const idx = this.products.findIndex((product) => product.id === current.id);
+    if (idx >= 0) this.products[idx] = updated;
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return updated;
   }
 
@@ -2083,36 +1858,29 @@ export class DatabaseManager {
     await this.initialize();
     const cleanId = String(id || '').trim();
     if (!cleanId) return false;
+    const current = await this.fetchProductFromAuthoritativeStore(cleanId);
+    if (!current) return false;
 
-    const lowerId = cleanId.toLowerCase();
-
-    // 1. Delete locally
-    this.products = this.products.filter((p) => 
-      p.id !== cleanId && 
-      p.slug !== cleanId && 
-      p.id?.toLowerCase() !== lowerId && 
-      p.slug?.toLowerCase() !== lowerId
-    );
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Delete in Supabase
     if (this.mode === 'supabase') {
-      try {
-        console.log('[PRODUCTS] excluindo produto no Supabase:', cleanId);
-        const adminClient = await this.getRequiredSupabaseAdminClient('deleteProduct');
-        const { error } = await adminClient
-          .from('products')
-          .delete()
-          .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-        if (error) {
-          console.warn('[DB] Supabase delete product notice:', error.message);
-        }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase delete exception:', sbErr?.message);
-        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
+      const adminClient = await this.getRequiredSupabaseAdminClient('deleteProduct');
+      const { data, error } = await adminClient
+        .from('products')
+        .delete()
+        .eq('id', current.id)
+        .select('id')
+        .single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_DELETE_FAILED: ${error?.message || 'o banco não confirmou a exclusão.'}`);
       }
+      this.products = this.products.filter((product) => product.id !== current.id);
+      return true;
     }
 
+    if (!IS_TEST_MODE) {
+      throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para excluir produtos.');
+    }
+    this.products = this.products.filter((product) => product.id !== current.id);
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return true;
   }
 
@@ -2125,12 +1893,20 @@ export class DatabaseManager {
   // ==========================================
   public async getAllCategories(): Promise<Category[]> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const client = await this.getRequiredSupabaseAdminClient('leitura de categorias');
+      const { data, error } = await client.from('categories').select('*').order('order', { ascending: true });
+      if (error || !Array.isArray(data)) throw new Error(`Falha ao ler categorias do Supabase: ${error?.message || 'resposta inválida'}`);
+      this.categories = data.map((row: any) => this.mapSupabaseCategory(row));
+    } else if (!IS_TEST_MODE) {
+      throw new Error('Supabase é obrigatório para leitura de categorias fora do modo de teste.');
+    }
     return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   }
 
   public async getCategoryById(idOrSlug: string): Promise<Category | null> {
-    await this.initialize();
-    return this.categories.find((c) => c.id === idOrSlug || c.slug === idOrSlug) || null;
+    const categories = await this.getAllCategories();
+    return categories.find((c) => c.id === idOrSlug || c.slug === idOrSlug) || null;
   }
 
   public async createCategory(categoryData: Partial<Category>): Promise<Category> {
@@ -2163,7 +1939,7 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase') {
       const adminClient = await this.getRequiredSupabaseAdminClient('createCategory');
-      const { error } = await adminClient.from('categories').upsert({
+      const { data, error } = await adminClient.from('categories').insert({
         id: newCategory.id,
         slug: newCategory.slug,
         name: newCategory.name,
@@ -2174,14 +1950,18 @@ export class DatabaseManager {
         product_count: newCategory.productCount,
         order: newCategory.order,
         active: newCategory.active,
-        data: newCategory,
-      });
-      if (error) {
+        data: null,
+      }).select('*').single();
+      if (error || !data) {
         console.error('[DB] Supabase category insert error:', error);
-        throw new Error(`Falha ao salvar categoria no Supabase: ${error.message}`);
+        throw new Error(`Falha ao salvar categoria no Supabase: ${error?.message || 'insert não confirmado'}`);
       }
+      const persisted = this.mapSupabaseCategory(data);
+      this.categories = [...this.categories.filter((category) => category.id !== persisted.id), persisted];
+      return persisted;
     }
 
+    if (!IS_TEST_MODE) throw new Error('Supabase é obrigatório para criar categorias fora do modo de teste.');
     this.categories.push(newCategory);
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
@@ -2193,62 +1973,21 @@ export class DatabaseManager {
     const cleanId = String(id || '').trim();
     const lowerId = cleanId.toLowerCase();
 
-    let idx = this.categories.findIndex((c) => 
-      c.id === cleanId || 
-      c.slug === cleanId || 
-      c.id?.toLowerCase() === lowerId || 
-      c.slug?.toLowerCase() === lowerId
-    );
-
-    if (idx === -1 && this.mode === 'supabase') {
-      const client = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (client) {
-        try {
-          const { data, error } = await client
-            .from('categories')
-            .select('*')
-            .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
-            .limit(1);
-          if (!error && data && data.length > 0) {
-            const loaded = this.mapSupabaseCategory(data[0]);
-            this.categories.push(loaded);
-            idx = this.categories.length - 1;
-          }
-        } catch {}
-      }
-    }
-
-    if (idx === -1) throw new Error(`Categoria "${id}" não encontrada.`);
-
-    const current = this.categories[idx];
+    const current = await this.getCategoryById(cleanId);
+    if (!current) throw new Error(`Categoria "${id}" não encontrada.`);
     const updated = {
       ...current,
       ...updates,
       id: current.id,
     };
 
-    if (updated.image && typeof updated.image === 'string' && updated.image.startsWith('data:image/')) {
-      try {
-        const matches = updated.image.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
-        if (matches) {
-          const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1].replace(/[^a-z0-9]/gi, '');
-          const buffer = Buffer.from(matches[2], 'base64');
-          const filename = `cat-${updated.id || cleanId}-${Date.now()}.${ext || 'jpg'}`;
-          if (!fs.existsSync(UPLOADS_DIR)) {
-            fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-          }
-          fs.writeFileSync(path.join(UPLOADS_DIR, filename), buffer);
-          updated.image = `/uploads/${filename}`;
-        }
-      } catch (imgErr) {
-        console.warn('[DB] Could not save category base64 image to file, keeping original:', imgErr);
-      }
+    if (updated.image && /^(data:|blob:|\/uploads\/)/i.test(updated.image)) {
+      throw new Error('A imagem da categoria precisa ser uma URL persistente.');
     }
 
     if (this.mode === 'supabase') {
       const adminClient = await this.getRequiredSupabaseAdminClient('updateCategory');
-      const { error } = await adminClient.from('categories').upsert({
-        id: updated.id,
+      const { data, error } = await adminClient.from('categories').update({
         slug: updated.slug,
         name: updated.name,
         tagline: updated.tagline,
@@ -2258,15 +1997,20 @@ export class DatabaseManager {
         product_count: updated.productCount,
         order: updated.order,
         active: updated.active,
-        data: updated,
-      });
-      if (error) {
+        data: null,
+      }).eq('id', current.id).select('*').single();
+      if (error || !data) {
         console.error('[DB] Supabase category update error:', error);
-        throw new Error(`Falha ao atualizar categoria no Supabase: ${error.message}`);
+        throw new Error(`Falha ao atualizar categoria no Supabase: ${error?.message || 'update não confirmado'}`);
       }
+      const persisted = this.mapSupabaseCategory(data);
+      this.categories = this.categories.map((category) => category.id === persisted.id ? persisted : category);
+      return persisted;
     }
 
-    this.categories[idx] = updated;
+    if (!IS_TEST_MODE) throw new Error('Supabase é obrigatório para atualizar categorias fora do modo de teste.');
+    const idx = this.categories.findIndex((category) => category.id === current.id);
+    if (idx >= 0) this.categories[idx] = updated;
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
     return updated;
@@ -2279,27 +2023,24 @@ export class DatabaseManager {
 
     const lowerId = cleanId.toLowerCase();
 
-    // Find category to identify both ID and slug for cascade removal
-    const targetCat = this.categories.find(
-      (c) =>
-        c.id === cleanId ||
-        c.slug === cleanId ||
-        c.id?.toLowerCase() === lowerId ||
-        c.slug?.toLowerCase() === lowerId
-    );
+    const targetCat = await this.getCategoryById(cleanId);
+    if (!targetCat) return false;
     const catSlug = (targetCat?.slug || lowerId).toLowerCase();
 
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('deleteCategory');
-        const { error } = await adminClient.from('categories').delete().or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-        if (error) {
-          console.error('[DB] Supabase category delete error:', error);
-        }
-        await adminClient.from('products').delete().or(`category.eq.${lowerId},category.eq.${catSlug}`);
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase admin client not available during category delete, updating local store:', sbErr?.message);
+      const adminClient = await this.getRequiredSupabaseAdminClient('deleteCategory');
+      const { count, error: productCountError } = await adminClient
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .or(`category.eq.${targetCat.id},category.eq.${catSlug},subcategory.eq.${targetCat.id},subcategory.eq.${catSlug}`);
+      if (productCountError) throw new Error(`Falha ao validar produtos da categoria: ${productCountError.message}`);
+      if ((count || 0) > 0) {
+        throw new Error('A categoria possui produtos. Mova ou exclua esses produtos antes de excluir a categoria.');
       }
+      const { data, error } = await adminClient.from('categories').delete().eq('id', targetCat.id).select('id').single();
+      if (error || data?.id !== targetCat.id) throw new Error(`Falha ao excluir categoria no Supabase: ${error?.message || 'delete não confirmado'}`);
+    } else if (!IS_TEST_MODE) {
+      throw new Error('Supabase é obrigatório para excluir categorias fora do modo de teste.');
     }
 
     this.categories = this.categories.filter((c) => 
@@ -2314,31 +2055,22 @@ export class DatabaseManager {
     });
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
-    // Cascade delete: remove all products belonging to this category
-    const initialCount = this.products.length;
-    this.products = this.products.filter((p) => {
-      const pCat = (p.category || '').toLowerCase();
-      const pSub = (p.subcategory || '').toLowerCase();
-      return pCat !== lowerId && pCat !== catSlug && pSub !== lowerId && pSub !== catSlug;
-    });
-    console.log(`[DB] Cascade deleted ${initialCount - this.products.length} products associated with deleted category '${cleanId}'`);
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
     return true;
   }
 
   public async reorderCategories(orderedIds: string[]): Promise<Category[]> {
     await this.initialize();
+    const authoritativeCategories = await this.getAllCategories();
     const reordered: Category[] = [];
 
     orderedIds.forEach((id, index) => {
-      const cat = this.categories.find((c) => c.id === id || c.slug === id);
+      const cat = authoritativeCategories.find((c) => c.id === id || c.slug === id);
       if (cat) {
         reordered.push({ ...cat, order: index });
       }
     });
 
-    this.categories.forEach((c) => {
+    authoritativeCategories.forEach((c) => {
       if (!reordered.find((r) => r.id === c.id)) {
         reordered.push({ ...c, order: reordered.length });
       }
@@ -2346,14 +2078,21 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase') {
       const adminClient = await this.getRequiredSupabaseAdminClient('reorderCategories');
-      for (const c of reordered) {
-        const { error } = await adminClient.from('categories').update({ order: c.order, data: c }).eq('id', c.id);
-        if (error) {
-          console.error('[DB] Supabase reorder categories error:', error);
+      for (const category of reordered) {
+        const { data, error } = await adminClient
+          .from('categories')
+          .update({ order: category.order, data: null })
+          .eq('id', category.id)
+          .select('id')
+          .single();
+        if (error || data?.id !== category.id) {
+          throw new Error(`Falha ao confirmar a ordem da categoria ${category.id}: ${error?.message || 'update não confirmado'}`);
         }
       }
+      return this.getAllCategories();
     }
 
+    if (!IS_TEST_MODE) throw new Error('Supabase é obrigatório para reordenar categorias fora do modo de teste.');
     this.categories = reordered;
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
@@ -3385,6 +3124,7 @@ export class DatabaseManager {
     if (this.mode === 'supabase' && this.supabase) {
       try {
         const { data, error } = await this.supabase.from('cart_items').select('*').eq('user_id', userId);
+        if (error) throw new Error(error.message);
         if (!error && Array.isArray(data)) {
           const nonUserItems = this.cartItems.filter((c) => c.userId !== userId);
           const sbItems = data.map((item: any) => {
@@ -3409,15 +3149,17 @@ export class DatabaseManager {
           this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
         }
       } catch (err) {
-        console.warn('[DB] Supabase getCartForUser notice:', err);
+        throw new Error(`Falha ao carregar o carrinho do Supabase: ${(err as any)?.message || err}`);
       }
+    } else if (!IS_TEST_MODE) {
+      throw new Error('Supabase é obrigatório para persistência do carrinho fora do modo de teste.');
     }
 
     const userItems = this.cartItems.filter((c) => c.userId === userId);
     const result: any[] = [];
     for (const item of userItems) {
       const prod =
-        this.products.find((p) => p.id === item.productId || (item as any).product_id === p.id) ||
+        (await this.getProductById(item.productId || (item as any).product_id)) ||
         (item as any).product ||
         ((item as any).data as any)?.product;
 
@@ -3443,7 +3185,7 @@ export class DatabaseManager {
     await this.initialize();
     const cleanQty = Math.max(1, parseInt(String(quantity || 1), 10));
     const cleanColorName = selectedColor?.colorName || selectedColor?.color || 'Padrão';
-    const prod = this.products.find((p) => p.id === productId);
+    const prod = await this.getProductById(productId);
 
     const existing = this.cartItems.find(
       (c) =>
@@ -3480,7 +3222,7 @@ export class DatabaseManager {
     if (this.mode === 'supabase' && this.supabase) {
       try {
         const itemToPersist = existing || this.cartItems[this.cartItems.length - 1];
-        await this.supabase.from('cart_items').upsert({
+        const { error } = await this.supabase.from('cart_items').upsert({
           id: itemToPersist.id,
           user_id: itemToPersist.userId,
           product_id: itemToPersist.productId,
@@ -3495,9 +3237,12 @@ export class DatabaseManager {
             product: prod || (itemToPersist as any).product,
           },
         });
+        if (error) throw new Error(error.message);
       } catch (err) {
-        console.warn('[DB] Supabase cart upsert warning:', err);
+        throw new Error(`Falha ao persistir o carrinho no Supabase: ${(err as any)?.message || err}`);
       }
+    } else if (!IS_TEST_MODE) {
+      throw new Error('Supabase é obrigatório para persistência do carrinho fora do modo de teste.');
     }
 
     return this.getCartForUser(userId);
@@ -3512,7 +3257,7 @@ export class DatabaseManager {
   ): Promise<any[]> {
     await this.initialize();
     const cleanQty = parseInt(String(quantity), 10);
-    const prod = this.products.find((p) => p.id === productId);
+    const prod = await this.getProductById(productId);
 
     const idx = this.cartItems.findIndex(
       (c) =>
@@ -3528,15 +3273,18 @@ export class DatabaseManager {
         this.cartItems.splice(idx, 1);
         if (this.mode === 'supabase' && this.supabase) {
           try {
-            await this.supabase.from('cart_items').delete().eq('id', item.id);
-          } catch {}
+            const { error } = await this.supabase.from('cart_items').delete().eq('id', item.id);
+            if (error) throw new Error(error.message);
+          } catch (error: any) {
+            throw new Error(`Falha ao remover item do carrinho no Supabase: ${error?.message || error}`);
+          }
         }
       } else {
         item.quantity = cleanQty;
         item.updatedAt = new Date().toISOString();
         if (this.mode === 'supabase' && this.supabase) {
           try {
-            await this.supabase.from('cart_items').upsert({
+            const { error } = await this.supabase.from('cart_items').upsert({
               id: item.id,
               user_id: item.userId,
               product_id: item.productId,
@@ -3551,7 +3299,10 @@ export class DatabaseManager {
                 product: prod || (item as any).product,
               },
             });
-          } catch {}
+            if (error) throw new Error(error.message);
+          } catch (error: any) {
+            throw new Error(`Falha ao atualizar item do carrinho no Supabase: ${error?.message || error}`);
+          }
         }
       }
       this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
@@ -3581,8 +3332,11 @@ export class DatabaseManager {
       this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
       if (this.mode === 'supabase' && this.supabase) {
         try {
-          await this.supabase.from('cart_items').delete().eq('id', item.id);
-        } catch {}
+          const { error } = await this.supabase.from('cart_items').delete().eq('id', item.id);
+          if (error) throw new Error(error.message);
+        } catch (error: any) {
+          throw new Error(`Falha ao remover item do carrinho no Supabase: ${error?.message || error}`);
+        }
       }
     }
 
@@ -3595,8 +3349,13 @@ export class DatabaseManager {
     this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        await this.supabase.from('cart_items').delete().eq('user_id', userId);
-      } catch {}
+        const { error } = await this.supabase.from('cart_items').delete().eq('user_id', userId);
+        if (error) throw new Error(error.message);
+      } catch (error: any) {
+        throw new Error(`Falha ao limpar o carrinho no Supabase: ${error?.message || error}`);
+      }
+    } else if (!IS_TEST_MODE) {
+      throw new Error('Supabase é obrigatório para persistência do carrinho fora do modo de teste.');
     }
   }
 
@@ -3645,7 +3404,7 @@ export class DatabaseManager {
       try {
         const userItems = this.cartItems.filter((c) => c.userId === userId);
         for (const item of userItems) {
-          await this.supabase.from('cart_items').upsert({
+          const { error } = await this.supabase.from('cart_items').upsert({
             id: item.id,
             user_id: item.userId,
             product_id: item.productId,
@@ -3657,8 +3416,13 @@ export class DatabaseManager {
             updated_at: item.updatedAt,
             data: item,
           });
+          if (error) throw new Error(error.message);
         }
-      } catch {}
+      } catch (error: any) {
+        throw new Error(`Falha ao mesclar o carrinho no Supabase: ${error?.message || error}`);
+      }
+    } else if (!IS_TEST_MODE) {
+      throw new Error('Supabase é obrigatório para persistência do carrinho fora do modo de teste.');
     }
 
     return this.getCartForUser(userId);
@@ -3692,7 +3456,7 @@ export class DatabaseManager {
     const userItems = this.wishlistItems.filter((w) => w.userId === userId);
     const result: Product[] = [];
     for (const item of userItems) {
-      const prod = this.products.find((p) => p.id === item.productId);
+      const prod = await this.getProductById(item.productId);
       if (prod) {
         result.push(prod);
       }
@@ -4508,30 +4272,30 @@ export class DatabaseManager {
   ): Promise<{ success: boolean; previousStock: number; newStock: number; error?: string }> {
     await this.initialize();
     if (this.mode === 'supabase') {
-      try {
-        const client = (await this.getSupabaseAdminClient()) || this.supabase;
-        if (client) {
-          const { data, error } = await client.rpc('deduct_inventory_atomic', {
-            p_product_id: productId,
-            p_quantity: quantity,
-            p_order_id: orderId || null,
-            p_reason: reason,
-          });
-          if (!error && data) {
-            return {
-              success: Boolean(data.success),
-              previousStock: Number(data.previous_stock || 0),
-              newStock: Number(data.new_stock || 0),
-              error: data.error,
-            };
-          }
-        }
-      } catch (err) {
-        console.warn('[DB] Supabase deduct_inventory_atomic fallback:', err);
+      const client = await this.getRequiredSupabaseAdminClient('baixa atômica de estoque');
+      const { data, error } = await client.rpc('deduct_inventory_atomic', {
+        p_product_id: productId,
+        p_quantity: quantity,
+        p_order_id: orderId || null,
+        p_reason: reason,
+      });
+      if (error) {
+        throw new Error(`Falha na baixa atômica de estoque: ${error.message}`);
       }
+      if (!data) throw new Error('A baixa atômica de estoque não foi confirmada pelo Supabase.');
+      return {
+        success: Boolean(data.success),
+        previousStock: Number(data.previous_stock || 0),
+        newStock: Number(data.new_stock || 0),
+        error: data.error,
+      };
     }
 
-    // Atomic in-memory & file state deduction
+    if (!IS_TEST_MODE) {
+      throw new Error('Supabase é obrigatório para baixa de estoque fora do modo de teste.');
+    }
+
+    // Isolated test-mode fallback. Never used by production/serverless requests.
     const idx = this.products.findIndex((p) => p.id === productId);
     if (idx === -1) {
       return { success: false, previousStock: 0, newStock: 0, error: 'Produto não encontrado' };
@@ -4825,6 +4589,7 @@ export class DatabaseManager {
   // ==========================================
   public async getOverviewMetrics(period = '30days'): Promise<AdminOverviewMetrics> {
     await this.initialize();
+    const authoritativeProducts = await this.fetchAllProductsFromAuthoritativeStore();
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
     const currentMonth = now.getMonth();
@@ -4908,7 +4673,7 @@ export class DatabaseManager {
             const pId = itm.productId;
             const sub = Number(itm.price || 0) * (itm.quantity || 1);
             if (!productSalesMap.has(pId)) {
-              const matchedProd = this.products.find((p) => p.id === pId);
+              const matchedProd = authoritativeProducts.find((p) => p.id === pId);
               productSalesMap.set(pId, {
                 id: pId,
                 title: itm.productTitle || matchedProd?.title || 'Produto',
@@ -4922,7 +4687,7 @@ export class DatabaseManager {
             pEntry.salesCount += itm.quantity || 1;
             pEntry.revenue += sub;
 
-            const matchedProd = this.products.find((p) => p.id === pId);
+            const matchedProd = authoritativeProducts.find((p) => p.id === pId);
             const catName = matchedProd?.category || 'Streetwear';
             if (!categorySalesMap.has(catName)) {
               categorySalesMap.set(catName, { category: catName, count: 0, revenue: 0 });
@@ -4939,7 +4704,7 @@ export class DatabaseManager {
       (r) => r.status !== 'Concluída' && r.status !== 'Recusada' && r.status !== 'Reembolso realizado'
     ).length;
 
-    const lowStockCount = this.products.filter((p) => (typeof p.stockCount === 'number' ? p.stockCount : 0) <= 5).length;
+    const lowStockCount = authoritativeProducts.filter((p) => (typeof p.stockCount === 'number' ? p.stockCount : 0) <= 5).length;
     const averageTicket = totalValidOrders > 0 ? Number((totalValidRevenue / totalValidOrders).toFixed(2)) : 0;
     const newCustomersThisMonth = (await this.getCustomerProfiles()).filter((c) => {
       const d = new Date(c.createdAt);
@@ -4997,6 +4762,7 @@ export class DatabaseManager {
   // ==========================================
   public async getReports(dateFrom?: string, dateTo?: string, period = 'this_month'): Promise<any> {
     await this.initialize();
+    const authoritativeProducts = await this.fetchAllProductsFromAuthoritativeStore();
     let startDate: Date;
     let endDate = new Date();
 
@@ -5060,7 +4826,7 @@ export class DatabaseManager {
         for (const itm of o.items) {
           const key = itm.productId;
           if (!productSalesMap.has(key)) {
-            const prod = this.products.find((p) => p.id === key);
+            const prod = authoritativeProducts.find((p) => p.id === key);
             productSalesMap.set(key, {
               title: itm.productTitle || prod?.title || 'Produto',
               category: prod?.category || 'Geral',
@@ -5307,7 +5073,7 @@ export class DatabaseManager {
     this.writeJsonFile(REVIEWS_FILE, this.productReviews);
 
     // Update product rating and review count
-    const product = this.products.find((p) => p.id === data.productId);
+    const product = await this.getProductById(data.productId);
     if (product) {
       const prodReviews = this.productReviews.filter((r) => r.productId === data.productId && r.status === 'published');
       const avgRating = prodReviews.reduce((sum, r) => sum + r.rating, 0) / prodReviews.length;
@@ -5356,7 +5122,7 @@ export class DatabaseManager {
     this.writeJsonFile(REVIEWS_FILE, this.productReviews);
 
     // Recalculate product rating
-    const product = this.products.find((p) => p.id === removed.productId);
+    const product = await this.getProductById(removed.productId);
     if (product) {
       const prodReviews = this.productReviews.filter((r) => r.productId === removed.productId && r.status === 'published');
       const avgRating = prodReviews.length > 0
@@ -6543,6 +6309,14 @@ app.get('/api/admin/health', requireAdmin, async (req, res) => {
 });
 
 // --- Products (Real persistent store) ---
+const persistenceErrorStatus = (error: unknown): number => {
+  const message = String((error as any)?.message || error || '').toLowerCase();
+  if (message.includes('não encontrad')) return 404;
+  if (message.includes('duplicate') || message.includes('unique') || message.includes('slug')) return 409;
+  if (message.includes('obrigatór') || message.includes('inválid') || message.includes('não persistente') || message.includes('precisa ser')) return 400;
+  return 500;
+};
+
 app.get('/api/products', async (req, res) => {
   try {
     const { category, subcategory, search, tag, sort, minPrice, maxPrice, onSale, status } = req.query;
@@ -6595,7 +6369,7 @@ app.post('/api/products', requireAdmin, async (req: any, res) => {
     const created = await db.createProduct(data);
     res.status(201).json(created);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao persistir novo produto.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao persistir novo produto.' });
   }
 });
 
@@ -6605,7 +6379,7 @@ app.put('/api/products/:id', requireAdmin, async (req: any, res) => {
     const updated = await db.updateProduct(cleanId, req.body);
     res.json(updated);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao atualizar produto.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao atualizar produto.' });
   }
 });
 
@@ -6616,10 +6390,14 @@ const handleStockUpdate = async (req: any, res: express.Response) => {
       return res.status(400).json({ error: 'O campo stockCount é obrigatório.' });
     }
     const cleanId = decodeURIComponent(req.params.id || '').trim();
-    const updated = await db.updateProductStock(cleanId, parseInt(stockCount, 10));
+    const parsedStock = Number(stockCount);
+    if (!Number.isInteger(parsedStock) || parsedStock < 0) {
+      return res.status(400).json({ error: 'stockCount deve ser um inteiro maior ou igual a zero.' });
+    }
+    const updated = await db.updateProductStock(cleanId, parsedStock);
     res.json(updated);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao atualizar saldo de estoque.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao atualizar saldo de estoque.' });
   }
 };
 
@@ -6638,7 +6416,7 @@ app.delete('/api/products/:id', requireAdmin, async (req: any, res) => {
     }
     res.json({ success: true, message: 'Produto excluído com sucesso.' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao excluir produto.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao excluir produto.' });
   }
 });
 
@@ -6646,7 +6424,9 @@ app.delete('/api/products/:id', requireAdmin, async (req: any, res) => {
 app.get('/api/categories', async (req, res) => {
   try {
     const categories = await db.getAllCategories();
-    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
     res.json(categories);
   } catch {
     res.status(500).json({ error: 'Erro ao buscar categorias.' });
@@ -6669,7 +6449,7 @@ app.post('/api/categories', requireAdmin, async (req, res) => {
     const created = await db.createCategory(req.body);
     res.status(201).json(created);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao criar categoria.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao criar categoria.' });
   }
 });
 
@@ -6679,7 +6459,7 @@ app.put('/api/categories/:id', requireAdmin, async (req, res) => {
     const updated = await db.updateCategory(cleanId, req.body);
     res.json(updated);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao atualizar categoria.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao atualizar categoria.' });
   }
 });
 
@@ -6692,7 +6472,7 @@ app.put('/api/categories-reorder', requireAdmin, async (req, res) => {
     const reordered = await db.reorderCategories(orderedIds);
     res.json(reordered);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao reordenar categorias.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao reordenar categorias.' });
   }
 });
 
@@ -6703,7 +6483,7 @@ app.delete('/api/categories/:id', requireAdmin, async (req, res) => {
     if (!success) return res.status(404).json({ error: 'Categoria não encontrada.' });
     res.json({ success: true, message: 'Categoria excluída com sucesso.' });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Erro ao excluir categoria.' });
+    res.status(persistenceErrorStatus(error)).json({ error: error.message || 'Erro ao excluir categoria.' });
   }
 });
 
@@ -6849,10 +6629,10 @@ app.post('/api/upload', requireAdmin, async (req, res) => {
     const base64Data = matches[2];
     const buffer = Buffer.from(base64Data, 'base64');
 
-    // 10MB File Size Limit
-    const MAX_SIZE_BYTES = 10 * 1024 * 1024;
+    // Keep the application limit aligned with the product-images bucket.
+    const MAX_SIZE_BYTES = 5 * 1024 * 1024;
     if (buffer.length > MAX_SIZE_BYTES) {
-      return res.status(400).json({ error: `O arquivo excede o limite máximo permitido de 10MB (${(buffer.length / (1024 * 1024)).toFixed(2)}MB).` });
+      return res.status(400).json({ error: `O arquivo excede o limite máximo permitido de 5MB (${(buffer.length / (1024 * 1024)).toFixed(2)}MB).` });
     }
 
     // Magic Bytes Verification
@@ -6882,57 +6662,47 @@ app.post('/api/upload', requireAdmin, async (req, res) => {
     const storagePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
 
     // Upload directly to Supabase Storage 'product-images' bucket
-    const adminClient = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
-    if (adminClient) {
-      try {
-        await adminClient.storage.createBucket('product-images', { public: true });
-      } catch {}
-
-      const { data: uploadData, error: uploadErr } = await adminClient.storage
-        .from('product-images')
-        .upload(storagePath, buffer, {
-          contentType: detectedMime,
-          cacheControl: '31536000',
-          upsert: true,
-        });
-
-      if (!uploadErr && uploadData) {
-        const { data: urlData } = adminClient.storage
-          .from('product-images')
-          .getPublicUrl(storagePath);
-
-        if (urlData && urlData.publicUrl) {
-          console.log('[UPLOAD] Imagem salva com sucesso no Supabase Storage:', urlData.publicUrl);
-          return res.json({ success: true, url: urlData.publicUrl });
-        }
-      }
-
-      if (uploadErr) {
-        console.error('[UPLOAD ERROR] Falha no Supabase Storage:', uploadErr.message);
-        return res.status(500).json({ error: `Erro no Supabase Storage: ${uploadErr.message}` });
-      }
-    }
-
-    // Fallback for local development if Supabase Storage is not available
-    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1' || process.env.VERCEL_ENV === 'production';
-    if (isProd) {
-      return res.status(500).json({
-        error: 'Supabase Storage não está configurado para salvar novas imagens em produção. Verifique o bucket product-images.',
+    const adminClient = await db.getRequiredSupabaseAdminClient('upload de imagem de produto');
+    const { data: uploadData, error: uploadErr } = await adminClient.storage
+      .from('product-images')
+      .upload(storagePath, buffer, {
+        contentType: detectedMime,
+        cacheControl: '31536000',
+        upsert: false,
       });
+
+    if (uploadErr || !uploadData) {
+      console.error('[UPLOAD ERROR] Falha no Supabase Storage:', uploadErr?.message || 'upload não confirmado');
+      return res.status(500).json({ error: 'Não foi possível persistir a imagem no Supabase Storage.' });
     }
 
-    const safeBaseName = (filename || 'upload').replace(/[^a-z0-9_-]/gi, '').toLowerCase().slice(0, 30);
-    const uniqueFilename = `marmot-${Date.now()}-${safeBaseName || 'img'}.${ext}`;
-    const filePath = path.join(UPLOADS_DIR, uniqueFilename);
-
-    if (!fs.existsSync(UPLOADS_DIR)) {
-      fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-    }
-    fs.writeFileSync(filePath, buffer);
-    const publicUrl = `/uploads/${uniqueFilename}`;
-    return res.json({ success: true, url: publicUrl });
+    const { data: urlData } = adminClient.storage.from('product-images').getPublicUrl(storagePath);
+    if (!urlData?.publicUrl) return res.status(500).json({ error: 'O Storage não retornou uma URL persistente.' });
+    return res.json({ success: true, url: urlData.publicUrl });
   } catch (err: any) {
     res.status(500).json({ error: err?.message || 'Falha ao processar upload.' });
+  }
+});
+
+app.delete('/api/upload', requireAdmin, async (req, res) => {
+  try {
+    const imageUrl = String(req.body?.url || '').trim();
+    const marker = '/storage/v1/object/public/product-images/';
+    const parsed = new URL(imageUrl);
+    const markerIndex = parsed.pathname.indexOf(marker);
+    if (parsed.protocol !== 'https:' || markerIndex < 0 || !parsed.hostname.endsWith('.supabase.co')) {
+      return res.status(400).json({ error: 'URL de imagem do Storage inválida.' });
+    }
+    const storagePath = decodeURIComponent(parsed.pathname.slice(markerIndex + marker.length));
+    if (!storagePath.startsWith('products/') || storagePath.includes('..')) {
+      return res.status(400).json({ error: 'Caminho de imagem inválido.' });
+    }
+    const adminClient = await db.getRequiredSupabaseAdminClient('remoção de imagem de produto');
+    const { error } = await adminClient.storage.from('product-images').remove([storagePath]);
+    if (error) return res.status(500).json({ error: 'Não foi possível remover a imagem do Supabase Storage.' });
+    return res.json({ success: true });
+  } catch {
+    return res.status(400).json({ error: 'URL de imagem do Storage inválida.' });
   }
 });
 

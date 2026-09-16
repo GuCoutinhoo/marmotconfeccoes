@@ -16,7 +16,8 @@
     "test:concurrency": "node --test test/integration/financial-concurrency.test.mjs",
     "test:all": "node --test test/*.test.mjs test/integration/*.test.mjs && node --import tsx --test test/infinitepay-client.test.ts",
     "import-product-images": "node scripts/import-product-images.mjs",
-    "import-product-images:dry-run": "node scripts/import-product-images.mjs --dry-run"
+    "import-product-images:dry-run": "node scripts/import-product-images.mjs --dry-run",
+    "migrate-legacy-product-images": "node scripts/migrate-legacy-product-images.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

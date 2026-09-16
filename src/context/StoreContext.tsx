@@ -1,20 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import { Category, Product } from '../types';
-import { INITIAL_8_CATEGORIES } from '../data/categories';
 import {
-  getStoredCategoryImage,
-  getAllStoredCategoryImages,
-  saveCategoryImageToLocalStorage,
-  ensureCategoryImagesStoredInLocalStorage,
-} from '../utils/categoryImageStorage';
-import {
-  fetchProductsFromSupabaseDirect,
-  fetchCategoriesFromSupabaseDirect,
   validateAndDeduplicateProducts,
-  createProductInSupabase,
-  updateProductInSupabase,
-  deleteProductInSupabase,
-  updateProductStockInSupabase,
   isSupabaseConfigured,
   supabase,
   mapSupabaseRowToProduct,
@@ -51,69 +38,8 @@ interface StoreContextType {
 
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
-// Helper to obtain permanently deleted category slugs/IDs
-const getDeletedCategorySlugs = (): Set<string> => {
-  const deleted = new Set<string>(['acessorios', 'acessórios']);
-  if (typeof window !== 'undefined' && window.localStorage) {
-    try {
-      const cached = localStorage.getItem('@marmot_deleted_categories');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) {
-          parsed.forEach((s) => deleted.add(String(s).toLowerCase().trim()));
-        }
-      }
-    } catch {}
-  }
-  return deleted;
-};
-
-const addDeletedCategorySlug = (slugOrId: string) => {
-  if (typeof window === 'undefined' || !window.localStorage) return;
-  try {
-    const clean = String(slugOrId || '').toLowerCase().trim();
-    if (!clean) return;
-    const current = getDeletedCategorySlugs();
-    current.add(clean);
-    localStorage.setItem('@marmot_deleted_categories', JSON.stringify(Array.from(current)));
-  } catch {}
-};
-
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Categories state: fallback to initial structural categories, synced with browser localStorage
-  const [categories, setCategories] = useState<Category[]>(() => {
-    const deletedSlugs = getDeletedCategorySlugs();
-    try {
-      const storedMap = getAllStoredCategoryImages();
-      const cached = localStorage.getItem('@marmot_cached_categories');
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        // If cache has old Unsplash images, do NOT use it
-        const hasLegacy = Array.isArray(parsed) && parsed.some((c: any) => c?.image?.includes('unsplash.com'));
-        if (Array.isArray(parsed) && parsed.length > 0 && !hasLegacy) {
-          return parsed
-            .filter((c: any) => {
-              const k = (c.slug || c.id || '').toLowerCase().trim();
-              return !deletedSlugs.has(k);
-            })
-            .map((cat: Category) => {
-              const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
-              return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
-            });
-        }
-      }
-    } catch {}
-    const storedMap = getAllStoredCategoryImages();
-    return (INITIAL_8_CATEGORIES || [])
-      .filter((c) => {
-        const k = (c.slug || c.id || '').toLowerCase().trim();
-        return !deletedSlugs.has(k);
-      })
-      .map((cat) => {
-        const key = cat.slug?.toLowerCase() || cat.id?.toLowerCase() || '';
-        return storedMap[key] ? { ...cat, image: storedMap[key] } : cat;
-      });
-  });
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // STRICT SINGLE SOURCE OF TRUTH: Initial products state MUST be empty []
   // NEVER initialize with stale local storage or fallback catalog with wrong images
@@ -122,36 +48,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [isFetchingFreshData, setIsFetchingFreshData] = useState<boolean>(false);
 
-  // Clean any old corrupted legacy caches on mount & ensure category images in localStorage
+  // Remove obsolete catalog caches. They are never read as a source of truth.
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         localStorage.removeItem('@marmot_cached_products');
         localStorage.removeItem('@marmot_cached_products_v2');
-        const cachedCat = localStorage.getItem('@marmot_cached_categories');
-        if (cachedCat && (cachedCat.includes('unsplash.com') || cachedCat.includes('"productCount":15') || cachedCat.includes('acessorios'))) {
-          localStorage.removeItem('@marmot_cached_categories');
-        }
+        localStorage.removeItem('@marmot_cached_categories');
+        localStorage.removeItem('@marmot_deleted_categories');
       }
     } catch {}
-
-    // Ensure category images are saved in browser localStorage
-    ensureCategoryImagesStoredInLocalStorage().then((storedMap) => {
-      if (storedMap && Object.keys(storedMap).length > 0) {
-        setCategories((prev) => {
-          const updated = prev.map((c) => {
-            const norm = c.slug?.toLowerCase() || c.id?.toLowerCase() || '';
-            return storedMap[norm] ? { ...c, image: storedMap[norm] } : c;
-          });
-          try {
-            localStorage.setItem('@marmot_cached_categories', JSON.stringify(updated));
-          } catch {}
-          return updated;
-        });
-      }
-    }).catch((err) => {
-      console.warn('[StoreContext] Erro ao sincronizar imagens com localStorage:', err);
-    });
   }, []);
 
   // Race condition protection: always ensure only the latest request can commit to state
@@ -195,50 +101,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setIsFetchingFreshData(true);
 
     try {
-      let loadedProducts: Product[] = [];
-      let loadedCategories: Category[] = [];
-
-      // 1. If Supabase is configured, fetch directly from Supabase as primary source of truth
-      if (isSupabaseConfigured()) {
-        try {
-          const [directProd, directCat] = await Promise.all([
-            fetchProductsFromSupabaseDirect().catch(() => ({ products: [] })),
-            fetchCategoriesFromSupabaseDirect().catch(() => ({ categories: [] })),
-          ]);
-
-          if (directProd?.products && directProd.products.length > 0) {
-            loadedProducts = directProd.products;
-          }
-          if (directCat?.categories && directCat.categories.length > 0) {
-            loadedCategories = directCat.categories;
-          }
-        } catch (sbErr) {
-          console.warn(`[PRODUCTS] request #${currentReqId} Supabase direct fetch notice:`, sbErr);
-        }
-      }
-
-      // 2. If Supabase returned empty, unavailable, or with legacy unsplash URLs, fallback to backend API
-      const hasLegacyCatImages = loadedCategories.some((c) => c.image && c.image.includes('unsplash.com'));
-      if (loadedProducts.length === 0 || loadedCategories.length === 0 || hasLegacyCatImages) {
-        const [prodRes, catRes] = await Promise.all([
-          loadedProducts.length === 0 ? fetch('/api/products', { cache: 'no-store' }).catch(() => null) : null,
-          fetch('/api/categories', { cache: 'no-store' }).catch(() => null),
-        ]);
-
-        if (loadedProducts.length === 0 && prodRes && prodRes.ok) {
-          const data = await prodRes.json();
-          if (data && Array.isArray(data.products) && data.products.length > 0) {
-            loadedProducts = data.products;
-          }
-        }
-
-        if (catRes && catRes.ok) {
-          const data = await catRes.json();
-          if (Array.isArray(data) && data.length > 0) {
-            loadedCategories = data;
-          }
-        }
-      }
+      const [prodRes, catRes] = await Promise.all([
+        fetch('/api/products', { cache: 'no-store', credentials: 'include' }),
+        fetch('/api/categories', { cache: 'no-store', credentials: 'include' }),
+      ]);
+      if (!prodRes.ok) throw new Error(`Falha ao carregar produtos (HTTP ${prodRes.status}).`);
+      if (!catRes.ok) throw new Error(`Falha ao carregar categorias (HTTP ${catRes.status}).`);
+      const productPayload = await prodRes.json();
+      const categoryPayload = await catRes.json();
+      const loadedProducts: Product[] = Array.isArray(productPayload?.products) ? productPayload.products : [];
+      const loadedCategories: Category[] = Array.isArray(categoryPayload) ? categoryPayload : [];
 
       // 3. Race condition verification: if a newer request started while this one was running, discard this older result
       if (currentReqId !== latestFetchRequestIdRef.current) {
@@ -246,62 +118,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return;
       }
 
-      // 4. Commit authoritative catalog to state, strictly filtering out deleted categories & orphan products
-      const deletedSlugs = getDeletedCategorySlugs();
-
-      const sanitizedCategories = loadedCategories.filter((c) => {
-        const id = (c.id || '').toLowerCase().trim();
-        const slug = (c.slug || '').toLowerCase().trim();
-        return !deletedSlugs.has(id) && !deletedSlugs.has(slug);
-      });
-
-      // Build active category identifier set
-      const activeCatKeys = new Set<string>();
-      sanitizedCategories.forEach((c) => {
-        if (c.id) activeCatKeys.add(c.id.toLowerCase().trim());
-        if (c.slug) activeCatKeys.add(c.slug.toLowerCase().trim());
-      });
-
-      // Filter products: must NOT belong to a deleted category and must belong to an active category
-      const sanitizedProducts = loadedProducts.filter((p) => {
-        const pCat = (p.category || '').toLowerCase().trim();
-        const pSub = (p.subcategory || '').toLowerCase().trim();
-        if (deletedSlugs.has(pCat) || deletedSlugs.has(pSub)) return false;
-        if (activeCatKeys.size > 0 && !activeCatKeys.has(pCat)) {
-          return false;
-        }
-        return true;
-      });
-
-      if (sanitizedProducts.length > 0) {
-        const uniqueProducts = validateAndDeduplicateProducts(sanitizedProducts);
-        console.log(`[PRODUCTS] committing catalog rows=${uniqueProducts.length} (filtered from ${loadedProducts.length})`);
-        setProducts(uniqueProducts);
-      } else {
-        console.warn(`[PRODUCTS] request #${currentReqId} returned 0 valid products after category cleanup.`);
-      }
-
-      if (sanitizedCategories.length > 0) {
-        const storedMap = getAllStoredCategoryImages();
-        const mergedCategories = sanitizedCategories.map((c) => {
-          const norm = c.slug?.toLowerCase() || c.id?.toLowerCase() || '';
-          if (norm === 'shorts' || norm === 'short') {
-            return {
-              ...c,
-              productCount: 11,
-              image: '/categoria shorts.png',
-            };
-          }
-          if (storedMap[norm]) {
-            return { ...c, image: storedMap[norm] };
-          }
-          return c;
-        });
-        setCategories(mergedCategories);
-        try {
-          localStorage.setItem('@marmot_cached_categories', JSON.stringify(mergedCategories));
-        } catch {}
-      }
+      const uniqueProducts = validateAndDeduplicateProducts(loadedProducts);
+      console.log(`[PRODUCTS] committing ${uniqueProducts.length} authoritative rows from API`);
+      setProducts(uniqueProducts);
+      setCategories(loadedCategories);
     } catch (error) {
       console.error(`[PRODUCTS] request #${currentReqId} erro ao carregar catálogo da loja:`, error);
     } finally {
@@ -353,17 +173,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             const newCat = mapSupabaseRowToCategory(payload.new);
             setCategories((prev) => {
               const filtered = prev.filter((c) => c.id !== newCat.id && c.slug !== newCat.slug);
-              const next = [...filtered, newCat];
-              try { localStorage.setItem('@marmot_cached_categories', JSON.stringify(next)); } catch {}
-              return next;
+              return [...filtered, newCat];
             });
           } else if (payload.eventType === 'UPDATE' && payload.new) {
             const updatedCat = mapSupabaseRowToCategory(payload.new);
-            setCategories((prev) => {
-              const next = prev.map((c) => (c.id === updatedCat.id || c.slug === updatedCat.slug ? { ...c, ...updatedCat } : c));
-              try { localStorage.setItem('@marmot_cached_categories', JSON.stringify(next)); } catch {}
-              return next;
-            });
+            setCategories((prev) => prev.map((c) => (c.id === updatedCat.id || c.slug === updatedCat.slug ? updatedCat : c)));
           }
         }
       )
@@ -376,7 +190,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Upload helper: uploads to Supabase Storage (bucket 'product-images') or fallback proxy and returns permanent URL
   const uploadImage = async (imageFileOrBase64: File | string, filename?: string): Promise<string> => {
-    if (typeof imageFileOrBase64 === 'string' && (imageFileOrBase64.startsWith('http://') || imageFileOrBase64.startsWith('https://') || imageFileOrBase64.startsWith('/uploads/'))) {
+    if (typeof imageFileOrBase64 === 'string' && (imageFileOrBase64.startsWith('http://') || imageFileOrBase64.startsWith('https://'))) {
       return imageFileOrBase64;
     }
 
@@ -423,9 +237,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateCategory = async (id: string, categoryData: Partial<Category>): Promise<Category> => {
     try {
-      if (categoryData.image) {
-        saveCategoryImageToLocalStorage(id, categoryData.image);
-      }
       const res = await fetch(`/api/categories/${encodeURIComponent(id)}`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
@@ -439,16 +250,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       const updated: Category = await res.json();
-      if (updated.image) {
-        saveCategoryImageToLocalStorage(updated.id || updated.slug, updated.image);
-      }
-      setCategories((prev) => {
-        const next = prev.map((c) => (c.id === id || c.slug === id ? updated : c));
-        try {
-          localStorage.setItem('@marmot_cached_categories', JSON.stringify(next));
-        } catch {}
-        return next;
-      });
+      setCategories((prev) => prev.map((c) => (c.id === id || c.slug === id ? updated : c)));
       return updated;
     } catch (error) {
       console.error('Update category error:', error);
@@ -459,54 +261,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const deleteCategory = async (id: string): Promise<boolean> => {
     try {
       const cleanId = String(id || '').trim();
-      const lowerId = cleanId.toLowerCase();
-
-      // Find the category to also obtain its slug
-      const catToDelete = categories.find(
-        (c) =>
-          c.id === cleanId ||
-          c.slug === cleanId ||
-          c.id?.toLowerCase() === lowerId ||
-          c.slug?.toLowerCase() === lowerId
-      );
-      const slugToDelete = (catToDelete?.slug || lowerId).toLowerCase();
-
-      // 1. Permanently register this category in deleted categories set
-      addDeletedCategorySlug(cleanId);
-      addDeletedCategorySlug(lowerId);
-      addDeletedCategorySlug(slugToDelete);
-
-      // 2. Cascade delete all products in this category from frontend state IMMEDIATELY
-      setProducts((prev) =>
-        prev.filter((p) => {
-          const pCat = (p.category || '').toLowerCase().trim();
-          const pSub = (p.subcategory || '').toLowerCase().trim();
-          return (
-            pCat !== lowerId &&
-            pCat !== slugToDelete &&
-            pSub !== lowerId &&
-            pSub !== slugToDelete
-          );
-        })
-      );
-
-      // 3. Remove category from frontend state
-      setCategories((prev) => {
-        const next = prev.filter(
-          (c) =>
-            c.id !== cleanId &&
-            c.slug !== cleanId &&
-            c.id?.toLowerCase() !== lowerId &&
-            c.slug?.toLowerCase() !== lowerId &&
-            c.slug?.toLowerCase() !== slugToDelete
-        );
-        try {
-          localStorage.setItem('@marmot_cached_categories', JSON.stringify(next));
-        } catch {}
-        return next;
-      });
-
-      // 4. Send delete request to backend API (which cascade deletes in store_products.json and Supabase)
       const res = await fetch(`/api/categories/${encodeURIComponent(cleanId)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(true),
@@ -515,9 +269,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({ error: 'Erro ao excluir categoria' }));
-        console.warn('[StoreContext] Backend category deletion notice:', errJson.error);
+        throw new Error(errJson.error || 'Erro ao excluir categoria no servidor');
       }
 
+      await fetchStoreData();
       return true;
     } catch (error) {
       console.error('Delete category error:', error);
@@ -534,27 +289,17 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         body: JSON.stringify({ orderedIds }),
       });
 
-      if (res.ok) {
-        const reordered = await res.json();
-        setCategories(reordered);
-        return reordered;
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({ error: 'Erro ao reordenar categorias' }));
+        throw new Error(errJson.error || 'Erro ao reordenar categorias no servidor');
       }
+      const reordered = await res.json();
+      setCategories(reordered);
+      return reordered;
     } catch (error) {
       console.error('Error reordering categories:', error);
+      throw error;
     }
-
-    const reordered: Category[] = [];
-    orderedIds.forEach((id, idx) => {
-      const found = categories.find((c) => c.id === id || c.slug === id);
-      if (found) reordered.push({ ...found, order: idx });
-    });
-    categories.forEach((c) => {
-      if (!reordered.find((r) => r.id === c.id)) {
-        reordered.push({ ...c, order: reordered.length });
-      }
-    });
-    setCategories(reordered);
-    return reordered;
   };
 
   const getCategoryBySlug = (slug: string): Category | undefined => {
@@ -567,38 +312,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // ==========================================
   const addProduct = async (productData: Partial<Product>): Promise<Product> => {
     try {
-      let created: Product | null = null;
-
-      // 1. Authoritative create via Backend API (applies server admin authentication & database sync)
-      try {
-        const res = await fetch('/api/products', {
-          method: 'POST',
-          headers: getAuthHeaders(true),
-          credentials: 'include',
-          body: JSON.stringify(productData),
-        });
-
-        if (res.ok) {
-          created = await res.json();
-        }
-      } catch (apiErr) {
-        console.warn('[PRODUCTS] API creation error, trying direct fallback:', apiErr);
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(productData),
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || `Falha ao salvar produto (HTTP ${res.status}).`);
       }
-
-      // 2. Fallback to direct Supabase helper if server API was unavailable
-      if (!created && isSupabaseConfigured()) {
-        try {
-          const directResult = await createProductInSupabase(productData);
-          if (directResult.product) {
-            created = directResult.product;
-          }
-        } catch (sbErr) {
-          console.warn('[PRODUCTS] Direct Supabase add notice:', sbErr);
-        }
-      }
-
+      const created: Product = await res.json();
       if (!created || !created.id) {
-        throw new Error('Falha ao salvar produto no servidor.');
+        throw new Error('O servidor não confirmou o produto criado.');
       }
 
       setProducts((prev) => {
@@ -614,38 +340,19 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateProduct = async (id: string, productData: Partial<Product>): Promise<Product> => {
     try {
-      let updated: Product | null = null;
-
-      // 1. Authoritative update via Backend API (verifies admin privileges & handles database sync)
-      try {
-        const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
-          method: 'PUT',
-          headers: getAuthHeaders(true),
-          credentials: 'include',
-          body: JSON.stringify(productData),
-        });
-
-        if (res.ok) {
-          updated = await res.json();
-        }
-      } catch (apiErr) {
-        console.warn('[PRODUCTS] API update error, trying direct fallback:', apiErr);
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(true),
+        credentials: 'include',
+        body: JSON.stringify(productData),
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || `Falha ao atualizar produto (HTTP ${res.status}).`);
       }
-
-      // 2. Fallback to direct Supabase helper if server API was unavailable
-      if (!updated && isSupabaseConfigured()) {
-        try {
-          const directResult = await updateProductInSupabase(id, productData);
-          if (directResult.product) {
-            updated = directResult.product;
-          }
-        } catch (sbErr) {
-          console.warn('[PRODUCTS] Direct Supabase update notice:', sbErr);
-        }
-      }
-
+      const updated: Product = await res.json();
       if (!updated || !updated.id) {
-        throw new Error('Falha ao atualizar produto no servidor.');
+        throw new Error('O servidor não confirmou o produto atualizado.');
       }
 
       setProducts((prev) => {
@@ -663,55 +370,39 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateStock = async (id: string, stockCount: number): Promise<void> => {
     try {
-      setProducts((prev) =>
-        prev.map((p) => {
-          if (p.id === id || p.slug === id) {
-            return {
-              ...p,
-              stockCount,
-              status: stockCount <= 0 ? 'out_of_stock' : p.status === 'out_of_stock' ? 'active' : p.status,
-            };
-          }
-          return p;
-        })
-      );
-
-      fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}/stock`, {
         method: 'PUT',
         headers: getAuthHeaders(true),
         credentials: 'include',
         body: JSON.stringify({ stockCount }),
-      }).catch(() => {});
-
-      if (isSupabaseConfigured()) {
-        await updateProductStockInSupabase(id, stockCount).catch(() => {});
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || `Falha ao atualizar estoque (HTTP ${res.status}).`);
       }
+      const persisted: Product = await res.json();
+      if (!persisted?.id) throw new Error('O servidor não confirmou a alteração de estoque.');
+      setProducts((prev) => prev.map((p) => (p.id === id || p.slug === id ? persisted : p)));
     } catch (error) {
       console.error('Update stock error:', error);
+      throw error;
     }
   };
 
   const deleteProduct = async (id: string): Promise<boolean> => {
     try {
-      // Find current product to remove images from storage if needed
       const current = products.find((p) => p.id === id || p.slug === id);
-      if (current?.image) {
-        deleteProductImageFromStorage(current.image).catch(() => {});
-      }
-
-      // Authoritative delete via backend
-      await fetch(`/api/products/${encodeURIComponent(id)}`, {
+      const res = await fetch(`/api/products/${encodeURIComponent(id)}`, {
         method: 'DELETE',
         headers: getAuthHeaders(true),
         credentials: 'include',
-      }).catch(() => {});
-
-      // Synchronize with Supabase
-      if (isSupabaseConfigured()) {
-        await deleteProductInSupabase(id).catch(() => {});
+      });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || `Falha ao excluir produto (HTTP ${res.status}).`);
       }
-
       setProducts((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
+      if (current?.image) void deleteProductImageFromStorage(current.image);
       return true;
     } catch (error) {
       console.error('Delete product error:', error);
