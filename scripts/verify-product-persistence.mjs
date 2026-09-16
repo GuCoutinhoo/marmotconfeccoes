@@ -6,6 +6,7 @@ import { DatabaseManager } from '../api/index.ts';
 const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 const id = `persistence-test-${suffix}`;
 const slug = `persistence-test-${suffix}`;
+const categoryId = `category-persistence-test-${suffix}`;
 const serviceClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
 });
@@ -105,6 +106,23 @@ try {
   const { data: stockDirect } = await serviceClient.from('products').select('stock_count').eq('id', id).single();
   assert.equal(stockDirect.stock_count, 13);
 
+  const categoryCreated = await db.createCategory({
+    id: categoryId,
+    slug: categoryId,
+    name: 'Categoria temporária de persistência',
+    image: 'https://example.com/category.jpg',
+    active: false,
+  });
+  assert.equal(categoryCreated.id, categoryId);
+  assert.equal(await db.deleteCategory(categoryId), true);
+  const { data: deletedCategory, error: deletedCategoryError } = await serviceClient
+    .from('categories')
+    .select('id')
+    .eq('id', categoryId)
+    .maybeSingle();
+  assert.ifError(deletedCategoryError);
+  assert.equal(deletedCategory, null);
+
   await assert.rejects(() => db.createProduct({ ...productA, id: `${id}-duplicate`, slug: productB.slug }), /duplicate|unique/i);
   await assert.rejects(() => db.updateProduct(id, { image: '/uploads/not-persistent.jpg', images: ['/uploads/not-persistent.jpg'] }), /PRODUCT_IMAGE_NOT_PERSISTENT/i);
   await assert.rejects(() => db.updateProductStock(id, -1), /PRODUCT_INVALID_STOCK/i);
@@ -114,6 +132,18 @@ try {
     const anon = createClient(process.env.SUPABASE_URL, anonKey, { auth: { persistSession: false } });
     const { error: unauthorizedError } = await anon.from('products').update({ title: 'NÃO DEVE SALVAR' }).eq('id', id);
     assert.ok(unauthorizedError, 'Mutation anônima deveria ser rejeitada pela RLS.');
+
+    const originalServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    try {
+      process.env.SUPABASE_SERVICE_ROLE_KEY = anonKey;
+      const invalidAdminDb = new DatabaseManager();
+      await assert.rejects(
+        () => invalidAdminDb.getRequiredSupabaseAdminClient('negative credential test'),
+        /SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED/,
+      );
+    } finally {
+      process.env.SUPABASE_SERVICE_ROLE_KEY = originalServiceRoleKey;
+    }
   }
 
   assert.equal(await coldStart.deleteProduct(id), true);
@@ -123,8 +153,10 @@ try {
   assert.ifError(deletedError);
   assert.equal(deletedDirect, null);
 
-  console.log('[PASS] create/read/update/stock/delete persisted through direct query and cold starts');
-  console.log('[PASS] duplicate slug, local image, invalid stock and unauthorized mutation failed closed');
+  console.log('[PASS] product create/read/update/stock/delete persisted through direct query and cold starts');
+  console.log('[PASS] category create/delete persisted with the validated administrative client');
+  console.log('[PASS] duplicate slug, local image, invalid stock, public mutation and invalid admin credential failed closed');
 } finally {
   await serviceClient.from('products').delete().or(`id.eq.${id},id.eq.${id}-duplicate`);
+  await serviceClient.from('categories').delete().eq('id', categoryId);
 }

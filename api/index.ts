@@ -28,6 +28,55 @@ import { IS_TEST_MODE } from '../src/server/runtime-flags.js';
 
 export { IS_TEST_MODE };
 
+export type SupabaseAdminCredentialKind = 'secret' | 'legacy_service_role' | 'invalid';
+
+export interface SupabaseAdminCredentialInspection {
+  valid: boolean;
+  kind: SupabaseAdminCredentialKind;
+  reason: string;
+}
+
+/**
+ * Performs a non-secret-bearing structural check before any network request.
+ * Opaque `sb_secret_` keys cannot be decoded, while legacy keys must contain
+ * the service_role claim. The remote OpenAPI probe below is still mandatory.
+ */
+export function inspectSupabaseAdminCredential(
+  value: string | undefined,
+  publicKeys: Array<string | undefined> = [],
+): SupabaseAdminCredentialInspection {
+  const key = String(value || '').trim();
+  if (!key) return { valid: false, kind: 'invalid', reason: 'missing' };
+
+  if (publicKeys.some((publicKey) => publicKey?.trim() && publicKey.trim() === key)) {
+    return { valid: false, kind: 'invalid', reason: 'matches_public_key' };
+  }
+  if (key.startsWith('sb_publishable_')) {
+    return { valid: false, kind: 'invalid', reason: 'publishable_key' };
+  }
+  if (key.startsWith('sb_secret_')) {
+    return { valid: true, kind: 'secret', reason: 'opaque_secret_candidate' };
+  }
+
+  const jwtParts = key.split('.');
+  if (jwtParts.length !== 3) {
+    return { valid: false, kind: 'invalid', reason: 'unsupported_key_format' };
+  }
+
+  try {
+    const payload = JSON.parse(Buffer.from(jwtParts[1], 'base64url').toString('utf8'));
+    if (payload?.role !== 'service_role') {
+      return { valid: false, kind: 'invalid', reason: 'jwt_role_is_not_service_role' };
+    }
+    if (typeof payload?.exp === 'number' && payload.exp <= Math.floor(Date.now() / 1000)) {
+      return { valid: false, kind: 'invalid', reason: 'jwt_expired' };
+    }
+    return { valid: true, kind: 'legacy_service_role', reason: 'service_role_claim' };
+  } catch {
+    return { valid: false, kind: 'invalid', reason: 'malformed_jwt' };
+  }
+}
+
 if ((process.env.MARMOT_TEST_MODE === 'true' || process.env.CI === 'true') && fs.existsSync('/tmp/supabase-disposable.env')) {
   try {
     const envLines = fs.readFileSync('/tmp/supabase-disposable.env', 'utf8').split('\n');
@@ -843,6 +892,7 @@ export class DatabaseManager {
   private pgPool: Pool | null = null;
   private supabase: SupabaseClient | null = null;
   private supabaseAdmin: SupabaseClient | null = null;
+  private supabaseAdminValidation: Promise<SupabaseClient | null> | null = null;
   private supabaseAuth: SupabaseClient | null = null;
   private adminToken: string | null = null;
   private adminTokenExpiresAt = 0;
@@ -1422,33 +1472,84 @@ export class DatabaseManager {
   }
 
   /**
-   * Returns authoritative Supabase client with service_role secret for administrative writes.
-   * Fail-Closed Security Policy: Never falls back to anon client for admin operations.
+   * Returns an independently-created, remotely validated administrative client.
+   * Only SUPABASE_SERVICE_ROLE_KEY is accepted. No public key, authenticated
+   * user session or general-purpose Supabase client can enter this path.
    */
   public async getSupabaseAdminClient(): Promise<SupabaseClient | null> {
-    const serviceKey = (process.env.SUPABASE_DISPOSABLE_URL ? process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY : null) || process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL;
+    if (this.supabaseAdmin) return this.supabaseAdmin;
+    if (this.supabaseAdminValidation) return this.supabaseAdminValidation;
 
-    if (serviceKey && serviceKey.trim() !== '') {
-      const cleanKey = serviceKey.trim();
-      const anonKey = process.env.SUPABASE_ANON_KEY;
+    const supabaseUrl = String(process.env.SUPABASE_URL || '').trim();
+    const serviceKey = String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+    const inspection = inspectSupabaseAdminCredential(serviceKey, [
+      process.env.SUPABASE_ANON_KEY,
+      process.env.VITE_SUPABASE_ANON_KEY,
+    ]);
 
-      // Fail-closed guard: Reject anon/publishable keys passed erroneously as service role key
-      if (cleanKey.startsWith('sb_publishable_') || (anonKey && cleanKey === anonKey.trim())) {
-        console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_KEY contém uma chave anon/publishable em vez de uma service_role secret válida! Acesso administrativo bloqueado.');
-        return null;
-      }
-
-      if (!this.supabaseAdmin) {
-        this.supabaseAdmin = createClient(supabaseUrl, cleanKey, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-      }
-      return this.supabaseAdmin;
+    if (!supabaseUrl || supabaseUrl.includes('placeholder') || !inspection.valid) {
+      console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', {
+        urlConfigured: Boolean(supabaseUrl && !supabaseUrl.includes('placeholder')),
+        credentialKind: inspection.kind,
+        reason: inspection.reason,
+      });
+      return null;
     }
 
-    // Strict fail-closed: Never fall back to anon key for administrative mutations
-    return null;
+    this.supabaseAdminValidation = (async () => {
+      try {
+        // Since April 2026 Supabase's OpenAPI root is restricted to legacy
+        // service_role and new sb_secret_ keys. This also detects a key copied
+        // from another project without logging or returning any credential.
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8_000);
+        let validationResponse: Response;
+        try {
+          validationResponse = await fetch(new URL('/rest/v1/', supabaseUrl), {
+            method: 'GET',
+            headers: {
+              apikey: serviceKey,
+              'User-Agent': 'marmot-backend-service-role-validation',
+            },
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(timeout);
+        }
+
+        if (!validationResponse.ok) {
+          console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', {
+            credentialKind: inspection.kind,
+            providerStatus: validationResponse.status,
+            reason: 'elevated_access_probe_rejected',
+          });
+          return null;
+        }
+
+        const validatedClient = createClient(supabaseUrl, serviceKey, {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+          },
+          global: {
+            headers: { 'X-Client-Info': 'marmot-backend-admin' },
+          },
+        });
+        this.supabaseAdmin = validatedClient;
+        return validatedClient;
+      } catch (error: any) {
+        console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', {
+          credentialKind: inspection.kind,
+          reason: error?.name === 'AbortError' ? 'elevated_access_probe_timeout' : 'elevated_access_probe_failed',
+        });
+        return null;
+      } finally {
+        this.supabaseAdminValidation = null;
+      }
+    })();
+
+    return this.supabaseAdminValidation;
   }
 
   /**
@@ -1458,12 +1559,12 @@ export class DatabaseManager {
   public async getRequiredSupabaseAdminClient(operationName = 'operação administrativa'): Promise<SupabaseClient> {
     const adminClient = await this.getSupabaseAdminClient();
     if (adminClient) return adminClient;
-    if (this.supabase) {
-      console.warn(`[DB] Usando cliente Supabase padrão para '${operationName}' (chave service_role não configurada).`);
-      return this.supabase;
-    }
-    console.error(`[DB CONFIG ERROR] SUPABASE_SERVICE_ROLE_KEY_NOT_CONFIGURED: Impossível executar '${operationName}' no Supabase sem a chave SUPABASE_SERVICE_ROLE_KEY configurada no servidor.`);
-    throw new Error(`SUPABASE_SERVICE_ROLE_KEY_NOT_CONFIGURED: A chave SUPABASE_SERVICE_ROLE_KEY é obrigatória para executar '${operationName}' no banco de dados com integridade e segurança. Verifique as variáveis de ambiente na Vercel.`);
+    console.error('[DB CONFIG ERROR] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', {
+      operationName,
+    });
+    throw new Error(
+      `SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED: SUPABASE_SERVICE_ROLE_KEY precisa conter uma chave server-side reconhecida pelo Supabase para executar '${operationName}'.`,
+    );
   }
 
   public getMode(): 'supabase' | 'postgres' | 'durable_file' {
@@ -1519,62 +1620,39 @@ export class DatabaseManager {
 
   private async fetchAllProductsFromAuthoritativeStore(): Promise<Product[]> {
     if (this.mode === 'supabase' && this.supabase) {
-      try {
-        const { data, error } = await this.supabase
-          .from('products')
-          .select(PRODUCT_SELECT_COLUMNS)
-          .order('id', { ascending: true });
-        if (!error && Array.isArray(data) && data.length > 0) {
-          const products = data.map((row: any) => this.mapSupabaseProduct(row));
-          this.products = products;
-          return products;
-        }
-        if (error) {
-          console.warn('[PRODUCTS] Erro ao consultar produtos no Supabase:', error.message);
-        }
-      } catch (err) {
-        console.warn('[PRODUCTS] Falha ao comunicar com Supabase:', err);
-      }
-    }
-    if (this.products && this.products.length > 0) {
-      return [...this.products];
-    }
-    const rawProds = this.readJsonFile(PRODUCTS_FILE, []);
-    if (rawProds && rawProds.length > 0) {
-      this.products = rawProds.map((p: any) => this.sanitizeProduct(p));
-      return [...this.products];
+      const { data, error } = await this.supabase
+        .from('products')
+        .select(PRODUCT_SELECT_COLUMNS)
+        .order('id', { ascending: true });
+      if (error) throw new Error(`SUPABASE_PRODUCTS_READ_FAILED: ${error.message}`);
+      const products = (data || []).map((row: any) => this.mapSupabaseProduct(row));
+      this.products = products;
+      return products;
     }
     if (IS_TEST_MODE) return [...this.products];
-    return [...this.products];
+    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
   }
 
   private async fetchProductFromAuthoritativeStore(idOrSlug: string): Promise<Product | null> {
     const clean = String(idOrSlug || '').trim();
     if (!clean) return null;
     if (this.mode === 'supabase' && this.supabase) {
-      try {
-        const readBy = async (column: 'id' | 'slug') => {
-          const { data, error } = await this.supabase!
-            .from('products')
-            .select(PRODUCT_SELECT_COLUMNS)
-            .eq(column, clean)
-            .maybeSingle();
-          if (error) return null;
-          return data ? this.mapSupabaseProduct(data) : null;
-        };
-        const found = (await readBy('id')) || (await readBy('slug'));
-        if (found) return found;
-      } catch (err) {
-        console.warn('[PRODUCTS] Erro ao consultar produto no Supabase:', err);
-      }
+      const readBy = async (column: 'id' | 'slug') => {
+        const { data, error } = await this.supabase!
+          .from('products')
+          .select(PRODUCT_SELECT_COLUMNS)
+          .eq(column, clean)
+          .maybeSingle();
+        if (error) throw new Error(`SUPABASE_PRODUCT_READ_FAILED: ${error.message}`);
+        return data ? this.mapSupabaseProduct(data) : null;
+      };
+      return (await readBy('id')) || (await readBy('slug'));
     }
-    const lower = clean.toLowerCase();
-    const memFound = this.products.find((product) => product.id?.toLowerCase() === lower || product.slug?.toLowerCase() === lower);
-    if (memFound) return memFound;
-    const rawProds = this.readJsonFile(PRODUCTS_FILE, []);
-    const fileFound = rawProds.find((p: any) => p.id?.toLowerCase() === lower || p.slug?.toLowerCase() === lower);
-    if (fileFound) return this.sanitizeProduct(fileFound);
-    return null;
+    if (IS_TEST_MODE) {
+      const lower = clean.toLowerCase();
+      return this.products.find((product) => product.id?.toLowerCase() === lower || product.slug?.toLowerCase() === lower) || null;
+    }
+    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
   }
 
   public async getProducts(filters?: any): Promise<Product[]> {
@@ -1750,9 +1828,7 @@ export class DatabaseManager {
       return persisted;
     }
 
-    if (!IS_TEST_MODE) {
-      console.warn('[DB] Supabase não conectado. Salvando produto no armazenamento local.');
-    }
+    if (!IS_TEST_MODE) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para criar produtos.');
     this.products.unshift(newProduct);
     this.writeJsonFile(PRODUCTS_FILE, this.products);
     return newProduct;
@@ -1829,9 +1905,7 @@ export class DatabaseManager {
       return persisted;
     }
 
-    if (!IS_TEST_MODE) {
-      console.warn('[DB] Supabase não conectado. Atualizando produto no armazenamento local.');
-    }
+    if (!IS_TEST_MODE) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para atualizar produtos.');
     const idx = this.products.findIndex((product) => product.id === current.id);
     if (idx >= 0) this.products[idx] = cleanProduct;
     this.writeJsonFile(PRODUCTS_FILE, this.products);
@@ -1871,9 +1945,7 @@ export class DatabaseManager {
       return persisted;
     }
 
-    if (!IS_TEST_MODE) {
-      console.warn('[DB] Supabase não conectado. Atualizando estoque no armazenamento local.');
-    }
+    if (!IS_TEST_MODE) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para atualizar estoque.');
     const idx = this.products.findIndex((product) => product.id === current.id);
     if (idx >= 0) this.products[idx] = updated;
     this.writeJsonFile(PRODUCTS_FILE, this.products);
@@ -1902,9 +1974,7 @@ export class DatabaseManager {
       return true;
     }
 
-    if (!IS_TEST_MODE) {
-      console.warn('[DB] Supabase não conectado. Excluindo produto no armazenamento local.');
-    }
+    if (!IS_TEST_MODE) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para excluir produtos.');
     this.products = this.products.filter((product) => product.id !== current.id);
     this.writeJsonFile(PRODUCTS_FILE, this.products);
     return true;

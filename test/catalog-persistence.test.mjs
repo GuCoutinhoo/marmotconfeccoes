@@ -18,6 +18,27 @@ test('catalog production flow has Supabase-only authoritative mutations', () => 
   assert.doesNotMatch(api, /pCat === 'acessorios'|activeCategorySlugs/);
 });
 
+test('catalog mutations require the remotely validated service-role client', () => {
+  assert.match(api, /const serviceKey = String\(process\.env\.SUPABASE_SERVICE_ROLE_KEY \|\| ''\)\.trim\(\)/);
+  assert.match(api, /SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED/);
+  assert.match(api, /await fetch\(new URL\('\/rest\/v1\/', supabaseUrl\)/);
+  assert.doesNotMatch(api, /Usando cliente Supabase padrão/);
+  assert.doesNotMatch(api, /SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY[^\n]*\|\| process\.env\.SUPABASE_SERVICE_ROLE_KEY/);
+
+  for (const operation of [
+    'createProduct',
+    'updateProduct',
+    'updateProductStock',
+    'deleteProduct',
+    'createCategory',
+    'updateCategory',
+    'deleteCategory',
+    'reorderCategories',
+  ]) {
+    assert.match(api, new RegExp(`getRequiredSupabaseAdminClient\\('${operation}'\\)`));
+  }
+});
+
 test('React state changes only after product API confirmation', () => {
   assert.match(context, /if \(!res\.ok\)[\s\S]*?const created: Product = await res\.json\(\);[\s\S]*?setProducts/);
   assert.match(context, /const persisted: Product = await res\.json\(\);[\s\S]*?setProducts/);
