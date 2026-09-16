@@ -73,10 +73,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           : 'border border-zinc-200/90 hover:border-[#0B0B0E] hover:shadow-[0_14px_34px_rgba(0,0,0,0.08)]'
       }`}
     >
-      {/* Yellow Atelier Accent Line at top on hover for editorial cards */}
-      {isEditorial && (
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-transparent group-hover:bg-[#F4C400] transition-colors duration-300 z-30 pointer-events-none" />
-      )}
+      {/* Linha de Destaque Amarela na Parte de Baixo no Hover */}
+      <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-transparent group-hover:bg-[#F4C400] transition-colors duration-300 z-30 pointer-events-none" />
 
       {/* 1. Image Container (Vertical Editorial Ratio 3:4) */}
       <div 

@@ -563,7 +563,8 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
               loading="eager"
               decoding="async"
               referrerPolicy="no-referrer"
-              className="absolute bottom-[49px] left-1/2 z-10 h-[625px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[650px]"
+              className="absolute bottom-[49px] left-1/2 z-10 h-[625px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[650px] mt-0 pt-[30px]"
+              style={{ marginTop: 0, paddingTop: '30px' }}
             />
 
             {/* seletor de look — ligado visualmente ao modelo */}

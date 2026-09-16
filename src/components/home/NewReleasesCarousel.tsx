@@ -244,155 +244,153 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
     <section
       ref={sectionRef}
       id="ultimos-lancamentos-drop"
-      className="py-6 sm:py-7 lg:py-8 bg-[#F6F5F2] border-b border-zinc-200/90 select-none overflow-hidden"
+      className="bg-[#F6F5F2] select-none relative overflow-hidden border-b border-zinc-200/90 py-16 sm:py-20 lg:py-24"
     >
-      {/* ========================================================= */}
-      {/* CABEÇALHO COMPACTO: TÍTULO EM UMA LINHA + CONTROLES       */}
-      {/* ========================================================= */}
-      <div className="w-full px-7 sm:px-8">
-        <motion.div
-          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
-          animate={
-            isSectionInView
-              ? { opacity: 1, y: 0 }
-              : shouldReduceMotion
-              ? { opacity: 1 }
-              : { opacity: 0, y: 10 }
-          }
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-4 sm:mb-5 lg:mb-6"
-        >
-          {/* Eyebrow: NOVA TEMPORADA • DROP 2026 */}
-          <div className="mb-1.5 flex items-center gap-1.5">
-            <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.26em] text-black">
-              NOVA TEMPORADA
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#F5C400] inline-block mx-1" />
-            <span className="text-[10px] sm:text-[11px] font-mono font-medium uppercase tracking-[0.22em] text-zinc-500">
-              DROP 2026
-            </span>
-          </div>
-
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-1">
-            {/* Bloco Título em Linha Única + Descrição Compacta */}
-            <div className="flex flex-col gap-1 min-w-0">
+      <div className="max-w-[1640px] mx-auto px-4 sm:px-7 lg:px-8">
+        {/* ========================================================= */}
+        {/* HEADER DA SEÇÃO: HIERARQUIA EDITORIAL MINIMALISTA         */}
+        {/* ========================================================= */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 sm:mb-11">
+          {/* Lado Esquerdo: Microtexto de Marca + Título Forte + Bloco de Apoio */}
+          <div className="flex flex-col md:flex-row md:items-center gap-6 lg:gap-8">
+            <div>
+              <span className="font-sans text-[11px] sm:text-[11.5px] font-extrabold uppercase tracking-[0.32em] text-[#111111] block mb-1.5 leading-none">
+                MARMOT
+              </span>
               <h2
-                className="font-anton uppercase tracking-[-0.03em] text-[#0B0B0E] leading-none whitespace-nowrap"
-                style={{ fontSize: '52.72px', fontWeight: 'normal' }}
+                className="font-anton text-4xl sm:text-5xl lg:text-[56px] xl:text-[60px] uppercase text-black leading-[0.92] tracking-tight"
+                style={{ fontWeight: 'normal' }}
               >
                 ÚLTIMOS LANÇAMENTOS
               </h2>
-              <p className="text-xs sm:text-[13px] text-zinc-500 font-normal leading-normal mt-0.5 max-w-xl">
-                Peças recém-chegadas. Desenvolvidas para um estilo real, dentro e fora da cidade.
+            </div>
+
+            {/* Divisor Vertical Elegante */}
+            <div
+              className="hidden md:block w-[1.5px] h-13 bg-zinc-300/90 shrink-0 self-center"
+              style={{
+                marginLeft: '-19px',
+                marginTop: '14px',
+              }}
+            />
+
+            {/* Microtítulo e Texto de Apoio Curto */}
+            <div className="max-w-md pt-0.5">
+              <span
+                className="text-[11px] sm:text-[11.5px] font-black uppercase tracking-[0.16em] text-black block mb-1"
+                style={{
+                  marginLeft: '-22px',
+                  marginTop: '12px',
+                }}
+              >
+                NOVA TEMPORADA • DROP 2026
+              </span>
+              <p
+                className="text-[12px] sm:text-[12.5px] text-zinc-500 leading-snug font-normal"
+                style={{
+                  marginTop: '9px',
+                  marginLeft: '-23px',
+                }}
+              >
+                Peças recém-chegadas com modelagem exclusiva.
+                <br />
+                Desenvolvidas para um estilo real, dentro e fora da cidade.
               </p>
             </div>
+          </div>
 
-            {/* Controles de Navegação Alinhados à Direita (Idênticos à Referência) */}
-            <div className="flex items-center gap-3 sm:gap-4 self-start lg:self-end shrink-0 pb-0.5">
-              {/* Link Ver Todos */}
+          {/* Lado Direito: Link de Navegação + Separador + Contador + Setas */}
+          <div className="flex items-center gap-4 sm:gap-6 self-start lg:self-end">
+            <button
+              type="button"
+              onClick={() => onNavigate('shop', 'novidades')}
+              className="text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.15em] text-black hover:text-zinc-600 underline underline-offset-4 flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <span>VER TODOS OS LANÇAMENTOS</span>
+              <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+            </button>
+
+            <div className="hidden sm:block w-px h-4.5 bg-zinc-300/80" />
+
+            {/* Contador: 01 — 07 */}
+            <span className="text-xs sm:text-[13px] font-mono font-medium text-zinc-600 tracking-wider">
+              {currentIndexStr} — {totalCountStr}
+            </span>
+
+            {/* Setas de Navegação [ ← ] [ → ] */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 type="button"
-                onClick={() => onNavigate('shop', 'novidades')}
-                className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-black hover:text-zinc-600 inline-flex items-center gap-1 cursor-pointer transition-colors underline underline-offset-4 decoration-black group whitespace-nowrap"
+                onClick={() => handleScroll('left')}
+                aria-label="Lançamentos anteriores"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-zinc-100 active:scale-95 border border-zinc-300/90 rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
               >
-                <span>VER TODOS OS LANÇAMENTOS</span>
-                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.2] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
               </button>
-
-              {/* Divisor Vertical */}
-              <div className="w-[1px] h-4 bg-zinc-300 mx-0.5 hidden sm:block" />
-
-              {/* Contador Numérico: "01 — 07" */}
-              <div className="font-mono text-xs sm:text-[13px] font-semibold tracking-wider text-zinc-800 whitespace-nowrap">
-                <span>{currentIndexStr}</span>
-                <span className="text-zinc-400 font-normal mx-1.5">—</span>
-                <span className="text-zinc-500">{totalCountStr}</span>
-              </div>
-
-              {/* Botões Quadrados de Navegação [ < ] [ > ] */}
-              <div className="flex items-center gap-1.5 ml-1">
-                <button
-                  type="button"
-                  onClick={() => handleScroll('left')}
-                  className="w-9 h-9 sm:w-10 sm:h-10 border border-black bg-white hover:bg-zinc-100 text-black rounded-[3px] transition-all flex items-center justify-center cursor-pointer active:scale-95 shadow-2xs"
-                  aria-label="Lançamentos anteriores"
-                  title="Lançamentos anteriores"
-                >
-                  <ArrowLeft className="w-4 h-4 stroke-[2]" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleScroll('right')}
-                  className="w-9 h-9 sm:w-10 sm:h-10 border border-black bg-[#F5C400] hover:bg-[#E5B500] text-black rounded-[3px] transition-all flex items-center justify-center cursor-pointer active:scale-95 shadow-2xs"
-                  aria-label="Próximos lançamentos"
-                  title="Próximos lançamentos"
-                >
-                  <ArrowRight className="w-4 h-4 stroke-[2]" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => handleScroll('right')}
+                aria-label="Próximos lançamentos"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#F4C400] hover:bg-[#E5B500] active:scale-95 border border-[#E5B500] rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
+              >
+                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
+              </button>
             </div>
           </div>
-        </motion.div>
-      </div>
+        </div>
 
-      {/* ========================================================= */}
-      {/* CARROSSEL DE CARDS COMPACTOS                              */}
-      {/* 4 CARDS COMPLETOS + 5º PARCIAL (14px-18px GAP)           */}
-      {/* ========================================================= */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScrollPosition}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUpOrLeave}
-        onMouseLeave={handleMouseUpOrLeave}
-        className="flex gap-3.5 sm:gap-4 overflow-x-auto scrollbar-none scroll-smooth snap-x snap-mandatory cursor-grab active:cursor-grabbing"
-        style={{
-          paddingTop: '2px',
-          paddingLeft: '32px',
-          paddingBottom: '12px',
-          paddingRight: '48px',
-          marginLeft: '30px',
-        }}
-      >
-        {releaseProducts.map((product) => {
-          const isFavorite = isInWishlist(product.id);
-          const primaryImage =
-            product.colors?.[0]?.image ||
-            product.image ||
-            (product.images && product.images.length > 0 ? product.images[0] : '');
-          const displayImage = getValidProductImageUrl(primaryImage, product.category, product.id);
-          const effectivePrice = product.promoPrice || product.price;
-          const pixPrice = effectivePrice * 0.95;
-          const categoryLabel = getDisplayCategory(product.category);
-          const swatches = getCardSwatches(product.id, product.colors);
+        {/* ========================================================= */}
+        {/* 4 A 5 CARDS VISÍVEIS (280–310px LARGURA, ~450px ALTURA)    */}
+        {/* ========================================================= */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScrollPosition}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUpOrLeave}
+          onMouseLeave={handleMouseUpOrLeave}
+          className="flex gap-4 sm:gap-5 overflow-x-auto scrollbar-none scroll-smooth snap-x snap-mandatory cursor-grab active:cursor-grabbing pb-5"
+        >
+          {releaseProducts.map((product) => {
+            const isFavorite = isInWishlist(product.id);
+            const primaryImage =
+              product.colors?.[0]?.image ||
+              product.image ||
+              (product.images && product.images.length > 0 ? product.images[0] : '');
+            const displayImage = getValidProductImageUrl(primaryImage, product.category, product.id);
+            const effectivePrice = product.promoPrice || product.price;
+            const pixPrice = effectivePrice * 0.95;
+            const categoryLabel = getDisplayCategory(product.category);
+            const swatches = getCardSwatches(product.id, product.colors);
 
-          return (
-            <article
-              key={product.id}
-              onClick={() => handleCardClick(product.id)}
-              className="group relative shrink-0 w-[220px] sm:w-[235px] md:w-[245px] lg:w-[255px] xl:w-[265px] rounded-[4px] bg-white border border-zinc-200/90 overflow-hidden cursor-pointer select-none shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] hover:border-black transition-all duration-300 snap-start flex flex-col"
-            >
-              {/* ÁREA DA FOTOGRAFIA: Proporção compacta (~1:1.12), roupas 100% visíveis */}
-              <div className="relative aspect-[1/1.12] w-full overflow-hidden bg-[#EAE7E1]">
+            return (
+              <article
+                key={product.id}
+                onClick={() => handleCardClick(product.id)}
+                className="group relative shrink-0 w-[275px] sm:w-[285px] md:w-[295px] lg:w-[305px] xl:w-[315px] rounded-[4px] bg-white border border-zinc-200/90 overflow-hidden cursor-pointer select-none shadow-[0_3px_14px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.12)] hover:border-black transition-all duration-300 snap-start flex flex-col"
+              >
+                {/* Linha Amarela na parte de baixo no hover */}
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-transparent group-hover:bg-[#F4C400] transition-colors duration-300 z-30 pointer-events-none" />
+              {/* ÁREA DA FOTOGRAFIA: Proporção generosa (~1:1.15), roupas bem enquadradas */}
+              <div className="relative aspect-[1/1.15] w-full overflow-hidden bg-[#EAE7E1]">
                 {/* Badge "NOVO DROP" */}
-                <span className="absolute top-2.5 left-2.5 z-10 bg-black/90 text-white text-[9px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-[2px] shadow-2xs">
+                <span className="absolute top-3.5 left-3.5 z-10 bg-black text-white text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-[2px] shadow-2xs">
                   NOVO DROP
                 </span>
 
-                {/* Botão de Favorito Compacto */}
+                {/* Botão de Favorito */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleWishlist(product);
                   }}
-                  className="absolute top-2.5 right-2.5 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/85 hover:bg-white text-zinc-900 flex items-center justify-center shadow-2xs hover:shadow-xs transition-all active:scale-90 cursor-pointer backdrop-blur-[2px]"
+                  className="absolute top-3.5 right-3.5 z-20 w-8.5 h-8.5 sm:w-9 sm:h-9 rounded-full bg-white/90 hover:bg-white text-zinc-900 flex items-center justify-center shadow-xs hover:shadow-sm transition-all active:scale-90 cursor-pointer backdrop-blur-[2px]"
                   aria-label={isFavorite ? 'Remover dos favoritos' : 'Salvar nos favoritos'}
                   title={isFavorite ? 'Remover dos favoritos' : 'Salvar nos favoritos'}
                 >
                   <Heart
-                    className={`w-3.5 h-3.5 transition-colors ${
+                    className={`w-4.5 h-4.5 transition-colors ${
                       isFavorite ? 'fill-red-500 stroke-red-500' : 'stroke-zinc-900 stroke-[1.8] fill-none'
                     }`}
                   />
@@ -410,72 +408,72 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                 />
 
                 {/* Botão de Espiada Rápida que sobe suavemente no hover */}
-                <div className="absolute bottom-2 left-2 right-2 z-20 opacity-0 translate-y-1.5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
+                <div className="absolute bottom-3 left-3 right-3 z-20 opacity-0 translate-y-1.5 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       _onQuickView(product);
                     }}
-                    className="w-full bg-white/95 hover:bg-[#0B0B0E] text-[#0B0B0E] hover:text-white py-1.5 px-2 rounded-[2px] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1 shadow-xs border border-zinc-200 hover:border-black transition-colors"
+                    className="w-full bg-white/95 hover:bg-[#0B0B0E] text-[#0B0B0E] hover:text-white py-2.5 px-3 rounded-[2px] text-[11px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs border border-zinc-200 hover:border-black transition-colors"
                   >
                     <span>Espiada Rápida</span>
                   </button>
                 </div>
               </div>
 
-              {/* ÁREA INFERIOR: Informações do Produto Compactas e Claras */}
-              <div className="p-3 sm:p-3.5 flex flex-col justify-between flex-1 bg-white border-t border-zinc-100">
-                <div className="space-y-0.5">
+              {/* ÁREA INFERIOR: Informações do Produto Claras e Confortáveis */}
+              <div className="p-4 sm:p-5 flex flex-col justify-between flex-1 bg-white border-t border-zinc-100">
+                <div className="space-y-1">
                   {/* Categoria */}
-                  <span className="text-[9.5px] font-mono font-bold uppercase tracking-[0.2em] text-zinc-400 block leading-tight">
+                  <span className="text-[10.5px] font-mono font-bold uppercase tracking-[0.2em] text-zinc-400 block leading-tight">
                     {categoryLabel}
                   </span>
 
                   {/* Nome do Produto */}
-                  <h3 className="text-[13px] sm:text-[13.5px] font-black uppercase tracking-tight text-[#0B0B0E] group-hover:text-zinc-700 transition-colors line-clamp-1 leading-snug">
+                  <h3 className="text-[14.5px] sm:text-[15.5px] font-black uppercase tracking-tight text-[#0B0B0E] group-hover:text-zinc-700 transition-colors line-clamp-1 leading-snug">
                     {product.title}
                   </h3>
                 </div>
 
                 {/* Bloco de Preço e Ação */}
-                <div className="pt-2 mt-2 border-t border-zinc-100 flex items-end justify-between gap-2">
+                <div className="pt-3 mt-3 border-t border-zinc-100 flex items-end justify-between gap-2">
                   <div className="min-w-0">
                     {/* Preço Principal */}
-                    <div className="text-[14px] sm:text-[15px] font-black text-[#0B0B0E] tracking-tight leading-none">
+                    <div className="text-[16px] sm:text-[17px] font-black text-[#0B0B0E] tracking-tight leading-none">
                       R$ {effectivePrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
 
                     {/* Preço no Pix com badge 5% PIX */}
-                    <div className="flex items-center gap-1 mt-1">
-                      <span className="text-[11px] sm:text-xs font-bold text-zinc-700">
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <span className="text-xs sm:text-[13px] font-bold text-zinc-700">
                         R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
-                      <span className="text-[8.5px] font-mono font-bold uppercase tracking-wider text-[#8A5E00] bg-[#FEF9C3] px-1 py-0.5 rounded-[2px]">
+                      <span className="text-[9.5px] font-mono font-bold uppercase tracking-wider text-[#8A5E00] bg-[#FEF9C3] px-1.5 py-0.5 rounded-[2px]">
                         5% PIX
                       </span>
                     </div>
 
                     {/* Swatches de Cores */}
-                    <div className="mt-1.5 flex items-center gap-1.5">
+                    <div className="mt-2.5 flex items-center gap-2">
                       <div className="flex items-center -space-x-0.5">
                         {swatches.map((swatch, sIdx) => (
                           <span
                             key={sIdx}
-                            className="w-2.5 h-2.5 rounded-full border border-black/20 shadow-2xs inline-block"
+                            className="w-3.5 h-3.5 rounded-full border border-black/20 shadow-2xs inline-block"
                             style={{ backgroundColor: swatch.hex }}
                           />
                         ))}
                       </div>
-                      <span className="text-[10px] text-zinc-400 font-normal">
+                      <span className="text-[11px] text-zinc-400 font-normal">
                         {product.colors && product.colors.length > 0 ? `${product.colors.length} cores` : '2 cores'}
                       </span>
                     </div>
                   </div>
 
-                  {/* Botão de Seta Circular Compacto */}
-                  <div className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full border border-black text-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors shrink-0 shadow-2xs">
-                    <ArrowRight className="w-3.5 h-3.5 stroke-[2] transition-transform duration-200 group-hover:translate-x-0.5" />
+                  {/* Botão de Seta Circular */}
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-black text-black flex items-center justify-center group-hover:bg-black group-hover:text-white transition-colors shrink-0 shadow-2xs">
+                    <ArrowRight className="w-4.5 h-4.5 stroke-[2] transition-transform duration-200 group-hover:translate-x-0.5" />
                   </div>
                 </div>
               </div>
@@ -484,10 +482,9 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         })}
       </div>
 
-      {/* ========================================================= */}
-      {/* RODAPÉ DA SEÇÃO (IDÊNTICO À REFERÊNCIA)                   */}
-      {/* ========================================================= */}
-      <div className="w-full px-7 sm:px-8">
+        {/* ========================================================= */}
+        {/* RODAPÉ DA SEÇÃO (IDÊNTICO À REFERÊNCIA)                   */}
+        {/* ========================================================= */}
         <div className="w-full border-t border-zinc-300 mt-6 sm:mt-7 pt-3 sm:pt-3.5 flex items-center justify-between select-none">
           {/* Lado Esquerdo */}
           <div className="flex items-center gap-2 font-mono text-[10px] sm:text-[10.5px] tracking-[0.22em] text-zinc-500 uppercase">

@@ -206,22 +206,22 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
             </div>
 
             {/* Bottom-Right: Setas Discretas de Navegação [ ← ] [ → ] */}
-            <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 z-20 flex items-center gap-1.5 select-none">
+            <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 z-20 flex items-center gap-1.5 sm:gap-2 select-none">
               <button
                 type="button"
                 onClick={handlePrevAngle}
                 aria-label="Perspectiva anterior"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0B0B0E] hover:bg-[#27272A] active:scale-95 text-white flex items-center justify-center rounded-[2px] transition-all cursor-pointer shadow-xs"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-zinc-100 active:scale-95 border border-zinc-300/90 rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowLeft className="w-4 h-4 stroke-[2.4]" />
+                <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
               </button>
               <button
                 type="button"
                 onClick={handleNextAngle}
                 aria-label="Próxima perspectiva"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#0B0B0E] hover:bg-[#27272A] active:scale-95 text-white flex items-center justify-center rounded-[2px] transition-all cursor-pointer shadow-xs"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#F4C400] hover:bg-[#E5B500] active:scale-95 border border-[#E5B500] rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowRight className="w-4 h-4 stroke-[2.4]" />
+                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
               </button>
             </div>
           </div>

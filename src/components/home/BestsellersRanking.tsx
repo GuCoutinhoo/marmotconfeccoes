@@ -302,7 +302,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
           <div className="flex flex-col md:flex-row md:items-center gap-6 lg:gap-8">
             <div>
               <span className="font-sans text-[11px] sm:text-[11.5px] font-extrabold uppercase tracking-[0.32em] text-[#111111] block mb-1.5 leading-none">
-                NUMERIT
+                MARMOT
               </span>
               <h2
                 className="font-anton text-4xl sm:text-5xl lg:text-[56px] xl:text-[60px] uppercase text-black leading-[0.92] tracking-tight"
@@ -341,7 +341,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
               >
                 Peças com maior saída, recompra e presença no cotidiano.
                 <br />
-                Uma curadoria construída a partir da experiência de quem veste Numerit.
+                Uma curadoria construída a partir da experiência de quem veste Marmot.
               </p>
             </div>
           </div>
@@ -407,6 +407,9 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                 onClick={() => onNavigate('product', item.originalProduct.id)}
                 className="group bg-white border border-zinc-200/90 rounded-[3px] overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer relative"
               >
+                {/* Linha Amarela na parte de baixo no hover */}
+                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-transparent group-hover:bg-[#F4C400] transition-colors duration-300 z-30 pointer-events-none" />
+
                 {/* 1. Imagem Grande sem espaços em branco sobrando */}
                 <div className="relative w-full aspect-[4/3.5] bg-[#E8E7E3] overflow-hidden">
                   <img

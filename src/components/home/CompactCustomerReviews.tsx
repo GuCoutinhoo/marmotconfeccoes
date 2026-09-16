@@ -1,114 +1,427 @@
 import React from 'react';
-import { Star, CheckCircle2 } from 'lucide-react';
+import {
+  CheckCircle2,
+  Star,
+} from 'lucide-react';
+
+type Review = {
+  id: string;
+  author: string;
+  location: string;
+  verified: boolean;
+  rating: number;
+  productName: string;
+  comment: string;
+};
+
+const reviews: Review[] = [
+  {
+    id: 'review-01',
+    author: 'Lucas M. Vasconcelos',
+    location: 'São Paulo - SP',
+    verified: true,
+    rating: 5,
+    productName: 'T-Shirt Heavyweight 260g',
+    comment:
+      'A malha dessa t-shirt é de outro patamar. Gola canelada grossa de 3cm que não deforma nem enrola após as lavagens.',
+  },
+  {
+    id: 'review-02',
+    author: 'Matheus B. Sampaio',
+    location: 'Curitiba - PR',
+    verified: true,
+    rating: 5,
+    productName: 'Hoodie Heavyweight 400g',
+    comment:
+      'Esquenta de verdade no inverno do sul. O capuz fica estruturado e volumoso sem ficar caído nos ombros.',
+  },
+  {
+    id: 'review-03',
+    author: 'Gabriel F. Castro',
+    location: 'Rio de Janeiro - RJ',
+    verified: true,
+    rating: 5,
+    productName: 'Calça Cargo Tactical Ripstop',
+    comment:
+      'Caimento impecável com tênis chunky. A modelagem baggy veste com a silhueta exata do lookbook.',
+  },
+];
 
 export const CompactCustomerReviews: React.FC = () => {
-  const reviews = [
-    {
-      author: 'Lucas M. Vasconcelos',
-      location: 'São Paulo - SP',
-      verified: true,
-      rating: 5,
-      productName: 'T-Shirt Heavyweight 260g',
-      comment: 'A malha dessa t-shirt é de outro patamar. Gola canelada grossa de 3cm que não deforma nem enrola após as lavagens.',
-    },
-    {
-      author: 'Matheus B. Sampaio',
-      location: 'Curitiba - PR',
-      verified: true,
-      rating: 5,
-      productName: 'Hoodie Heavyweight 400g',
-      comment: 'Esquenta de verdade no inverno do sul. O capuz fica estruturado e volumoso sem ficar caído nos ombros.',
-    },
-    {
-      author: 'Gabriel F. Castro',
-      location: 'Rio de Janeiro - RJ',
-      verified: true,
-      rating: 5,
-      productName: 'Calça Cargo Tactical Ripstop',
-      comment: 'Caimento impecável com tênis chunky. A modelagem baggy veste com a silhueta exata do lookbook.',
-    },
-  ];
-
   return (
-    <section id="avaliacoes-compradores" className="relative w-full bg-[#F6F5F2] text-[#090909] select-none border-b border-black/[0.08]">
-      {/* Transição Editorial Minimalista Marmot */}
-      <div className="w-full pt-12 sm:pt-16 lg:pt-20 pb-8 sm:pb-10">
-        <div className="mx-auto w-[calc(100%-32px)] max-w-[1494px] lg:w-[89.4%]">
-          <div className="relative flex items-center justify-center">
-            {/* Divisor horizontal fino e elegante */}
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-black/[0.13]" />
-            </div>
+    <section
+      id="avaliacoes-compradores"
+      className="
+        relative
+        w-full
+        overflow-hidden
+        border-b
+        border-zinc-200/90
+        bg-white
+        py-12
+        text-[#0B0B0E]
+        sm:py-14
+        lg:py-16
+      "
+    >
+      <div className="mx-auto max-w-[1640px] px-4 sm:px-7 lg:px-8">
 
-            {/* Microtexto central com assinatura amarela Marmot */}
-            <div className="relative z-10 flex items-center gap-2.5 bg-[#F6F5F2] px-5 py-1">
-              <span className="h-[3px] w-[10px] bg-[#F6C800] shrink-0" />
-              <span className="font-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.28em] text-black/75">
-                MARMOT / EXPERIÊNCIA REAL
+        {/* HEADER */}
+        <div
+          className="
+            mb-8
+            flex
+            flex-col
+            justify-between
+            gap-6
+            lg:mb-10
+            lg:flex-row
+            lg:items-end
+          "
+        >
+          {/* ESQUERDA */}
+          <div className="flex flex-col gap-5 md:flex-row md:items-end md:gap-7">
+
+            <div>
+              <span
+                className="
+                  mb-1.5
+                  block
+                  text-[10px]
+                  font-extrabold
+                  uppercase
+                  tracking-[0.32em]
+                  text-black
+                  sm:text-[11px]
+                "
+              >
+                MARMOT
               </span>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Conteúdo das Avaliações */}
-      <div className="mx-auto w-[calc(100%-32px)] max-w-[1494px] pb-14 sm:pb-16 lg:pb-20 lg:w-[89.4%]">
-        <div className="mb-6 sm:mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <div>
-            <div className="mb-2 flex items-center gap-2">
-              <span className="h-[3px] w-[8px] bg-[#F6C800] inline-block" />
-              <span className="font-mono text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.24em] text-black/55">
-                PROVA SOCIAL // FEEDBACK REAL
+              <h2
+                className="
+                  font-anton
+                  text-[38px]
+                  font-normal
+                  uppercase
+                  leading-[0.92]
+                  tracking-tight
+                  text-black
+                  sm:text-[46px]
+                  lg:text-[52px]
+                  xl:text-[56px]
+                "
+              >
+                AVALIAÇÕES DE COMPRADORES
+              </h2>
+            </div>
+
+            {/* DIVISOR */}
+            <div className="hidden h-[52px] w-px bg-zinc-300 md:block" />
+
+            {/* TEXTO DE APOIO */}
+            <div className="max-w-[330px] pb-[2px]">
+              <span
+                className="
+                  mb-1
+                  block
+                  text-[10px]
+                  font-black
+                  uppercase
+                  tracking-[0.16em]
+                  text-black
+                  sm:text-[11px]
+                "
+              >
+                EXPERIÊNCIA REAL
               </span>
+
+              <p className="text-[12px] leading-[1.45] text-zinc-500 sm:text-[12.5px]">
+                Opiniões de quem comprou, vestiu e colocou as peças
+                Marmot no dia a dia.
+              </p>
             </div>
-            <h2 className="font-anton text-2xl sm:text-3xl lg:text-[34px] font-normal uppercase tracking-tight text-[#0B0B0E] leading-none">
-              AVALIAÇÕES DE COMPRADORES
-            </h2>
           </div>
 
-          <div className="flex items-center gap-2 font-mono text-xs text-black/60">
-            <span className="font-bold text-[#0B0B0E]">4.9 / 5.0</span>
-            <span>•</span>
-            <span>+1.400 Avaliações Verificadas</span>
-          </div>
-        </div>
+          {/* SCORE */}
+          <div
+            className="
+              flex
+              shrink-0
+              items-center
+              gap-4
+              self-start
+              lg:self-end
+            "
+          >
+            <div className="h-[44px] w-[2px] bg-[#F4C400]" />
 
-        {/* Compact Review Cards Grid */}
-        <div className="grid grid-cols-1 gap-3.5 sm:gap-4 md:grid-cols-3 lg:gap-5">
-          {reviews.map((rev, idx) => (
-            <div
-              key={idx}
-              className="space-y-3 rounded-[2px] border border-black/[0.08] bg-white p-5 transition-all duration-200 hover:border-black/40"
+            <strong
+              className="
+                font-anton
+                text-[42px]
+                font-normal
+                leading-none
+                tracking-tight
+                text-black
+              "
             >
-              <div className="flex items-center justify-between">
-                <div className="flex gap-0.5 text-black">
-                  {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} className="h-3.5 w-3.5 fill-current text-black" />
-                  ))}
-                </div>
+              4.9
+            </strong>
 
-                {rev.verified && (
-                  <span className="inline-flex items-center gap-1 rounded-[1px] bg-black/[0.04] px-2 py-0.5 font-mono text-[10px] font-bold text-black/75">
-                    <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Compra Verificada
+            <div>
+              <div className="flex items-center gap-[2px]">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star
+                    key={index}
+                    className="
+                      h-[12px]
+                      w-[12px]
+                      fill-[#F4C400]
+                      text-[#F4C400]
+                    "
+                    strokeWidth={1.5}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-1.5 flex items-center gap-1.5">
+                <CheckCircle2
+                  className="h-3 w-3 text-emerald-600"
+                  strokeWidth={2}
+                />
+
+                <span
+                  className="
+                    font-mono
+                    text-[8px]
+                    font-bold
+                    uppercase
+                    tracking-[0.13em]
+                    text-zinc-500
+                    sm:text-[9px]
+                  "
+                >
+                  +1.400 verificadas
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* CARDS */}
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-4
+            md:grid-cols-3
+            lg:gap-5
+          "
+        >
+          {reviews.map((review, index) => (
+            <article
+              key={review.id}
+              className="
+                group
+                relative
+                flex
+                min-h-[235px]
+                flex-col
+                overflow-hidden
+                rounded-[3px]
+                border
+                border-zinc-200/90
+                bg-white
+                p-5
+                transition-all
+                duration-300
+                hover:border-zinc-300
+                hover:shadow-[0_8px_24px_rgba(0,0,0,0.055)]
+                sm:p-6
+                lg:min-h-[250px]
+              "
+            >
+              {/* AMARELO NO HOVER */}
+              <span
+                className="
+                  absolute
+                  bottom-0
+                  left-0
+                  h-[3px]
+                  w-0
+                  bg-[#F4C400]
+                  transition-all
+                  duration-500
+                  group-hover:w-full
+                "
+              />
+
+              {/* TOP */}
+              <div className="flex items-center justify-between gap-3">
+                <span
+                  className="
+                    font-mono
+                    text-[9px]
+                    font-bold
+                    tracking-[0.18em]
+                    text-zinc-400
+                  "
+                >
+                  {String(index + 1).padStart(2, '0')} —{' '}
+                  {String(reviews.length).padStart(2, '0')}
+                </span>
+
+                {review.verified && (
+                  <span
+                    className="
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      rounded-[2px]
+                      bg-[#F5F5F4]
+                      px-2
+                      py-1
+                      font-mono
+                      text-[8px]
+                      font-bold
+                      uppercase
+                      tracking-[0.08em]
+                      text-zinc-600
+                    "
+                  >
+                    <CheckCircle2
+                      className="h-3 w-3 text-emerald-600"
+                      strokeWidth={2}
+                    />
+
+                    Verificada
                   </span>
                 )}
               </div>
 
-              <p className="text-xs italic leading-relaxed text-black/80 sm:text-[13px]">
-                "{rev.comment}"
-              </p>
-
-              <div className="flex items-center justify-between border-t border-black/[0.06] pt-3 text-[11px]">
-                <div>
-                  <span className="block font-bold text-black">{rev.author}</span>
-                  <span className="font-mono text-[10px] text-black/40">{rev.location}</span>
-                </div>
-                <span className="max-w-[150px] truncate font-mono text-[10px] text-black/55 text-right">
-                  {rev.productName}
-                </span>
+              {/* ESTRELAS */}
+              <div className="mt-5 flex gap-[2px]">
+                {Array.from({ length: review.rating }).map(
+                  (_, starIndex) => (
+                    <Star
+                      key={starIndex}
+                      className="
+                        h-[13px]
+                        w-[13px]
+                        fill-[#F4C400]
+                        text-[#F4C400]
+                      "
+                      strokeWidth={1.6}
+                    />
+                  )
+                )}
               </div>
-            </div>
+
+              {/* REVIEW */}
+              <blockquote
+                className="
+                  mt-4
+                  max-w-[430px]
+                  text-[13px]
+                  font-medium
+                  leading-[1.55]
+                  tracking-[-0.01em]
+                  text-zinc-800
+                  sm:text-[14px]
+                "
+              >
+                “{review.comment}”
+              </blockquote>
+
+              {/* BOTTOM */}
+              <div className="mt-auto pt-6">
+                <div
+                  className="
+                    flex
+                    items-end
+                    justify-between
+                    gap-4
+                    border-t
+                    border-zinc-200
+                    pt-4
+                  "
+                >
+                  <div className="min-w-0">
+                    <strong
+                      className="
+                        block
+                        truncate
+                        text-[10px]
+                        font-black
+                        uppercase
+                        tracking-tight
+                        text-black
+                        sm:text-[11px]
+                      "
+                    >
+                      {review.author}
+                    </strong>
+
+                    <span
+                      className="
+                        mt-1
+                        block
+                        font-mono
+                        text-[8px]
+                        uppercase
+                        tracking-[0.12em]
+                        text-zinc-400
+                      "
+                    >
+                      {review.location}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
           ))}
+        </div>
+
+        {/* BOTTOM META */}
+        <div
+          className="
+            mt-4
+            flex
+            items-center
+            justify-between
+            border-t
+            border-zinc-200
+            pt-3
+          "
+        >
+          <span
+            className="
+              font-mono
+              text-[8px]
+              font-bold
+              uppercase
+              tracking-[0.18em]
+              text-zinc-400
+            "
+          >
+            MARMOT / EXPERIÊNCIA REAL
+          </span>
+
+          <span
+            className="
+              hidden
+              font-mono
+              text-[8px]
+              font-bold
+              uppercase
+              tracking-[0.18em]
+              text-zinc-400
+              sm:block
+            "
+          >
+            FEEDBACK DE COMPRADORES
+          </span>
         </div>
       </div>
     </section>

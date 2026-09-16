@@ -38,10 +38,10 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
           {/* LEFT: Massive Editorial Headline + Yellow Button */}
           <div className="flex flex-col items-start max-w-[760px]">
             <h1 className="font-black uppercase tracking-[-0.04em] text-white leading-[0.88] select-none">
-              <span className="block text-[56px] sm:text-[80px] md:text-[96px] lg:text-[112px] xl:text-[124px] 2xl:text-[132px] drop-shadow-[0_4px_16px_rgba(0,0,0,0.7)]">
+              <span className="block pl-[80px] text-[56px] sm:text-[80px] md:text-[96px] lg:text-[112px] xl:text-[124px] 2xl:text-[132px] drop-shadow-[0_4px_16px_rgba(0,0,0,0.7)]">
                 FEITO
               </span>
-              <span className="block text-[56px] sm:text-[80px] md:text-[96px] lg:text-[112px] xl:text-[124px] 2xl:text-[132px] drop-shadow-[0_4px_16px_rgba(0,0,0,0.7)]">
+              <span className="block pl-[80px] text-[56px] sm:text-[80px] md:text-[96px] lg:text-[112px] xl:text-[124px] 2xl:text-[132px] drop-shadow-[0_4px_16px_rgba(0,0,0,0.7)]">
                 DIFERENTE.
               </span>
             </h1>
@@ -49,7 +49,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
             {/* Premium Yellow CTA Button */}
             <button
               onClick={() => onNavigate('shop')}
-              className="mt-6 sm:mt-8 h-[54px] sm:h-[60px] px-8 sm:px-10 bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] font-black text-sm sm:text-[15px] uppercase tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-2.5 shadow-xl hover:shadow-[0_12px_28px_rgba(244,196,0,0.45)] cursor-pointer group shrink-0"
+              className="mt-6 sm:mt-8 ml-[88px] h-[54px] sm:h-[60px] px-8 sm:px-10 bg-[#F4C400] hover:bg-[#ffd21a] text-[#0B0B0E] font-black text-sm sm:text-[15px] uppercase tracking-[0.1em] transition-all duration-200 flex items-center justify-center gap-2.5 shadow-xl hover:shadow-[0_12px_28px_rgba(244,196,0,0.45)] cursor-pointer group shrink-0"
             >
               <span>COMPRAR NOVO DROP</span>
               <ArrowRight className="w-4.5 h-4.5 transition-transform duration-200 group-hover:translate-x-1" />

@@ -32,28 +32,28 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onQuickView }) =
         onNavigate={onNavigate}
       />
 
-      {/* 4. Destaque de Ateliê - Peça em Foco */}
-      <SingleProductSpotlight
-        products={products}
-        onQuickView={onQuickView}
-        onNavigate={onNavigate}
-      />
-
-      {/* 5. Os Mais Procurados (Ranking com Prova Social) */}
-      <BestsellersRanking
-        products={products}
-        onQuickView={onQuickView}
-        onNavigate={onNavigate}
-      />
-
-      {/* 6. MARMOT FIT SYSTEM - Guia Visual Interativo de Caimento */}
+      {/* 4. MARMOT FIT SYSTEM - Guia Visual Interativo de Caimento */}
       <MarmotFitSystem
         onNavigate={onNavigate}
         onQuickView={onQuickView}
         products={products}
       />
 
-      {/* 7. Avaliações Reais de Compradores (Última Section) */}
+      {/* 5. Destaque de Ateliê - Peça em Foco */}
+      <SingleProductSpotlight
+        products={products}
+        onQuickView={onQuickView}
+        onNavigate={onNavigate}
+      />
+
+      {/* 6. Os Mais Procurados (Ranking com Prova Social) */}
+      <BestsellersRanking
+        products={products}
+        onQuickView={onQuickView}
+        onNavigate={onNavigate}
+      />
+
+      {/* 7. Avaliações Reais de Compradores */}
       <CompactCustomerReviews />
 
       {/* O cadastro permanece no rodapé global para evitar duas chamadas idênticas em sequência. */}
