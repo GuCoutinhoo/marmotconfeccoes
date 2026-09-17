@@ -153,8 +153,8 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
       id="product-spotlight-section"
       className="bg-[#F4F4F2] select-none relative overflow-hidden border-y border-zinc-200/80"
       style={{
-        paddingTop: '32px',
-        paddingBottom: '32px',
+        paddingTop: '22px',
+        paddingBottom: '22px',
       }}
     >
       <div className="max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -166,7 +166,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
           {/* ======================================================= */}
           {/* 1. LADO ESQUERDO: FOTO DO PRODUTO / MODELO (52% col)    */}
           {/* ======================================================= */}
-          <div className="lg:col-span-6 xl:col-span-6 relative w-full min-h-[500px] sm:min-h-[620px] lg:min-h-[720px] xl:min-h-[760px] bg-[#E3E2DD] overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-300/80">
+          <div className="lg:col-span-6 xl:col-span-6 relative w-full min-h-[440px] sm:min-h-[520px] lg:min-h-[580px] xl:min-h-[610px] bg-[#E3E2DD] overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-300/80">
             {/* Top-Left: Bloco Tipográfico Editorial */}
             <div className="absolute top-6 left-6 sm:top-7 sm:left-7 z-20 pointer-events-none select-none text-left">
               <span className="font-sans text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-[#1E1E1E] block leading-tight">
@@ -229,14 +229,14 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
           {/* ======================================================= */}
           {/* 2. LADO DIREITO: CONTEÚDO DO PRODUTO + MINIATURAS       */}
           {/* ======================================================= */}
-          <div className="lg:col-span-6 xl:col-span-6 p-6 sm:p-8 lg:p-10 xl:p-12 flex flex-col lg:flex-row justify-between gap-6 xl:gap-8 bg-[#F6F5F2]">
+          <div className="lg:col-span-6 xl:col-span-6 p-5 sm:p-7 lg:p-8 xl:p-9 flex flex-col lg:flex-row justify-between gap-5 xl:gap-7 bg-[#F6F5F2]">
             
             {/* Bloco Principal de Informações */}
             <div className="flex-1 flex flex-col justify-between">
               <div>
                 {/* Microtexto / Categoria */}
-                <div className="mb-2">
-                  <span className="font-sans text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
+                <div className="mb-1.5">
+                  <span className="font-sans text-[10.5px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
                     JAQUETAS &nbsp;/&nbsp; NOVO DROP
                   </span>
                 </div>
@@ -244,7 +244,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                 {/* Título Grande e Forte */}
                 <h2
                   onClick={() => onNavigate('product', product.id)}
-                  className="font-anton text-4xl sm:text-5xl lg:text-[48px] xl:text-[54px] font-normal uppercase text-black leading-[0.92] tracking-tight mb-3 cursor-pointer hover:text-zinc-800 transition-colors select-none"
+                  className="font-anton text-3xl sm:text-4xl lg:text-[42px] xl:text-[48px] font-normal uppercase text-black leading-[0.92] tracking-tight mb-2.5 cursor-pointer hover:text-zinc-800 transition-colors select-none"
                   style={{ fontWeight: 'normal' }}
                 >
                   JAQUETA
@@ -253,7 +253,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                 </h2>
 
                 {/* Avaliação por Estrelas */}
-                <div className="flex items-center gap-2 mb-3.5 select-none">
+                <div className="flex items-center gap-2 mb-3 select-none">
                   <div className="flex text-black gap-0.5">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-3.5 h-3.5 fill-black text-black" />
@@ -264,14 +264,14 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                 </div>
 
                 {/* Descrição Curta Editorial */}
-                <p className="text-[13.5px] sm:text-[14px] text-zinc-600 leading-relaxed font-normal mb-4 max-w-lg">
+                <p className="text-[13px] sm:text-[13.5px] text-zinc-600 leading-relaxed font-normal mb-3 max-w-lg">
                   Inspirada no varsity clássico, reinterpretada em proporções amplas.
                   <br className="hidden sm:inline" />
                   Uma peça atemporal, feita para o dia a dia.
                 </p>
 
                 {/* Linha de Características Resumidas */}
-                <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-2.5 gap-y-1 text-[10px] sm:text-[10.5px] font-semibold uppercase tracking-[0.14em] text-zinc-500 mb-5 select-none">
+                <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-2.5 gap-y-1 text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500 mb-4 select-none">
                   <span>MANGAS CONTRASTANTES</span>
                   <span className="text-zinc-300 font-light">|</span>
                   <span>PUNHOS LISTRADOS</span>
@@ -282,11 +282,11 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                 </div>
 
                 {/* Bloco de Preço */}
-                <div className="mb-6 select-none">
-                  <span className="text-3xl sm:text-[34px] font-extrabold text-black tracking-tight block leading-none mb-1">
+                <div className="mb-4 sm:mb-5 select-none">
+                  <span className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight block leading-none mb-1">
                     R$ 489,90
                   </span>
-                  <span className="text-xs sm:text-[12.5px] text-zinc-500 font-normal">
+                  <span className="text-xs text-zinc-500 font-normal">
                     3x de R$ 163,30 sem juros &nbsp;•&nbsp; R$ 465,40 no Pix
                   </span>
                 </div>

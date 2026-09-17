@@ -341,21 +341,21 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
   return (
     <section
       id="os-mais-procurados-section"
-      className="bg-[#F6F5F2] select-none relative overflow-hidden border-b border-zinc-200/90 py-10 sm:py-12 lg:py-14"
+      className="bg-[#F6F5F2] select-none relative overflow-hidden border-b border-zinc-200/90 py-7 sm:py-8 lg:py-10"
     >
       <div className="max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* ========================================================= */}
         {/* HEADER DA SEÇÃO: HIERARQUIA EDITORIAL MINIMALISTA         */}
         {/* ========================================================= */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 sm:mb-11">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-6 sm:mb-8">
           {/* Lado Esquerdo: Microtexto de Marca + Título Forte + Bloco de Apoio */}
           <div className="flex flex-col md:flex-row md:items-center gap-6 lg:gap-8">
             <div>
-              <span className="font-sans text-[11px] sm:text-[11.5px] font-extrabold uppercase tracking-[0.32em] text-[#111111] block mb-1.5 leading-none">
+              <span className="font-sans text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-[0.32em] text-[#111111] block mb-1 leading-none">
                 MARMOT
               </span>
               <h2
-                className="font-anton text-4xl sm:text-5xl lg:text-[56px] xl:text-[60px] uppercase text-black leading-[0.92] tracking-tight"
+                className="font-anton text-3xl sm:text-4xl lg:text-[48px] xl:text-[52px] uppercase text-black leading-[0.92] tracking-tight"
                 style={{ fontWeight: 'normal' }}
               >
                 OS MAIS PROCURADOS
@@ -440,7 +440,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
         {/* GRADE DE PRODUTOS: CARDS REFINADOS E ELEGANTES           */}
         {/* Altura natural para rolagem orgânica da página            */}
         {/* ========================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-4.5">
           {currentItems.map((item) => {
             const activeColorIdx = selectedColorMap[item.id] ?? 0;
             const activeColor = item.colors[activeColorIdx] || item.colors[0];
@@ -458,7 +458,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                 className="group relative flex flex-col bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)] hover:border-black/15 transition-all duration-300 overflow-hidden select-none cursor-pointer font-sans"
               >
                 {/* 1. Imagem Grande (65% a 70% da altura visual do card, object-fit: cover) */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#F6F6F6]">
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F6F6F6]">
                   <img
                     src={currentImg}
                     alt={item.title}
@@ -485,38 +485,38 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                 </div>
 
                 {/* 2. Área de Informações com Hierarquia e Espaçamentos Precisos */}
-                <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between flex-1">
+                <div className="p-3.5 sm:p-4 lg:p-4.5 flex flex-col justify-between flex-1">
                   <div>
                     {/* Categoria */}
-                    <p className="font-sans font-medium uppercase text-[10.5px] sm:text-[11px] tracking-[0.16em] text-[#555555] mb-2 leading-none">
+                    <p className="font-sans font-medium uppercase text-[10px] sm:text-[10.5px] tracking-[0.16em] text-[#555555] mb-1.5 leading-none">
                       {item.categoryLabel}
                     </p>
 
                     {/* Nome do Produto */}
-                    <h3 className="font-sans font-bold uppercase text-[15px] sm:text-[16px] tracking-[-0.02em] leading-[0.95] text-black hover:text-zinc-700 transition-colors line-clamp-2 mb-3 sm:mb-3.5">
+                    <h3 className="font-sans font-bold uppercase text-[14px] sm:text-[15px] tracking-[-0.02em] leading-[0.95] text-black hover:text-zinc-700 transition-colors line-clamp-2 mb-2 sm:mb-2.5">
                       {item.title}
                     </h3>
 
                     {/* Preço (Sans-serif pesada, mesmo estilo visual do título, sem serif) */}
-                    <div className="flex items-baseline gap-2 mb-1.5">
-                      <span className="font-sans font-extrabold text-[21px] sm:text-[23px] tracking-[-0.035em] leading-[0.95] text-black">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-sans font-extrabold text-[19px] sm:text-[21px] tracking-[-0.035em] leading-[0.95] text-black">
                         R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
 
                     {/* Parcelamento */}
-                    <p className="font-sans font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-0.5">
+                    <p className="font-sans font-normal text-[10.5px] sm:text-[11px] text-[#555555] leading-tight mb-0.5">
                       ou 3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sem juros
                     </p>
 
                     {/* Pix */}
-                    <p className="font-sans font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-4 sm:mb-5">
+                    <p className="font-sans font-normal text-[10.5px] sm:text-[11px] text-[#555555] leading-tight mb-3 sm:mb-3.5">
                       R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} no Pix
                     </p>
                   </div>
 
                   {/* Divisor + Área das Cores & CTA */}
-                  <div className="pt-3.5 border-t border-[#EAEAEA] flex items-center justify-between gap-3">
+                  <div className="pt-2.5 border-t border-[#EAEAEA] flex items-center justify-between gap-3">
                     {/* Swatches e Quantidade */}
                     <div className="flex items-center min-w-0">
                       <div className="flex items-center gap-1.5 shrink-0">

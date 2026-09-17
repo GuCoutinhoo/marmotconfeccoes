@@ -28,8 +28,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'jaquetas',
       slug: 'jaquetas',
       name: 'JAQUETAS',
-      image: '/categories/categoria-jaquetas.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria jaqueta.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-jaquetas.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria jaqueta.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 20%',
       defaultPieces: 18,
     },
@@ -37,8 +37,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'shorts',
       slug: 'shorts',
       name: 'SHORTS',
-      image: '/categories/categoria-shorts.png?v=20260917_v7_clean_headroom',
-      fallbackImage: '/categoria shorts.png?v=20260917_v7_clean_headroom',
+      image: '/categories/categoria-shorts.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria shorts.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 10%',
       defaultPieces: 12,
     },
@@ -46,8 +46,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'calcas',
       slug: 'calcas',
       name: 'CALÇAS',
-      image: '/categories/categoria-calcas.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria calca.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-calcas.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria calca.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 35%',
       defaultPieces: 20,
     },
@@ -55,8 +55,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'moletons',
       slug: 'moletons',
       name: 'MOLETONS',
-      image: '/categories/categoria-moletons.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria moletom.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria moletom.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 14%',
       defaultPieces: 16,
     },
@@ -64,8 +64,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'camisetas',
       slug: 'camisetas',
       name: 'CAMISETAS',
-      image: '/categories/categoria-camisetas.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria camiseta.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria camiseta.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 18%',
       defaultPieces: 24,
     },
@@ -76,8 +76,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'camisetas',
       slug: 'camisetas',
       name: 'CAMISETAS',
-      image: '/categories/categoria-camisetas.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria camiseta.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria camiseta.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 18%',
       defaultPieces: 24,
     },
@@ -85,8 +85,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'tenis',
       slug: 'tenis',
       name: 'TÊNIS',
-      image: '/categories/categoria-tenis.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria tenis.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-tenis.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria tenis.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 62%',
       defaultPieces: 14,
     },
@@ -94,8 +94,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'acessorios',
       slug: 'acessorios',
       name: 'ACESSÓRIOS',
-      image: '/categories/categoria-acessorios.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria acessorios.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-acessorios.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria acessorios.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 30%',
       defaultPieces: 10,
     },
@@ -103,8 +103,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'shorts',
       slug: 'shorts',
       name: 'SHORTS',
-      image: '/categories/categoria-shorts.png?v=20260917_v7_clean_headroom',
-      fallbackImage: '/categoria shorts.png?v=20260917_v7_clean_headroom',
+      image: '/categories/categoria-shorts.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria shorts.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 10%',
       defaultPieces: 12,
     },
@@ -112,8 +112,8 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       id: 'moletons',
       slug: 'moletons',
       name: 'MOLETONS',
-      image: '/categories/categoria-moletons.png?v=20260916_v5_new_assets',
-      fallbackImage: '/categoria moletom.png?v=20260916_v5_new_assets',
+      image: '/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria moletom.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 14%',
       defaultPieces: 16,
     },
@@ -374,7 +374,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 via-35% to-transparent pointer-events-none" />
 
         {/* Textos no canto inferior esquerdo */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 lg:p-6 z-10 flex flex-col items-start">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-4.5 lg:p-5 z-10 flex flex-col items-start">
           {/* Nome da categoria em Inter / negrito pesado / branco */}
           <h3
             style={{
@@ -382,7 +382,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               fontWeight: 900,
               letterSpacing: '-0.02em',
             }}
-            className="text-white uppercase leading-none text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] mb-1.5 sm:mb-2"
+            className="text-white uppercase leading-none text-xl sm:text-2xl lg:text-[23px] xl:text-[25px] mb-1 sm:mb-1.5"
           >
             {item.name}
           </h3>
@@ -404,12 +404,12 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     <section
       ref={sectionRef}
       id="category-showcase-section"
-      className="bg-[#FAFAFA] pt-[38px] pb-7 sm:pb-9 select-none overflow-hidden"
+      className="bg-[#FAFAFA] pt-4.5 sm:pt-5 pb-3 sm:pb-3.5 select-none overflow-hidden"
     >
       {/* ========================================================= */}
       {/* CABEÇALHO DA SEÇÃO                                         */}
       {/* ========================================================= */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto mb-4 sm:mb-5">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto mb-2.5 sm:mb-3">
         <div className="flex items-start sm:items-end justify-between gap-4">
           {/* BLOCO ESQUERDO: TÍTULO + SUBTÍTULO */}
           <div className="flex flex-col items-start text-left">
@@ -419,13 +419,13 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
                 initial="hidden"
                 animate={hasEntered ? "visible" : "hidden"}
                 style={{
-                  fontFamily: '"Archivo Black", sans-serif',
-                  letterSpacing: '-0.04em',
-                  fontSize: '31px',
-                  lineHeight: '31px',
-                  fontWeight: 'normal',
+                  fontFamily: '"Inter Tight", sans-serif',
+                  letterSpacing: '-0.03em',
+                  fontSize: '32px',
+                  lineHeight: '32px',
+                  fontWeight: 800,
                 }}
-                className="text-[31px] leading-[31px] font-normal uppercase text-black select-none will-change-transform"
+                className="text-[32px] leading-[32px] font-extrabold uppercase text-black select-none will-change-transform font-inter-tight"
               >
                 COMPRE POR CATEGORIA
               </motion.h2>
@@ -477,14 +477,14 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2 gap-3.5 sm:gap-4 md:gap-4.5 lg:gap-5 h-auto md:h-[580px] lg:h-[640px] xl:h-[680px]"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2 gap-2.5 sm:gap-3 md:gap-3.5 lg:gap-4 h-auto md:h-[460px] lg:h-[495px] xl:h-[530px] 2xl:h-[550px]"
           >
             {/* 1. CARD GRANDE (ESQUERDA - ALTURA TOTAL / 2 LINHAS) */}
             <motion.div
               variants={cardLeftVariant}
               initial="hidden"
               animate={hasEntered ? "visible" : "hidden"}
-              className="sm:col-span-2 md:col-span-1 md:row-span-2 md:col-start-1 md:row-start-1 w-full h-[440px] sm:h-[480px] md:h-full will-change-transform"
+              className="sm:col-span-2 md:col-span-1 md:row-span-2 md:col-start-1 md:row-start-1 w-full h-[350px] sm:h-[390px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item1, 'w-full h-full')}
             </motion.div>
@@ -494,7 +494,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               variants={cardTopVariant}
               initial="hidden"
               animate={hasEntered ? "visible" : "hidden"}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-1 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-1 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item2, 'w-full h-full')}
             </motion.div>
@@ -504,7 +504,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               variants={cardTopRightVariant}
               initial="hidden"
               animate={hasEntered ? "visible" : "hidden"}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-1 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-1 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item3, 'w-full h-full')}
             </motion.div>
@@ -514,7 +514,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               variants={cardBottomVariant}
               initial="hidden"
               animate={hasEntered ? "visible" : "hidden"}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-2 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-2 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item4, 'w-full h-full')}
             </motion.div>
@@ -524,7 +524,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               variants={cardBottomRightVariant}
               initial="hidden"
               animate={hasEntered ? "visible" : "hidden"}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-2 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-2 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item5, 'w-full h-full')}
             </motion.div>

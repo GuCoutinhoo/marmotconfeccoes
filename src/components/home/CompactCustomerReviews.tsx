@@ -58,10 +58,10 @@ export const CompactCustomerReviews: React.FC = () => {
         border-b
         border-zinc-200/90
         bg-white
-        py-8
+        py-6
         text-[#0B0B0E]
-        sm:py-10
-        lg:py-12
+        sm:py-7
+        lg:py-8
       "
     >
       <div className="mx-auto max-w-[1820px] px-4 sm:px-6 lg:px-8">
@@ -69,12 +69,12 @@ export const CompactCustomerReviews: React.FC = () => {
         {/* HEADER */}
         <div
           className="
-            mb-8
+            mb-5
             flex
             flex-col
             justify-between
-            gap-6
-            lg:mb-10
+            gap-5
+            lg:mb-7
             lg:flex-row
             lg:items-end
           "
@@ -226,20 +226,20 @@ export const CompactCustomerReviews: React.FC = () => {
                 group
                 relative
                 flex
-                min-h-[235px]
+                min-h-[195px]
                 flex-col
                 overflow-hidden
                 rounded-[3px]
                 border
                 border-zinc-200/90
                 bg-white
-                p-5
+                p-4
                 transition-all
                 duration-300
                 hover:border-zinc-300
                 hover:shadow-[0_8px_24px_rgba(0,0,0,0.055)]
-                sm:p-6
-                lg:min-h-[250px]
+                sm:p-5
+                lg:min-h-[210px]
               "
             >
               {/* AMARELO NO HOVER */}

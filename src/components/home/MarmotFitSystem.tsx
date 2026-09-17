@@ -507,7 +507,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
       }}
     >
       {/* HERO */}
-      <div className="relative mx-auto w-full max-w-[1820px] px-4 sm:px-6 lg:px-8 pt-[36px] lg:pt-[44px]">
+      <div className="relative mx-auto w-full max-w-[1820px] px-4 sm:px-6 lg:px-8 pt-6 lg:pt-8">
         {/* topo editorial */}
         <div className="relative z-20 flex h-[28px] items-center justify-between">
           <span className="relative z-10 bg-[#f2f2ef]/80 pr-5 font-mono text-[10px] font-bold uppercase tracking-[0.29em] text-black">
@@ -527,16 +527,16 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
         </div>
 
         {/* 3 colunas */}
-        <div className="relative mt-[31px] grid min-h-[568px] grid-cols-1 items-end gap-0 lg:grid-cols-[31.8%_31.1%_37.1%]">
+        <div className="relative mt-5 grid min-h-[490px] lg:min-h-[510px] grid-cols-1 items-end gap-0 lg:grid-cols-[31.8%_31.1%_37.1%]">
           {/* esquerda */}
-          <div className="relative z-20 self-start pt-[19px] lg:pr-3">
-            <h2 className="font-anton text-[56px] font-bold uppercase leading-[0.95] text-black sm:text-[76px] lg:text-[90px] lg:leading-[92.7px]">
+          <div className="relative z-20 self-start pt-3 lg:pr-3">
+            <h2 className="font-anton text-[48px] font-bold uppercase leading-[0.95] text-black sm:text-[66px] lg:text-[76px] lg:leading-[78px]">
               ESCOLHA O
               <br />
               CAIMENTO.
             </h2>
 
-            <p className="mt-[20px] max-w-[420px] font-sans text-[16px] font-normal leading-[1.45] tracking-[-0.012em] text-[#1D1D1D] lg:text-[18px]">
+            <p className="mt-3.5 max-w-[400px] font-sans text-[15px] font-normal leading-[1.4] tracking-[-0.012em] text-[#1D1D1D] lg:text-[16px]">
               Cada peça veste de um jeito.
               <br />
               Descubra a silhueta que melhor
@@ -546,13 +546,13 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('shop')}
-              className="group mt-[27px] flex h-[46px] w-[242px] items-center justify-center gap-5 border border-black/65 bg-transparent font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-black hover:text-white"
+              className="group mt-5 flex h-[42px] w-[220px] items-center justify-center gap-4 border border-black/65 bg-transparent font-mono text-[10.5px] font-bold uppercase tracking-[0.18em] text-black transition-colors hover:bg-black hover:text-white"
             >
               EXPLORAR FITS
               <ArrowRight className="h-4 w-4 stroke-[1.65] transition-transform group-hover:translate-x-1" />
             </button>
 
-            <div className="mt-[25px] flex items-center gap-[22px] font-mono text-[10px] font-medium uppercase tracking-[0.25em] text-black">
+            <div className="mt-4 flex items-center gap-4 font-mono text-[9.5px] font-medium uppercase tracking-[0.22em] text-black">
               <span>BOXY</span>
               <span className="h-[3px] w-[3px] rounded-full bg-black" />
               <span>OVERSIZED</span>
@@ -562,10 +562,10 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
           </div>
 
           {/* modelo + seletor de look */}
-          <div className="relative z-30 hidden h-[568px] items-end justify-center lg:flex">
+          <div className="relative z-30 hidden h-[490px] lg:h-[510px] items-end justify-center lg:flex">
             <div
               aria-hidden="true"
-              className="absolute bottom-[48px] left-1/2 h-[115px] w-[470px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.075),rgba(0,0,0,0)_70%)] blur-[2px]"
+              className="absolute bottom-[40px] left-1/2 h-[95px] w-[400px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.075),rgba(0,0,0,0)_70%)] blur-[2px]"
             />
 
             <img
@@ -575,8 +575,8 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
               loading="eager"
               decoding="async"
               referrerPolicy="no-referrer"
-              className="absolute bottom-[49px] left-1/2 z-10 h-[625px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[650px] mt-0 pt-[30px]"
-              style={{ marginTop: 0, paddingTop: '30px' }}
+              className="absolute bottom-[40px] left-1/2 z-10 h-[530px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[555px] mt-0 pt-[20px]"
+              style={{ marginTop: 0, paddingTop: '20px' }}
             />
 
             {/* seletor de look — ligado visualmente ao modelo */}
@@ -625,9 +625,9 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
           </div>
 
           {/* direita */}
-          <div className="relative z-20 self-start pt-[17px] lg:pl-[31px]">
+          <div className="relative z-20 self-start pt-2 lg:pl-7">
             {/* FITS */}
-            <div className="flex flex-col gap-[13px]">
+            <div className="flex flex-col gap-2.5">
               {FIT_ORDER.map((fitKey) => {
                 const fitItem = FIT_SYSTEM_DATA[fitKey];
                 const isActive = selectedFit === fitKey;
@@ -637,27 +637,27 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                     key={fitKey}
                     type="button"
                     onClick={() => handleFitSelect(fitKey)}
-                    className="group relative grid h-[90px] w-full grid-cols-[52px_132px_1px_minmax(0,1fr)_30px] items-center gap-x-[18px] border border-white/95 bg-white/88 text-left shadow-[0_4px_22px_rgba(0,0,0,0.018)] transition-colors hover:bg-white"
+                    className="group relative grid h-[80px] w-full grid-cols-[48px_120px_1px_minmax(0,1fr)_26px] items-center gap-x-3.5 border border-white/95 bg-white/88 text-left shadow-[0_4px_22px_rgba(0,0,0,0.018)] transition-colors hover:bg-white"
                   >
                     {isActive && (
                       <span className="absolute inset-y-0 left-0 w-[4px] bg-[#F6C800]" />
                     )}
 
-                    <span className="pl-[29px] font-bebas text-[23px] font-bold leading-none text-black">
+                    <span className="pl-6 font-bebas text-[21px] font-bold leading-none text-black">
                       {fitItem.code}
                     </span>
 
-                    <span className="font-anton text-[26px] font-bold uppercase leading-none tracking-[-0.01em] text-black">
+                    <span className="font-anton text-[23px] font-bold uppercase leading-none tracking-[-0.01em] text-black">
                       {fitItem.name}
                     </span>
 
-                    <span className="h-[55px] w-px bg-black/16" />
+                    <span className="h-[46px] w-px bg-black/16" />
 
-                    <p className="max-w-[245px] pr-1 font-sans text-[15.5px] font-normal leading-[1.25] tracking-[-0.013em] text-[#171717]">
+                    <p className="max-w-[245px] pr-1 font-sans text-[14px] font-normal leading-[1.25] tracking-[-0.013em] text-[#171717]">
                       {fitItem.shortDescription}
                     </p>
 
-                    <ArrowRight className="h-[22px] w-[22px] justify-self-end stroke-[1.35] text-black transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="h-5 w-5 justify-self-end stroke-[1.35] text-black transition-transform group-hover:translate-x-1" />
                   </button>
                 );
               })}
@@ -726,7 +726,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4 pb-[44px] sm:pb-[52px] lg:pb-[60px]">
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4 pb-7 sm:pb-8 lg:pb-10">
             {activeLook.products.slice(0, 4).map((item, index) => {
               const formattedPrice = item.price.toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
@@ -740,7 +740,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                 <div
                   key={`${selectedFit}-${selectedLookNumber}-${item.id}-${index}`}
                   onClick={() => onNavigate('product', item.slug || item.id)}
-                  className="group relative flex h-[160px] sm:h-[170px] lg:h-[180px] w-full overflow-hidden bg-[#ECECE9] transition-all duration-200 hover:bg-[#E3E3DF] cursor-pointer"
+                  className="group relative flex h-[142px] sm:h-[150px] lg:h-[158px] w-full overflow-hidden bg-[#ECECE9] transition-all duration-200 hover:bg-[#E3E3DF] cursor-pointer"
                 >
                   {/* Imagem do Produto (à esquerda, flush) */}
                   <div className="h-full w-[46%] sm:w-[48%] shrink-0 overflow-hidden bg-[#DFDFDC]">

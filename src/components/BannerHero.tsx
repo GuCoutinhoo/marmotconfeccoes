@@ -11,7 +11,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
   return (
     <section 
       className="relative w-full bg-[#0B0B0E] text-white overflow-hidden -mt-[62px] sm:-mt-[66px]"
-      style={{ height: 'calc(100dvh + 24px)', minHeight: '740px', maxHeight: '1200px' }}
+      style={{ height: 'calc(91dvh - 10px)', minHeight: '620px', maxHeight: '890px' }}
     >
       {/* Full Bleed Background Image - Spanning 100% width and height behind header */}
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
@@ -31,7 +31,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
       </div>
 
       {/* Hero Content Container - Full Height Flex layout */}
-      <div className="relative z-10 w-full h-full px-7 sm:px-8 flex flex-col justify-between pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-12">
+      <div className="relative z-10 w-full h-full px-7 sm:px-8 flex flex-col justify-between pt-22 sm:pt-26 lg:pt-28 pb-5 sm:pb-8">
         {/* Main Composition: Left Title & CTA + Right Discreet Editorial Text */}
         <div className="flex-1 flex flex-col lg:flex-row lg:items-center justify-between gap-8 my-auto">
           
