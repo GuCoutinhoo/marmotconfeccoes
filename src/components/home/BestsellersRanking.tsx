@@ -341,113 +341,79 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
   return (
     <section
       id="os-mais-procurados-section"
-      className="bg-[#F6F5F2] select-none relative overflow-hidden border-b border-zinc-200/90 py-7 sm:py-8 lg:py-10"
+      className="bg-[#FAFAFA] select-none relative overflow-hidden border-b border-zinc-200/80 pt-7 sm:pt-9 pb-7 sm:pb-9"
     >
-      <div className="max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* ========================================================= */}
-        {/* HEADER DA SEÇÃO: HIERARQUIA EDITORIAL MINIMALISTA         */}
+        {/* HEADER DA SEÇÃO UNIFICADO                                 */}
         {/* ========================================================= */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-6 sm:mb-8">
-          {/* Lado Esquerdo: Microtexto de Marca + Título Forte + Bloco de Apoio */}
-          <div className="flex flex-col md:flex-row md:items-center gap-6 lg:gap-8">
-            <div>
-              <span className="font-sans text-[10.5px] sm:text-[11px] font-extrabold uppercase tracking-[0.32em] text-[#111111] block mb-1 leading-none">
-                MARMOT
+        <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+          <div className="flex flex-col items-start text-left">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] sm:text-[10.5px] font-extrabold uppercase tracking-[0.24em] text-zinc-400">
+                CURADORIA EXCLUSIVA
               </span>
-              <h2
-                className="font-anton text-3xl sm:text-4xl lg:text-[48px] xl:text-[52px] uppercase text-black leading-[0.92] tracking-tight"
-                style={{ fontWeight: 'normal' }}
-              >
-                OS MAIS PROCURADOS
-              </h2>
-            </div>
-
-            {/* Divisor Vertical Elegante */}
-            <div
-              className="hidden md:block w-[1.5px] h-13 bg-zinc-300/90 shrink-0 self-center"
-              style={{
-                marginLeft: '-19px',
-                marginTop: '14px',
-              }}
-            />
-
-            {/* Microtítulo e Texto de Apoio Curto */}
-            <div className="max-w-md pt-0.5">
-              <span
-                className="text-[11px] sm:text-[11.5px] font-black uppercase tracking-[0.16em] text-black block mb-1"
-                style={{
-                  marginLeft: '-22px',
-                  marginTop: '12px',
-                }}
-              >
-                SELEÇÃO DA COMUNIDADE
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F4C400]" />
+              <span className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.24em] text-zinc-500">
+                BESTSELLERS
               </span>
-              <p
-                className="text-[12px] sm:text-[12.5px] text-zinc-500 leading-snug font-normal"
-                style={{
-                  marginTop: '9px',
-                  marginLeft: '-23px',
-                }}
-              >
-                Peças com maior saída, recompra e presença no cotidiano.
-                <br />
-                Uma curadoria construída a partir da experiência de quem veste Marmot.
-              </p>
             </div>
+            <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-[-0.03em] uppercase text-zinc-950 leading-none">
+              OS MAIS PROCURADOS
+            </h2>
+            <p className="text-xs sm:text-[13px] text-zinc-500 font-normal mt-1.5">
+              Peças com maior presença, silhueta marcante e recompra comprovada pela comunidade.
+            </p>
           </div>
 
-          {/* Lado Direito: Link de Navegação + Separador + Contador + Setas */}
-          <div className="flex items-center gap-4 sm:gap-6 self-start lg:self-end">
+          {/* Lado Direito: Link de Navegação + Contador + Setas */}
+          <div className="flex items-center gap-3 sm:gap-4 self-start sm:self-end">
             <button
               type="button"
               onClick={() => onNavigate('shop')}
-              className="text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.15em] text-black hover:text-zinc-600 underline underline-offset-4 flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="h-9 sm:h-10 px-4 rounded-[3px] border border-zinc-900 bg-zinc-900 hover:bg-black text-white font-bold text-[11px] tracking-wider uppercase flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
             >
-              <span>VER TODOS OS LANÇAMENTOS</span>
-              <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>VER CATÁLOGO</span>
+              <ArrowUpRight className="w-3.5 h-3.5 stroke-[2]" />
             </button>
 
-            <div className="hidden sm:block w-px h-4.5 bg-zinc-300/80" />
-
-            {/* Contador: 01 — 07 */}
-            <span className="text-xs sm:text-[13px] font-mono font-medium text-zinc-600 tracking-wider">
-              {String(currentPage).padStart(2, '0')} — {String(totalPages).padStart(2, '0')}
+            {/* Contador: 01 / 07 */}
+            <span className="text-xs font-mono font-bold text-zinc-500 tracking-wider px-1">
+              {String(currentPage).padStart(2, '0')} / {String(totalPages).padStart(2, '0')}
             </span>
 
             {/* Setas de Navegação [ ← ] [ → ] */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={handlePrev}
                 aria-label="Página anterior"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-zinc-100 active:scale-95 border border-zinc-300/90 rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-zinc-50 active:scale-95 border border-zinc-200/90 rounded-[3px] flex items-center justify-center text-zinc-900 transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
+                <ArrowLeft className="w-4 h-4 stroke-[2]" />
               </button>
               <button
                 type="button"
                 onClick={handleNext}
                 aria-label="Próxima página"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#F4C400] hover:bg-[#E5B500] active:scale-95 border border-[#E5B500] rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
+                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-amber-50/40 active:scale-95 border border-[#F4C400] rounded-[3px] flex items-center justify-center text-zinc-900 transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
+                <ArrowRight className="w-4 h-4 stroke-[2]" />
               </button>
             </div>
           </div>
-        </div>
+        </header>
 
         {/* ========================================================= */}
-        {/* GRADE DE PRODUTOS: CARDS REFINADOS E ELEGANTES           */}
-        {/* Altura natural para rolagem orgânica da página            */}
+        {/* GRADE DE PRODUTOS: CARDS PADRONIZADOS NO SISTEMA         */}
         {/* ========================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-4.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-4.5">
           {currentItems.map((item) => {
             const activeColorIdx = selectedColorMap[item.id] ?? 0;
             const activeColor = item.colors[activeColorIdx] || item.colors[0];
             const currentImg = activeColor?.image || item.image;
             const isFav = isInWishlist(item.originalProduct.id);
 
-            // Cálculos exatos baseados na referência
             const installmentValue = item.price / 3;
             const pixPrice = item.price * 0.95;
 
@@ -455,10 +421,10 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
               <article
                 key={item.id}
                 onClick={() => onNavigate('product', item.originalProduct.slug || item.originalProduct.id)}
-                className="group relative flex flex-col bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)] hover:border-black/15 transition-all duration-300 overflow-hidden select-none cursor-pointer font-sans"
+                className="group relative flex flex-col bg-white rounded-[3px] border border-zinc-200/90 hover:border-zinc-950 transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] overflow-hidden select-none cursor-pointer"
               >
-                {/* 1. Imagem Grande (65% a 70% da altura visual do card, object-fit: cover) */}
-                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#F6F6F6]">
+                {/* 1. Imagem Aspect 4/5 com Fundo Neutro Unificado */}
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#EEEEEC]">
                   <img
                     src={currentImg}
                     alt={item.title}
@@ -468,58 +434,55 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                     className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
 
-                  {/* Botão de Favorito: Botão circular branco no canto superior direito */}
+                  {/* Botão de Favorito Unificado */}
                   <button
                     type="button"
                     onClick={(e) => handleWishlistClick(item.originalProduct, e)}
                     aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
                     title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-                    className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-20 w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 hover:bg-white text-black flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-200 cursor-pointer"
+                    className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/95 hover:bg-white text-zinc-900 flex items-center justify-center border border-zinc-200/60 shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
                   >
                     <Heart
-                      className={`w-4 h-4 transition-all duration-200 stroke-[1.3] ${
-                        isFav ? 'fill-black text-black' : 'fill-transparent text-black'
+                      className={`w-3.5 h-3.5 transition-colors stroke-[1.5] ${
+                        isFav ? 'fill-rose-600 text-rose-600' : 'fill-transparent text-zinc-800'
                       }`}
                     />
                   </button>
                 </div>
 
-                {/* 2. Área de Informações com Hierarquia e Espaçamentos Precisos */}
-                <div className="p-3.5 sm:p-4 lg:p-4.5 flex flex-col justify-between flex-1">
+                {/* 2. Área de Informações Unificada */}
+                <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1 bg-white">
                   <div>
                     {/* Categoria */}
-                    <p className="font-sans font-medium uppercase text-[10px] sm:text-[10.5px] tracking-[0.16em] text-[#555555] mb-1.5 leading-none">
+                    <span className="block text-[10px] sm:text-[10.5px] font-semibold tracking-[0.18em] text-zinc-400 uppercase mb-1 leading-none">
                       {item.categoryLabel}
-                    </p>
+                    </span>
 
                     {/* Nome do Produto */}
-                    <h3 className="font-sans font-bold uppercase text-[14px] sm:text-[15px] tracking-[-0.02em] leading-[0.95] text-black hover:text-zinc-700 transition-colors line-clamp-2 mb-2 sm:mb-2.5">
+                    <h3 className="font-bold text-zinc-900 text-xs sm:text-[13.5px] tracking-tight uppercase line-clamp-1 group-hover:text-black transition-colors mb-1.5">
                       {item.title}
                     </h3>
 
-                    {/* Preço (Sans-serif pesada, mesmo estilo visual do título, sem serif) */}
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-sans font-extrabold text-[19px] sm:text-[21px] tracking-[-0.035em] leading-[0.95] text-black">
-                        R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
+                    {/* Preço Principal */}
+                    <div className="font-extrabold text-zinc-950 text-base sm:text-[17px] tracking-tight leading-none mb-1">
+                      R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
 
                     {/* Parcelamento */}
-                    <p className="font-sans font-normal text-[10.5px] sm:text-[11px] text-[#555555] leading-tight mb-0.5">
-                      ou 3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sem juros
-                    </p>
+                    <div className="text-[10.5px] sm:text-[11px] text-zinc-500 font-normal leading-tight mb-0.5">
+                      3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sem juros
+                    </div>
 
                     {/* Pix */}
-                    <p className="font-sans font-normal text-[10.5px] sm:text-[11px] text-[#555555] leading-tight mb-3 sm:mb-3.5">
+                    <div className="text-[10.5px] sm:text-[11px] text-zinc-800 font-medium leading-tight mb-2.5">
                       R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} no Pix
-                    </p>
+                    </div>
                   </div>
 
-                  {/* Divisor + Área das Cores & CTA */}
-                  <div className="pt-2.5 border-t border-[#EAEAEA] flex items-center justify-between gap-3">
-                    {/* Swatches e Quantidade */}
-                    <div className="flex items-center min-w-0">
-                      <div className="flex items-center gap-1.5 shrink-0">
+                  {/* Divisor + Área das Cores & Botão de Visualização */}
+                  <div className="pt-2.5 border-t border-zinc-100">
+                    <div className="flex items-center justify-between gap-2 mb-2.5">
+                      <div className="flex items-center gap-1.5">
                         {item.colors.slice(0, 4).map((c, idx) => {
                           const isWhite = c.hex.toLowerCase() === '#ffffff' || c.hex.toLowerCase() === '#fff';
                           return (
@@ -538,19 +501,22 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                         })}
                       </div>
 
-                      {/* Separador vertical fino */}
-                      <div className="h-3 w-[1px] bg-[#D4D4D4] mx-2 sm:mx-2.5 shrink-0" />
-
-                      {/* Quantidade de cores */}
-                      <span className="font-sans font-normal text-[11px] sm:text-[11.5px] text-[#333333] whitespace-nowrap truncate select-none">
-                        {item.colors.length} {item.colors.length === 1 ? 'cor' : 'cores'}
+                      <span className="text-[9.5px] sm:text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                        {item.colors.length} {item.colors.length === 1 ? 'COR' : 'CORES'}
                       </span>
                     </div>
 
-                    {/* CTA: Círculo preto com seta fina branca */}
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black hover:bg-zinc-800 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs shrink-0 group/cta">
-                      <ArrowRight className="w-4 h-4 text-white stroke-[1.4] transition-transform duration-200 group-hover/cta:translate-x-0.5" />
-                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onNavigate('product', item.originalProduct.slug || item.originalProduct.id);
+                      }}
+                      className="w-full h-8.5 rounded-[2px] border border-zinc-900 bg-white group-hover:bg-zinc-950 group-hover:text-white text-zinc-900 font-bold text-[10.5px] tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
+                    >
+                      <span>VER PRODUTO</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
               </article>

@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Product } from '../../types';
 import { ArrowRight, Heart, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useWishlist } from '../../context/WishlistContext';
+import { motion } from 'motion/react';
 
 interface NewReleasesCarouselProps {
   products: Product[];
@@ -195,209 +196,100 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
   const formatPrice = (price: number) => `R$ ${price.toFixed(2).replace('.', ',')}`;
 
   return (
-    <section id="ultimos-lancamentos-drop" className="nr-section">
-      <style>{`
-        #ultimos-lancamentos-drop,
-        #ultimos-lancamentos-drop * {
-          box-sizing: border-box;
-        }
-
-        #ultimos-lancamentos-drop {
-          --nr-bg: #f7f6f3;
-          --nr-card: #ffffff;
-          --nr-text: #090909;
-          --nr-muted: #777777;
-          --nr-line: #dededb;
-          --nr-yellow: #ffc900;
-          background: var(--nr-bg);
-          color: var(--nr-text);
-          width: 100%;
-          overflow: hidden;
-          border-bottom: 1px solid #e7e6e2;
-        }
-
-        #ultimos-lancamentos-drop .nr-shell {
-          width: calc(100% - 32px);
-          max-width: 1820px;
-          margin: 0 auto;
-          padding: clamp(16px, 1.8vh, 22px) 0 clamp(16px, 2vh, 24px);
-        }
-
-        #ultimos-lancamentos-drop .nr-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
-          gap: 16px;
-          margin-bottom: clamp(14px, 1.6vh, 20px);
-        }
-
-        #ultimos-lancamentos-drop .nr-title-block {
-          min-width: 0;
-          overflow: visible;
-        }
-
-        #ultimos-lancamentos-drop .nr-eyebrow {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          height: 16px;
-          margin: 0 0 6px 2px;
-          white-space: nowrap;
-        }
-
-        #ultimos-lancamentos-drop .nr-eyebrow__brand,
-        #ultimos-lancamentos-drop .nr-eyebrow__label {
-          font-family: 'Marmot Sans', 'Inter', sans-serif;
-          font-size: 11px;
-          line-height: 1;
-          text-transform: uppercase;
-          letter-spacing: .22em;
-          font-weight: 800;
-        }
-
-        #ultimos-lancamentos-drop .nr-eyebrow__label {
-          color: #8b8b8b;
-          font-weight: 700;
-        }
-
-        #ultimos-lancamentos-drop .nr-eyebrow__dot {
-          width: 6px;
-          height: 6px;
-          flex: 0 0 6px;
-          border-radius: 999px;
-          background: var(--nr-yellow);
-        }
-
-        #ultimos-lancamentos-drop .nr-title {
-          margin: 0;
-          font-family: 'Inter Tight', sans-serif;
-          font-size: 32px;
-          font-weight: 800;
-          line-height: 32px;
-          letter-spacing: -.035em;
-          display: inline-block;
-          text-transform: uppercase;
-          white-space: nowrap;
-        }
-
-        #ultimos-lancamentos-drop .nr-view-all {
-          align-self: flex-end;
-          border: 1px solid #18181b;
-          background: #18181b;
-          color: #ffffff;
-          height: 36px;
-          padding: 0 16px;
-          border-radius: 6px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          font-family: 'Inter Tight', 'Inter', sans-serif;
-          font-size: 11px;
-          font-weight: 700;
-          letter-spacing: .12em;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: all .2s ease;
-          white-space: nowrap;
-        }
-
-        #ultimos-lancamentos-drop .nr-view-all:hover {
-          background: #27272a;
-          border-color: #27272a;
-        }
-
-        #ultimos-lancamentos-drop .nr-view-all svg {
-          width: 14px;
-          height: 14px;
-          stroke-width: 2;
-          transition: transform .2s ease;
-        }
-
-        #ultimos-lancamentos-drop .nr-view-all:hover svg {
-          transform: translateX(3px);
-        }
-
-        @media (max-width: 640px) {
-          #ultimos-lancamentos-drop .nr-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-          }
-
-          #ultimos-lancamentos-drop .nr-header-actions {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          }
-        }
-      `}</style>
-
-      <div className="nr-shell">
-        <header className="nr-header">
-          <div className="nr-title-block">
-            <div className="nr-eyebrow">
-              <span className="nr-eyebrow__brand">LASTED DROP</span>
-              <span className="nr-eyebrow__dot" />
-              <span className="nr-eyebrow__label">2026</span>
+    <motion.section
+      id="ultimos-lancamentos-drop"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: false, amount: 0.1 }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      className="bg-[#FAFAFA] text-[#18181B] w-full overflow-hidden border-b border-zinc-200/80 pt-7 sm:pt-9 pb-7 sm:pb-9"
+    >
+      <div className="w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* CABEÇALHO UNIFICADO */}
+        <motion.header
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: false, amount: 0.2 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4 sm:mb-5"
+        >
+          <div className="flex flex-col items-start text-left">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="text-[10px] sm:text-[10.5px] font-extrabold uppercase tracking-[0.24em] text-zinc-400">
+                DROP EXCLUSIVO
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F4C400]" />
+              <span className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.24em] text-zinc-500">
+                2026
+              </span>
             </div>
-            <h2 className="nr-title">ÚLTIMOS LANÇAMENTOS</h2>
+            <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-[-0.03em] uppercase text-zinc-950 leading-none">
+              ÚLTIMOS LANÇAMENTOS
+            </h2>
+            <p className="text-xs sm:text-[13px] text-zinc-500 font-normal mt-1.5">
+              Silhuetas pesadas, proporções amplas e matéria-prima de alta gramatura.
+            </p>
           </div>
 
-          <div className="nr-header-actions flex items-center gap-2">
-            {/* Botões de scroll rápido em telas menores */}
-            <div className="flex lg:hidden items-center gap-1.5">
+          <div className="flex items-center gap-2 self-start sm:self-end">
+            {/* Botões de navegação horizontal */}
+            <div className="flex items-center gap-1.5">
               <button
                 type="button"
                 onClick={scrollLeft}
                 aria-label="Anterior"
-                className="w-8 h-8 rounded-md border border-zinc-200 bg-white flex items-center justify-center text-zinc-800 hover:bg-zinc-100 transition-colors shadow-sm cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-[3px] border border-zinc-200/90 bg-white flex items-center justify-center text-zinc-900 hover:bg-zinc-50 active:scale-95 transition-all shadow-2xs cursor-pointer"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4 stroke-[2]" />
               </button>
               <button
                 type="button"
                 onClick={scrollRight}
                 aria-label="Próximo"
-                className="w-8 h-8 rounded-md border border-zinc-200 bg-white flex items-center justify-center text-zinc-800 hover:bg-zinc-100 transition-colors shadow-sm cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-[3px] border border-[#F4C400] bg-white flex items-center justify-center text-zinc-900 hover:bg-amber-50/40 active:scale-95 transition-all shadow-2xs cursor-pointer"
               >
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-4 h-4 stroke-[2]" />
               </button>
             </div>
 
             <button
               type="button"
-              className="nr-view-all cursor-pointer"
+              className="h-9 sm:h-10 px-4 rounded-[3px] border border-zinc-900 bg-zinc-900 hover:bg-black text-white font-bold text-[11px] tracking-wider uppercase flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
               onClick={() => onNavigate('shop', 'novidades')}
             >
               <span>VER TODOS</span>
-              <ArrowRight />
+              <ArrowRight className="w-3.5 h-3.5 stroke-[2]" />
             </button>
           </div>
-        </header>
+        </motion.header>
 
-        {/* 
-          LAYOUT EXATO DA IMAGEM:
-          5 CARDS VERTICAIS ARREDONDADOS LADO A LADO EM LINHA HORIZONTAL ÚNICA
-        */}
+        {/* GRADE / CARROSSEL DE CARDS UNIFICADOS */}
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4 xl:gap-5 pb-3 lg:pb-0 scrollbar-none snap-x snap-mandatory"
+          className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4 xl:gap-4.5 pb-2 lg:pb-0 scrollbar-none snap-x snap-mandatory"
         >
-          {spotlightItems.map((item) => {
+          {spotlightItems.map((item, index) => {
             const isWishlisted = isInWishlist(item.id);
 
             return (
-              <article
+              <motion.article
                 key={item.id}
+                initial={{ opacity: 0, y: 28, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: false, amount: 0.08 }}
+                transition={{
+                  duration: 0.55,
+                  delay: index * 0.07,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                whileHover={{ y: -4, transition: { duration: 0.22 } }}
                 onClick={() => handleProductNavigate(item)}
-                className="group relative flex flex-col flex-shrink-0 w-[270px] sm:w-[290px] md:w-[310px] lg:w-auto snap-center bg-white border border-[#dededb] hover:border-black rounded-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer"
+                className="group relative flex flex-col flex-shrink-0 w-[270px] sm:w-[290px] md:w-[310px] lg:w-auto snap-center bg-white border border-zinc-200/90 hover:border-zinc-950 rounded-[3px] overflow-hidden transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer select-none"
               >
-                {/* TOPO: Imagem com Badge e Wishlist */}
-                <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#ececea]">
+                {/* TOPO: Imagem com Proporção 4/5 e Fundo Neutro Unificado */}
+                <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#EEEEEC]">
                   {item.badge && (
-                    <span className="absolute top-3.5 left-3.5 z-10 px-2.5 py-1 bg-black/90 backdrop-blur-sm text-white text-[9px] font-extrabold uppercase tracking-widest rounded-sm shadow-sm pointer-events-none">
+                    <span className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-black/90 backdrop-blur-sm text-white text-[9.5px] font-extrabold uppercase tracking-[0.16em] rounded-[2px] shadow-sm pointer-events-none select-none">
                       {item.badge}
                     </span>
                   )}
@@ -406,11 +298,11 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                     type="button"
                     aria-label={isWishlisted ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
                     onClick={(e) => handleWishlistToggle(e, item)}
-                    className="absolute top-3.5 right-3.5 z-10 w-9 h-9 rounded-full bg-white/95 backdrop-blur-sm border border-black/10 flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm"
+                    className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/95 hover:bg-white text-zinc-900 border border-zinc-200/60 flex items-center justify-center shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
                   >
                     <Heart
-                      className={`w-4 h-4 transition-colors ${
-                        isWishlisted ? 'text-[#e44242] fill-[#e44242]' : 'text-zinc-900 stroke-[1.8]'
+                      className={`w-3.5 h-3.5 transition-colors stroke-[1.5] ${
+                        isWishlisted ? 'text-rose-600 fill-rose-600' : 'text-zinc-800 fill-transparent'
                       }`}
                     />
                   </button>
@@ -419,7 +311,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                     src={item.image}
                     alt={item.title}
                     style={{ objectPosition: item.objectPosition || 'center center' }}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out select-none pointer-events-none"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03] select-none pointer-events-none"
                     loading="lazy"
                     decoding="async"
                     referrerPolicy="no-referrer"
@@ -431,43 +323,43 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                   />
                 </div>
 
-                {/* CORPO: Informações do Produto */}
-                <div className="p-3.5 sm:p-4 xl:p-4.5 flex flex-col justify-between flex-1 bg-white">
+                {/* CORPO: Informações com Tipografia e Proporção Unificadas */}
+                <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1 bg-white">
                   <div>
-                    <span className="block text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase mb-1">
+                    <span className="block text-[10px] sm:text-[10.5px] font-semibold tracking-[0.18em] text-zinc-400 uppercase mb-1 leading-none">
                       {item.category}
                     </span>
 
-                    <h3 className="font-bold text-zinc-900 text-xs sm:text-[13px] xl:text-sm tracking-tight uppercase line-clamp-1 group-hover:text-black transition-colors mb-1">
+                    <h3 className="font-bold text-zinc-900 text-xs sm:text-[13.5px] tracking-tight uppercase line-clamp-1 group-hover:text-black transition-colors mb-1.5">
                       {item.title}
                     </h3>
 
-                    <div className="font-black text-zinc-950 text-base sm:text-lg xl:text-xl tracking-tight leading-tight">
+                    <div className="font-extrabold text-zinc-950 text-base sm:text-[17px] tracking-tight leading-none mb-1">
                       {formatPrice(item.price)}
                     </div>
 
-                    <div className="text-[10px] sm:text-[11px] text-zinc-500 leading-tight mt-0.5">
+                    <div className="text-[10.5px] sm:text-[11px] text-zinc-500 font-normal leading-tight mb-0.5">
                       {item.installments}
                     </div>
 
-                    <div className="text-[10px] sm:text-[11px] text-zinc-600 font-medium leading-tight">
+                    <div className="text-[10.5px] sm:text-[11px] text-zinc-800 font-medium leading-tight mb-2.5">
                       {item.pixPrice}
                     </div>
                   </div>
 
-                  <div className="mt-2.5 pt-2.5 border-t border-zinc-100">
+                  <div className="pt-2.5 border-t border-zinc-100">
                     <div className="flex items-center justify-between gap-2 mb-2.5">
                       <div className="flex items-center gap-1.5">
                         {item.colors.map((colorHex, idx) => (
                           <span
                             key={`${item.id}-${idx}`}
-                            className="w-3.5 h-3.5 rounded-full border border-black/15 flex-shrink-0"
+                            className="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full border border-black/15 flex-shrink-0"
                             style={{ backgroundColor: colorHex }}
                           />
                         ))}
                       </div>
 
-                      <span className="text-[9px] sm:text-[10px] font-medium tracking-wider text-zinc-400 uppercase">
+                      <span className="text-[9.5px] sm:text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
                         {item.colorCount} CORES
                       </span>
                     </div>
@@ -478,18 +370,18 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                         e.stopPropagation();
                         handleProductNavigate(item);
                       }}
-                      className="w-full h-9 sm:h-9.5 rounded-md border border-zinc-900 bg-white group-hover:bg-zinc-950 group-hover:text-white text-zinc-900 font-bold text-[11px] tracking-wider uppercase flex items-center justify-center gap-2 transition-all duration-200"
+                      className="w-full h-8.5 rounded-[2px] border border-zinc-900 bg-white group-hover:bg-zinc-950 group-hover:text-white text-zinc-900 font-bold text-[10.5px] tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
                     >
                       <span>VER PRODUTO</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
-              </article>
+              </motion.article>
             );
           })}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 };

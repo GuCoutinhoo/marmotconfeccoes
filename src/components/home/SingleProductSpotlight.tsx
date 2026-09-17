@@ -151,41 +151,27 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
   return (
     <section
       id="product-spotlight-section"
-      className="bg-[#F4F4F2] select-none relative overflow-hidden border-y border-zinc-200/80"
-      style={{
-        paddingTop: '22px',
-        paddingBottom: '22px',
-      }}
+      className="bg-[#FAFAFA] select-none relative overflow-hidden border-b border-zinc-200/80 py-10 sm:py-14 lg:py-16"
     >
-      <div className="max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* ========================================================= */}
         {/* CARD CENTRAL DE DESTAQUE - ESTRUTURA HORIZONTAL SPLIT     */}
         {/* ========================================================= */}
-        <div className="bg-[#EDEDED] sm:bg-[#EFEFEF] border border-zinc-300/80 rounded-[3px] overflow-hidden shadow-xs grid grid-cols-1 lg:grid-cols-12 items-stretch">
+        <div className="bg-white border border-zinc-200/90 rounded-[3px] overflow-hidden shadow-none hover:shadow-[0_12px_32px_rgba(0,0,0,0.05)] transition-all grid grid-cols-1 lg:grid-cols-12 items-stretch">
           
           {/* ======================================================= */}
           {/* 1. LADO ESQUERDO: FOTO DO PRODUTO / MODELO (52% col)    */}
           {/* ======================================================= */}
-          <div className="lg:col-span-6 xl:col-span-6 relative w-full min-h-[440px] sm:min-h-[520px] lg:min-h-[580px] xl:min-h-[610px] bg-[#E3E2DD] overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-300/80">
-            {/* Top-Left: Bloco Tipográfico Editorial */}
-            <div className="absolute top-6 left-6 sm:top-7 sm:left-7 z-20 pointer-events-none select-none text-left">
-              <span className="font-sans text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-[#1E1E1E] block leading-tight">
-                DESTAQUE
-              </span>
-              <span className="font-sans text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-[#1E1E1E] block leading-tight">
-                DE ATELIÊ
-              </span>
-              <div className="w-4.5 h-[1.5px] bg-[#1E1E1E] my-2" />
-              <span className="font-sans text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.22em] text-[#1E1E1E] block leading-tight">
-                SIGNATURE
-              </span>
-              <span className="font-sans text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.22em] text-[#1E1E1E] block leading-tight">
-                PIECE
+          <div className="lg:col-span-6 xl:col-span-6 relative w-full min-h-[540px] sm:min-h-[620px] lg:min-h-[700px] xl:min-h-[750px] bg-[#EEEEEC] overflow-hidden flex items-center justify-center border-b lg:border-b-0 lg:border-r border-zinc-200/80">
+            {/* Top-Left: Badge Editorial Minimalista */}
+            <div className="absolute top-5 left-5 sm:top-6 sm:left-6 z-20 pointer-events-none select-none text-left">
+              <span className="px-3 py-1.5 bg-black/90 backdrop-blur-sm text-white text-[10px] font-extrabold uppercase tracking-[0.18em] rounded-[2px] shadow-sm">
+                PEÇA ASSINATURA • ATELIÊ
               </span>
             </div>
 
             {/* Imagem Fotográfica Principal com Transição Suave de Ângulo */}
-            <div className="w-full h-full absolute inset-0 overflow-hidden flex items-center justify-center bg-[#E3E2DD]">
+            <div className="w-full h-full absolute inset-0 overflow-hidden flex items-center justify-center bg-[#EEEEEC]">
               <img
                 key={`${selectedColorSlug}-${activeAngleIndex}`}
                 src={currentAngle.image}
@@ -199,29 +185,29 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
             </div>
 
             {/* Bottom-Left: Assinatura MARMOT */}
-            <div className="absolute bottom-6 left-6 sm:bottom-7 sm:left-7 z-20 pointer-events-none select-none">
-              <span className="font-sans text-[11px] sm:text-[12px] font-bold tracking-[0.34em] text-[#1E1E1E] uppercase">
+            <div className="absolute bottom-5 left-5 sm:bottom-6 sm:left-6 z-20 pointer-events-none select-none">
+              <span className="font-sans text-[11px] sm:text-[12px] font-extrabold tracking-[0.32em] text-zinc-400 uppercase">
                 MARMOT
               </span>
             </div>
 
             {/* Bottom-Right: Setas Discretas de Navegação [ ← ] [ → ] */}
-            <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 z-20 flex items-center gap-1.5 sm:gap-2 select-none">
+            <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 z-20 flex items-center gap-2 select-none">
               <button
                 type="button"
                 onClick={handlePrevAngle}
                 aria-label="Perspectiva anterior"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-zinc-100 active:scale-95 border border-zinc-300/90 rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
+                className="w-10 h-10 sm:w-11 sm:h-11 bg-white hover:bg-zinc-100 active:scale-95 border border-zinc-200/90 rounded-[3px] flex items-center justify-center text-zinc-900 transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
+                <ArrowLeft className="w-4.5 h-4.5 stroke-[2]" />
               </button>
               <button
                 type="button"
                 onClick={handleNextAngle}
                 aria-label="Próxima perspectiva"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#F4C400] hover:bg-[#E5B500] active:scale-95 border border-[#E5B500] rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
+                className="w-10 h-10 sm:w-11 sm:h-11 bg-[#F4C400] hover:bg-[#E5B500] active:scale-95 border border-[#E5B500] rounded-[3px] flex items-center justify-center text-zinc-950 transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
+                <ArrowRight className="w-4.5 h-4.5 stroke-[2]" />
               </button>
             </div>
           </div>
@@ -229,23 +215,22 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
           {/* ======================================================= */}
           {/* 2. LADO DIREITO: CONTEÚDO DO PRODUTO + MINIATURAS       */}
           {/* ======================================================= */}
-          <div className="lg:col-span-6 xl:col-span-6 p-5 sm:p-7 lg:p-8 xl:p-9 flex flex-col lg:flex-row justify-between gap-5 xl:gap-7 bg-[#F6F5F2]">
+          <div className="lg:col-span-6 xl:col-span-6 p-6 sm:p-8 lg:p-10 xl:p-11 flex flex-col lg:flex-row justify-between gap-6 xl:gap-8 bg-white">
             
             {/* Bloco Principal de Informações */}
             <div className="flex-1 flex flex-col justify-between">
               <div>
                 {/* Microtexto / Categoria */}
-                <div className="mb-1.5">
-                  <span className="font-sans text-[10.5px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                    JAQUETAS &nbsp;/&nbsp; NOVO DROP
+                <div className="mb-2">
+                  <span className="text-[10.5px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-zinc-400">
+                    JAQUETAS • DROP ESPECIAL
                   </span>
                 </div>
 
-                {/* Título Grande e Forte */}
+                {/* Título com Tipografia Unificada */}
                 <h2
                   onClick={() => onNavigate('product', product.id)}
-                  className="font-anton text-3xl sm:text-4xl lg:text-[42px] xl:text-[48px] font-normal uppercase text-black leading-[0.92] tracking-tight mb-2.5 cursor-pointer hover:text-zinc-800 transition-colors select-none"
-                  style={{ fontWeight: 'normal' }}
+                  className="text-2xl sm:text-3xl lg:text-[38px] xl:text-[42px] font-extrabold uppercase text-zinc-950 leading-[1.04] tracking-[-0.03em] mb-3 cursor-pointer hover:text-black transition-colors select-none"
                 >
                   JAQUETA
                   <br />
@@ -253,25 +238,25 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                 </h2>
 
                 {/* Avaliação por Estrelas */}
-                <div className="flex items-center gap-2 mb-3 select-none">
-                  <div className="flex text-black gap-0.5">
+                <div className="flex items-center gap-2 mb-3.5 select-none">
+                  <div className="flex text-[#F4C400] gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-black text-black" />
+                      <Star key={i} className="w-3.5 h-3.5 fill-[#F4C400] text-[#F4C400]" />
                     ))}
                   </div>
-                  <span className="text-xs font-bold text-black">5.0</span>
+                  <span className="text-xs font-bold text-zinc-900">5.0</span>
                   <span className="text-xs text-zinc-500 font-normal">(30 avaliações)</span>
                 </div>
 
                 {/* Descrição Curta Editorial */}
-                <p className="text-[13px] sm:text-[13.5px] text-zinc-600 leading-relaxed font-normal mb-3 max-w-lg">
+                <p className="text-[13.5px] sm:text-[14.5px] text-zinc-600 leading-relaxed font-normal mb-3.5 max-w-lg">
                   Inspirada no varsity clássico, reinterpretada em proporções amplas.
                   <br className="hidden sm:inline" />
-                  Uma peça atemporal, feita para o dia a dia.
+                  Uma peça atemporal, feita para durar e estruturar o visual.
                 </p>
 
                 {/* Linha de Características Resumidas */}
-                <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-2.5 gap-y-1 text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500 mb-4 select-none">
+                <div className="flex flex-wrap items-center gap-x-2 sm:gap-x-2.5 gap-y-1 text-[9.5px] sm:text-[10px] font-semibold uppercase tracking-[0.14em] text-zinc-500 mb-5 select-none">
                   <span>MANGAS CONTRASTANTES</span>
                   <span className="text-zinc-300 font-light">|</span>
                   <span>PUNHOS LISTRADOS</span>
@@ -282,11 +267,11 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                 </div>
 
                 {/* Bloco de Preço */}
-                <div className="mb-4 sm:mb-5 select-none">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-black tracking-tight block leading-none mb-1">
+                <div className="mb-5 sm:mb-6 select-none">
+                  <span className="text-2xl sm:text-3xl lg:text-[32px] font-extrabold text-black tracking-tight block leading-none mb-1">
                     R$ 489,90
                   </span>
-                  <span className="text-xs text-zinc-500 font-normal">
+                  <span className="text-xs sm:text-[13px] text-zinc-500 font-normal">
                     3x de R$ 163,30 sem juros &nbsp;•&nbsp; R$ 465,40 no Pix
                   </span>
                 </div>
@@ -404,7 +389,7 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
                   key={angle.id}
                   type="button"
                   onClick={() => setActiveAngleIndex(idx)}
-                  className={`w-14 sm:w-16 h-18 sm:h-20 rounded-[2px] overflow-hidden transition-all cursor-pointer relative bg-[#E6E5E0] ${
+                  className={`w-14 sm:w-16 lg:w-17 h-18 sm:h-21 lg:h-23 rounded-[3px] overflow-hidden transition-all cursor-pointer relative bg-[#E6E5E0] ${
                     activeAngleIndex === idx
                       ? 'ring-2 ring-black ring-offset-1 opacity-100 shadow-2xs'
                       : 'border border-zinc-300 opacity-65 hover:opacity-100 hover:border-zinc-500'

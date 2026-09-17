@@ -10,8 +10,7 @@ const HERO_IMAGE = '/hero-v2.png';
 export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
   return (
     <section 
-      className="relative w-full bg-[#0B0B0E] text-white overflow-hidden -mt-[62px] sm:-mt-[66px]"
-      style={{ height: 'calc(91dvh - 10px)', minHeight: '620px', maxHeight: '890px' }}
+      className="relative w-full bg-[#0B0B0E] text-white overflow-hidden -mt-[62px] sm:-mt-[66px] h-screen min-h-[640px]"
     >
       {/* Full Bleed Background Image - Spanning 100% width and height behind header */}
       <div className="absolute inset-0 z-0 overflow-hidden select-none pointer-events-none">
@@ -61,7 +60,7 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
             <div className="space-y-1">
               <div className="flex items-center justify-end gap-2 text-[10.5px] font-mono tracking-[0.25em] text-[#F4C400] uppercase font-bold">
                 <span className="w-1.5 h-1.5 bg-[#F4C400] rotate-45" />
-                <span>NOVO DROP // 2026</span>
+                <span>NOVO DROP • 2026</span>
               </div>
               <p className="text-xs font-bold text-white tracking-[0.18em] uppercase">
                 LIMITED EDITION ARCHIVE

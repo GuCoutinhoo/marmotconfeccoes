@@ -22,15 +22,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onQuickView }) =
       {/* 1. Hero Principal - Lookbook Editorial */}
       <BannerHero onNavigate={onNavigate} />
 
-      {/* 2. Compre por Categoria (Navegação Visual) */}
-      <CategoryNavigationGrid onNavigate={onNavigate} />
-
-      {/* 3. Novidades & Últimos Lançamentos (Carousel) */}
+      {/* 2. Novidades & Últimos Lançamentos (Carousel) */}
       <NewReleasesCarousel
         products={products}
         onQuickView={onQuickView}
         onNavigate={onNavigate}
       />
+
+      {/* 3. Compre por Categoria (Navegação Visual) */}
+      <CategoryNavigationGrid onNavigate={onNavigate} />
 
       {/* 4. MARMOT FIT SYSTEM - Guia Visual Interativo de Caimento */}
       <MarmotFitSystem

@@ -229,7 +229,7 @@ const cardBottomRightVariant = {
 const titleVariant = {
   hidden: {
     opacity: 0,
-    y: 38,
+    y: 32,
     transition: { duration: 0 },
   },
   visible: {
@@ -239,6 +239,23 @@ const titleVariant = {
       duration: 0.75,
       ease: [0.16, 1, 0.3, 1],
       delay: 0.05,
+    },
+  },
+};
+
+const subtitleVariant = {
+  hidden: {
+    opacity: 0,
+    y: 18,
+    transition: { duration: 0 },
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.75,
+      ease: [0.16, 1, 0.3, 1],
+      delay: 0.12,
     },
   },
 };
@@ -255,35 +272,26 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     });
   }, []);
 
-  // Monitora o scroll para disparar a animação sempre que o usuário rolar para baixo ao passar pela seção
+  // Monitora a visibilidade para disparar a animação assim que o usuário entrar no site ou alcançar a seção
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    let lastScrollY = window.scrollY || document.documentElement.scrollTop;
     let ticking = false;
 
     const checkPosition = () => {
-      const currentScrollY = window.scrollY || document.documentElement.scrollTop;
-      const isScrollingDown = currentScrollY >= lastScrollY;
-      lastScrollY = currentScrollY;
-
       const rect = el.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
 
-      // Se a seção está abaixo da viewport (usuário rolou para cima e está acima dela):
-      // Reseta imediatamente para "hidden" para que, na próxima descida, a animação aconteça novamente
-      if (rect.top > vh * 0.85) {
+      // Se a seção estiver completamente fora da tela (abaixo da viewport):
+      if (rect.top >= vh) {
         setHasEntered(false);
         ticking = false;
         return;
       }
 
-      // Ao rolar para baixo e a seção entrar no campo de visão:
-      if (isScrollingDown && rect.top <= vh * 0.85 && rect.bottom >= 60) {
-        setHasEntered(true);
-      } else if (!isScrollingDown && rect.top < vh && rect.bottom > 0) {
-        // Ao rolar para cima enquanto passa pela seção, mantém os cards visíveis
+      // Se qualquer parte da seção entrou na viewport (inclusive a prévia no rodapé ao abrir o site):
+      if (rect.top < vh && rect.bottom >= 0) {
         setHasEntered(true);
       }
 
@@ -300,10 +308,16 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
 
-    // Verificação inicial
+    // Verificação imediata na entrada do usuário
     checkPosition();
 
+    // Confirmação de segurança caso assets ou fontes terminem de carregar
+    const rafId = requestAnimationFrame(checkPosition);
+    const timer = setTimeout(checkPosition, 60);
+
     return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timer);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
@@ -401,54 +415,37 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
   };
 
   return (
-    <section
+    <motion.section
       ref={sectionRef}
       id="category-showcase-section"
-      className="bg-[#FAFAFA] pt-4.5 sm:pt-5 pb-3 sm:pb-3.5 select-none overflow-hidden"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: false, amount: 0.1 }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+      className="bg-[#FAFAFA] pt-6 sm:pt-8 pb-8 sm:pb-10 border-b border-zinc-200/80 select-none overflow-hidden"
     >
       {/* ========================================================= */}
       {/* CABEÇALHO DA SEÇÃO                                         */}
       {/* ========================================================= */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto mb-2.5 sm:mb-3">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto mb-3 sm:mb-4">
         <div className="flex items-start sm:items-end justify-between gap-4">
           {/* BLOCO ESQUERDO: TÍTULO + SUBTÍTULO */}
           <div className="flex flex-col items-start text-left">
-            <div className="overflow-hidden">
-              <motion.h2
-                variants={titleVariant}
-                initial="hidden"
-                animate={hasEntered ? "visible" : "hidden"}
-                style={{
-                  fontFamily: '"Inter Tight", sans-serif',
-                  letterSpacing: '-0.03em',
-                  fontSize: '32px',
-                  lineHeight: '32px',
-                  fontWeight: 800,
-                }}
-                className="text-[32px] leading-[32px] font-extrabold uppercase text-black select-none will-change-transform font-inter-tight"
-              >
-                COMPRE POR CATEGORIA
-              </motion.h2>
-            </div>
-            <p
-              style={{
-                fontFamily: '"Inter", sans-serif',
-                fontSize: '12px',
-                marginTop: '1px',
-              }}
-              className="text-[12px] text-zinc-400 font-normal mt-[1px] select-none tracking-normal"
-            >
+            <h2 className="text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-[-0.03em] uppercase text-zinc-950 leading-none select-none">
+              COMPRE POR CATEGORIA
+            </h2>
+            <p className="text-xs sm:text-[13px] text-zinc-500 font-normal mt-1.5 select-none tracking-normal">
               Explore a coleção e encontre seu próximo look.
             </p>
           </div>
 
           {/* BLOCO DIREITO: Setas superiores para alternar entre conjuntos de categorias */}
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               type="button"
               onClick={handlePrevSet}
               aria-label="Conjunto anterior"
-              className="w-9 h-9 sm:w-10 sm:h-10 border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-95 flex items-center justify-center text-black transition-all cursor-pointer rounded-lg"
+              className="w-9 h-9 sm:w-10 sm:h-10 border border-zinc-200/90 bg-white hover:bg-zinc-50 active:scale-95 flex items-center justify-center text-zinc-900 transition-all cursor-pointer rounded-[3px] shadow-2xs"
             >
               <ArrowLeft className="w-4 h-4 stroke-[2]" />
             </button>
@@ -456,7 +453,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
               type="button"
               onClick={handleNextSet}
               aria-label="Próximo conjunto"
-              className="w-9 h-9 sm:w-10 sm:h-10 border border-[#F5C400] bg-white hover:bg-amber-50/40 active:scale-95 flex items-center justify-center text-black transition-all cursor-pointer rounded-lg"
+              className="w-9 h-9 sm:w-10 sm:h-10 border border-[#F4C400] bg-white hover:bg-amber-50/40 active:scale-95 flex items-center justify-center text-zinc-900 transition-all cursor-pointer rounded-[3px] shadow-2xs"
             >
               <ArrowRight className="w-4 h-4 stroke-[2]" />
             </button>
@@ -473,17 +470,18 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSetIndex}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: -14 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2 gap-2.5 sm:gap-3 md:gap-3.5 lg:gap-4 h-auto md:h-[460px] lg:h-[495px] xl:h-[530px] 2xl:h-[550px]"
           >
             {/* 1. CARD GRANDE (ESQUERDA - ALTURA TOTAL / 2 LINHAS) */}
             <motion.div
               variants={cardLeftVariant}
               initial="hidden"
-              animate={hasEntered ? "visible" : "hidden"}
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.05 }}
               className="sm:col-span-2 md:col-span-1 md:row-span-2 md:col-start-1 md:row-start-1 w-full h-[350px] sm:h-[390px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item1, 'w-full h-full')}
@@ -493,7 +491,8 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             <motion.div
               variants={cardTopVariant}
               initial="hidden"
-              animate={hasEntered ? "visible" : "hidden"}
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.05 }}
               className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-1 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item2, 'w-full h-full')}
@@ -503,7 +502,8 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             <motion.div
               variants={cardTopRightVariant}
               initial="hidden"
-              animate={hasEntered ? "visible" : "hidden"}
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.05 }}
               className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-1 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item3, 'w-full h-full')}
@@ -513,7 +513,8 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             <motion.div
               variants={cardBottomVariant}
               initial="hidden"
-              animate={hasEntered ? "visible" : "hidden"}
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.05 }}
               className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-2 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item4, 'w-full h-full')}
@@ -523,7 +524,8 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             <motion.div
               variants={cardBottomRightVariant}
               initial="hidden"
-              animate={hasEntered ? "visible" : "hidden"}
+              whileInView="visible"
+              viewport={{ once: false, amount: 0.05 }}
               className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-2 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
             >
               {renderCategoryCard(item5, 'w-full h-full')}
@@ -531,6 +533,6 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
           </motion.div>
         </AnimatePresence>
       </div>
-    </section>
+    </motion.section>
   );
 };
