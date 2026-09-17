@@ -1014,7 +1014,11 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
         setIsAddOpen(false);
       }
     } catch (err: any) {
-      showToast('Erro ao Salvar', err?.message || 'Ocorreu um erro ao salvar o produto no banco.', 'error');
+      const isServiceRoleError = String(err?.message || '').includes('SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED');
+      const msg = isServiceRoleError
+        ? 'A chave de serviço SUPABASE_SERVICE_ROLE_KEY não está configurada no ambiente. Adicione a chave no painel de configurações para persistir alterações no Supabase.'
+        : (err?.message || 'Ocorreu um erro ao salvar o produto no banco.');
+      showToast('Erro ao Salvar', msg, 'error');
     } finally {
       setIsSaving(false);
     }
@@ -1028,7 +1032,11 @@ export const AdminProductsTab: React.FC<AdminProductsTabProps> = ({ onNavigateTo
       showToast('Produto Removido', 'Peça excluída do catálogo e do banco de dados com sucesso.', 'info');
       setDeletingId(null);
     } catch (err: any) {
-      showToast('Erro ao Excluir', err?.message || 'Falha ao remover produto do banco de dados.', 'error');
+      const isServiceRoleError = String(err?.message || '').includes('SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED');
+      const msg = isServiceRoleError
+        ? 'A chave de serviço SUPABASE_SERVICE_ROLE_KEY não está configurada no ambiente. Adicione a chave no painel de configurações para autorizar exclusões no Supabase.'
+        : (err?.message || 'Falha ao remover produto do banco de dados.');
+      showToast('Erro ao Excluir', msg, 'error');
     }
   };
 

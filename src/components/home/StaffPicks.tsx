@@ -51,7 +51,7 @@ export const StaffPicks: React.FC<StaffPicksProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {staffPicksData.map((item, idx) => {
-            const product = products.find((p) => p.id === item.productId) || products[idx];
+            const product = products.find((p) => p.id === item.productId || p.slug === item.productId);
             if (!product) return null;
 
             const prodImg = product.images?.[0] || (product as any).image || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80';

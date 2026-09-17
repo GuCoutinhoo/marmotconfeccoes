@@ -73,6 +73,17 @@ function getInitialRoute(): { page: string; param: string } {
     return { page: 'tracking', param: urlParams.get('code') || '' };
   }
 
+  if (pathname.startsWith('/produto/') || pathname.startsWith('/product/')) {
+    const rawPath = window.location.pathname;
+    const segments = rawPath.split('/').filter(Boolean);
+    const idOrSlug = segments[1] ? decodeURIComponent(segments[1]) : '';
+    return { page: idOrSlug ? 'product' : 'shop', param: idOrSlug };
+  }
+
+  if (pathname === '/produto' || pathname === '/product') {
+    return { page: 'shop', param: '' };
+  }
+
   if (pathname.startsWith('/shop') || pathname.startsWith('/catalogo')) {
     const urlParams = new URLSearchParams(search);
     return { page: 'shop', param: urlParams.get('cat') || '' };
@@ -141,6 +152,8 @@ export function AppContent() {
         window.history.pushState({}, '', '/checkout');
       } else if (page === 'tracking') {
         window.history.pushState({}, '', param ? `/tracking?code=${param}` : '/tracking');
+      } else if (page === 'product') {
+        window.history.pushState({}, '', param ? `/produto/${encodeURIComponent(param)}` : '/shop');
       }
     }
   }, []);

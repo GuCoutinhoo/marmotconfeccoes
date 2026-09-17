@@ -113,6 +113,15 @@
   font-family: 'Barlow Condensed', 'Bebas Neue', sans-serif;
 }
 
+.font-bodoni {
+  font-family: 'Bodoni Moda', 'Didot', 'Bodoni MT', 'Baskerville', 'Playfair Display', serif;
+}
+
+.font-helvetica-now,
+.font-haas {
+  font-family: 'Helvetica Now Display', 'Helvetica Now', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 .marmot-category-card {
   border-radius: 0px !important;
 }

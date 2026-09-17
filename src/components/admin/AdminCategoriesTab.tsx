@@ -245,9 +245,17 @@ export const AdminCategoriesTab: React.FC = () => {
   // Confirm Delete
   const handleConfirmDelete = async () => {
     if (!deletingId) return;
-    await deleteCategory(deletingId);
-    showToast('Categoria Removida', 'Categoria excluída com sucesso.', 'info');
-    setDeletingId(null);
+    try {
+      await deleteCategory(deletingId);
+      showToast('Categoria Removida', 'Categoria excluída com sucesso.', 'info');
+      setDeletingId(null);
+    } catch (err: any) {
+      const isServiceRoleError = String(err?.message || '').includes('SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED');
+      const msg = isServiceRoleError
+        ? 'A chave de serviço SUPABASE_SERVICE_ROLE_KEY não está configurada no ambiente. Adicione a chave no painel de configurações para autorizar exclusões no Supabase.'
+        : (err?.message || 'Falha ao remover categoria do banco de dados.');
+      showToast('Erro ao Excluir', msg, 'error');
+    }
   };
 
   return (

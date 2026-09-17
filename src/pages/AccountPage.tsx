@@ -68,18 +68,6 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [isSyncingOrders, setIsSyncingOrders] = useState(false);
   const payNowInFlightRef = useRef<Set<string>>(new Set());
 
-  const handleManualSync = async () => {
-    setIsSyncingOrders(true);
-    try {
-      await refreshOrders();
-      showToast('Sincronizado', 'Seus pedidos foram atualizados diretamente do banco de dados.', 'success');
-    } catch {
-      showToast('Erro', 'Falha ao sincronizar pedidos.', 'error');
-    } finally {
-      setIsSyncingOrders(false);
-    }
-  };
-
   // Auth Tabs when NOT logged in: 'login' | 'register' | 'forgot' | 'verify' | 'awaiting_confirmation'
   const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot' | 'verify' | 'awaiting_confirmation'>(
     initialTab === 'register' ? 'register' : 'login'
@@ -171,6 +159,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   const [addrState, setAddrState] = useState('SP');
   const [addrCep, setAddrCep] = useState('');
   const [addrIsDefault, setAddrIsDefault] = useState(false);
+  const [loadingAddrCep, setLoadingAddrCep] = useState(false);
 
   // Handle Resend Cooldown Timer
   React.useEffect(() => {
@@ -488,7 +477,17 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
     setIsAddressModalOpen(false);
   };
 
-  const [loadingAddrCep, setLoadingAddrCep] = useState(false);
+  const handleManualSync = async () => {
+    setIsSyncingOrders(true);
+    try {
+      await refreshOrders();
+      showToast('Sincronizado', 'Seus pedidos foram atualizados diretamente do banco de dados.', 'success');
+    } catch {
+      showToast('Erro', 'Falha ao sincronizar pedidos.', 'error');
+    } finally {
+      setIsSyncingOrders(false);
+    }
+  };
 
   // Real CEP Lookup via ViaCEP
   const handleCepLookup = async () => {

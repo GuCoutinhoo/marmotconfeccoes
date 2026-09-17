@@ -96,10 +96,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const activeUserIdRef = useRef<string | null>(user?.id || null);
   const cartRef = useRef<CartItem[]>(cart);
 
-  useEffect(() => {
-    cartRef.current = cart;
-  }, [cart]);
-
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(() => {
     try {
       const saved = localStorage.getItem('@marmot_coupon');
@@ -147,6 +143,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const { showToast } = useToast();
+
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
 
   // Load and synchronize cart strictly for authenticated user (Supabase as Source of Truth)
   useEffect(() => {

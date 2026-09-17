@@ -15,13 +15,19 @@ export const EssentialsGrid: React.FC<EssentialsGridProps> = ({
   onNavigate,
 }) => {
   // Select a mixed curation of essentials: camisetas, moletons, calças, tênis, jaquetas
-  const essentialTee = products.find((p) => p.category === 'camisetas') || products[0];
-  const essentialHoodie = products.find((p) => p.category === 'moletons') || products[1];
-  const essentialPant = products.find((p) => p.category === 'cargos' || p.category === 'calcas') || products[2];
-  const essentialSneaker = products.find((p) => p.category === 'tenis') || products[3];
-  const essentialOuterwear = products.find((p) => p.category === 'jaquetas' || p.category === 'shorts') || products[4];
+  const essentialTee = products.find((p) => p.category === 'camisetas');
+  const essentialHoodie = products.find((p) => p.category === 'moletons');
+  const essentialPant = products.find((p) => p.category === 'cargos' || p.category === 'calcas');
+  const essentialSneaker = products.find((p) => p.category === 'tenis');
+  const essentialOuterwear = products.find((p) => p.category === 'jaquetas' || p.category === 'shorts');
 
-  const essentialsList = [essentialTee, essentialHoodie, essentialPant, essentialSneaker, essentialOuterwear].filter(Boolean) as Product[];
+  const essentialsList = [
+    essentialTee,
+    essentialHoodie,
+    essentialPant,
+    essentialSneaker,
+    essentialOuterwear,
+  ].filter(Boolean) as Product[];
 
   return (
     <section className="py-20 bg-[#080808] border-b border-[#262626]">

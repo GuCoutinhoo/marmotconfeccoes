@@ -38,15 +38,17 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   onNavigate,
   onQuickView,
 }) => {
-  const { products } = useStore();
+  const { products, isLoading, isInitialized } = useStore();
   const { user } = useAuth();
-  const product = products.find((p) => p.id === productId || p.slug === productId) || products[0];
+
+  // Strict product search by id or slug - NEVER fallback to products[0] or any other product
+  const product = products.find(
+    (p) => p.id === productId || p.slug === productId
+  );
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [selectedColor, setSelectedColor] = useState<ProductVariant>(
-    product?.colors?.[0] || { color: 'black', colorName: 'Preto Ônix', colorHex: '#121212' }
-  );
-  const [selectedSize, setSelectedSize] = useState<string>(product?.sizes?.[0] || 'M');
+  const [selectedColor, setSelectedColor] = useState<ProductVariant | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
   const [isAddedRecently, setIsAddedRecently] = useState(false);
@@ -58,38 +60,54 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const [newReviewTitle, setNewReviewTitle] = useState('');
   const [newReviewComment, setNewReviewComment] = useState('');
   const [newReviewName, setNewReviewName] = useState(user?.name || '');
-  const [reviewsList, setReviewsList] = useState<any[]>(product?.reviews || []);
+  const [reviewsList, setReviewsList] = useState<any[]>([]);
 
-  const loadProductReviews = async (pId: string) => {
-    try {
-      const res = await fetch(`/api/products/${pId}/reviews`);
-      if (res.ok) {
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setReviewsList(data);
-          return;
-        }
-      }
-    } catch {
-      // fallback
-    }
-    if (product?.reviews) {
-      setReviewsList(product.reviews);
-    }
-  };
+  // Synchronously reset selections when product changes to prevent stale data leaking across products
+  const [lastTrackedId, setLastTrackedId] = useState<string | null>(null);
+  if (product && product.id !== lastTrackedId) {
+    setLastTrackedId(product.id);
+    setSelectedImageIndex(0);
+    setSelectedColor(product.colors?.[0] || null);
+    setSelectedSize(product.sizes?.[0] || '');
+    setReviewsList(product.reviews || []);
+    setQuantity(1);
+    setIsAddedRecently(false);
+    setIsReviewFormOpen(false);
+  } else if (!product && lastTrackedId !== null) {
+    setLastTrackedId(null);
+    setSelectedImageIndex(0);
+    setSelectedColor(null);
+    setSelectedSize('');
+    setReviewsList([]);
+  }
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setSelectedImageIndex(0);
-    if (product) {
-      if (product.colors?.length) {
-        setSelectedColor(product.colors[0]);
-      }
-      if (product.sizes?.length) {
-        setSelectedSize(product.sizes[0]);
-      }
-      loadProductReviews(product.id);
+
+    if (!product) {
+      return;
     }
+
+    let isSubscribed = true;
+    const loadProductReviews = async (pId: string) => {
+      try {
+        const res = await fetch(`/api/products/${encodeURIComponent(pId)}/reviews`);
+        if (res.ok && isSubscribed) {
+          const data = await res.json();
+          if (Array.isArray(data) && isSubscribed) {
+            setReviewsList(data);
+          }
+        }
+      } catch {
+        // Keep initial product.reviews
+      }
+    };
+
+    loadProductReviews(product.id);
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [productId, product?.id]);
 
   const { addToCart } = useCart();
@@ -97,6 +115,19 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   const { showToast } = useToast();
 
   if (!product) {
+    // 1. While catalog is still loading, show loading spinner to avoid premature "not found"
+    if (isLoading || !isInitialized) {
+      return (
+        <div className="min-h-[60vh] flex flex-col items-center justify-center p-8">
+          <div className="w-8 h-8 border-2 border-[#18181B] border-t-[#F4C400] rounded-full animate-spin mb-3" />
+          <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#71717A]">
+            Carregando peça...
+          </span>
+        </div>
+      );
+    }
+
+    // 2. Once catalog finishes loading, if product doesn't exist, display "Peça não encontrada"
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
         <h2 className="text-xl font-black uppercase text-[#0B0B0E] mb-2">Peça não encontrada</h2>
@@ -112,11 +143,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   }
 
   const isFavorite = isInWishlist(product.id);
+  const activeColor: ProductVariant = selectedColor || product.colors?.[0] || { color: 'black', colorName: 'Padrão', colorHex: '#121212' };
+  const activeSize: string = selectedSize || product.sizes?.[0] || '';
 
   const images = React.useMemo(() => {
     const list: string[] = [];
-    if (selectedColor?.image) list.push(selectedColor.image);
-    if (selectedColor?.featuredImage) list.push(selectedColor.featuredImage);
+    if (activeColor?.image) list.push(activeColor.image);
+    if (activeColor?.featuredImage) list.push(activeColor.featuredImage);
     if (product.images && product.images.length > 0) {
       product.images.forEach((img) => {
         if (!list.includes(img)) list.push(img);
@@ -128,7 +161,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
     return list.length > 0
       ? list.map((url) => getValidProductImageUrl(url, product.category, product.id))
       : [getValidProductImageUrl(product.image, product.category, product.id)];
-  }, [product, selectedColor]);
+  }, [product, activeColor]);
 
   const handleSelectColor = (variant: ProductVariant) => {
     setSelectedColor(variant);
@@ -136,7 +169,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
   };
 
   const handleAddToCart = () => {
-    const success = addToCart(product, selectedSize, selectedColor, quantity);
+    const success = addToCart(product, activeSize || product.sizes?.[0] || 'U', activeColor, quantity);
     if (success) {
       setIsAddedRecently(true);
       setTimeout(() => setIsAddedRecently(false), 2000);
@@ -337,11 +370,11 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             {product.colors && product.colors.length > 0 && (
               <div className="space-y-2">
                 <label className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-zinc-600 block">
-                  COR: <span className="text-[#0B0B0E] font-sans font-extrabold">{selectedColor.colorName || selectedColor.color}</span>
+                  COR: <span className="text-[#0B0B0E] font-sans font-extrabold">{activeColor.colorName || activeColor.color}</span>
                 </label>
                 <div className="flex items-center gap-2.5">
                   {product.colors.map((c, idx) => {
-                    const isSelected = (selectedColor.colorHex || selectedColor.color) === (c.colorHex || c.color);
+                    const isSelected = (activeColor.colorHex || activeColor.color) === (c.colorHex || c.color);
                     return (
                       <button
                         key={idx}
@@ -479,8 +512,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               items={[{
                 productId: product.id,
                 quantity,
-                size: selectedSize,
-                colorName: selectedColor.colorName || selectedColor.color,
+                size: activeSize,
+                colorName: activeColor.colorName || activeColor.color,
               }]}
             />
 

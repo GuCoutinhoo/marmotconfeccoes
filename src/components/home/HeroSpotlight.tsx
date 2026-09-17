@@ -15,7 +15,7 @@ export const HeroSpotlight: React.FC<HeroSpotlightProps> = ({
   onNavigate,
 }) => {
   const { addToCart } = useCart();
-  const mainProduct = products.find((p) => p.id === 'prod-004') || products[0];
+  const mainProduct = products.find((p) => p.isBestSeller || p.rating >= 4.8);
   const sideProducts = mainProduct ? products.filter((p) => p.id !== mainProduct.id).slice(0, 3) : [];
 
   const [selectedSize, setSelectedSize] = useState<string>(mainProduct?.sizes?.[1] || mainProduct?.sizes?.[0] || 'M');

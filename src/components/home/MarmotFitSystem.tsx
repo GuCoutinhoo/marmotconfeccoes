@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Product } from '../../types';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ProductCard } from '../ProductCard';
 
 interface MarmotFitSystemProps {
   onNavigate: (page: string, param?: string) => void;
@@ -171,7 +172,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CARGOS',
           },
           {
-            id: 'prod-cam-007-alt',
+            id: 'prod-cam-007',
             slug: 'camiseta-raglan-oversized',
             title: 'RAGLAN OVERSIZED PRETA/CINZA',
             price: 189.9,
@@ -179,13 +180,13 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CAMISETAS',
           },
           {
-            id: 'prod-cal-007',
-            slug: 'calca-cargo-balloon',
-            title: 'CALÇA CARGO BALLOON',
-            price: 329.9,
+            id: 'prod-cal-001',
+            slug: 'calca-balloon',
+            title: 'CALÇA BALLOON',
+            price: 319.9,
             image:
-              'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
-            category: 'CARGOS',
+              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png',
+            category: 'CALÇAS',
           },
         ],
       },
@@ -224,7 +225,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CAMISETAS',
           },
           {
-            id: 'prod-jaq-017-alt',
+            id: 'prod-jaq-017',
             slug: 'jaqueta-varsity-oversized',
             title: 'VARSITY OVERSIZED PRETA',
             price: 489.9,
@@ -271,7 +272,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CARGOS',
           },
           {
-            id: 'prod-cam-008-alt',
+            id: 'prod-cam-008',
             slug: 'camiseta-raw-hem',
             title: 'CAMISETA RAW HEM VERDE',
             price: 189.9,
@@ -315,7 +316,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CARGOS',
           },
           {
-            id: 'prod-cam-010-alt',
+            id: 'prod-cam-010',
             slug: 'camiseta-washed-vintage',
             title: 'WASHED VINTAGE CINZA CLARO',
             price: 189.9,
@@ -323,13 +324,13 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CAMISETAS',
           },
           {
-            id: 'prod-cal-007',
-            slug: 'calca-cargo-balloon',
-            title: 'CALÇA CARGO BALLOON',
-            price: 329.9,
+            id: 'prod-cal-001',
+            slug: 'calca-balloon',
+            title: 'CALÇA BALLOON',
+            price: 319.9,
             image:
-              'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
-            category: 'CARGOS',
+              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png',
+            category: 'CALÇAS',
           },
         ],
       },
@@ -372,7 +373,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CARGOS',
           },
           {
-            id: 'prod-jaq-016-alt',
+            id: 'prod-jaq-016',
             slug: 'jaqueta-utility',
             title: 'JAQUETA UTILITY PRETA',
             price: 459.9,
@@ -451,6 +452,7 @@ const formatPrice = (value: number) =>
 
 export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
   onNavigate,
+  onQuickView,
   products = [],
 }) => {
   const [selectedFit, setSelectedFit] = useState<FitKey>('BOXY');
@@ -473,15 +475,45 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
       (product) => product.id === item.id || product.slug === item.slug,
     );
 
-  const resolveProductData = (item: LookProductItem) => {
+  const resolveFullProduct = (item: LookProductItem): Product => {
     const storeProduct = resolveStoreProduct(item);
+    if (storeProduct) {
+      return {
+        ...storeProduct,
+        image: item.image || storeProduct.image,
+        category: item.category || storeProduct.category,
+      };
+    }
 
     return {
-      id: storeProduct?.id || item.id,
-      title: storeProduct?.title || item.title,
-      price: storeProduct?.promoPrice ?? storeProduct?.price ?? item.price,
-      image: storeProduct?.images?.[0] || storeProduct?.image || item.image,
-      category: storeProduct?.category || item.category,
+      id: item.id,
+      slug: item.slug || item.id,
+      title: item.title,
+      subtitle: item.category,
+      description: `${item.title} - Caimento ${activeFit.name}`,
+      price: item.price,
+      category: item.category,
+      subcategory: item.category,
+      collection: activeFit.name,
+      tags: [activeFit.name],
+      rating: 4.9,
+      reviewCount: 14,
+      stockCount: 10,
+      sku: `SKU-${item.id}`,
+      sizes: ['P', 'M', 'G', 'GG'],
+      colors: [
+        {
+          colorName: 'Padrão',
+          colorHex: '#121212',
+          color: 'Preto',
+          image: item.image,
+          images: [item.image],
+        },
+      ],
+      image: item.image,
+      images: [item.image],
+      details: [`Caimento ${activeFit.name}`],
+      careInstructions: [],
     };
   };
 
@@ -718,69 +750,24 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-[12px] pb-[44px] sm:grid-cols-2 sm:pb-[50px] lg:grid-cols-4 lg:pb-[56px]">
-            {activeLook.products.slice(0, 4).map((item) => {
-              const resolved = resolveProductData(item);
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 pb-[44px] sm:pb-[50px] lg:pb-[56px]">
+            {activeLook.products.slice(0, 4).map((item, index) => {
+              const fullProduct = resolveFullProduct(item);
 
               return (
-                <article
-                  key={`${selectedFit}-${selectedLookNumber}-${item.id}`}
-                  onClick={() =>
-                    onNavigate('product', resolved.id)
-                  }
-                  className="group relative grid h-[184px] cursor-pointer grid-cols-[45%_55%] overflow-hidden border border-black/[0.07] bg-white/72 text-left transition-all duration-250 hover:border-black/25"
+                <div
+                  key={`${selectedFit}-${selectedLookNumber}-${item.id}-${index}`}
+                  className="flex flex-col"
                 >
-                  <div className="relative h-full overflow-hidden bg-[#ECECE9]">
-                    <img
-                      src={resolved.image}
-                      alt={resolved.title}
-                      loading="lazy"
-                      decoding="async"
-                      referrerPolicy="no-referrer"
-                      className="h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.07]"
-                    />
-
-                    {resolved.category && (
-                      <div className="absolute left-2.5 top-2.5 z-20">
-                        <span className="inline-block rounded-[1px] bg-black/85 px-1.5 py-0.5 font-mono text-[7.5px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-xs">
-                          {resolved.category}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex h-full min-w-0 flex-col justify-between bg-white/88 p-[15px] lg:p-[17px]">
-                    <div>
-                      <div className="flex items-center gap-1.5 font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-black/45">
-                        <span>{activeFit.name}</span>
-                        <span className="h-1 w-1 rounded-full bg-black/25" />
-                        <span>LOOK 0{selectedLookNumber}</span>
-                      </div>
-
-                      <h3 className="mt-1.5 line-clamp-2 font-bebas text-[18px] font-bold uppercase leading-[1.08] tracking-[0.01em] text-black">
-                        {resolved.title}
-                      </h3>
-                    </div>
-
-                    <div className="mt-auto border-t border-black/[0.07] pt-2.5">
-                      <div className="flex items-end justify-between gap-1.5">
-                        <div className="min-w-0">
-                          <span className="block font-mono text-[13.5px] font-bold leading-none tracking-tight text-black">
-                            {formatPrice(resolved.price)}
-                          </span>
-
-                          <span className="mt-1 block font-sans text-[10px] font-normal leading-none tracking-tight text-black/50">
-                            até 6x sem juros
-                          </span>
-                        </div>
-
-                        <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full border border-black/15 bg-black/[0.03] text-black transition-all duration-200 group-hover:border-black group-hover:bg-black group-hover:text-white">
-                          <ArrowUpRight className="h-3.5 w-3.5 stroke-[1.85] transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </article>
+                  <ProductCard
+                    product={fullProduct}
+                    onQuickView={onQuickView || ((prod) => onNavigate('product', prod.slug || prod.id))}
+                    onProductClick={(productId) => {
+                      const target = fullProduct.slug || fullProduct.id || productId;
+                      onNavigate('product', target);
+                    }}
+                  />
+                </div>
               );
             })}
           </div>

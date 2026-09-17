@@ -68,32 +68,42 @@ const REFERENCE_BESTSELLERS: CuratedBestsellerItem[] = [
     ],
   },
   {
-    id: 'prod-cal-007',
-    slug: 'calca-cargo-balloon',
+    id: 'prod-cal-003',
+    slug: 'calca-cargo-multi-pocket',
     categoryLabel: 'CARGOS',
-    title: 'CALÇA CARGO BALLOON',
-    price: 329.9,
-    image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
+    title: 'CALÇA CARGO MULTI POCKET',
+    price: 359.9,
+    image: 'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png',
     colors: [
       {
-        name: 'Pitch Black',
-        hex: '#2B3846',
-        image: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
+        name: 'Grafite',
+        hex: '#3F3F46',
+        image: 'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-multi-pocket/grafite/01-a12e3d436b94fc10.png',
+      },
+      {
+        name: 'Preto',
+        hex: '#171717',
+        image: 'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
       },
     ],
   },
   {
-    id: 'prod-cal-008',
-    slug: 'calca-cargo-convertible',
+    id: 'prod-crg-010',
+    slug: 'calca-cargo-tactical',
     categoryLabel: 'CARGOS',
-    title: 'CALÇA CARGO CONVERTIBLE',
-    price: 349.9,
-    image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80',
+    title: 'CALÇA CARGO TACTICAL',
+    price: 359.9,
+    image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80',
     colors: [
       {
-        name: 'Khaki Sand',
-        hex: '#C2B199',
-        image: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80',
+        name: 'Verde Militar',
+        hex: '#4B5320',
+        image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80',
+      },
+      {
+        name: 'Preto',
+        hex: '#171717',
+        image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80',
       },
     ],
   },
@@ -191,51 +201,85 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
 
   // Conecta os produtos da base de dados se presentes, mapeando para o layout
   const pagesData = useMemo(() => {
-    // Página 1: Fixa com os 8 da referência
-    const page1Items = REFERENCE_BESTSELLERS.map((refItem) => {
+    if (!products || products.length === 0) return [];
+
+    const usedIds = new Set<string>();
+    const page1Items: Array<{
+      id: string;
+      slug: string;
+      categoryLabel: string;
+      title: string;
+      price: number;
+      image: string;
+      colors: Array<{ name: string; hex: string; image: string }>;
+      originalProduct: Product;
+    }> = [];
+
+    // 1. Mapeia os itens curados da referência QUE REALMENTE EXISTEM no catálogo do banco
+    REFERENCE_BESTSELLERS.forEach((refItem) => {
       const dbMatch = products.find((p) => p.slug === refItem.slug || p.id === refItem.id);
-      return {
-        ...refItem,
-        originalProduct: dbMatch || ({
-          id: refItem.id,
-          slug: refItem.slug,
-          title: refItem.title,
-          subtitle: '',
-          description: '',
-          price: refItem.price,
-          image: refItem.image,
-          images: [refItem.image],
-          category: refItem.categoryLabel.toLowerCase(),
-          subcategory: '',
-          collection: 'Numerit Edition',
-          tags: ['Bestseller'],
-          sizes: ['P', 'M', 'G', 'GG'],
-          colors: refItem.colors.map((c) => ({
-            color: c.name.toLowerCase(),
-            colorName: c.name,
-            colorHex: c.hex,
-            image: c.image,
-          })),
-          stockCount: 15,
-          sku: refItem.id,
-          details: [],
-          careInstructions: [],
-          rating: 5.0,
-          reviewCount: 30,
-        } as unknown as Product),
-      };
+      if (dbMatch && (dbMatch.status === undefined || dbMatch.status === 'active')) {
+        usedIds.add(dbMatch.id);
+        page1Items.push({
+          id: dbMatch.id,
+          slug: dbMatch.slug,
+          categoryLabel: (dbMatch.category || refItem.categoryLabel).toUpperCase(),
+          title: dbMatch.title.toUpperCase(),
+          price: dbMatch.price,
+          image: dbMatch.image || dbMatch.images?.[0] || refItem.image,
+          colors: dbMatch.colors && dbMatch.colors.length > 0
+            ? dbMatch.colors.map((c) => ({
+                name: c.colorName || c.color,
+                hex: c.colorHex || '#171717',
+                image: c.image || c.featuredImage || refItem.image,
+              }))
+            : refItem.colors,
+          originalProduct: dbMatch,
+        });
+      }
     });
 
-    // Demais páginas extraídas dinamicamente do catálogo para permitir navegação real de 01 a 07
+    // 2. Se a página 1 tiver menos de 8 itens, preenche com outros produtos reais do catálogo
     const remainingProducts = products.filter(
-      (p) => !REFERENCE_BESTSELLERS.some((r) => r.slug === p.slug || r.id === p.id)
+      (p) => !usedIds.has(p.id) && (p.status === undefined || p.status === 'active')
     );
 
-    const pages: Array<typeof page1Items> = [page1Items];
+    const sortedRemaining = [...remainingProducts].sort((a, b) => {
+      if (a.isBestSeller && !b.isBestSeller) return -1;
+      if (!a.isBestSeller && b.isBestSeller) return 1;
+      return (b.rating || 0) - (a.rating || 0);
+    });
+
+    while (page1Items.length < 8 && sortedRemaining.length > 0) {
+      const p = sortedRemaining.shift()!;
+      usedIds.add(p.id);
+      page1Items.push({
+        id: p.id,
+        slug: p.slug,
+        categoryLabel: (p.category || 'LANÇAMENTO').toUpperCase(),
+        title: p.title.toUpperCase(),
+        price: p.price,
+        image: p.image || p.images?.[0] || 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
+        colors: p.colors && p.colors.length > 0
+          ? p.colors.map((c) => ({
+              name: c.colorName || c.color,
+              hex: c.colorHex || '#171717',
+              image: c.image || c.featuredImage || p.image || '',
+            }))
+          : [
+              { name: 'Padrão', hex: '#171717', image: p.image || '' },
+              { name: 'Secundária', hex: '#6F513D', image: p.image || '' },
+            ],
+        originalProduct: p,
+      });
+    }
+
+    const pages: Array<typeof page1Items> = page1Items.length > 0 ? [page1Items] : [];
     const itemsPerPage = 8;
 
-    for (let i = 0; i < remainingProducts.length && pages.length < 7; i += itemsPerPage) {
-      const chunk = remainingProducts.slice(i, i + itemsPerPage);
+    // Demais páginas extraídas dinamicamente do catálogo real
+    for (let i = 0; i < sortedRemaining.length && pages.length < 7; i += itemsPerPage) {
+      const chunk = sortedRemaining.slice(i, i + itemsPerPage);
       if (chunk.length > 0) {
         pages.push(
           chunk.map((p) => ({
@@ -245,14 +289,16 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
             title: p.title.toUpperCase(),
             price: p.price,
             image: p.image || p.images?.[0] || 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
-            colors: p.colors?.map((c) => ({
-              name: c.colorName || c.color,
-              hex: c.colorHex || '#171717',
-              image: c.image || c.featuredImage,
-            })) || [
-              { name: 'Padrão', hex: '#171717' },
-              { name: 'Secundária', hex: '#6F513D' },
-            ],
+            colors: p.colors && p.colors.length > 0
+              ? p.colors.map((c) => ({
+                  name: c.colorName || c.color,
+                  hex: c.colorHex || '#171717',
+                  image: c.image || c.featuredImage,
+                }))
+              : [
+                  { name: 'Padrão', hex: '#171717' },
+                  { name: 'Secundária', hex: '#6F513D' },
+                ],
             originalProduct: p,
           }))
         );
@@ -262,8 +308,12 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
     return pages;
   }, [products]);
 
-  const totalPages = Math.max(pagesData.length, 7);
-  const currentItems = pagesData[currentPage - 1] || pagesData[0];
+  const totalPages = Math.max(pagesData.length, 1);
+  const currentItems = pagesData[currentPage - 1] || pagesData[0] || [];
+
+  if (currentItems.length === 0) {
+    return null;
+  }
 
   const handlePrev = () => {
     setCurrentPage((prev) => (prev > 1 ? prev - 1 : pagesData.length));
@@ -402,96 +452,108 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
             const pixPrice = item.price * 0.95;
 
             return (
-              <div
+              <article
                 key={item.id}
-                onClick={() => onNavigate('product', item.originalProduct.id)}
-                className="group bg-white border border-zinc-200/90 rounded-[3px] overflow-hidden flex flex-col justify-between transition-all duration-300 hover:shadow-md cursor-pointer relative"
+                onClick={() => onNavigate('product', item.originalProduct.slug || item.originalProduct.id)}
+                className="group relative flex flex-col bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)] hover:border-black/15 transition-all duration-300 overflow-hidden select-none cursor-pointer"
               >
-                {/* Linha Amarela na parte de baixo no hover */}
-                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-transparent group-hover:bg-[#F4C400] transition-colors duration-300 z-30 pointer-events-none" />
-
-                {/* 1. Imagem Grande sem espaços em branco sobrando */}
-                <div className="relative w-full aspect-[4/3.5] bg-[#E8E7E3] overflow-hidden">
+                {/* 1. Imagem Grande (65% a 70% da altura visual do card, object-fit: cover) */}
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#F6F6F6]">
                   <img
                     src={currentImg}
                     alt={item.title}
                     loading="lazy"
                     decoding="async"
                     referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
 
-                  {/* Botão de Favorito Refinado (Canto Superior Direito) */}
+                  {/* Botão de Favorito: Botão circular branco no canto superior direito */}
                   <button
                     type="button"
                     onClick={(e) => handleWishlistClick(item.originalProduct, e)}
-                    aria-label="Salvar nos favoritos"
-                    className="absolute top-3.5 right-3.5 z-10 w-8 h-8 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer text-zinc-900 border border-black/5"
+                    aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                    title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+                    className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-20 w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 hover:bg-white text-black flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-200 cursor-pointer"
                   >
                     <Heart
-                      className={`w-3.5 h-3.5 transition-colors ${
-                        isFav ? 'fill-red-500 text-red-500' : 'text-zinc-800 stroke-[2]'
+                      className={`w-4 h-4 transition-all duration-200 stroke-[1.3] ${
+                        isFav ? 'fill-black text-black' : 'fill-transparent text-black'
                       }`}
                     />
                   </button>
                 </div>
 
-                {/* 2. Conteúdo do Card Alinhado e Organizado */}
-                <div className="p-4 sm:p-4.5 flex flex-col justify-between flex-1">
+                {/* 2. Área de Informações com Hierarquia e Espaçamentos Precisos */}
+                <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between flex-1">
                   <div>
-                    {/* Categoria Microtexto */}
-                    <span className="text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.18em] text-zinc-500 block mb-1">
+                    {/* Categoria */}
+                    <p className="font-helvetica-now font-medium uppercase text-[10.5px] sm:text-[11px] tracking-[0.16em] text-[#555555] mb-2 leading-none">
                       {item.categoryLabel}
-                    </span>
+                    </p>
 
                     {/* Nome do Produto */}
-                    <h3 className="font-extrabold text-[14px] sm:text-[14.5px] uppercase tracking-tight text-[#111111] leading-snug mb-2 line-clamp-1 group-hover:text-zinc-700 transition-colors">
+                    <h3 className="font-helvetica-now font-bold uppercase text-[15px] sm:text-[16px] tracking-[-0.02em] leading-[0.95] text-black hover:text-zinc-700 transition-colors line-clamp-2 mb-3 sm:mb-3.5">
                       {item.title}
                     </h3>
 
-                    {/* Bloco de Preços Rigorosamente Formatados */}
-                    <div className="mb-3.5">
-                      {/* Preço Principal */}
-                      <span className="text-xl sm:text-[21px] font-black text-black tracking-tight block leading-none mb-1">
+                    {/* Preço (Sans-serif pesada, mesmo estilo visual do título, sem serif) */}
+                    <div className="flex items-baseline gap-2 mb-1.5">
+                      <span className="font-helvetica-now font-extrabold text-[21px] sm:text-[23px] tracking-[-0.035em] leading-[0.95] text-black">
                         R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
-
-                      {/* Parcelamento Atraente */}
-                      <span className="text-[12px] sm:text-[12.5px] text-zinc-700 font-semibold block leading-tight mb-0.5">
-                        ou 3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sem juros
-                      </span>
-
-                      {/* Valor no Pix */}
-                      <span className="text-[11px] sm:text-[11.5px] text-zinc-500 font-normal block leading-tight">
-                        R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} no Pix
-                      </span>
                     </div>
+
+                    {/* Parcelamento */}
+                    <p className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-0.5">
+                      ou 3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sem juros
+                    </p>
+
+                    {/* Pix */}
+                    <p className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-4 sm:mb-5">
+                      R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} no Pix
+                    </p>
                   </div>
 
-                  {/* 3. Swatches de Cor Discretos */}
-                  <div className="flex items-center gap-1.5 pt-1">
-                    <div className="flex items-center gap-1.5">
-                      {item.colors.map((c, idx) => (
-                        <button
-                          key={c.name}
-                          type="button"
-                          onClick={(e) => handleColorSelect(item.id, idx, e)}
-                          className={`w-3.5 h-3.5 rounded-full transition-all cursor-pointer ${
-                            activeColorIdx === idx
-                              ? 'ring-1.5 ring-black ring-offset-1 scale-105'
-                              : 'border border-black/15 hover:scale-105'
-                          }`}
-                          style={{ backgroundColor: c.hex }}
-                          title={c.name}
-                        />
-                      ))}
+                  {/* Divisor + Área das Cores & CTA */}
+                  <div className="pt-3.5 border-t border-[#EAEAEA] flex items-center justify-between gap-3">
+                    {/* Swatches e Quantidade */}
+                    <div className="flex items-center min-w-0">
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {item.colors.slice(0, 4).map((c, idx) => {
+                          const isWhite = c.hex.toLowerCase() === '#ffffff' || c.hex.toLowerCase() === '#fff';
+                          return (
+                            <button
+                              key={c.name || idx}
+                              type="button"
+                              onClick={(e) => handleColorSelect(item.id, idx, e)}
+                              className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full transition-transform duration-150 hover:scale-110 cursor-pointer ${
+                                isWhite ? 'border border-black/25' : 'border border-black/10'
+                              }`}
+                              style={{ backgroundColor: c.hex }}
+                              title={c.name}
+                              aria-label={c.name}
+                            />
+                          );
+                        })}
+                      </div>
+
+                      {/* Separador vertical fino */}
+                      <div className="h-3 w-[1px] bg-[#D4D4D4] mx-2 sm:mx-2.5 shrink-0" />
+
+                      {/* Quantidade de cores */}
+                      <span className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#333333] whitespace-nowrap truncate select-none">
+                        {item.colors.length} {item.colors.length === 1 ? 'cor' : 'cores'}
+                      </span>
                     </div>
-                    <span className="text-[10.5px] sm:text-[11px] text-zinc-500 font-medium ml-1">
-                      {item.colors.length} {item.colors.length === 1 ? 'cor' : 'cores'}
-                    </span>
+
+                    {/* CTA: Círculo preto com seta fina branca */}
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black hover:bg-zinc-800 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs shrink-0 group/cta">
+                      <ArrowRight className="w-4 h-4 text-white stroke-[1.4] transition-transform duration-200 group-hover/cta:translate-x-0.5" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
