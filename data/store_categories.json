@@ -95,14 +95,14 @@
     "name": "Shorts",
     "tagline": "Mesh Basketball & Sweat Shorts",
     "description": "Shorts em mesh respirável, denim utilitário e moletom pesado para os dias quentes.",
-    "image": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=800&q=80",
+    "image": "/categoria shorts.png",
     "subcategories": [
       "Basketball Mesh Shorts",
       "Cargo Shorts",
       "Sweat Shorts Heavy",
       "Swim Tech"
     ],
-    "productCount": 15,
+    "productCount": 11,
     "order": 5,
     "active": true,
     "createdAt": "2026-08-15T17:16:26.168372+00:00"

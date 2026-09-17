@@ -2,6 +2,1132 @@ import { Product } from '../types';
 
 export const CATALOG_90_PRODUCTS_PART1: Product[] = [
   {
+    "id": "prod-acs-001",
+    "slug": "bone-trucker",
+    "title": "Boné Trucker",
+    "subtitle": "Persistence Verified 7:58:20 PM",
+    "description": "Aba curva ou levemente reta\nParte traseira em tela\nAjuste regulável\nVisual retrô\nEstética streetwear casual",
+    "price": 149.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 15,
+    "stockCount": 25,
+    "sku": "MM-ACS-001",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "brown_beige",
+        "colorName": "Marrom + Bege",
+        "colorHex": "#6E4D38",
+        "image": "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80"
+    ],
+    "details": [
+      "Aba curva ou levemente reta",
+      "Parte traseira em tela",
+      "Ajuste regulável",
+      "Visual retrô",
+      "Estética streetwear casual"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:46.764+00:00"
+  },
+  {
+    "id": "prod-acs-002",
+    "slug": "bone-5-panel",
+    "title": "Boné 5 Panel",
+    "subtitle": "Construção em cinco painéis",
+    "description": "Construção em cinco painéis\nPerfil baixo\nAba reta\nDesign minimalista\nVisual urbano",
+    "price": 149.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 16,
+    "stockCount": 26,
+    "sku": "MM-ACS-002",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "olive_green",
+        "colorName": "Verde oliva",
+        "colorHex": "#4E5742",
+        "image": "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1521369909029-2afed882baee?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1534215754734-18e55d13e346?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Construção em cinco painéis",
+      "Perfil baixo",
+      "Aba reta",
+      "Design minimalista",
+      "Visual urbano"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:46.986+00:00"
+  },
+  {
+    "id": "prod-acs-003",
+    "slug": "gorro-beanie",
+    "title": "Gorro Beanie",
+    "subtitle": "Tricô encorpado",
+    "description": "Tricô encorpado\nAjuste rente à cabeça\nBarra dobrável\nVisual minimalista\nEstética streetwear de inverno",
+    "price": 129.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 17,
+    "stockCount": 27,
+    "sku": "MM-ACS-003",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "lead_grey",
+        "colorName": "Cinza chumbo",
+        "colorHex": "#353942",
+        "image": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Tricô encorpado",
+      "Ajuste rente à cabeça",
+      "Barra dobrável",
+      "Visual minimalista",
+      "Estética streetwear de inverno"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:47.2+00:00"
+  },
+  {
+    "id": "prod-acs-004",
+    "slug": "bucket-hat",
+    "title": "Bucket Hat",
+    "subtitle": "Aba circular",
+    "description": "Aba circular\nEstrutura flexível\nModelagem confortável\nVisual inspirado nos anos 90\nPode possuir bolsos ou detalhes utilitários",
+    "price": 159.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 18,
+    "stockCount": 28,
+    "sku": "MM-ACS-004",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "sand_beige",
+        "colorName": "Bege areia",
+        "colorHex": "#D5C4A1",
+        "image": "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1572495532056-85e3a1ca5582?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Aba circular",
+      "Estrutura flexível",
+      "Modelagem confortável",
+      "Visual inspirado nos anos 90",
+      "Pode possuir bolsos ou detalhes utilitários"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:47.433+00:00"
+  },
+  {
+    "id": "prod-acs-005",
+    "slug": "shoulder-bag",
+    "title": "Shoulder Bag",
+    "subtitle": "Bolsa compacta transversal",
+    "description": "Bolsa compacta transversal\nAlça ajustável\nCompartimentos com zíper\nConstrução funcional\nVisual urbano e utilitário",
+    "price": 189.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 19,
+    "stockCount": 29,
+    "sku": "MM-ACS-005",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+          "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "graphite",
+        "colorName": "Grafite",
+        "colorHex": "#3E424B",
+        "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Bolsa compacta transversal",
+      "Alça ajustável",
+      "Compartimentos com zíper",
+      "Construção funcional",
+      "Visual urbano e utilitário"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:47.683+00:00"
+  },
+  {
+    "id": "prod-acs-006",
+    "slug": "crossbody-utility-bag",
+    "title": "Crossbody Utility Bag",
+    "subtitle": "Diversos compartimentos",
+    "description": "Diversos compartimentos\nBolsos externos\nFivelas e reguladores\nAlça larga\nInspiração em equipamentos táticos",
+    "price": 219.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 20,
+    "stockCount": 30,
+    "sku": "MM-ACS-006",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "military_green",
+        "colorName": "Verde militar",
+        "colorHex": "#414B3B",
+        "image": "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1577733966973-d680bffd2e80?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Diversos compartimentos",
+      "Bolsos externos",
+      "Fivelas e reguladores",
+      "Alça larga",
+      "Inspiração em equipamentos táticos"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:47.917+00:00"
+  },
+  {
+    "id": "prod-acs-007",
+    "slug": "mochila-tactical",
+    "title": "Mochila Tactical",
+    "subtitle": "Estrutura robusta",
+    "description": "Estrutura robusta\nBolsos modulares\nStraps externos\nCompartimentos organizadores\nVisual técnico e militar",
+    "price": 349.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 21,
+    "stockCount": 31,
+    "sku": "MM-ACS-007",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "lead",
+        "colorName": "Chumbo",
+        "colorHex": "#2D333D",
+        "image": "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Estrutura robusta",
+      "Bolsos modulares",
+      "Straps externos",
+      "Compartimentos organizadores",
+      "Visual técnico e militar"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:48.145+00:00"
+  },
+  {
+    "id": "prod-acs-008",
+    "slug": "cinto-webbing",
+    "title": "Cinto Webbing",
+    "subtitle": "Fita larga em nylon",
+    "description": "Fita larga em nylon\nFivela metálica ou técnica\nComprimento ajustável\nPonta alongada\nVisual utilitário",
+    "price": 129.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 22,
+    "stockCount": 32,
+    "sku": "MM-ACS-008",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "grey",
+        "colorName": "Cinza",
+        "colorHex": "#5B626C",
+        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Fita larga em nylon",
+      "Fivela metálica ou técnica",
+      "Comprimento ajustável",
+      "Ponta alongada",
+      "Visual utilitário"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:48.351+00:00"
+  },
+  {
+    "id": "prod-acs-009",
+    "slug": "cinto-studded",
+    "title": "Cinto Studded",
+    "subtitle": "Aplicações metálicas",
+    "description": "Aplicações metálicas\nConstrução robusta\nFivela marcante\nInspiração punk e grunge\nVisual mais agressivo",
+    "price": 179.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 23,
+    "stockCount": 33,
+    "sku": "MM-ACS-009",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black_silver",
+        "colorName": "Preto + Prata",
+        "colorHex": "#1A1A1A",
+        "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "dark_brown_silver",
+        "colorName": "Marrom escuro + Prata",
+        "colorHex": "#4A3525",
+        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1624222247344-550fb60583dc?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Aplicações metálicas",
+      "Construção robusta",
+      "Fivela marcante",
+      "Inspiração punk e grunge",
+      "Visual mais agressivo"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:48.571+00:00"
+  },
+  {
+    "id": "prod-acs-010",
+    "slug": "carteira-chain",
+    "title": "Carteira Chain",
+    "subtitle": "Carteira compacta",
+    "description": "Carteira compacta\nCorrente metálica lateral\nConstrução em couro ou material semelhante\nVisual inspirado em skate e punk\nDetalhe metálico marcante",
+    "price": 149.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 24,
+    "stockCount": 34,
+    "sku": "MM-ACS-010",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black_silver",
+        "colorName": "Preto + Prata",
+        "colorHex": "#181818",
+        "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "brown_silver",
+        "colorName": "Marrom + Prata",
+        "colorHex": "#5A3D2A",
+        "image": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1627123424574-724758594e93?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1512374382149-233c42b6a83b?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Carteira compacta",
+      "Corrente metálica lateral",
+      "Construção em couro ou material semelhante",
+      "Visual inspirado em skate e punk",
+      "Detalhe metálico marcante"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:48.791+00:00"
+  },
+  {
+    "id": "prod-acs-011",
+    "slug": "oculos-wraparound",
+    "title": "Óculos Wraparound",
+    "subtitle": "Lentes curvas",
+    "description": "Lentes curvas\nFormato esportivo\nArmação envolvente\nVisual futurista\nInspiração Y2K",
+    "price": 229.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 25,
+    "stockCount": 25,
+    "sku": "MM-ACS-011",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "silver_darklens",
+        "colorName": "Prata + Lente escura",
+        "colorHex": "#A2AAB4",
+        "image": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Lentes curvas",
+      "Formato esportivo",
+      "Armação envolvente",
+      "Visual futurista",
+      "Inspiração Y2K"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:49.017+00:00"
+  },
+  {
+    "id": "prod-acs-012",
+    "slug": "oculos-retangular",
+    "title": "Óculos Retangular",
+    "subtitle": "Armação estreita",
+    "description": "Armação estreita\nLinhas retas\nDesign minimalista\nVisual retrô e contemporâneo\nFácil combinação com looks oversized",
+    "price": 219.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 26,
+    "stockCount": 26,
+    "sku": "MM-ACS-012",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "tortoise_brown",
+        "colorName": "Tartaruga marrom",
+        "colorHex": "#654321",
+        "image": "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1508296695146-257a814070b4?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Armação estreita",
+      "Linhas retas",
+      "Design minimalista",
+      "Visual retrô e contemporâneo",
+      "Fácil combinação com looks oversized"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:49.237+00:00"
+  },
+  {
+    "id": "prod-acs-013",
+    "slug": "corrente-necklace",
+    "title": "Corrente Necklace",
+    "subtitle": "Corrente metálica de espessura média",
+    "description": "Corrente metálica de espessura média\nDesign simples ou industrial\nPode receber pingentes\nVisual urbano\nAcabamento robusto",
+    "price": 169.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 15,
+    "stockCount": 27,
+    "sku": "MM-ACS-013",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "silver",
+        "colorName": "Prata",
+        "colorHex": "#C5CCD6",
+        "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "metallic_black",
+        "colorName": "Preto metálico",
+        "colorHex": "#25272B",
+        "image": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Corrente metálica de espessura média",
+      "Design simples ou industrial",
+      "Pode receber pingentes",
+      "Visual urbano",
+      "Acabamento robusto"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:49.478+00:00"
+  },
+  {
+    "id": "prod-acs-014",
+    "slug": "pulseira-chain",
+    "title": "Pulseira Chain",
+    "subtitle": "Elos metálicos",
+    "description": "Elos metálicos\nConstrução pesada\nFecho aparente\nVisual industrial\nEstética streetwear minimalista",
+    "price": 149.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 16,
+    "stockCount": 28,
+    "sku": "MM-ACS-014",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "silver",
+        "colorName": "Prata",
+        "colorHex": "#C5CCD6",
+        "image": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "metallic_black",
+        "colorName": "Preto metálico",
+        "colorHex": "#25272B",
+        "image": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1611591475152-4c83136ab5b6?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Elos metálicos",
+      "Construção pesada",
+      "Fecho aparente",
+      "Visual industrial",
+      "Estética streetwear minimalista"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:49.713+00:00"
+  },
+  {
+    "id": "prod-acs-015",
+    "slug": "luva-fingerless",
+    "title": "Luva Fingerless",
+    "subtitle": "Dedos parcialmente expostos",
+    "description": "Dedos parcialmente expostos\nConstrução em tecido, couro ou material técnico\nAjuste firme\nDetalhes utilitários\nVisual grunge e experimental",
+    "price": 139.9,
+    "category": "acessorios",
+    "subcategory": "Acessórios",
+    "collection": "Coleção Marmot Accessories Atelier 2026",
+    "tags": [
+      "Acessórios",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 17,
+    "stockCount": 29,
+    "sku": "MM-ACS-015",
+    "sizes": [
+      "Único"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Preto",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80"
+        ]
+      },
+      {
+        "color": "lead_grey",
+        "colorName": "Cinza chumbo",
+        "colorHex": "#353942",
+        "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1516762689617-e1cffcef479d?auto=format&fit=crop&w=1000&q=80",
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Dedos parcialmente expostos",
+      "Construção em tecido, couro ou material técnico",
+      "Ajuste firme",
+      "Detalhes utilitários",
+      "Visual grunge e experimental"
+    ],
+    "careInstructions": [
+      "Limpar com pano macio e seco",
+      "Evitar contato com produtos químicos agressivos",
+      "Guardar em local arejado e protegido da umidade"
+    ],
+    "composition": [
+      "Materiais Premium / Aço Inoxidável 316L / Nylon de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.3,
+    "height": 8,
+    "width": 18,
+    "length": 22,
+    "isNewRelease": true,
+    "isBestSeller": false,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T02:10:49.925+00:00"
+  },
+  {
     "id": "prod-cal-001",
     "slug": "calca-balloon",
     "title": "Calça Balloon",
@@ -2116,6 +3242,146 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     "featured": true,
     "status": "active",
     "createdAt": "2026-08-24T23:04:20.088+00:00"
+  },
+  {
+    "id": "prod-crg-002",
+    "slug": "calca-cargo-balloon",
+    "title": "Calça Cargo Balloon",
+    "subtitle": "Volume acentuado nas coxas",
+    "description": "Volume acentuado nas coxas\nPernas arredondadas\nBarra levemente afunilada\nBolsos cargo grandes\nSilhueta volumosa\nVisual moderno e marcante",
+    "price": 329.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
+    "tags": [
+      "Cargos",
+      "Calças",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 11,
+    "stockCount": 21,
+    "sku": "MM-CRG-002",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Pitch Black",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Volume acentuado nas coxas",
+      "Pernas arredondadas",
+      "Barra levemente afunilada",
+      "Bolsos cargo grandes",
+      "Silhueta volumosa",
+      "Visual moderno e marcante"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T17:47:31.539+00:00"
+  },
+  {
+    "id": "prod-crg-003",
+    "slug": "calca-cargo-convertible",
+    "title": "Calça Cargo Convertible",
+    "subtitle": "Partes removíveis nas pernas",
+    "description": "Partes removíveis nas pernas\nZíperes horizontais de conversão\nPode ser transformada em bermuda\nBolsos cargo laterais\nConstrução modular\nVisual técnico e funcional",
+    "price": 349.9,
+    "category": "cargos",
+    "subcategory": "Cargos",
+    "collection": "Coleção Marmot Cargo & Utilitário 2026",
+    "tags": [
+      "Cargos",
+      "Calças",
+      "Streetwear",
+      "Utilitário"
+    ],
+    "rating": 5,
+    "reviewCount": 12,
+    "stockCount": 22,
+    "sku": "MM-CRG-003",
+    "sizes": [
+      "38",
+      "40",
+      "42",
+      "44",
+      "46"
+    ],
+    "colors": [
+      {
+        "color": "black",
+        "colorName": "Pitch Black",
+        "colorHex": "#121212",
+        "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "featuredImage": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+        "images": [
+          "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+        ]
+      }
+    ],
+    "image": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+    "images": [
+      "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "details": [
+      "Partes removíveis nas pernas",
+      "Zíperes horizontais de conversão",
+      "Pode ser transformada em bermuda",
+      "Bolsos cargo laterais",
+      "Construção modular",
+      "Visual técnico e funcional"
+    ],
+    "careInstructions": [
+      "Lavar do avesso com água fria",
+      "Não alvejar nem centrifugar em alta rotação",
+      "Secar à sombra em varal"
+    ],
+    "composition": [
+      "100% Algodão Ripstop Encorpado / Tecido Técnico de Alta Resistência"
+    ],
+    "reviews": [],
+    "weight": 0.65,
+    "height": 6,
+    "width": 28,
+    "length": 36,
+    "isNewRelease": true,
+    "isBestSeller": true,
+    "featured": true,
+    "status": "active",
+    "createdAt": "2026-08-25T17:47:32.349+00:00"
   },
   {
     "id": "prod-crg-004",

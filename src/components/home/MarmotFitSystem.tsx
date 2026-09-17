@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Product } from '../../types';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { ProductCard } from '../ProductCard';
 
 interface MarmotFitSystemProps {
   onNavigate: (page: string, param?: string) => void;
@@ -60,7 +59,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-heavy-boxy',
             title: 'CAMISETA HEAVY BOXY',
             price: 179.9,
-            image: '/Camiseta Heavy Boxy - Preto.png',
+            image: '/fit_card_heavy_boxy.png',
             category: 'CAMISETAS',
           },
           {
@@ -68,7 +67,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-drop-shoulder',
             title: 'CAMISETA DROP SHOULDER',
             price: 159.9,
-            image: '/Camiseta Drop Shoulder - Cinza.png',
+            image: '/fit_card_drop_shoulder.png',
             category: 'CAMISETAS',
           },
           {
@@ -76,8 +75,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA BAGGY',
             price: 299.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CALÇAS',
           },
           {
@@ -85,8 +83,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'jaqueta-utility',
             title: 'JAQUETA UTILITY',
             price: 459.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png',
+            image: '/fit_card_jaqueta_utility.png',
             category: 'JAQUETAS',
           },
         ],
@@ -104,7 +101,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'moletom-heavy-boxy',
             title: 'MOLETOM HEAVY BOXY',
             price: 349.9,
-            image: '/uploads/products/prod-mol-008/6977d400eb581174.webp',
+            image: '/fit_card_mol_boxy.png',
             category: 'MOLETONS',
           },
           {
@@ -112,8 +109,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-balloon',
             title: 'CALÇA BALLOON',
             price: 319.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png',
+            image: '/fit_card_calca_balloon.png',
             category: 'CALÇAS',
           },
           {
@@ -121,7 +117,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-heavy-boxy',
             title: 'CAMISETA HEAVY BOXY',
             price: 189.9,
-            image: '/Camiseta Heavy Boxy - Branco.png',
+            image: '/fit_card_boxy_branco.png',
             category: 'CAMISETAS',
           },
           {
@@ -129,8 +125,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/verde/01-04ce78f411ae78e5.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
         ],
@@ -159,7 +154,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-raglan-oversized',
             title: 'CAMISETA RAGLAN OVERSIZED',
             price: 189.9,
-            image: '/Camiseta Raglan Oversized - Branco e Preto.png',
+            image: '/fit_card_raglan_branco.png',
             category: 'CAMISETAS',
           },
           {
@@ -167,8 +162,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
           {
@@ -176,7 +170,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-raglan-oversized',
             title: 'RAGLAN OVERSIZED PRETA/CINZA',
             price: 189.9,
-            image: '/Camiseta Raglan Oversized - Preto e Cinza.png',
+            image: '/fit_card_raglan_preto.png',
             category: 'CAMISETAS',
           },
           {
@@ -184,8 +178,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-balloon',
             title: 'CALÇA BALLOON',
             price: 319.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png',
+            image: '/fit_card_calca_balloon.png',
             category: 'CALÇAS',
           },
         ],
@@ -203,8 +196,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'jaqueta-varsity-oversized',
             title: 'JAQUETA VARSITY OVERSIZED',
             price: 489.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/marrom/01-4e26fc6bbb93b114.png',
+            image: '/fit_card_varsity.png',
             category: 'JAQUETAS',
           },
           {
@@ -212,8 +204,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
           {
@@ -221,16 +212,15 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-heavy-boxy',
             title: 'CAMISETA HEAVY BOXY',
             price: 189.9,
-            image: '/Camiseta Heavy Boxy - Branco.png',
+            image: '/fit_card_boxy_branco.png',
             category: 'CAMISETAS',
           },
           {
-            id: 'prod-jaq-017',
-            slug: 'jaqueta-varsity-oversized',
-            title: 'VARSITY OVERSIZED PRETA',
-            price: 489.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-varsity-oversized/preto/01-de2f2ad52698a820.png',
+            id: 'prod-jaq-016',
+            slug: 'jaqueta-utility',
+            title: 'JAQUETA UTILITY PRETA',
+            price: 459.9,
+            image: '/fit_card_jaqueta_utility.png',
             category: 'JAQUETAS',
           },
         ],
@@ -259,7 +249,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-raw-hem',
             title: 'CAMISETA RAW HEM',
             price: 189.9,
-            image: '/Camiseta Raw Hem - Branco.png',
+            image: '/fit_card_raw_hem_branco.png',
             category: 'CAMISETAS',
           },
           {
@@ -267,8 +257,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
           {
@@ -276,7 +265,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-raw-hem',
             title: 'CAMISETA RAW HEM VERDE',
             price: 189.9,
-            image: '/Camiseta Raw Hem - Verde.png',
+            image: '/fit_card_raw_hem_verde.png',
             category: 'CAMISETAS',
           },
           {
@@ -284,8 +273,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-balloon',
             title: 'CALÇA BALLOON',
             price: 319.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/marrom/01-7420fefd4335acc4.png',
+            image: '/fit_card_calca_balloon.png',
             category: 'CALÇAS',
           },
         ],
@@ -303,7 +291,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-washed-vintage',
             title: 'CAMISETA WASHED VINTAGE',
             price: 189.9,
-            image: '/Camiseta Washed Vintage - Cinza escuro.png',
+            image: '/fit_card_washed_escuro.png',
             category: 'CAMISETAS',
           },
           {
@@ -311,8 +299,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
           {
@@ -320,7 +307,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-washed-vintage',
             title: 'WASHED VINTAGE CINZA CLARO',
             price: 189.9,
-            image: '/Camiseta Washed Vintage - Cinza Claro.png',
+            image: '/fit_card_washed_claro.png',
             category: 'CAMISETAS',
           },
           {
@@ -328,8 +315,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-balloon',
             title: 'CALÇA BALLOON',
             price: 319.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png',
+            image: '/fit_card_calca_balloon.png',
             category: 'CALÇAS',
           },
         ],
@@ -359,8 +345,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'jaqueta-utility',
             title: 'JAQUETA UTILITY',
             price: 459.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/verde/01-647103d9e03cd00e.png',
+            image: '/fit_card_jaqueta_utility.png',
             category: 'JAQUETAS',
           },
           {
@@ -368,27 +353,24 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
           {
-            id: 'prod-jaq-016',
-            slug: 'jaqueta-utility',
-            title: 'JAQUETA UTILITY PRETA',
-            price: 459.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/jaqueta-utility/preto/01-7b885c4486cf213c.png',
-            category: 'JAQUETAS',
+            id: 'prod-cam-005',
+            slug: 'camiseta-pocket-utility',
+            title: 'CAMISETA POCKET UTILITY',
+            price: 179.9,
+            image: '/fit_card_pocket_utility.png',
+            category: 'CAMISETAS',
           },
           {
-            id: 'prod-crg-010',
-            slug: 'calca-cargo-tactical',
-            title: 'CALÇA CARGO TACTICAL',
-            price: 359.9,
-            image:
-              'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80',
-            category: 'CARGOS',
+            id: 'prod-cal-001',
+            slug: 'calca-balloon',
+            title: 'CALÇA BALLOON',
+            price: 319.9,
+            image: '/fit_card_calca_balloon.png',
+            category: 'CALÇAS',
           },
         ],
       },
@@ -405,7 +387,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'moletom-half-zip-utility',
             title: 'MOLETOM HALF ZIP UTILITY',
             price: 349.9,
-            image: '/uploads/products/prod-mol-007/62667afc0ce10cbd.webp',
+            image: '/fit_card_mol_utility.png',
             category: 'MOLETONS',
           },
           {
@@ -413,8 +395,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-cargo-baggy/preto/01-438192cbe349f461.png',
+            image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
           {
@@ -422,17 +403,16 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-heavy-boxy',
             title: 'CAMISETA HEAVY BOXY',
             price: 189.9,
-            image: '/Camiseta Heavy Boxy - Preto.png',
+            image: '/fit_card_heavy_boxy.png',
             category: 'CAMISETAS',
           },
           {
-            id: 'prod-cal-001',
-            slug: 'calca-balloon',
-            title: 'CALÇA BALLOON',
-            price: 319.9,
-            image:
-              'https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/calca-balloon/preto/01-4baf0ddb3e08244f.png',
-            category: 'CALÇAS',
+            id: 'prod-jaq-016',
+            slug: 'jaqueta-utility',
+            title: 'JAQUETA UTILITY',
+            price: 459.9,
+            image: '/fit_card_jaqueta_utility.png',
+            category: 'JAQUETAS',
           },
         ],
       },
@@ -730,11 +710,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
           <div className="flex h-[50px] items-center justify-between border-t border-black/10">
             <div className="flex min-w-0 flex-1 items-center gap-[14px] pr-5">
               <span className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black">
-                PEÇAS DESTE LOOK
-              </span>
-
-              <span className="hidden shrink-0 font-mono text-[8px] font-medium uppercase tracking-[0.18em] text-black/35 sm:inline">
-                {activeFit.name} / LOOK 0{selectedLookNumber}
+                PEÇAS COM ESTE CAIMENTO
               </span>
 
               <span className="h-px flex-1 bg-black/14" />
@@ -743,30 +719,63 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('shop')}
-              className="group flex shrink-0 items-center gap-3 pl-5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-black transition-opacity hover:opacity-55"
+              className="group flex shrink-0 items-center gap-2.5 pl-5 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-black transition-opacity hover:opacity-55 cursor-pointer"
             >
               VER MAIS PRODUTOS
-              <ArrowRight className="h-[14px] w-[14px] stroke-[1.45] transition-transform group-hover:translate-x-1" />
+              <ArrowRight className="h-[13px] w-[13px] stroke-[1.45] transition-transform group-hover:translate-x-1" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 pb-[44px] sm:pb-[50px] lg:pb-[56px]">
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-4 pb-[44px] sm:pb-[52px] lg:pb-[60px]">
             {activeLook.products.slice(0, 4).map((item, index) => {
-              const fullProduct = resolveFullProduct(item);
+              const formattedPrice = item.price.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
+              const isTop =
+                !item.category?.toUpperCase().includes('CALÇ') &&
+                !item.title?.toUpperCase().includes('CALÇA');
 
               return (
                 <div
                   key={`${selectedFit}-${selectedLookNumber}-${item.id}-${index}`}
-                  className="flex flex-col"
+                  onClick={() => onNavigate('product', item.slug || item.id)}
+                  className="group relative flex h-[160px] sm:h-[170px] lg:h-[180px] w-full overflow-hidden bg-[#ECECE9] transition-all duration-200 hover:bg-[#E3E3DF] cursor-pointer"
                 >
-                  <ProductCard
-                    product={fullProduct}
-                    onQuickView={onQuickView || ((prod) => onNavigate('product', prod.slug || prod.id))}
-                    onProductClick={(productId) => {
-                      const target = fullProduct.slug || fullProduct.id || productId;
-                      onNavigate('product', target);
-                    }}
-                  />
+                  {/* Imagem do Produto (à esquerda, flush) */}
+                  <div className="h-full w-[46%] sm:w-[48%] shrink-0 overflow-hidden bg-[#DFDFDC]">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      loading="lazy"
+                      decoding="async"
+                      className={`h-full w-full object-cover ${
+                        isTop ? 'object-top' : 'object-center'
+                      } transition-transform duration-500 ease-out group-hover:scale-105`}
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes('fit_card')) {
+                          target.src = '/fit_card_heavy_boxy.png';
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {/* Informações (à direita: Título, Preço e Seta) */}
+                  <div className="flex flex-1 flex-col justify-between p-4 sm:p-4.5 lg:p-5 min-w-0">
+                    <div>
+                      <h4 className="font-anton text-[15px] sm:text-[16px] lg:text-[17px] font-bold uppercase leading-[1.12] tracking-[-0.01em] text-black line-clamp-2">
+                        {item.title}
+                      </h4>
+                      <p className="mt-2 font-sans text-[13px] sm:text-[14px] font-medium tracking-tight text-[#444444]">
+                        R$ {formattedPrice}
+                      </p>
+                    </div>
+
+                    <div className="pt-2">
+                      <ArrowRight className="h-4 w-4 stroke-[1.4] text-black transition-transform duration-300 group-hover:translate-x-1.5" />
+                    </div>
+                  </div>
                 </div>
               );
             })}

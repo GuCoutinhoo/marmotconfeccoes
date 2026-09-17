@@ -11,6 +11,7 @@ interface ProductCardProps {
   onProductClick: (productId: string) => void;
   priorityBadge?: string;
   variant?: 'standard' | 'editorial';
+  size?: 'standard' | 'compact';
   hideNewReleaseBadge?: boolean;
   editorialIndex?: number;
 }
@@ -21,6 +22,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   onProductClick,
   priorityBadge,
   variant = 'standard',
+  size = 'standard',
   hideNewReleaseBadge = false,
   editorialIndex,
 }) => {
@@ -30,6 +32,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { addToCart } = useCart();
 
+  const isCompact = size === 'compact';
   const isFavorite = isInWishlist(product.id);
   const primaryImage = product.image || (product.images && product.images.length > 0 ? product.images[0] : '');
   const rawImages = (product.images && product.images.length > 0)
@@ -71,7 +74,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   return (
     <article
       id={`product-card-${product.id}`}
-      className="group relative flex flex-col bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)] hover:border-black/15 transition-all duration-300 overflow-hidden select-none"
+      className={`group relative flex flex-col bg-white border border-black/[0.06] hover:border-black/15 transition-all duration-300 overflow-hidden select-none ${
+        isCompact
+          ? 'rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.025)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.05)]'
+          : 'rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)]'
+      }`}
     >
       {/* 1. IMAGEM DO PRODUTO (Aproximadamente 65% a 70% da altura visual do card, object-fit: cover, sem padding ao redor) */}
       <div 
@@ -97,12 +104,18 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             e.stopPropagation();
             toggleWishlist(product);
           }}
-          className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 z-20 w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-full bg-white/95 hover:bg-white text-black flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-200 cursor-pointer"
+          className={`absolute z-20 rounded-full bg-white/95 hover:bg-white text-black flex items-center justify-center shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] transition-all duration-200 cursor-pointer ${
+            isCompact
+              ? 'top-2.5 right-2.5 w-7 h-7 sm:w-7.5 sm:h-7.5'
+              : 'top-3.5 right-3.5 sm:top-4 sm:right-4 w-8 h-8 sm:w-8.5 sm:h-8.5'
+          }`}
           aria-label={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           title={isFavorite ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
         >
           <Heart
-            className={`w-4 h-4 transition-all duration-200 stroke-[1.3] ${
+            className={`transition-all duration-200 stroke-[1.3] ${
+              isCompact ? 'w-3.5 h-3.5' : 'w-4 h-4'
+            } ${
               isFavorite ? 'fill-black text-black' : 'fill-transparent text-black'
             }`}
           />
@@ -115,11 +128,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             e.stopPropagation();
             onQuickView(product);
           }}
-          className="absolute top-3.5 left-3.5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 h-7 px-2.5 rounded-full bg-white/95 hover:bg-white text-black flex items-center gap-1.5 shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] text-[9.5px] uppercase font-helvetica-now tracking-wider cursor-pointer"
+          className={`absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-white/95 hover:bg-white text-black flex items-center gap-1.5 shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] uppercase font-helvetica-now tracking-wider cursor-pointer ${
+            isCompact
+              ? 'top-2.5 left-2.5 h-6 px-2 text-[8.5px]'
+              : 'top-3.5 left-3.5 h-7 px-2.5 text-[9.5px]'
+          }`}
           aria-label="Espiada rápida"
           title="Espiada rápida"
         >
-          <Eye className="w-3 h-3 stroke-[1.4] text-black" />
+          <Eye className={`${isCompact ? 'w-2.5 h-2.5' : 'w-3 h-3'} stroke-[1.4] text-black`} />
           <span className="hidden sm:inline">Espiar</span>
         </button>
 
@@ -148,83 +165,64 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
       </div>
 
       {/* 3. ÁREA DE INFORMAÇÕES: Hierarquia vertical limpa com espaçamentos rigorosos */}
-      <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between flex-1">
+      <div className={`flex flex-col justify-between flex-1 ${
+        isCompact ? 'p-3 sm:p-3.5' : 'p-4 sm:p-5 lg:p-6'
+      }`}>
         <div>
-          {/* CATEGORIA:
-              - Helvetica Now Display Medium / Inter Medium
-              - font-weight: 500
-              - text-transform: uppercase
-              - letter-spacing: 0.16em
-              - tamanho pequeno
-              - cor cinza escuro (#555)
-          */}
-          <p className="font-helvetica-now font-medium uppercase text-[10.5px] sm:text-[11px] tracking-[0.16em] text-[#555555] mb-2 leading-none">
+          {/* CATEGORIA */}
+          <p className={`font-helvetica-now font-medium uppercase tracking-[0.16em] text-[#555555] leading-none ${
+            isCompact ? 'text-[9px] sm:text-[9.5px] mb-1.5' : 'text-[10.5px] sm:text-[11px] mb-2'
+          }`}>
             {categoryLabel}
           </p>
 
-          {/* NOME DO PRODUTO:
-              - Helvetica Now Display Bold
-              - font-weight: 700 ou 800
-              - text-transform: uppercase
-              - letter-spacing: -0.02em
-              - line-height: 0.95
-              - cor preta
-          */}
+          {/* NOME DO PRODUTO */}
           <h3
             onClick={() => onProductClick(product.slug || product.id)}
-            className="font-helvetica-now font-bold uppercase text-[15px] sm:text-[16px] tracking-[-0.02em] leading-[0.95] text-black hover:text-zinc-700 transition-colors cursor-pointer line-clamp-2 mb-3 sm:mb-3.5"
+            className={`font-helvetica-now font-bold uppercase tracking-[-0.02em] text-black hover:text-zinc-700 transition-colors cursor-pointer ${
+              isCompact
+                ? 'text-[12.5px] sm:text-[13.5px] leading-tight line-clamp-1 mb-2'
+                : 'text-[15px] sm:text-[16px] leading-[0.95] line-clamp-2 mb-3 sm:mb-3.5'
+            }`}
           >
             {product.title}
           </h3>
 
-          {/* PREÇO:
-              - Helvetica Now Display Bold / ExtraBold
-              - font-weight: 800
-              - letter-spacing: -0.035em
-              - line-height: 0.95
-              - cor preta
-              - Mesma linguagem sans-serif pesada do título (sem serif)
-          */}
-          <div className="flex items-baseline gap-2 mb-1.5">
-            <span className="font-helvetica-now font-extrabold text-[21px] sm:text-[23px] tracking-[-0.035em] leading-[0.95] text-black">
+          {/* PREÇO */}
+          <div className={`flex items-baseline gap-2 ${isCompact ? 'mb-1' : 'mb-1.5'}`}>
+            <span className={`font-helvetica-now font-extrabold tracking-[-0.035em] text-black ${
+              isCompact
+                ? 'text-[17px] sm:text-[18.5px] leading-tight'
+                : 'text-[21px] sm:text-[23px] leading-[0.95]'
+            }`}>
               R$ {formattedPrice}
             </span>
             {product.promoPrice && product.price > product.promoPrice && (
-              <span className="font-helvetica-now text-[11px] sm:text-xs text-zinc-400 line-through font-normal tracking-normal">
+              <span className="font-helvetica-now text-[10px] sm:text-[11px] text-zinc-400 line-through font-normal tracking-normal">
                 R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             )}
           </div>
 
-          {/* PARCELAMENTO:
-              - Helvetica Now Display Regular ou Inter Regular
-              - font-weight: 400
-              - cor #555
-              - line-height compacto
-          */}
-          <p className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-0.5">
+          {/* PARCELAMENTO */}
+          <p className={`font-helvetica-now font-normal text-[#555555] leading-tight mb-0.5 ${
+            isCompact ? 'text-[10px] sm:text-[10.5px]' : 'text-[11px] sm:text-[11.5px]'
+          }`}>
             ou 3x de R$ {formattedInstallment} sem juros
           </p>
 
-          {/* PIX:
-              - Helvetica Now Display Regular ou Inter Regular
-              - font-weight: 400
-              - cor #555
-              - line-height compacto
-          */}
-          <p className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-4 sm:mb-5">
+          {/* PIX */}
+          <p className={`font-helvetica-now font-normal text-[#555555] leading-tight ${
+            isCompact ? 'text-[10px] sm:text-[10.5px] mb-2.5 sm:mb-3' : 'text-[11px] sm:text-[11.5px] mb-4 sm:mb-5'
+          }`}>
             R$ {formattedPix} no Pix
           </p>
         </div>
 
-        {/* 4. DIVISOR + ÁREA DAS CORES E CTA:
-            - Linha divisória fina
-            - Espaço acima até divisor: 16–20px (no elemento anterior)
-            - Espaço do divisor até as cores: 14px (pt-3.5)
-            - Swatches circulares pequenos, borda sutil, separador vertical fino, quantidade de cores
-            - Botão circular preto com seta fina branca apontando para a direita no canto inferior direito
-        */}
-        <div className="pt-3.5 border-t border-[#EAEAEA] flex items-center justify-between gap-3">
+        {/* 4. DIVISOR + ÁREA DAS CORES E CTA */}
+        <div className={`border-t border-[#EAEAEA] flex items-center justify-between ${
+          isCompact ? 'pt-2.5 gap-2' : 'pt-3.5 gap-3'
+        }`}>
           {/* Lado Esquerdo: Swatches + Separador Vertical + Quantidade de Cores */}
           <div className="flex items-center min-w-0">
             <div className="flex items-center gap-1.5 shrink-0">
@@ -245,7 +243,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                       if (img) setHoveredColorImage(img);
                     }}
                     onMouseLeave={() => setHoveredColorImage(null)}
-                    className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full transition-transform duration-150 hover:scale-110 cursor-pointer ${
+                    className={`rounded-full transition-transform duration-150 hover:scale-110 cursor-pointer ${
+                      isCompact ? 'w-2.5 h-2.5 sm:w-3 sm:h-3' : 'w-3 h-3 sm:w-3.5 sm:h-3.5'
+                    } ${
                       isWhite ? 'border border-black/25' : 'border border-black/10'
                     }`}
                     style={{ backgroundColor: hex }}
@@ -257,10 +257,14 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
 
             {/* Separador vertical fino */}
-            <div className="h-3 w-[1px] bg-[#D4D4D4] mx-2 sm:mx-2.5 shrink-0" />
+            <div className={`w-[1px] bg-[#D4D4D4] shrink-0 ${
+              isCompact ? 'h-2.5 mx-1.5 sm:mx-2' : 'h-3 mx-2 sm:mx-2.5'
+            }`} />
 
             {/* Quantidade de cores */}
-            <span className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#333333] whitespace-nowrap truncate select-none">
+            <span className={`font-helvetica-now font-normal text-[#333333] whitespace-nowrap truncate select-none ${
+              isCompact ? 'text-[10px] sm:text-[10.5px]' : 'text-[11px] sm:text-[11.5px]'
+            }`}>
               {colorsCountText}
             </span>
           </div>
@@ -272,11 +276,15 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               e.stopPropagation();
               onProductClick(product.slug || product.id);
             }}
-            className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-black hover:bg-zinc-800 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs shrink-0 group/cta"
+            className={`rounded-full bg-black hover:bg-zinc-800 text-white flex items-center justify-center transition-all duration-200 cursor-pointer shadow-xs shrink-0 group/cta ${
+              isCompact ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-9 h-9 sm:w-10 sm:h-10'
+            }`}
             aria-label={`Ver detalhes de ${product.title}`}
             title="Ver produto"
           >
-            <ArrowRight className="w-4 h-4 text-white stroke-[1.4] transition-transform duration-200 group-hover/cta:translate-x-0.5" />
+            <ArrowRight className={`text-white stroke-[1.4] transition-transform duration-200 group-hover/cta:translate-x-0.5 ${
+              isCompact ? 'w-3.5 h-3.5' : 'w-4 h-4'
+            }`} />
           </button>
         </div>
       </div>

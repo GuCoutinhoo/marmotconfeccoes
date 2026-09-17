@@ -1,4 +1,4 @@
-import { Product } from '../types';
+import type { Product } from '../types.js';
 
 export interface ShortsVariantImage {
   colorKey: string;
@@ -515,16 +515,46 @@ export function buildShortsProducts(): Product[] {
   });
 }
 
-export function getShortsImageMapping(idOrSlug: string): ShortsImageMapping | undefined {
-  if (!idOrSlug) return undefined;
-  const clean = idOrSlug.toLowerCase().trim();
+export function getShortsImageMapping(idOrSlugOrTitle: string): ShortsImageMapping | undefined {
+  if (!idOrSlugOrTitle) return undefined;
+  const clean = idOrSlugOrTitle.toLowerCase().trim();
   if (SHORTS_IMAGE_MAPPINGS[clean]) {
     return SHORTS_IMAGE_MAPPINGS[clean];
   }
   for (const [id, mapping] of Object.entries(SHORTS_IMAGE_MAPPINGS)) {
-    if (id.toLowerCase() === clean || mapping.slug.toLowerCase() === clean) {
+    if (
+      id.toLowerCase() === clean ||
+      mapping.slug.toLowerCase() === clean ||
+      mapping.title.toLowerCase().trim() === clean ||
+      mapping.sku.toLowerCase() === clean
+    ) {
       return mapping;
     }
   }
   return undefined;
+}
+
+export function applyShortsMapping<T extends { id?: string; slug?: string; title?: string; image?: string; images?: string[]; colors?: any[] }>(prod: T): T {
+  if (!prod) return prod;
+  const mapping =
+    getShortsImageMapping(String(prod.id || '')) ||
+    getShortsImageMapping(String(prod.slug || '')) ||
+    getShortsImageMapping(String(prod.title || ''));
+  if (!mapping) return prod;
+  return {
+    ...prod,
+    image: mapping.defaultImage,
+    images: mapping.images,
+    colors: mapping.variants.map((v) => ({
+      color: v.colorKey,
+      colorName: v.colorName,
+      colorHex: v.colorHex,
+      image: v.image,
+      featuredImage: v.featuredImage,
+      images: v.images,
+      sku: `${mapping.sku}-${v.colorKey.toUpperCase()}`,
+      stockCount: 15,
+      sizes: ['P', 'M', 'G', 'GG', 'XG'],
+    })),
+  };
 }
