@@ -12,14 +12,16 @@ test('catalog production flow has Supabase-only authoritative mutations', () => 
   assert.match(api, /fetchAllProductsFromAuthoritativeStore/);
   assert.match(api, /getRequiredSupabaseAdminClient\('createProduct'\)/);
   assert.match(api, /PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para criar produtos/);
-  assert.match(api, /if \(this\.mode === 'supabase' && !IS_TEST_MODE\) \{\s*return;/);
+  assert.match(api, /if \(this\.productionRuntime \|\| \(this\.mode === 'supabase' && !IS_TEST_MODE\)\) \{\s*return;/);
+  assert.match(api, /LOCAL_FILE_PERSISTENCE_FORBIDDEN_IN_PRODUCTION/);
+  assert.match(api, /env\.NODE_ENV === 'production' \|\| env\.VERCEL === '1' \|\| env\.VERCEL_ENV === 'production'/);
   assert.doesNotMatch(context, /createProductInSupabase|updateProductInSupabase|deleteProductInSupabase|updateProductStockInSupabase/);
   assert.doesNotMatch(client, /fetchProductsFromSupabaseDirect/);
   assert.doesNotMatch(api, /pCat === 'acessorios'|activeCategorySlugs/);
 });
 
 test('catalog mutations require the remotely validated service-role client', () => {
-  assert.match(api, /const serviceKey = String\(process\.env\.SUPABASE_SERVICE_ROLE_KEY \|\| ''\)\.trim\(\)/);
+  assert.match(api, /process\.env\.SUPABASE_SERVICE_ROLE_KEY \|\| ''/);
   assert.match(api, /SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED/);
   assert.match(api, /await fetch\(new URL\('\/rest\/v1\/', supabaseUrl\)/);
   assert.doesNotMatch(api, /Usando cliente Supabase padrão/);
@@ -37,6 +39,56 @@ test('catalog mutations require the remotely validated service-role client', () 
   ]) {
     assert.match(api, new RegExp(`getRequiredSupabaseAdminClient\\('${operation}'\\)`));
   }
+});
+
+test('production initialization never loads or seeds local catalog files', () => {
+  const initializeStart = api.indexOf('public async initialize(): Promise<void>');
+  const initializeEnd = api.indexOf('private async loadFromPostgres', initializeStart);
+  const initialize = api.slice(initializeStart, initializeEnd);
+  const productionBranch = initialize.slice(
+    initialize.indexOf('if (this.productionRuntime)'),
+    initialize.indexOf('} else {'),
+  );
+  assert.doesNotMatch(productionBranch, /loadFromFiles|readJsonFile|writeJsonFile/);
+
+  const supabaseLoadStart = api.indexOf('private async loadFromSupabase()');
+  const supabaseLoadEnd = api.indexOf('private loadFromFiles()', supabaseLoadStart);
+  const supabaseLoad = api.slice(supabaseLoadStart, supabaseLoadEnd);
+  assert.doesNotMatch(supabaseLoad, /loadFromFiles|writeJsonFile|INITIAL_CATEGORIES|\.upsert\(/);
+  assert.match(supabaseLoad, /SUPABASE_\$\{table\.toUpperCase\(\)\}_READ_FAILED/);
+});
+
+test('healthcheck exposes authoritative production persistence state', () => {
+  assert.match(api, /catalogSource: 'supabase'/);
+  assert.match(api, /productionPersistenceValid:/);
+  assert.match(api, /databaseStatus: 'ERROR'/);
+  assert.match(api, /SUPABASE_REQUIRED_IN_PRODUCTION/);
+});
+
+test('production secondary persistence paths do not silently accept Supabase failures', () => {
+  for (const code of [
+    'SUPABASE_CART_READ_FAILED',
+    'SUPABASE_CART_UPSERT_FAILED',
+    'SUPABASE_FAVORITES_READ_FAILED',
+    'SUPABASE_FAVORITES_UPSERT_FAILED',
+    'SUPABASE_USER_SAVE_FAILED',
+    'SUPABASE_COUPON_SAVE_FAILED',
+    'SUPABASE_RETURN_SAVE_FAILED',
+    'SUPABASE_INVENTORY_MOVEMENT_SAVE_FAILED',
+    'SUPABASE_STORE_SETTINGS_SAVE_FAILED',
+    'SUPABASE_SHIPMENT_EVENT_SAVE_FAILED',
+  ]) {
+    assert.match(api, new RegExp(code));
+  }
+  assert.match(api, /getRequiredSupabaseAdminClient\('saveShippingSettings'\)/);
+  assert.match(api, /assertLocalPersistenceAllowed\('shipping settings'\)/);
+});
+
+test('public catalog responses are fresh and accessories remain valid catalog data', () => {
+  assert.match(api, /Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate'/);
+  assert.doesNotMatch(api, /pCat === 'acessorios'|pCat === 'acessórios'|pSub === 'acessorios'/);
+  assert.match(api, /fetchAllProductsFromAuthoritativeStore/);
+  assert.match(api, /SUPABASE_CATEGORIES_READ_FAILED/);
 });
 
 test('React state changes only after product API confirmation', () => {

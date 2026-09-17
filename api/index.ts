@@ -24,11 +24,56 @@ import {
   type InfinitePayCheckoutItem,
 } from '../src/server/infinitePayClient';
 import { IS_TEST_MODE } from '../src/server/runtime-flags';
-import { getCamisetaImageMapping } from '../src/data/camisetaImageMappings';
-import { getJaquetaImageMapping } from '../src/data/jaquetaImageMappings';
-import { getShortsImageMapping } from '../src/data/shortsImageMappings';
 
 export { IS_TEST_MODE };
+
+export type DatabaseMode = 'postgres' | 'supabase' | 'durable_file' | 'unavailable';
+
+export function isProductionPersistenceRuntime(env: NodeJS.ProcessEnv = process.env): boolean {
+  return env.NODE_ENV === 'production' || env.VERCEL === '1' || env.VERCEL_ENV === 'production';
+}
+
+export type SupabaseAdminCredentialKind = 'secret' | 'legacy_service_role' | 'invalid';
+
+export interface SupabaseAdminCredentialInspection {
+  valid: boolean;
+  kind: SupabaseAdminCredentialKind;
+  reason: string;
+}
+
+export function inspectSupabaseAdminCredential(
+  value: string | undefined,
+  publicKeys: Array<string | undefined> = [],
+): SupabaseAdminCredentialInspection {
+  const key = String(value || '').trim();
+  if (!key) return { valid: false, kind: 'invalid', reason: 'missing' };
+  if (publicKeys.some((publicKey) => publicKey?.trim() && publicKey.trim() === key)) {
+    return { valid: false, kind: 'invalid', reason: 'matches_public_key' };
+  }
+  if (key.startsWith('sb_publishable_')) {
+    return { valid: false, kind: 'invalid', reason: 'publishable_key' };
+  }
+  if (key.startsWith('sb_secret_')) {
+    return { valid: true, kind: 'secret', reason: 'opaque_secret_candidate' };
+  }
+
+  const jwtParts = key.split('.');
+  if (jwtParts.length !== 3) {
+    return { valid: false, kind: 'invalid', reason: 'unsupported_key_format' };
+  }
+  try {
+    const payload = JSON.parse(Buffer.from(jwtParts[1], 'base64url').toString('utf8'));
+    if (payload?.role !== 'service_role') {
+      return { valid: false, kind: 'invalid', reason: 'jwt_role_is_not_service_role' };
+    }
+    if (typeof payload?.exp === 'number' && payload.exp <= Math.floor(Date.now() / 1000)) {
+      return { valid: false, kind: 'invalid', reason: 'jwt_expired' };
+    }
+    return { valid: true, kind: 'legacy_service_role', reason: 'service_role_claim' };
+  } catch {
+    return { valid: false, kind: 'invalid', reason: 'malformed_jwt' };
+  }
+}
 
 if ((process.env.MARMOT_TEST_MODE === 'true' || process.env.CI === 'true') && fs.existsSync('/tmp/supabase-disposable.env')) {
   try {
@@ -43,7 +88,7 @@ if ((process.env.MARMOT_TEST_MODE === 'true' || process.env.CI === 'true') && fs
 }
 
 const UPLOADS_DIR = path.join(process.cwd(), 'public', 'uploads');
-if (!fs.existsSync(UPLOADS_DIR)) {
+if (!isProductionPersistenceRuntime() && !fs.existsSync(UPLOADS_DIR)) {
   try {
     fs.mkdirSync(UPLOADS_DIR, { recursive: true });
   } catch {
@@ -706,25 +751,25 @@ const INITIAL_CATEGORIES: Category[] = [
     active: true,
   },
   {
-    id: 'headwear',
-    slug: 'headwear',
-    name: 'Headwear',
-    tagline: 'Caps, Buckets & Beanies',
-    description: 'Bonés desestruturados dad hat, gorros canelados e bucket hats.',
-    image: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?auto=format&fit=crop&w=800&q=80',
-    subcategories: ['Dad Hats', 'Buckets', 'Beanies', 'Snapbacks'],
+    id: 'cargos',
+    slug: 'cargos',
+    name: 'Cargos',
+    tagline: 'Utilitário & Multi-Pocket',
+    description: 'Calças cargo com construção funcional, tecidos resistentes e modelagem streetwear.',
+    image: '/categories/categoria-cargos.png?v=20260917_v9_novas_imagens_categoria',
+    subcategories: ['Cargo Pants', 'Ripstop', 'Parachute'],
     productCount: 0,
     order: 6,
     active: true,
   },
   {
-    id: 'calcados',
-    slug: 'calcados',
-    name: 'Calçados',
-    tagline: 'Slides & Street Footwear',
-    description: 'Slides anatômicos de EVA injetado e calçados desenvolvidos para o cotidiano urbano.',
-    image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&w=800&q=80',
-    subcategories: ['Recovery Slides', 'Chunky Slides'],
+    id: 'acessorios',
+    slug: 'acessorios',
+    name: 'Acessórios',
+    tagline: 'Detalhes & Utilidade Urbana',
+    description: 'Bolsas, bonés, meias, cintos e acessórios para completar a composição.',
+    image: '/categories/categoria-acessorios.png?v=20260917_v9_novas_imagens_categoria',
+    subcategories: ['Bolsas', 'Bonés', 'Meias', 'Cintos'],
     productCount: 0,
     order: 7,
     active: true,
@@ -789,6 +834,9 @@ const EMAIL_LOGS_FILE = path.join(DATA_DIR, 'email_logs.json');
 const SHIPMENT_EVENTS_FILE = path.join(DATA_DIR, 'shipment_events.json');
 const CAMPAIGNS_FILE = path.join(DATA_DIR, 'campaign_records.json');
 
+const PRODUCT_SELECT_COLUMNS =
+  'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
+
 const INITIAL_STORE_SETTINGS: StoreSettingsData = {
   storeName: 'MARMOT Streetwear',
   contactEmail: 'contato@marmotstreetwear.com.br',
@@ -830,7 +878,7 @@ const INITIAL_STORE_BANNERS: StoreBanner[] = [
   },
 ];
 
-if (!fs.existsSync(DATA_DIR)) {
+if (!isProductionPersistenceRuntime() && !fs.existsSync(DATA_DIR)) {
   try {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   } catch {
@@ -842,11 +890,15 @@ export class DatabaseManager {
   private pgPool: Pool | null = null;
   private supabase: SupabaseClient | null = null;
   private supabaseAdmin: SupabaseClient | null = null;
+  private supabaseAdminValidation: Promise<SupabaseClient | null> | null = null;
   private supabaseAuth: SupabaseClient | null = null;
   private adminToken: string | null = null;
   private adminTokenExpiresAt = 0;
-  private mode: 'postgres' | 'supabase' | 'durable_file' = 'durable_file';
+  private mode: DatabaseMode = 'durable_file';
+  private readonly productionRuntime = isProductionPersistenceRuntime();
+  private persistenceConfigurationError: string | null = null;
   private isInitialized = false;
+  private initializationPromise: Promise<void> | null = null;
 
   private products: Product[] = [];
   private categories: Category[] = [];
@@ -873,11 +925,33 @@ export class DatabaseManager {
 
   private detectAndInitMode() {
     const dbUrl = process.env.DISPOSABLE_DATABASE_URL || process.env.DATABASE_URL;
+    const runtimeSupabaseUrl = this.productionRuntime
+      ? String(process.env.SUPABASE_URL || '').trim()
+      : String(process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL || '').trim();
+    const runtimeSupabaseKey = this.productionRuntime
+      ? String(process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim()
+      : String(
+          process.env.SUPABASE_DISPOSABLE_URL
+            ? process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || process.env.SUPABASE_DISPOSABLE_ANON_KEY || ''
+            : process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '',
+        ).trim();
 
-    const runtimeSupabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL;
-    const runtimeSupabaseKey = process.env.SUPABASE_DISPOSABLE_URL
-      ? (process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY || process.env.SUPABASE_DISPOSABLE_ANON_KEY)
-      : (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY);
+    if (this.productionRuntime) {
+      const credential = inspectSupabaseAdminCredential(runtimeSupabaseKey, [
+        process.env.SUPABASE_ANON_KEY,
+        process.env.VITE_SUPABASE_ANON_KEY,
+      ]);
+      if (!runtimeSupabaseUrl || runtimeSupabaseUrl.includes('placeholder')) {
+        this.mode = 'unavailable';
+        this.persistenceConfigurationError = 'SUPABASE_URL_REQUIRED_IN_PRODUCTION';
+        return;
+      }
+      if (!credential.valid) {
+        this.mode = 'unavailable';
+        this.persistenceConfigurationError = 'SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED';
+        return;
+      }
+    }
 
     if (runtimeSupabaseUrl && runtimeSupabaseKey && !runtimeSupabaseUrl.includes('placeholder')) {
       try {
@@ -891,9 +965,14 @@ export class DatabaseManager {
         console.log('[DB] Live Supabase persistence mode enabled.');
       } catch (err) {
         console.error('[DB] Failed to init Supabase client:', err);
-        this.mode = 'durable_file';
+        if (this.productionRuntime) {
+          this.mode = 'unavailable';
+          this.persistenceConfigurationError = 'SUPABASE_CLIENT_INITIALIZATION_FAILED';
+        } else {
+          this.mode = 'durable_file';
+        }
       }
-    } else if (dbUrl) {
+    } else if (!this.productionRuntime && dbUrl) {
       try {
         this.pgPool = new Pool({
           connectionString: dbUrl,
@@ -906,31 +985,50 @@ export class DatabaseManager {
         this.mode = 'durable_file';
       }
     } else {
-      this.mode = 'durable_file';
+      this.mode = this.productionRuntime ? 'unavailable' : 'durable_file';
+      if (this.productionRuntime) {
+        this.persistenceConfigurationError ||= 'SUPABASE_REQUIRED_IN_PRODUCTION';
+      }
     }
   }
 
   public async initialize(): Promise<void> {
     if (this.isInitialized) return;
+    if (this.initializationPromise) return this.initializationPromise;
 
-    // Load local storage files as initial fallback
-    this.loadFromFiles();
-
-    if (this.mode === 'supabase' && this.supabase) {
-      // In Supabase mode, ensure authoritative catalog is loaded before marking initialization complete
-      try {
+    this.initializationPromise = (async () => {
+      if (this.productionRuntime) {
+        if (this.mode !== 'supabase' || !this.supabase) {
+          throw new Error(this.persistenceConfigurationError || 'SUPABASE_REQUIRED_IN_PRODUCTION');
+        }
         await this.loadFromSupabase();
-      } catch (err: any) {
-        console.warn('[DB] Supabase initial load notice:', err?.message || err);
+      } else {
+        this.loadFromFiles();
+        if (this.mode === 'supabase' && this.supabase) {
+          try {
+            await this.loadFromSupabase();
+          } catch (error: any) {
+            console.warn('[DB] Supabase unavailable in local development; keeping local fixtures:', error?.message || error);
+          }
+        } else if (this.mode === 'postgres' && this.pgPool) {
+          await this.loadFromPostgres();
+        }
       }
-    } else if (this.mode === 'postgres' && this.pgPool) {
-      await this.loadFromPostgres().catch(() => {});
-    }
+
+      try {
+        await this.cleanUpArtificialTrackingCodes();
+      } catch (error: any) {
+        if (this.productionRuntime) throw error;
+        console.warn('[DB] Local tracking cleanup skipped:', error?.message || error);
+      }
+      this.isInitialized = true;
+    })();
 
     try {
-      await this.cleanUpArtificialTrackingCodes();
-    } catch {}
-    this.isInitialized = true;
+      await this.initializationPromise;
+    } finally {
+      this.initializationPromise = null;
+    }
   }
 
   private async loadFromPostgres() {
@@ -986,119 +1084,58 @@ export class DatabaseManager {
   public sanitizeProduct(p: any): Product {
     if (!p) return {} as Product;
     const prodId = String(p.id || `prod-${Date.now()}`);
-    const prodSlug = String(p.slug || '').trim();
-    const prodTitle = String(p.title || '').trim();
-    const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
-    const jaquetaMapping = getJaquetaImageMapping(prodId) || getJaquetaImageMapping(prodSlug);
-    const shortsMapping = getShortsImageMapping(prodId) || getShortsImageMapping(prodSlug) || getShortsImageMapping(prodTitle);
+    const rawImages = Array.isArray(p.images)
+      ? p.images.filter((image: unknown) => typeof image === 'string' && image.trim())
+      : [];
+    const requestedMainImage = typeof p.image === 'string' ? p.image.trim() : '';
+    const mainImage = requestedMainImage || rawImages[0] || '';
+    const images = rawImages.length > 0
+      ? (mainImage && rawImages[0] !== mainImage
+          ? [mainImage, ...rawImages.filter((image: string) => image !== mainImage)]
+          : rawImages)
+      : (mainImage ? [mainImage] : []);
 
-    const rawMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : shortsMapping
-      ? shortsMapping.defaultImage
-      : (p.image || (Array.isArray(p.images) && p.images[0]) || '');
-    const cleanMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : shortsMapping
-      ? shortsMapping.defaultImage
-      : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
+    const assertPersistentImage = (value: unknown, field: string) => {
+      if (typeof value !== 'string' || !value) return;
+      if (!/^https:\/\//i.test(value) && this.mode === 'supabase') {
+        throw new Error(`PRODUCT_IMAGE_NOT_PERSISTENT: ${field} deve apontar para uma URL persistente do Storage.`);
+      }
+    };
+    assertPersistentImage(mainImage, 'image');
+    images.forEach((image: string, index: number) => assertPersistentImage(image, `images[${index}]`));
 
-    const rawImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : shortsMapping
-      ? shortsMapping.images
-      : (Array.isArray(p.images) && p.images.length > 0
-          ? p.images
-          : (rawMainImage ? [rawMainImage] : []));
-    const cleanImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : shortsMapping
-      ? shortsMapping.images
-      : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
-
-    const rawColors = jaquetaMapping
-      ? jaquetaMapping.colors
-      : shortsMapping
-      ? shortsMapping.variants.map((v) => ({
-          color: v.colorKey,
-          colorName: v.colorName,
-          colorHex: v.colorHex,
-          image: v.image,
-          featuredImage: v.featuredImage,
-          images: v.images,
-          sku: `${shortsMapping.sku}-${v.colorKey.toUpperCase()}`,
-          stockCount: 15,
-          sizes: ['P', 'M', 'G', 'GG', 'XG'],
-        }))
-      : Array.isArray(p.colors) && p.colors.length > 0
+    const rawColors = Array.isArray(p.colors) && p.colors.length > 0
       ? p.colors
       : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }];
-
-    const cleanColors = rawColors.map((c: any, cIdx: number) => {
-      const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
-        ? c.images
-        : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
-      const cleanVariantImages = rawVariantImages.map((vImg: string, vIdx: number) =>
-        saveBase64ToUploads(vImg, `p-${prodId.slice(-6)}-c${cIdx}-v${vIdx}`)
-      );
-      const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
-      const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
-
-      let finalFeatured = cleanFeatured || cleanMainImage;
-      let finalVariantImages = cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]);
-
-      if (camisetaMapping) {
-        const match = camisetaMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
-      }
-
-      if (shortsMapping) {
-        const match = shortsMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
-      }
-
+    const colors = rawColors.map((color: any, colorIndex: number) => {
+      const variantImages: string[] = Array.isArray(color.images)
+        ? color.images.filter((image: unknown) => typeof image === 'string' && image.trim())
+        : [];
+      const featuredImage = String(color.featuredImage || color.image || variantImages[0] || mainImage || '');
+      const normalizedImages = variantImages.length > 0 ? variantImages : (featuredImage ? [featuredImage] : []);
+      assertPersistentImage(featuredImage, `colors[${colorIndex}].featuredImage`);
+      normalizedImages.forEach((image, index) => assertPersistentImage(image, `colors[${colorIndex}].images[${index}]`));
       return {
-        id: c.id,
-        color: c.color || 'default',
-        colorName: c.colorName || 'Cor Única',
-        colorHex: c.colorHex || '#000000',
-        image: finalFeatured,
-        featuredImage: finalFeatured,
-        images: finalVariantImages,
-        sku: c.sku,
-        stockCount: c.stockCount,
-        sizes: c.sizes,
+        id: color.id,
+        color: color.color || 'default',
+        colorName: color.colorName || 'Cor Única',
+        colorHex: color.colorHex || '#000000',
+        image: featuredImage,
+        featuredImage,
+        images: normalizedImages,
+        sku: color.sku,
+        stockCount: color.stockCount,
+        sizes: color.sizes,
       };
     });
 
     return {
       ...p,
       id: prodId,
-      image: cleanMainImage || (cleanImagesList[0] || ''),
-      images: cleanImagesList.length > 0 ? cleanImagesList : (cleanMainImage ? [cleanMainImage] : []),
-      colors: cleanColors,
+      slug: String(p.slug || '').trim(),
+      image: mainImage,
+      images,
+      colors,
       status: (p.status as any) || 'active',
       weight: p.weight && Number(p.weight) > 0 ? Number(p.weight) : (p.category === 'moletons' || p.category === 'jaquetas' ? 0.75 : p.category === 'calcas' ? 0.6 : 0.35),
       height: p.height && Number(p.height) > 0 ? Number(p.height) : (p.category === 'moletons' || p.category === 'jaquetas' ? 8 : 4),
@@ -1109,360 +1146,167 @@ export class DatabaseManager {
 
   private mapSupabaseProduct(item: any): Product {
     if (!item) return {} as Product;
-    const d = (item.data && typeof item.data === 'object') ? item.data : {};
-    const prodId = String(item.id || d.id || `prod-${Date.now()}`);
-    const prodSlug = String(item.slug || d.slug || '').trim();
-    const prodTitle = String(item.title || d.title || '').trim();
-    const camisetaMapping = getCamisetaImageMapping(prodId) || getCamisetaImageMapping(prodSlug);
-    const jaquetaMapping = getJaquetaImageMapping(prodId) || getJaquetaImageMapping(prodSlug);
-    const shortsMapping = getShortsImageMapping(prodId) || getShortsImageMapping(prodSlug) || getShortsImageMapping(prodTitle);
-    
-    const rawMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : shortsMapping
-      ? shortsMapping.defaultImage
-      : (item.image || d.image || (Array.isArray(item.images) && item.images[0]) || (Array.isArray(d.images) && d.images[0]) || '');
-    const cleanMainImage = camisetaMapping
-      ? camisetaMapping.defaultImage
-      : jaquetaMapping
-      ? jaquetaMapping.defaultImage
-      : shortsMapping
-      ? shortsMapping.defaultImage
-      : saveBase64ToUploads(rawMainImage, `p-${prodId.slice(-6)}-main`);
-
-    const rawImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : shortsMapping
-      ? shortsMapping.images
-      : (Array.isArray(item.images) && item.images.length > 0
-          ? item.images
-          : (Array.isArray(d.images) && d.images.length > 0 ? d.images : (rawMainImage ? [rawMainImage] : [])));
-    const cleanImagesList = camisetaMapping
-      ? camisetaMapping.images
-      : jaquetaMapping
-      ? jaquetaMapping.images
-      : shortsMapping
-      ? shortsMapping.images
-      : rawImagesList.map((img: string, idx: number) => saveBase64ToUploads(img, `p-${prodId.slice(-6)}-g${idx}`));
-
-    const rawColors = jaquetaMapping
-      ? jaquetaMapping.colors
-      : shortsMapping
-      ? shortsMapping.variants.map((v) => ({
-          color: v.colorKey,
-          colorName: v.colorName,
-          colorHex: v.colorHex,
-          image: v.image,
-          featuredImage: v.featuredImage,
-          images: v.images,
-          sku: `${shortsMapping.sku}-${v.colorKey.toUpperCase()}`,
-          stockCount: 15,
-          sizes: ['P', 'M', 'G', 'GG', 'XG'],
-        }))
-      : Array.isArray(item.colors) && item.colors.length > 0
-      ? item.colors
-      : (Array.isArray(d.colors) && d.colors.length > 0 ? d.colors : [{ color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' }]);
-
-    const cleanColors = rawColors.map((c: any, cIdx: number) => {
-      const rawVariantImages: string[] = Array.isArray(c.images) && c.images.length > 0
-        ? c.images
-        : (c.featuredImage ? [c.featuredImage] : (c.image ? [c.image] : []));
-      const cleanVariantImages = rawVariantImages.map((vImg: string, vIdx: number) => saveBase64ToUploads(vImg, `p-${prodId.slice(-6)}-c${cIdx}-v${vIdx}`));
-      const rawFeatured = c.featuredImage || rawVariantImages[0] || c.image || '';
-      const cleanFeatured = saveBase64ToUploads(rawFeatured, `p-${prodId.slice(-6)}-c${cIdx}-feat`);
-
-      let finalFeatured = cleanFeatured || cleanMainImage;
-      let finalVariantImages = cleanVariantImages.length > 0 ? cleanVariantImages : (cleanImagesList.length > 0 ? cleanImagesList : [cleanMainImage]);
-
-      if (camisetaMapping) {
-        const match = camisetaMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
-      }
-
-      if (shortsMapping) {
-        const match = shortsMapping.variants.find(
-          (v) =>
-            (c.color && v.colorKey.toLowerCase() === c.color.toLowerCase()) ||
-            (c.colorName && v.colorName.toLowerCase() === c.colorName.toLowerCase())
-        );
-        if (match) {
-          finalFeatured = match.image;
-          finalVariantImages = [match.image];
-        }
-      }
-
-      return {
-        id: c.id,
-        color: c.color || 'default',
-        colorName: c.colorName || 'Cor Única',
-        colorHex: c.colorHex || '#000000',
-        image: finalFeatured,
-        featuredImage: finalFeatured,
-        images: finalVariantImages,
-        sku: c.sku,
-        stockCount: c.stockCount,
-        sizes: c.sizes,
-      };
+    return this.sanitizeProduct({
+      id: String(item.id || ''),
+      slug: String(item.slug || ''),
+      title: item.title || '',
+      subtitle: item.subtitle || '',
+      description: item.description || '',
+      price: Number(item.price),
+      promoPrice: item.promo_price === null || item.promo_price === undefined ? undefined : Number(item.promo_price),
+      category: String(item.category || '').toLowerCase().trim(),
+      subcategory: item.subcategory || '',
+      collection: item.collection || '',
+      tags: Array.isArray(item.tags) ? item.tags : [],
+      rating: Number(item.rating ?? 5),
+      reviewCount: Number(item.review_count ?? 0),
+      stockCount: Math.max(0, Number(item.stock_count ?? 0)),
+      sku: item.sku || '',
+      sizes: Array.isArray(item.sizes) ? item.sizes : [],
+      colors: Array.isArray(item.colors) ? item.colors : [],
+      image: item.image || '',
+      images: Array.isArray(item.images) ? item.images : [],
+      details: Array.isArray(item.details) ? item.details : [],
+      careInstructions: Array.isArray(item.care_instructions) ? item.care_instructions : [],
+      composition: Array.isArray(item.composition) ? item.composition : [],
+      reviews: Array.isArray(item.reviews) ? item.reviews : [],
+      weight: Number(item.weight ?? 0.35),
+      height: Number(item.height ?? 4),
+      width: Number(item.width ?? 20),
+      length: Number(item.length ?? 25),
+      isNewRelease: Boolean(item.is_new_release),
+      isBestSeller: Boolean(item.is_best_seller),
+      featured: Boolean(item.featured),
+      status: item.status || 'active',
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
     });
-
-    return {
-      id: prodId,
-      slug: String(item.slug || d.slug || (item.title ? item.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '')),
-      title: item.title || d.title || 'Produto Streetwear',
-      subtitle: item.subtitle || d.subtitle || '',
-      description: item.description || d.description || '',
-      price: typeof item.price === 'number' ? item.price : parseFloat(item.price || d.price || 0),
-      promoPrice: item.promo_price !== undefined && item.promo_price !== null
-        ? parseFloat(item.promo_price)
-        : (d.promoPrice !== undefined && d.promoPrice !== null ? parseFloat(d.promoPrice) : undefined),
-      category: String(item.category || d.category || 'camisetas').toLowerCase().trim(),
-      subcategory: String(item.subcategory || d.subcategory || 'Essenciais').trim(),
-      collection: item.collection || d.collection || 'Vol. 04: Cyber Dystopia',
-      tags: Array.isArray(item.tags) ? item.tags : (Array.isArray(d.tags) ? d.tags : ['Lançamento']),
-      rating: typeof item.rating === 'number' ? item.rating : parseFloat(item.rating || d.rating || 5.0),
-      reviewCount: typeof item.review_count === 'number' ? item.review_count : parseInt(item.review_count || d.reviewCount || 0, 10),
-      stockCount: typeof item.stock_count === 'number'
-        ? item.stock_count
-        : (item.stock_count !== undefined && item.stock_count !== null
-            ? (parseInt(String(item.stock_count), 10) >= 0 ? parseInt(String(item.stock_count), 10) : 0)
-            : (typeof d?.stockCount === 'number' ? d.stockCount : 0)),
-      sku: item.sku || d.sku || `MM-${Math.floor(1000 + Math.random() * 9000)}`,
-      sizes: Array.isArray(item.sizes) && item.sizes.length > 0 ? item.sizes : (Array.isArray(d.sizes) && d.sizes.length > 0 ? d.sizes : ['P', 'M', 'G', 'GG']),
-      colors: cleanColors,
-      image: cleanMainImage || (cleanImagesList[0] || ''),
-      images: cleanImagesList.length > 0 ? cleanImagesList : (cleanMainImage ? [cleanMainImage] : []),
-      details: Array.isArray(item.details) ? item.details : (Array.isArray(d.details) ? d.details : ['100% Algodão Heavyweight']),
-      careInstructions: Array.isArray(item.care_instructions) ? item.care_instructions : (Array.isArray(d.careInstructions) ? d.careInstructions : ['Lavar em ciclo suave']),
-      composition: Array.isArray(item.composition) ? item.composition : (Array.isArray(d.composition) ? d.composition : ['100% Algodão']),
-      reviews: Array.isArray(item.reviews) ? item.reviews : (Array.isArray(d.reviews) ? d.reviews : []),
-      weight: typeof item.weight === 'number' ? item.weight : parseFloat(item.weight || d.weight || 0.35),
-      height: typeof item.height === 'number' ? item.height : parseFloat(item.height || d.height || 4),
-      width: typeof item.width === 'number' ? item.width : parseFloat(item.width || d.width || 20),
-      length: typeof item.length === 'number' ? item.length : parseFloat(item.length || d.length || 25),
-      isNewRelease: item.is_new_release !== undefined ? Boolean(item.is_new_release) : Boolean(d.isNewRelease),
-      isBestSeller: item.is_best_seller !== undefined ? Boolean(item.is_best_seller) : Boolean(d.isBestSeller),
-      featured: item.featured !== undefined ? Boolean(item.featured) : Boolean(d.featured),
-      status: (item.status || d.status || 'active') as any,
-      createdAt: item.created_at || d.createdAt || new Date().toISOString(),
-    };
   }
 
   private mapSupabaseCategory(item: any): Category {
     if (!item) return {} as Category;
-    const d = (item.data && typeof item.data === 'object') ? item.data : {};
     return {
-      id: String(item.id || d.id || item.slug || d.slug || `cat-${Date.now()}`),
-      slug: String(item.slug || d.slug || item.name || d.name || '').toLowerCase().trim(),
-      name: item.name || d.name || 'Categoria',
-      tagline: item.tagline || d.tagline || '',
-      description: item.description || d.description || '',
-      image: item.image || d.image || '',
-      subcategories: Array.isArray(item.subcategories) ? item.subcategories : (Array.isArray(d.subcategories) ? d.subcategories : ['Geral']),
-      productCount: typeof item.product_count === 'number' ? item.product_count : (typeof d.productCount === 'number' ? d.productCount : 0),
-      order: typeof item.order === 'number' ? item.order : (typeof d.order === 'number' ? d.order : 0),
-      active: item.active !== undefined ? Boolean(item.active) : (d.active !== undefined ? Boolean(d.active) : true),
-      createdAt: item.created_at || d.createdAt || new Date().toISOString(),
+      id: String(item.id || ''),
+      slug: String(item.slug || '').toLowerCase().trim(),
+      name: item.name || '',
+      tagline: item.tagline || '',
+      description: item.description || '',
+      image: item.image || '',
+      subcategories: Array.isArray(item.subcategories) ? item.subcategories : [],
+      productCount: Number(item.product_count ?? 0),
+      order: Number(item.order ?? 0),
+      active: item.active !== false,
+      createdAt: item.created_at,
     };
   }
 
   private async loadFromSupabase() {
-    if (!this.supabase) return;
-    this.loadFromFiles();
+    if (!this.supabase) throw new Error('SUPABASE_NOT_CONFIGURED: cliente Supabase indisponível.');
 
-    try {
-      const { data: catData, error: catErr } = await this.supabase.from('categories').select('*').order('order', { ascending: true });
-      if (!catErr && catData && catData.length > 0) {
-        this.categories = catData.map((item: any) => this.mapSupabaseCategory(item));
-        this.writeJsonFile(CATEGORIES_FILE, this.categories);
-      } else if (!catErr && catData && catData.length === 0) {
-        for (const cat of this.categories) {
-          await this.supabase.from('categories').upsert({
-            id: cat.id,
-            slug: cat.slug,
-            name: cat.name,
-            tagline: cat.tagline,
-            description: cat.description,
-            image: cat.image,
-            subcategories: cat.subcategories,
-            product_count: cat.productCount,
-            order: cat.order,
-            active: cat.active,
-            data: cat,
-          });
-        }
+    const read = async (table: string, query: any): Promise<any[]> => {
+      const { data, error } = await query;
+      if (error) {
+        throw new Error(`SUPABASE_${table.toUpperCase()}_READ_FAILED: ${error.message}`);
       }
+      return Array.isArray(data) ? data : [];
+    };
 
-      console.log('[PRODUCTS] Carregando catálogo completo do Supabase...');
-      const PRODUCT_SELECT_COLUMNS = 'id, slug, title, subtitle, description, price, promo_price, category, subcategory, collection, tags, rating, review_count, stock_count, sku, sizes, colors, image, images, details, care_instructions, composition, weight, height, width, length, is_new_release, is_best_seller, featured, status, created_at, updated_at';
-      const { data: prodData, error: prodErr } = await this.supabase
-        .from('products')
-        .select(PRODUCT_SELECT_COLUMNS)
-        .order('id', { ascending: true });
+    const catData = await read('categories', this.supabase.from('categories').select('*').order('order', { ascending: true }));
+    this.categories = catData.map((item: any) => this.mapSupabaseCategory(item));
 
-      if (!prodErr && prodData && Array.isArray(prodData) && prodData.length > 0) {
-        const mapped = prodData.map((item: any) => this.mapSupabaseProduct(item));
-        const byId = new Map<string, Product>();
-        for (const p of mapped) {
-          if (p && p.id && String(p.id).trim().length > 0) {
-            byId.set(String(p.id).trim(), p);
-          }
-        }
-        const uniqueProducts = Array.from(byId.values());
-        this.products = uniqueProducts;
-        this.writeJsonFile(PRODUCTS_FILE, this.products);
-        console.log(`[PRODUCTS] ${this.products.length} produtos únicos carregados do Supabase com sucesso.`);
-      } else if (prodErr) {
-        console.warn('[PRODUCTS] aviso ao carregar do Supabase:', prodErr.message || prodErr);
-      }
+    const prodData = await read(
+      'products',
+      this.supabase.from('products').select(PRODUCT_SELECT_COLUMNS).order('id', { ascending: true }),
+    );
+    const mappedProducts = prodData.map((item: any) => this.mapSupabaseProduct(item));
+    this.products = Array.from(
+      new Map(mappedProducts.filter((product) => product.id).map((product) => [product.id, product])).values(),
+    );
 
-      const { data: ordersData, error: ordersErr } = await this.supabase.from('orders').select('*');
-      if (!ordersErr && ordersData && ordersData.length > 0) {
-        this.orders = ordersData.map((item: any) => item.data || item);
-        this.writeJsonFile(ORDERS_FILE, this.orders);
-      }
+    const ordersData = await read('orders', this.supabase.from('orders').select('*'));
+    this.orders = ordersData.map((item: any) => item.data || item);
 
-      const { data: couponsData, error: couponsErr } = await this.supabase.from('coupons').select('*');
-      if (!couponsErr && couponsData && couponsData.length > 0) {
-        this.coupons = couponsData.map((item: any) => {
-          const d = item.data || {};
-          const discountVal = item.discount_percentage ?? item.discount_value ?? d.discountPercentage ?? d.discountValue ?? 10;
-          return {
-            code: String(item.code || d.code || '').toUpperCase(),
-            discountPercentage: Number(discountVal),
-            discountValue: Number(discountVal),
-            discountType: item.discount_type || d.discountType || 'percentage',
-            minOrderValue: Number(item.min_order_value ?? d.minOrderValue ?? 0),
-            description: item.description || d.description || '',
-            active: item.active !== false && d.active !== false,
-          };
-        });
-        this.writeJsonFile(COUPONS_FILE, this.coupons);
-      }
+    const couponsData = await read('coupons', this.supabase.from('coupons').select('*'));
+    this.coupons = couponsData.map((item: any) => {
+      const data = item.data || {};
+      const discount = item.discount_percentage ?? item.discount_value ?? data.discountPercentage ?? data.discountValue ?? 10;
+      return {
+        code: String(item.code || data.code || '').toUpperCase(),
+        discountPercentage: Number(discount),
+        discountValue: Number(discount),
+        discountType: item.discount_type || data.discountType || 'percentage',
+        minOrderValue: Number(item.min_order_value ?? data.minOrderValue ?? 0),
+        description: item.description || data.description || '',
+        active: item.active !== false && data.active !== false,
+      };
+    });
 
-      try {
-        const { data: retData } = await this.supabase.from('returns').select('*');
-        if (retData && retData.length > 0) {
-          this.returns = retData.map((item: any) => item.data || item);
-          this.writeJsonFile(RETURNS_FILE, this.returns);
-        }
-      } catch {}
+    const profiles = await read('profiles', this.supabase.from('profiles').select('*'));
+    this.users = profiles.map((item: any) => {
+      const data = item.data && typeof item.data === 'object' ? item.data : {};
+      return {
+        ...data,
+        id: item.id,
+        email: item.email || data.email || '',
+        name: item.name || data.name || 'Cliente Marmot',
+        role: item.role || data.role || 'customer',
+        phone: item.phone ?? data.phone ?? '',
+        cpf: item.cpf ?? data.cpf ?? '',
+        addresses: item.addresses ?? data.addresses ?? [],
+        passwordHash: '',
+        isVerified: true,
+        createdAt: item.created_at || data.createdAt || new Date().toISOString(),
+        lastLogin: item.updated_at || data.lastLogin,
+      } as DbUser;
+    });
 
-      try {
-        const { data: movData } = await this.supabase.from('inventory_movements').select('*');
-        if (movData && movData.length > 0) {
-          this.inventoryMovements = movData.map((item: any) => item.data || item);
-          this.writeJsonFile(INVENTORY_MOVEMENTS_FILE, this.inventoryMovements);
-        }
-      } catch {}
+    this.returns = (await read('returns', this.supabase.from('returns').select('*'))).map((item: any) => item.data || item);
+    this.inventoryMovements = (await read('inventory_movements', this.supabase.from('inventory_movements').select('*'))).map((item: any) => item.data || item);
+    this.storeBanners = (await read('store_banners', this.supabase.from('store_banners').select('*'))).map((item: any) => item.data || item);
 
-      try {
-        const { data: bannerData } = await this.supabase.from('store_banners').select('*');
-        if (bannerData && bannerData.length > 0) {
-          this.storeBanners = bannerData.map((item: any) => item.data || item);
-          this.writeJsonFile(STORE_BANNERS_FILE, this.storeBanners);
-        }
-      } catch {}
+    const settingsData = await read('store_settings', this.supabase.from('store_settings').select('*').limit(1));
+    if (settingsData.length > 0) this.storeSettings = settingsData[0].data || settingsData[0];
 
-      try {
-        const { data: settingsData } = await this.supabase.from('store_settings').select('*').limit(1);
-        if (settingsData && settingsData.length > 0) {
-          this.storeSettings = settingsData[0].data || settingsData[0];
-          this.writeJsonFile(STORE_SETTINGS_FILE, this.storeSettings);
-        }
-      } catch {}
+    this.cartItems = (await read('cart_items', this.supabase.from('cart_items').select('*'))).map((item: any) => item.data || item);
+    this.wishlistItems = (await read('favorites', this.supabase.from('favorites').select('*'))).map((item: any) => item.data || {
+      id: item.id,
+      userId: item.user_id,
+      productId: item.product_id,
+      createdAt: item.created_at,
+    });
+    this.userAddresses = (await read('user_addresses', this.supabase.from('user_addresses').select('*'))).map((item: any) => ({
+      id: item.id,
+      userId: item.user_id,
+      recipientName: item.recipient_name,
+      cep: item.cep,
+      street: item.street,
+      number: item.number,
+      complement: item.complement,
+      neighborhood: item.neighborhood,
+      city: item.city,
+      state: item.state,
+      isDefault: Boolean(item.is_default),
+      phone: item.phone || item.data?.phone,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
+    }));
+    this.newsletterSubscribers = (await read('newsletter_subscribers', this.supabase.from('newsletter_subscribers').select('*'))).map((item: any) => item.data || item);
+    this.productReviews = (await read('product_reviews', this.supabase.from('product_reviews').select('*'))).map((item: any) => item.data || item);
+    this.emailLogs = (await read('email_logs', this.supabase.from('email_logs').select('*'))).map((item: any) => item.data || item);
+    this.shipmentEvents = (await read('shipment_events', this.supabase.from('shipment_events').select('*'))).map((item: any) => item.data || item);
+    this.campaignRecords = (await read(
+      'campaign_records',
+      this.supabase.from('campaign_records').select('*').eq('type', 'newsletter').order('created_at', { ascending: false }),
+    )).map((item: any) => this.mapCampaignRow(item));
 
-      try {
-        const { data: cartData } = await this.supabase.from('cart_items').select('*');
-        if (cartData && cartData.length > 0) {
-          this.cartItems = cartData.map((item: any) => item.data || item);
-          this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
-        }
-      } catch {}
-
-      try {
-        const { data: wishData } = await this.supabase.from('favorites').select('*');
-        if (wishData && wishData.length > 0) {
-          this.wishlistItems = wishData.map((item: any) => item.data || {
-            id: item.id,
-            userId: item.user_id,
-            productId: item.product_id,
-            createdAt: item.created_at,
-          });
-          this.writeJsonFile(WISHLIST_ITEMS_FILE, this.wishlistItems);
-        }
-      } catch {}
-
-      try {
-        const { data: addrData } = await this.supabase.from('user_addresses').select('*');
-        if (addrData && addrData.length > 0) {
-          this.userAddresses = addrData.map((item: any) => ({
-            id: item.id,
-            userId: item.user_id,
-            recipientName: item.recipient_name,
-            cep: item.cep,
-            street: item.street,
-            number: item.number,
-            complement: item.complement,
-            neighborhood: item.neighborhood,
-            city: item.city,
-            state: item.state,
-            isDefault: Boolean(item.is_default),
-            phone: item.phone || item.data?.phone,
-            createdAt: item.created_at,
-            updatedAt: item.updated_at,
-          }));
-          this.writeJsonFile(USER_ADDRESSES_FILE, this.userAddresses);
-        }
-      } catch {}
-
-      try {
-        const { data: newsData } = await this.supabase.from('newsletter_subscribers').select('*');
-        if (newsData && newsData.length > 0) {
-          this.newsletterSubscribers = newsData.map((item: any) => item.data || item);
-          this.writeJsonFile(NEWSLETTER_FILE, this.newsletterSubscribers);
-        }
-      } catch {}
-
-      try {
-        const { data: revData } = await this.supabase.from('product_reviews').select('*');
-        if (revData && revData.length > 0) {
-          this.productReviews = revData.map((item: any) => item.data || item);
-          this.writeJsonFile(REVIEWS_FILE, this.productReviews);
-        }
-      } catch {}
-
-      try {
-        const { data: emailData } = await this.supabase.from('email_logs').select('*');
-        if (emailData && emailData.length > 0) {
-          this.emailLogs = emailData.map((item: any) => item.data || item);
-          this.writeJsonFile(EMAIL_LOGS_FILE, this.emailLogs);
-        }
-      } catch {}
-
-      try {
-        const { data: shipEvtData } = await this.supabase.from('shipment_events').select('*');
-        if (shipEvtData && shipEvtData.length > 0) {
-          this.shipmentEvents = shipEvtData.map((item: any) => item.data || item);
-          this.writeJsonFile(SHIPMENT_EVENTS_FILE, this.shipmentEvents);
-        }
-      } catch {}
-    } catch (err) {
-      console.warn('[DB] Supabase query notice, continuing with persistent cache:', err);
-    }
+    console.log('[DB] Supabase authoritative state loaded.', {
+      products: this.products.length,
+      categories: this.categories.length,
+    });
   }
 
   private loadFromFiles() {
+    this.assertLocalPersistenceAllowed('loadFromFiles');
     this.categories = this.readJsonFile(CATEGORIES_FILE, INITIAL_CATEGORIES);
     const rawProds = this.readJsonFile(PRODUCTS_FILE, []);
     let neededSanitization = false;
@@ -1550,6 +1394,7 @@ export class DatabaseManager {
   }
 
   private readJsonFile<T>(filePath: string, defaultData: T): T {
+    this.assertLocalPersistenceAllowed('readJsonFile');
     try {
       if (fs.existsSync(filePath)) {
         const raw = fs.readFileSync(filePath, 'utf-8');
@@ -1562,6 +1407,9 @@ export class DatabaseManager {
   }
 
   private writeJsonFile<T>(filePath: string, data: T): void {
+    if (this.productionRuntime || (this.mode === 'supabase' && !IS_TEST_MODE)) {
+      return;
+    }
     try {
       const effectivePath = (IS_TEST_MODE && filePath.includes(DATA_DIR))
         ? path.join(os.tmpdir(), 'marmot-test-data', path.basename(filePath))
@@ -1587,6 +1435,12 @@ export class DatabaseManager {
       } catch {
         // Safe failover
       }
+    }
+  }
+
+  private assertLocalPersistenceAllowed(operation: string): void {
+    if (this.productionRuntime) {
+      throw new Error(`LOCAL_FILE_PERSISTENCE_FORBIDDEN_IN_PRODUCTION: ${operation}`);
     }
   }
 
@@ -1628,29 +1482,68 @@ export class DatabaseManager {
    * Fail-Closed Security Policy: Never falls back to anon client for admin operations.
    */
   public async getSupabaseAdminClient(): Promise<SupabaseClient | null> {
-    const serviceKey = (process.env.SUPABASE_DISPOSABLE_URL ? process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY : null) || process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const supabaseUrl = process.env.SUPABASE_DISPOSABLE_URL || process.env.SUPABASE_URL;
+    if (this.supabaseAdmin) return this.supabaseAdmin;
+    if (this.supabaseAdminValidation) return this.supabaseAdminValidation;
 
-    if (serviceKey && serviceKey.trim() !== '') {
-      const cleanKey = serviceKey.trim();
-      const anonKey = process.env.SUPABASE_ANON_KEY;
+    const useDisposable = !this.productionRuntime && Boolean(process.env.SUPABASE_DISPOSABLE_URL);
+    const supabaseUrl = String(useDisposable ? process.env.SUPABASE_DISPOSABLE_URL : process.env.SUPABASE_URL || '').trim();
+    const serviceKey = String(useDisposable ? process.env.SUPABASE_DISPOSABLE_SERVICE_ROLE_KEY : process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
+    const inspection = inspectSupabaseAdminCredential(serviceKey, [
+      useDisposable ? process.env.SUPABASE_DISPOSABLE_ANON_KEY : process.env.SUPABASE_ANON_KEY,
+      process.env.VITE_SUPABASE_ANON_KEY,
+    ]);
 
-      // Fail-closed guard: Reject anon/publishable keys passed erroneously as service role key
-      if (cleanKey.startsWith('sb_publishable_') || (anonKey && cleanKey === anonKey.trim())) {
-        console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_KEY contém uma chave anon/publishable em vez de uma service_role secret válida! Acesso administrativo bloqueado.');
-        return null;
-      }
-
-      if (!this.supabaseAdmin) {
-        this.supabaseAdmin = createClient(supabaseUrl, cleanKey, {
-          auth: { persistSession: false, autoRefreshToken: false },
-        });
-      }
-      return this.supabaseAdmin;
+    if (!supabaseUrl || supabaseUrl.includes('placeholder') || !inspection.valid) {
+      console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', {
+        urlConfigured: Boolean(supabaseUrl && !supabaseUrl.includes('placeholder')),
+        credentialKind: inspection.kind,
+        reason: inspection.reason,
+      });
+      return null;
     }
 
-    // Strict fail-closed: Never fall back to anon key for administrative mutations
-    return null;
+    this.supabaseAdminValidation = (async () => {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8_000);
+        let response: Response;
+        try {
+          response = await fetch(new URL('/rest/v1/', supabaseUrl), {
+            method: 'GET',
+            headers: {
+              apikey: serviceKey,
+              'User-Agent': 'marmot-backend-service-role-validation',
+            },
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(timeout);
+        }
+        if (!response.ok) {
+          console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', {
+            credentialKind: inspection.kind,
+            providerStatus: response.status,
+            reason: 'elevated_access_probe_rejected',
+          });
+          return null;
+        }
+        this.supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+          auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+          global: { headers: { 'X-Client-Info': 'marmot-backend-admin' } },
+        });
+        return this.supabaseAdmin;
+      } catch (error: any) {
+        console.error('[DB SECURITY ALERT] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', {
+          credentialKind: inspection.kind,
+          reason: error?.name === 'AbortError' ? 'elevated_access_probe_timeout' : 'elevated_access_probe_failed',
+        });
+        return null;
+      } finally {
+        this.supabaseAdminValidation = null;
+      }
+    })();
+
+    return this.supabaseAdminValidation;
   }
 
   /**
@@ -1659,20 +1552,111 @@ export class DatabaseManager {
    */
   public async getRequiredSupabaseAdminClient(operationName = 'operação administrativa'): Promise<SupabaseClient> {
     const adminClient = await this.getSupabaseAdminClient();
-    if (!adminClient) {
-      console.error(`[DB CONFIG ERROR] SUPABASE_SERVICE_ROLE_KEY_NOT_CONFIGURED: Impossível executar '${operationName}' no Supabase sem a chave SUPABASE_SERVICE_ROLE_KEY configurada no servidor.`);
-      throw new Error(`SUPABASE_SERVICE_ROLE_KEY_NOT_CONFIGURED: A chave SUPABASE_SERVICE_ROLE_KEY é obrigatória para executar '${operationName}' no banco de dados com integridade e segurança. Verifique as variáveis de ambiente na Vercel.`);
-    }
-    return adminClient;
+    if (adminClient) return adminClient;
+    console.error('[DB CONFIG ERROR] SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED', { operationName });
+    throw new Error(
+      `SUPABASE_SERVICE_ROLE_INVALID_OR_NOT_CONFIGURED: SUPABASE_SERVICE_ROLE_KEY precisa conter uma chave server-side reconhecida pelo Supabase para executar '${operationName}'.`,
+    );
   }
 
-  public getMode(): 'supabase' | 'postgres' | 'durable_file' {
+  public getMode(): DatabaseMode {
     return this.mode;
+  }
+
+  public getPersistenceStatus(): { production: boolean; valid: boolean; error: string | null; catalogSource: 'supabase' | 'local' | 'unavailable' } {
+    const valid = !this.productionRuntime || (this.mode === 'supabase' && Boolean(this.supabase) && !this.persistenceConfigurationError);
+    return {
+      production: this.productionRuntime,
+      valid,
+      error: valid ? null : (this.persistenceConfigurationError || 'SUPABASE_REQUIRED_IN_PRODUCTION'),
+      catalogSource: this.mode === 'supabase' ? 'supabase' : this.mode === 'unavailable' ? 'unavailable' : 'local',
+    };
   }
 
   // ==========================================
   // PRODUCTS CRUD
   // ==========================================
+  private productToSupabasePayload(product: Product): Record<string, any> {
+    return {
+      id: product.id,
+      slug: product.slug,
+      title: product.title,
+      subtitle: product.subtitle || '',
+      description: product.description || '',
+      price: product.price,
+      promo_price: product.promoPrice ?? null,
+      category: product.category,
+      subcategory: product.subcategory || '',
+      collection: product.collection || '',
+      tags: product.tags || [],
+      rating: product.rating ?? 5,
+      review_count: product.reviewCount ?? 0,
+      stock_count: product.stockCount ?? 0,
+      sku: product.sku || '',
+      sizes: product.sizes || [],
+      colors: product.colors || [],
+      image: product.image || '',
+      images: product.images || [],
+      details: product.details || [],
+      care_instructions: product.careInstructions || [],
+      composition: product.composition || [],
+      weight: product.weight ?? 0.35,
+      height: product.height ?? 4,
+      width: product.width ?? 20,
+      length: product.length ?? 25,
+      is_new_release: Boolean(product.isNewRelease),
+      is_best_seller: Boolean(product.isBestSeller),
+      featured: Boolean(product.featured),
+      status: product.status || 'active',
+      data: null,
+    };
+  }
+
+  private validatePersistentProduct(product: Product): void {
+    if (!product.id?.trim()) throw new Error('PRODUCT_INVALID_ID: o ID do produto é obrigatório.');
+    if (!product.slug?.trim()) throw new Error('PRODUCT_INVALID_SLUG: o slug do produto é obrigatório.');
+    if (!product.title?.trim()) throw new Error('PRODUCT_INVALID_TITLE: o título do produto é obrigatório.');
+    if (!Number.isFinite(product.price) || product.price < 0) throw new Error('PRODUCT_INVALID_PRICE: o preço deve ser um número válido e não negativo.');
+    if (!Number.isInteger(product.stockCount) || product.stockCount < 0) throw new Error('PRODUCT_INVALID_STOCK: o estoque deve ser um inteiro não negativo.');
+  }
+
+  private async fetchAllProductsFromAuthoritativeStore(): Promise<Product[]> {
+    if (this.mode === 'supabase' && this.supabase) {
+      const { data, error } = await this.supabase
+        .from('products')
+        .select(PRODUCT_SELECT_COLUMNS)
+        .order('id', { ascending: true });
+      if (error) throw new Error(`SUPABASE_PRODUCTS_READ_FAILED: ${error.message}`);
+      const products = (data || []).map((row: any) => this.mapSupabaseProduct(row));
+      this.products = products;
+      return products;
+    }
+    if (!this.productionRuntime) return [...this.products];
+    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
+  }
+
+  private async fetchProductFromAuthoritativeStore(idOrSlug: string): Promise<Product | null> {
+    const clean = String(idOrSlug || '').trim();
+    if (!clean) return null;
+    if (this.mode === 'supabase' && this.supabase) {
+      const readBy = async (column: 'id' | 'slug') => {
+        const { data, error } = await this.supabase!
+          .from('products')
+          .select(PRODUCT_SELECT_COLUMNS)
+          .eq(column, clean)
+          .maybeSingle();
+        if (error) throw new Error(`SUPABASE_PRODUCT_READ_FAILED: ${error.message}`);
+        return data ? this.mapSupabaseProduct(data) : null;
+      };
+      return (await readBy('id')) || (await readBy('slug'));
+    }
+    if (!this.productionRuntime) {
+      const lower = clean.toLowerCase();
+      return this.products.find((product) => product.id?.toLowerCase() === lower || product.slug?.toLowerCase() === lower) || null;
+    }
+    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
+  }
+
   public async getProducts(filters?: any): Promise<Product[]> {
     return this.getAllProducts(filters);
   }
@@ -1689,21 +1673,12 @@ export class DatabaseManager {
     sort?: string;
   }): Promise<Product[]> {
     await this.initialize();
+    const authoritativeProducts = await this.fetchAllProductsFromAuthoritativeStore();
 
-    // Filter out products belonging to deleted categories or not belonging to an active category
-    const activeCategorySlugs = new Set<string>();
-    this.categories.forEach((c) => {
-      if (c.id) activeCategorySlugs.add(c.id.toLowerCase().trim());
-      if (c.slug) activeCategorySlugs.add(c.slug.toLowerCase().trim());
-    });
-
-    let list = this.products.filter((p) => {
-      const pCat = (p.category || '').toLowerCase().trim();
-      const pSub = (p.subcategory || '').toLowerCase().trim();
-      if (pCat === 'acessorios' || pCat === 'acessórios' || pSub === 'acessorios') return false;
-      if (activeCategorySlugs.size > 0 && !activeCategorySlugs.has(pCat)) return false;
-      return true;
-    });
+    // Never hide or rebuild persisted catalog rows implicitly. Storefront and
+    // admin consumers can request explicit filters, while the unfiltered API
+    // must expose the complete authoritative catalog.
+    let list = authoritativeProducts;
 
     if (!filters) return list;
 
@@ -1768,37 +1743,7 @@ export class DatabaseManager {
 
   public async getProductById(idOrSlug: string): Promise<Product | null> {
     await this.initialize();
-    if (!idOrSlug) return null;
-    const clean = String(idOrSlug).trim();
-    const lower = clean.toLowerCase();
-
-    let prod = this.products.find((p) => 
-      p.id === clean || 
-      p.slug === clean || 
-      p.id?.toLowerCase() === lower || 
-      p.slug?.toLowerCase() === lower
-    );
-
-    if (!prod && this.mode === 'supabase') {
-      const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (adminClient) {
-        try {
-          const { data, error } = await adminClient
-            .from('products')
-            .select('*')
-            .or(`id.eq.${clean},slug.eq.${clean}`)
-            .limit(1);
-
-          if (!error && data && data.length > 0) {
-            prod = this.mapSupabaseProduct(data[0]);
-            this.products.unshift(prod);
-            this.writeJsonFile(PRODUCTS_FILE, this.products);
-          }
-        } catch {}
-      }
-    }
-
-    return prod || null;
+    return this.fetchProductFromAuthoritativeStore(idOrSlug);
   }
 
   public async createProduct(productData: Partial<Product>): Promise<Product> {
@@ -1868,98 +1813,35 @@ export class DatabaseManager {
       status: (productData.status as any) || 'active',
       createdAt: new Date().toISOString(),
     });
+    this.validatePersistentProduct(newProduct);
 
-    // 1. Persistent local storage & active in-memory list (Always guaranteed)
-    this.products.unshift(newProduct);
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Synchronize to Supabase database with direct await
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('createProduct');
-        const { error } = await adminClient.from('products').insert({
-          id: newProduct.id,
-          slug: newProduct.slug,
-          title: newProduct.title,
-          subtitle: newProduct.subtitle,
-          description: newProduct.description,
-          price: newProduct.price,
-          promo_price: newProduct.promoPrice ?? null,
-          category: newProduct.category,
-          subcategory: newProduct.subcategory,
-          collection: newProduct.collection,
-          tags: newProduct.tags,
-          rating: newProduct.rating,
-          review_count: newProduct.reviewCount,
-          stock_count: newProduct.stockCount,
-          sku: newProduct.sku,
-          sizes: newProduct.sizes,
-          colors: newProduct.colors,
-          image: newProduct.image,
-          images: newProduct.images,
-          details: newProduct.details,
-          care_instructions: newProduct.careInstructions,
-          composition: newProduct.composition,
-          weight: newProduct.weight,
-          height: newProduct.height,
-          width: newProduct.width,
-          length: newProduct.length,
-          is_new_release: newProduct.isNewRelease,
-          is_best_seller: newProduct.isBestSeller,
-          featured: newProduct.featured,
-          status: newProduct.status,
-          data: null,
-        });
-
-        if (error) {
-          console.warn('[DB] Supabase product insert notice:', error.message);
-        } else {
-          console.log('[DB] Produto criado no Supabase com sucesso:', newProduct.id);
-        }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase insert exception:', sbErr?.message);
-        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
+      const adminClient = await this.getRequiredSupabaseAdminClient('createProduct');
+      const { data, error } = await adminClient
+        .from('products')
+        .insert(this.productToSupabasePayload(newProduct))
+        .select(PRODUCT_SELECT_COLUMNS)
+        .single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_INSERT_FAILED: ${error?.message || 'o banco não retornou o produto criado.'}`);
       }
+      const persisted = this.mapSupabaseProduct(data);
+      this.products = [persisted, ...this.products.filter((product) => product.id !== persisted.id)];
+      return persisted;
     }
 
+    if (this.productionRuntime) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para criar produtos.');
+    this.products.unshift(newProduct);
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return newProduct;
   }
 
   public async updateProduct(idOrSlug: string, updates: Partial<Product>): Promise<Product> {
     await this.initialize();
-    const clean = String(idOrSlug).trim();
-    const lower = clean.toLowerCase();
-
-    let idx = this.products.findIndex((p) => 
-      p.id === clean || 
-      p.slug === clean || 
-      p.id?.toLowerCase() === lower || 
-      p.slug?.toLowerCase() === lower
-    );
-
-    if (idx === -1 && this.mode === 'supabase' && this.supabase) {
-      const client = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (client) {
-        try {
-          const { data, error } = await client
-            .from('products')
-            .select('*')
-            .or(`id.eq.${clean},slug.eq.${clean}`)
-            .limit(1);
-          if (!error && data && data.length > 0) {
-            const loaded = this.mapSupabaseProduct(data[0]);
-            this.products.unshift(loaded);
-            idx = 0;
-          }
-        } catch {}
-      }
-    }
-
-    if (idx === -1) {
+    const current = await this.fetchProductFromAuthoritativeStore(idOrSlug);
+    if (!current) {
       throw new Error(`Produto não encontrado para "${idOrSlug}"`);
     }
-
-    const current = this.products[idx];
     const updatedProduct: Product = {
       ...current,
       ...updates,
@@ -2004,110 +1886,43 @@ export class DatabaseManager {
     }
 
     const cleanProduct = this.sanitizeProduct(updatedProduct);
+    this.validatePersistentProduct(cleanProduct);
 
-    // 1. Persistent local storage & in-memory update (Always guaranteed)
-    this.products[idx] = cleanProduct;
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Synchronize to Supabase database via direct UPDATE with await
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('updateProduct');
-        const updatePayload: Record<string, any> = {
-          updated_at: new Date().toISOString(),
-          data: null,
-        };
-        if (updates.title !== undefined) updatePayload.title = cleanProduct.title;
-        if (updates.slug !== undefined) updatePayload.slug = cleanProduct.slug;
-        if (updates.subtitle !== undefined) updatePayload.subtitle = cleanProduct.subtitle || '';
-        if (updates.description !== undefined) updatePayload.description = cleanProduct.description || '';
-        if (updates.price !== undefined) updatePayload.price = cleanProduct.price;
-        if (updates.promoPrice !== undefined) updatePayload.promo_price = cleanProduct.promoPrice ?? null;
-        if (updates.category !== undefined) updatePayload.category = cleanProduct.category;
-        if (updates.subcategory !== undefined) updatePayload.subcategory = cleanProduct.subcategory || 'Essenciais';
-        if (updates.collection !== undefined) updatePayload.collection = cleanProduct.collection || 'Vol. 04: Cyber Dystopia';
-        if (updates.tags !== undefined) updatePayload.tags = cleanProduct.tags || [];
-        if (updates.rating !== undefined) updatePayload.rating = cleanProduct.rating || 5.0;
-        if (updates.reviewCount !== undefined) updatePayload.review_count = cleanProduct.reviewCount || 0;
-        if (updates.stockCount !== undefined) updatePayload.stock_count = typeof cleanProduct.stockCount === 'number' ? cleanProduct.stockCount : 0;
-        if (updates.sku !== undefined) updatePayload.sku = cleanProduct.sku || '';
-        if (updates.sizes !== undefined) updatePayload.sizes = cleanProduct.sizes || ['P', 'M', 'G', 'GG'];
-        if (updates.colors !== undefined) updatePayload.colors = cleanProduct.colors || [];
-        if (updates.image !== undefined || updates.images !== undefined) {
-          updatePayload.image = cleanProduct.image || '';
-          updatePayload.images = cleanProduct.images || [];
-        }
-        if (updates.details !== undefined) updatePayload.details = cleanProduct.details || [];
-        if (updates.careInstructions !== undefined) updatePayload.care_instructions = cleanProduct.careInstructions || [];
-        if (updates.composition !== undefined) updatePayload.composition = cleanProduct.composition || [];
-        if (updates.weight !== undefined) updatePayload.weight = cleanProduct.weight || 0.35;
-        if (updates.height !== undefined) updatePayload.height = cleanProduct.height || 4;
-        if (updates.width !== undefined) updatePayload.width = cleanProduct.width || 20;
-        if (updates.length !== undefined) updatePayload.length = cleanProduct.length || 25;
-        if (updates.isNewRelease !== undefined) updatePayload.is_new_release = Boolean(cleanProduct.isNewRelease);
-        if (updates.isBestSeller !== undefined) updatePayload.is_best_seller = Boolean(cleanProduct.isBestSeller);
-        if (updates.featured !== undefined) updatePayload.featured = Boolean(cleanProduct.featured);
-        if (updates.status !== undefined) updatePayload.status = cleanProduct.status || 'active';
-
-        const { data: updateData, error } = await adminClient
-          .from('products')
-          .update(updatePayload)
-          .eq('id', cleanProduct.id)
-          .select()
-          .single();
-
-        if (error) {
-          console.error('[DB] Supabase product update error:', error.message);
-          throw new Error(`Falha no Supabase ao atualizar produto: ${error.message}`);
-        } else {
-          console.log('[DB] Produto atualizado no Supabase com sucesso via UPDATE:', cleanProduct.id);
-          if (updateData) {
-            cleanProduct.updatedAt = updateData.updated_at || cleanProduct.updatedAt;
-          }
-        }
-      } catch (sbErr: any) {
-        console.error('[DB] Supabase product update exception:', sbErr?.message || sbErr);
-        throw sbErr;
+      const adminClient = await this.getRequiredSupabaseAdminClient('updateProduct');
+      const updatePayload = this.productToSupabasePayload(cleanProduct);
+      delete updatePayload.id;
+      updatePayload.updated_at = new Date().toISOString();
+      const { data, error } = await adminClient
+        .from('products')
+        .update(updatePayload)
+        .eq('id', current.id)
+        .select(PRODUCT_SELECT_COLUMNS)
+        .single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_UPDATE_FAILED: ${error?.message || 'o banco não retornou o produto atualizado.'}`);
       }
+      const persisted = this.mapSupabaseProduct(data);
+      this.products = this.products.map((product) => product.id === persisted.id ? persisted : product);
+      return persisted;
     }
 
+    if (this.productionRuntime) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para atualizar produtos.');
+    const idx = this.products.findIndex((product) => product.id === current.id);
+    if (idx >= 0) this.products[idx] = cleanProduct;
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return cleanProduct;
   }
 
   public async updateProductStock(id: string, stockCount: number): Promise<Product> {
     await this.initialize();
-    const clean = String(id).trim();
-    const lower = clean.toLowerCase();
-
-    let idx = this.products.findIndex((p) => 
-      p.id === clean || 
-      p.slug === clean || 
-      p.id?.toLowerCase() === lower || 
-      p.slug?.toLowerCase() === lower
-    );
-
-    if (idx === -1 && this.mode === 'supabase' && this.supabase) {
-      const client = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (client) {
-        try {
-          const { data, error } = await client
-            .from('products')
-            .select('*')
-            .or(`id.eq.${clean},slug.eq.${clean}`)
-            .limit(1);
-          if (!error && data && data.length > 0) {
-            const loaded = this.mapSupabaseProduct(data[0]);
-            this.products.unshift(loaded);
-            idx = 0;
-          }
-        } catch {}
-      }
+    const current = await this.fetchProductFromAuthoritativeStore(id);
+    if (!current) throw new Error(`Produto #${id} não encontrado.`);
+    const parsedStock = Number(stockCount);
+    if (!Number.isInteger(parsedStock) || parsedStock < 0) {
+      throw new Error('PRODUCT_INVALID_STOCK: o estoque deve ser um inteiro não negativo.');
     }
-
-    if (idx === -1) throw new Error(`Produto #${id} não encontrado.`);
-
-    const current = this.products[idx];
-    const newStock = Math.max(0, parseInt(String(stockCount), 10));
+    const newStock = parsedStock;
     const status = newStock <= 0 ? 'out_of_stock' : current.status === 'out_of_stock' ? 'active' : current.status;
 
     const updated: Product = {
@@ -2116,29 +1931,26 @@ export class DatabaseManager {
       status: status as any,
     };
 
-    // 1. Save locally
-    this.products[idx] = updated;
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Sync to Supabase
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('updateProductStock');
-        const { error } = await adminClient.from('products').update({
+      const adminClient = await this.getRequiredSupabaseAdminClient('updateProductStock');
+      const { data, error } = await adminClient.from('products').update({
           stock_count: newStock,
           status: status,
           data: null,
-        }).eq('id', current.id);
-
-        if (error) {
-          console.warn('[DB] Supabase stock update notice:', error.message);
-        }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase stock update exception:', sbErr?.message);
-        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
+          updated_at: new Date().toISOString(),
+        }).eq('id', current.id).select(PRODUCT_SELECT_COLUMNS).single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_STOCK_UPDATE_FAILED: ${error?.message || 'o banco não retornou o estoque atualizado.'}`);
       }
+      const persisted = this.mapSupabaseProduct(data);
+      this.products = this.products.map((product) => product.id === persisted.id ? persisted : product);
+      return persisted;
     }
 
+    if (this.productionRuntime) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para atualizar estoque.');
+    const idx = this.products.findIndex((product) => product.id === current.id);
+    if (idx >= 0) this.products[idx] = updated;
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return updated;
   }
 
@@ -2146,36 +1958,27 @@ export class DatabaseManager {
     await this.initialize();
     const cleanId = String(id || '').trim();
     if (!cleanId) return false;
+    const current = await this.fetchProductFromAuthoritativeStore(cleanId);
+    if (!current) return false;
 
-    const lowerId = cleanId.toLowerCase();
-
-    // 1. Delete locally
-    this.products = this.products.filter((p) => 
-      p.id !== cleanId && 
-      p.slug !== cleanId && 
-      p.id?.toLowerCase() !== lowerId && 
-      p.slug?.toLowerCase() !== lowerId
-    );
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
-    // 2. Delete in Supabase
     if (this.mode === 'supabase') {
-      try {
-        console.log('[PRODUCTS] excluindo produto no Supabase:', cleanId);
-        const adminClient = await this.getRequiredSupabaseAdminClient('deleteProduct');
-        const { error } = await adminClient
-          .from('products')
-          .delete()
-          .or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-        if (error) {
-          console.warn('[DB] Supabase delete product notice:', error.message);
-        }
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase delete exception:', sbErr?.message);
-        if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') throw sbErr;
+      const adminClient = await this.getRequiredSupabaseAdminClient('deleteProduct');
+      const { data, error } = await adminClient
+        .from('products')
+        .delete()
+        .eq('id', current.id)
+        .select('id')
+        .single();
+      if (error || !data) {
+        throw new Error(`SUPABASE_PRODUCT_DELETE_FAILED: ${error?.message || 'o banco não confirmou a exclusão.'}`);
       }
+      this.products = this.products.filter((product) => product.id !== current.id);
+      return true;
     }
 
+    if (this.productionRuntime) throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para excluir produtos.');
+    this.products = this.products.filter((product) => product.id !== current.id);
+    this.writeJsonFile(PRODUCTS_FILE, this.products);
     return true;
   }
 
@@ -2188,12 +1991,21 @@ export class DatabaseManager {
   // ==========================================
   public async getAllCategories(): Promise<Category[]> {
     await this.initialize();
-    return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    if (this.mode === 'supabase' && this.supabase) {
+      const { data, error } = await this.supabase.from('categories').select('*').order('order', { ascending: true });
+      if (error) throw new Error(`SUPABASE_CATEGORIES_READ_FAILED: ${error.message}`);
+      this.categories = (data || []).map((row: any) => this.mapSupabaseCategory(row));
+      return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+    if (!this.productionRuntime) {
+      return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+    throw new Error('CATEGORY_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar categorias.');
   }
 
   public async getCategoryById(idOrSlug: string): Promise<Category | null> {
-    await this.initialize();
-    return this.categories.find((c) => c.id === idOrSlug || c.slug === idOrSlug) || null;
+    const categories = await this.getAllCategories();
+    return categories.find((c) => c.id === idOrSlug || c.slug === idOrSlug) || null;
   }
 
   public async createCategory(categoryData: Partial<Category>): Promise<Category> {
@@ -2226,7 +2038,7 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase') {
       const adminClient = await this.getRequiredSupabaseAdminClient('createCategory');
-      const { error } = await adminClient.from('categories').upsert({
+      const { data, error } = await adminClient.from('categories').insert({
         id: newCategory.id,
         slug: newCategory.slug,
         name: newCategory.name,
@@ -2237,14 +2049,18 @@ export class DatabaseManager {
         product_count: newCategory.productCount,
         order: newCategory.order,
         active: newCategory.active,
-        data: newCategory,
-      });
-      if (error) {
+        data: null,
+      }).select('*').single();
+      if (error || !data) {
         console.error('[DB] Supabase category insert error:', error);
-        throw new Error(`Falha ao salvar categoria no Supabase: ${error.message}`);
+        throw new Error(`Falha ao salvar categoria no Supabase: ${error?.message || 'insert não confirmado'}`);
       }
+      const persisted = this.mapSupabaseCategory(data);
+      this.categories = [...this.categories.filter((category) => category.id !== persisted.id), persisted];
+      return persisted;
     }
 
+    if (this.productionRuntime) throw new Error('Supabase é obrigatório para criar categorias em produção.');
     this.categories.push(newCategory);
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
@@ -2256,62 +2072,21 @@ export class DatabaseManager {
     const cleanId = String(id || '').trim();
     const lowerId = cleanId.toLowerCase();
 
-    let idx = this.categories.findIndex((c) => 
-      c.id === cleanId || 
-      c.slug === cleanId || 
-      c.id?.toLowerCase() === lowerId || 
-      c.slug?.toLowerCase() === lowerId
-    );
-
-    if (idx === -1 && this.mode === 'supabase') {
-      const client = (await this.getSupabaseAdminClient()) || this.supabase;
-      if (client) {
-        try {
-          const { data, error } = await client
-            .from('categories')
-            .select('*')
-            .or(`id.eq.${cleanId},slug.eq.${cleanId}`)
-            .limit(1);
-          if (!error && data && data.length > 0) {
-            const loaded = this.mapSupabaseCategory(data[0]);
-            this.categories.push(loaded);
-            idx = this.categories.length - 1;
-          }
-        } catch {}
-      }
-    }
-
-    if (idx === -1) throw new Error(`Categoria "${id}" não encontrada.`);
-
-    const current = this.categories[idx];
+    const current = await this.getCategoryById(cleanId);
+    if (!current) throw new Error(`Categoria "${id}" não encontrada.`);
     const updated = {
       ...current,
       ...updates,
       id: current.id,
     };
 
-    if (updated.image && typeof updated.image === 'string' && updated.image.startsWith('data:image/')) {
-      try {
-        const matches = updated.image.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
-        if (matches) {
-          const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1].replace(/[^a-z0-9]/gi, '');
-          const buffer = Buffer.from(matches[2], 'base64');
-          const filename = `cat-${updated.id || cleanId}-${Date.now()}.${ext || 'jpg'}`;
-          if (!fs.existsSync(UPLOADS_DIR)) {
-            fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-          }
-          fs.writeFileSync(path.join(UPLOADS_DIR, filename), buffer);
-          updated.image = `/uploads/${filename}`;
-        }
-      } catch (imgErr) {
-        console.warn('[DB] Could not save category base64 image to file, keeping original:', imgErr);
-      }
+    if (updated.image && /^(data:|blob:|\/uploads\/)/i.test(updated.image)) {
+      throw new Error('A imagem da categoria precisa ser uma URL persistente.');
     }
 
     if (this.mode === 'supabase') {
       const adminClient = await this.getRequiredSupabaseAdminClient('updateCategory');
-      const { error } = await adminClient.from('categories').upsert({
-        id: updated.id,
+      const { data, error } = await adminClient.from('categories').update({
         slug: updated.slug,
         name: updated.name,
         tagline: updated.tagline,
@@ -2321,15 +2096,20 @@ export class DatabaseManager {
         product_count: updated.productCount,
         order: updated.order,
         active: updated.active,
-        data: updated,
-      });
-      if (error) {
+        data: null,
+      }).eq('id', current.id).select('*').single();
+      if (error || !data) {
         console.error('[DB] Supabase category update error:', error);
-        throw new Error(`Falha ao atualizar categoria no Supabase: ${error.message}`);
+        throw new Error(`Falha ao atualizar categoria no Supabase: ${error?.message || 'update não confirmado'}`);
       }
+      const persisted = this.mapSupabaseCategory(data);
+      this.categories = this.categories.map((category) => category.id === persisted.id ? persisted : category);
+      return persisted;
     }
 
-    this.categories[idx] = updated;
+    if (this.productionRuntime) throw new Error('Supabase é obrigatório para atualizar categorias em produção.');
+    const idx = this.categories.findIndex((category) => category.id === current.id);
+    if (idx >= 0) this.categories[idx] = updated;
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
     return updated;
@@ -2342,27 +2122,24 @@ export class DatabaseManager {
 
     const lowerId = cleanId.toLowerCase();
 
-    // Find category to identify both ID and slug for cascade removal
-    const targetCat = this.categories.find(
-      (c) =>
-        c.id === cleanId ||
-        c.slug === cleanId ||
-        c.id?.toLowerCase() === lowerId ||
-        c.slug?.toLowerCase() === lowerId
-    );
+    const targetCat = await this.getCategoryById(cleanId);
+    if (!targetCat) return false;
     const catSlug = (targetCat?.slug || lowerId).toLowerCase();
 
     if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('deleteCategory');
-        const { error } = await adminClient.from('categories').delete().or(`id.eq.${cleanId},slug.eq.${cleanId}`);
-        if (error) {
-          console.error('[DB] Supabase category delete error:', error);
-        }
-        await adminClient.from('products').delete().or(`category.eq.${lowerId},category.eq.${catSlug}`);
-      } catch (sbErr: any) {
-        console.warn('[DB] Supabase admin client not available during category delete, updating local store:', sbErr?.message);
+      const adminClient = await this.getRequiredSupabaseAdminClient('deleteCategory');
+      const { count, error: productCountError } = await adminClient
+        .from('products')
+        .select('id', { count: 'exact', head: true })
+        .or(`category.eq.${targetCat.id},category.eq.${catSlug},subcategory.eq.${targetCat.id},subcategory.eq.${catSlug}`);
+      if (productCountError) throw new Error(`Falha ao validar produtos da categoria: ${productCountError.message}`);
+      if ((count || 0) > 0) {
+        throw new Error('A categoria possui produtos. Mova ou exclua esses produtos antes de excluir a categoria.');
       }
+      const { data, error } = await adminClient.from('categories').delete().eq('id', targetCat.id).select('id').single();
+      if (error || data?.id !== targetCat.id) throw new Error(`Falha ao excluir categoria no Supabase: ${error?.message || 'delete não confirmado'}`);
+    } else if (this.productionRuntime) {
+      throw new Error('Supabase é obrigatório para excluir categorias em produção.');
     }
 
     this.categories = this.categories.filter((c) => 
@@ -2377,31 +2154,22 @@ export class DatabaseManager {
     });
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
-    // Cascade delete: remove all products belonging to this category
-    const initialCount = this.products.length;
-    this.products = this.products.filter((p) => {
-      const pCat = (p.category || '').toLowerCase();
-      const pSub = (p.subcategory || '').toLowerCase();
-      return pCat !== lowerId && pCat !== catSlug && pSub !== lowerId && pSub !== catSlug;
-    });
-    console.log(`[DB] Cascade deleted ${initialCount - this.products.length} products associated with deleted category '${cleanId}'`);
-    this.writeJsonFile(PRODUCTS_FILE, this.products);
-
     return true;
   }
 
   public async reorderCategories(orderedIds: string[]): Promise<Category[]> {
     await this.initialize();
+    const authoritativeCategories = await this.getAllCategories();
     const reordered: Category[] = [];
 
     orderedIds.forEach((id, index) => {
-      const cat = this.categories.find((c) => c.id === id || c.slug === id);
+      const cat = authoritativeCategories.find((c) => c.id === id || c.slug === id);
       if (cat) {
         reordered.push({ ...cat, order: index });
       }
     });
 
-    this.categories.forEach((c) => {
+    authoritativeCategories.forEach((c) => {
       if (!reordered.find((r) => r.id === c.id)) {
         reordered.push({ ...c, order: reordered.length });
       }
@@ -2409,14 +2177,30 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase') {
       const adminClient = await this.getRequiredSupabaseAdminClient('reorderCategories');
-      for (const c of reordered) {
-        const { error } = await adminClient.from('categories').update({ order: c.order, data: c }).eq('id', c.id);
-        if (error) {
-          console.error('[DB] Supabase reorder categories error:', error);
-        }
+      const payload = reordered.map((category) => ({
+        id: category.id,
+        slug: category.slug,
+        name: category.name,
+        tagline: category.tagline,
+        description: category.description || '',
+        image: category.image,
+        subcategories: category.subcategories,
+        product_count: category.productCount ?? 0,
+        order: category.order,
+        active: category.active !== false,
+        data: null,
+      }));
+      const { data, error } = await adminClient
+        .from('categories')
+        .upsert(payload, { onConflict: 'id' })
+        .select('id');
+      if (error || !Array.isArray(data) || data.length !== payload.length) {
+        throw new Error(`SUPABASE_CATEGORY_REORDER_FAILED: ${error?.message || 'o banco não confirmou todas as categorias.'}`);
       }
+      return this.getAllCategories();
     }
 
+    if (this.productionRuntime) throw new Error('Supabase é obrigatório para reordenar categorias em produção.');
     this.categories = reordered;
     this.writeJsonFile(CATEGORIES_FILE, this.categories);
 
@@ -2428,74 +2212,80 @@ export class DatabaseManager {
   // ==========================================
   public async getUsers(): Promise<DbUser[]> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const client = await this.getRequiredSupabaseAdminClient('getUsers');
+      const { data, error } = await client.from('profiles').select('*');
+      if (error) throw new Error(`SUPABASE_USERS_READ_FAILED: ${error.message}`);
+      this.users = (data || []).map((row: any) => this.mapProfileRow(row));
+    }
     return this.users;
   }
 
   public async getUserByEmail(email: string): Promise<DbUser | null> {
     await this.initialize();
     const clean = email.toLowerCase().trim();
-    const local = this.users.find((u) => u.email.toLowerCase() === clean);
-    if (local) return local;
-
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase.from('profiles').select('*').eq('email', clean).single();
-        if (!error && data) {
-          const legacyData = data.data && typeof data.data === 'object' && Object.keys(data.data).length > 0 ? data.data : null;
-          return {
-            ...legacyData,
-            id: data.id,
-            email: data.email,
-            name: data.name || legacyData?.name || 'Cliente Marmot',
-            role: data.role || legacyData?.role || 'customer',
-            phone: data.phone ?? legacyData?.phone ?? '',
-            cpf: data.cpf ?? legacyData?.cpf ?? '',
-            addresses: data.addresses ?? legacyData?.addresses ?? [],
-            createdAt: data.created_at || legacyData?.createdAt || new Date().toISOString(),
-            lastLogin: data.updated_at || legacyData?.lastLogin,
-          };
-        }
-      } catch {
-        // Continue
+        const client = await this.getRequiredSupabaseAdminClient('getUserByEmail');
+        const { data, error } = await client.from('profiles').select('*').eq('email', clean).maybeSingle();
+        if (error) throw new Error(`SUPABASE_USER_READ_FAILED: ${error.message}`);
+        return data ? this.mapProfileRow(data) : null;
+      } catch (error) {
+        if (this.productionRuntime) throw error;
       }
     }
-
-    return null;
+    return this.users.find((u) => u.email.toLowerCase() === clean) || null;
   }
 
   public async getUserById(id: string): Promise<DbUser | null> {
     await this.initialize();
-    const local = this.users.find((u) => u.id === id);
-    if (local) return local;
-
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase.from('profiles').select('*').eq('id', id).single();
-        if (!error && data) {
-          const legacyData = data.data && typeof data.data === 'object' && Object.keys(data.data).length > 0 ? data.data : null;
-          return {
-            ...legacyData,
-            id: data.id,
-            email: data.email,
-            name: data.name || legacyData?.name || 'Cliente Marmot',
-            role: data.role || legacyData?.role || 'customer',
-            phone: data.phone ?? legacyData?.phone ?? '',
-            cpf: data.cpf ?? legacyData?.cpf ?? '',
-            addresses: data.addresses ?? legacyData?.addresses ?? [],
-            createdAt: data.created_at || legacyData?.createdAt || new Date().toISOString(),
-            lastLogin: data.updated_at || legacyData?.lastLogin,
-          };
-        }
-      } catch {
-        // Continue
+        const client = await this.getRequiredSupabaseAdminClient('getUserById');
+        const { data, error } = await client.from('profiles').select('*').eq('id', id).maybeSingle();
+        if (error) throw new Error(`SUPABASE_USER_READ_FAILED: ${error.message}`);
+        return data ? this.mapProfileRow(data) : null;
+      } catch (error) {
+        if (this.productionRuntime) throw error;
       }
     }
+    return this.users.find((u) => u.id === id) || null;
+  }
 
-    return null;
+  private mapProfileRow(data: any): DbUser {
+    const legacyData = data?.data && typeof data.data === 'object' && Object.keys(data.data).length > 0 ? data.data : {};
+    return {
+      ...legacyData,
+      id: data.id,
+      email: data.email,
+      name: data.name || legacyData.name || 'Cliente Marmot',
+      role: data.role || legacyData.role || 'customer',
+      phone: data.phone ?? legacyData.phone ?? '',
+      cpf: data.cpf ?? legacyData.cpf ?? '',
+      addresses: data.addresses ?? legacyData.addresses ?? [],
+      createdAt: data.created_at || legacyData.createdAt || new Date().toISOString(),
+      lastLogin: data.updated_at || legacyData.lastLogin,
+    };
   }
 
   public async saveUser(user: DbUser): Promise<DbUser> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const client = await this.getRequiredSupabaseAdminClient('saveUser');
+      const { error } = await client.from('profiles').upsert({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        phone: (user as any).phone,
+        cpf: (user as any).cpf,
+        addresses: (user as any).addresses,
+        data: user,
+      });
+      if (error) throw new Error(`SUPABASE_USER_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) {
+      throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+    }
     const idx = this.users.findIndex((u) => u.id === user.id);
     if (idx >= 0) {
       this.users[idx] = user;
@@ -2504,22 +2294,6 @@ export class DatabaseManager {
     }
     this.writeJsonFile(USERS_FILE, this.users);
 
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('profiles').upsert({
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          phone: (user as any).phone,
-          cpf: (user as any).cpf,
-          addresses: (user as any).addresses,
-          data: user,
-        });
-      } catch (err) {
-        console.error('[DB] Supabase user upsert error:', err);
-      }
-    }
     return user;
   }
 
@@ -2539,7 +2313,8 @@ export class DatabaseManager {
           .order('is_default', { ascending: false })
           .order('created_at', { ascending: false });
 
-        if (!error && Array.isArray(data) && data.length > 0) {
+        if (error) throw new Error(`SUPABASE_USER_ADDRESSES_READ_FAILED: ${error.message}`);
+        if (Array.isArray(data)) {
           const list: Address[] = data.map((r: any) => ({
             id: r.id,
             recipientName: r.recipient_name || r.data?.recipientName || '',
@@ -2563,6 +2338,7 @@ export class DatabaseManager {
           return list;
         }
       } catch (err) {
+        if (this.productionRuntime) throw err;
         console.error('[DB] Supabase getUserAddresses error:', err);
       }
     }
@@ -2622,24 +2398,14 @@ export class DatabaseManager {
       updatedAddresses[0].isDefault = true;
     }
 
-    this.userAddresses = this.userAddresses.filter((a) => a.userId !== userId).concat(
-      updatedAddresses.map((a) => ({ ...a, userId }))
-    );
-    this.writeJsonFile(USER_ADDRESSES_FILE, this.userAddresses);
-
-    const userIdx = this.users.findIndex((u) => u.id === userId);
-    if (userIdx >= 0) {
-      (this.users[userIdx] as any).addresses = updatedAddresses;
-      this.writeJsonFile(USERS_FILE, this.users);
-    }
-
     if (this.mode === 'supabase' && this.supabase) {
-      try {
+        const client = await this.getRequiredSupabaseAdminClient('saveUserAddress');
         if (isDefault) {
-          await this.supabase.from('user_addresses').update({ is_default: false }).eq('user_id', userId);
+          const { error } = await client.from('user_addresses').update({ is_default: false }).eq('user_id', userId);
+          if (error) throw new Error(`SUPABASE_USER_ADDRESS_DEFAULT_RESET_FAILED: ${error.message}`);
         }
 
-        await this.supabase.from('user_addresses').upsert({
+        const { error: addressError } = await client.from('user_addresses').upsert({
           id: newAddress.id,
           user_id: userId,
           recipient_name: newAddress.recipientName,
@@ -2654,13 +2420,23 @@ export class DatabaseManager {
           data: newAddress,
           updated_at: new Date().toISOString(),
         });
+        if (addressError) throw new Error(`SUPABASE_USER_ADDRESS_SAVE_FAILED: ${addressError.message}`);
 
-        await this.supabase.from('profiles').update({
+        const { error: profileError } = await client.from('profiles').update({
           addresses: updatedAddresses,
         }).eq('id', userId);
-      } catch (err) {
-        console.error('[DB] Supabase saveUserAddress error:', err);
-      }
+        if (profileError) throw new Error(`SUPABASE_PROFILE_ADDRESSES_SAVE_FAILED: ${profileError.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+
+    this.userAddresses = this.userAddresses.filter((a) => a.userId !== userId).concat(
+      updatedAddresses.map((a) => ({ ...a, userId }))
+    );
+    this.writeJsonFile(USER_ADDRESSES_FILE, this.userAddresses);
+
+    const userIdx = this.users.findIndex((u) => u.id === userId);
+    if (userIdx >= 0) {
+      (this.users[userIdx] as any).addresses = updatedAddresses;
+      this.writeJsonFile(USERS_FILE, this.users);
     }
 
     return updatedAddresses;
@@ -2691,24 +2467,14 @@ export class DatabaseManager {
 
     const targetAddress = updatedAddresses.find((a) => a.id === addressId)!;
 
-    this.userAddresses = this.userAddresses.filter((a) => a.userId !== userId).concat(
-      updatedAddresses.map((a) => ({ ...a, userId }))
-    );
-    this.writeJsonFile(USER_ADDRESSES_FILE, this.userAddresses);
-
-    const userIdx = this.users.findIndex((u) => u.id === userId);
-    if (userIdx >= 0) {
-      (this.users[userIdx] as any).addresses = updatedAddresses;
-      this.writeJsonFile(USERS_FILE, this.users);
-    }
-
     if (this.mode === 'supabase' && this.supabase) {
-      try {
+        const client = await this.getRequiredSupabaseAdminClient('updateUserAddress');
         if (targetAddress.isDefault) {
-          await this.supabase.from('user_addresses').update({ is_default: false }).eq('user_id', userId);
+          const { error } = await client.from('user_addresses').update({ is_default: false }).eq('user_id', userId);
+          if (error) throw new Error(`SUPABASE_USER_ADDRESS_DEFAULT_RESET_FAILED: ${error.message}`);
         }
 
-        await this.supabase.from('user_addresses').upsert({
+        const { error: addressError } = await client.from('user_addresses').upsert({
           id: targetAddress.id,
           user_id: userId,
           recipient_name: targetAddress.recipientName,
@@ -2723,13 +2489,23 @@ export class DatabaseManager {
           data: targetAddress,
           updated_at: new Date().toISOString(),
         });
+        if (addressError) throw new Error(`SUPABASE_USER_ADDRESS_UPDATE_FAILED: ${addressError.message}`);
 
-        await this.supabase.from('profiles').update({
+        const { error: profileError } = await client.from('profiles').update({
           addresses: updatedAddresses,
         }).eq('id', userId);
-      } catch (err) {
-        console.error('[DB] Supabase updateUserAddress error:', err);
-      }
+        if (profileError) throw new Error(`SUPABASE_PROFILE_ADDRESSES_SAVE_FAILED: ${profileError.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+
+    this.userAddresses = this.userAddresses.filter((a) => a.userId !== userId).concat(
+      updatedAddresses.map((a) => ({ ...a, userId }))
+    );
+    this.writeJsonFile(USER_ADDRESSES_FILE, this.userAddresses);
+
+    const userIdx = this.users.findIndex((u) => u.id === userId);
+    if (userIdx >= 0) {
+      (this.users[userIdx] as any).addresses = updatedAddresses;
+      this.writeJsonFile(USERS_FILE, this.users);
     }
 
     return updatedAddresses;
@@ -2749,6 +2525,22 @@ export class DatabaseManager {
       updatedAddresses[0].isDefault = true;
     }
 
+    if (this.mode === 'supabase' && this.supabase) {
+        const client = await this.getRequiredSupabaseAdminClient('deleteUserAddress');
+        const { error: deleteError } = await client.from('user_addresses').delete().eq('id', addressId).eq('user_id', userId);
+        if (deleteError) throw new Error(`SUPABASE_USER_ADDRESS_DELETE_FAILED: ${deleteError.message}`);
+
+        if (addressToDelete.isDefault && updatedAddresses.length > 0) {
+          const { error } = await client.from('user_addresses').update({ is_default: true }).eq('id', updatedAddresses[0].id).eq('user_id', userId);
+          if (error) throw new Error(`SUPABASE_USER_ADDRESS_DEFAULT_SAVE_FAILED: ${error.message}`);
+        }
+
+        const { error: profileError } = await client.from('profiles').update({
+          addresses: updatedAddresses,
+        }).eq('id', userId);
+        if (profileError) throw new Error(`SUPABASE_PROFILE_ADDRESSES_SAVE_FAILED: ${profileError.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+
     this.userAddresses = this.userAddresses.filter((a) => a.userId !== userId).concat(
       updatedAddresses.map((a) => ({ ...a, userId }))
     );
@@ -2758,22 +2550,6 @@ export class DatabaseManager {
     if (userIdx >= 0) {
       (this.users[userIdx] as any).addresses = updatedAddresses;
       this.writeJsonFile(USERS_FILE, this.users);
-    }
-
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('user_addresses').delete().eq('id', addressId).eq('user_id', userId);
-
-        if (addressToDelete.isDefault && updatedAddresses.length > 0) {
-          await this.supabase.from('user_addresses').update({ is_default: true }).eq('id', updatedAddresses[0].id).eq('user_id', userId);
-        }
-
-        await this.supabase.from('profiles').update({
-          addresses: updatedAddresses,
-        }).eq('id', userId);
-      } catch (err) {
-        console.error('[DB] Supabase deleteUserAddress error:', err);
-      }
     }
 
     return updatedAddresses;
@@ -2789,7 +2565,7 @@ export class DatabaseManager {
   private shippingQuotes: any[] = [];
 
   public async saveShippingQuotes(quotes: any[]): Promise<void> {
-    if (process.env.NODE_ENV === 'production') {
+    if (isProductionPersistenceRuntime()) {
       console.warn('[DB_SECURITY] In-memory shipping quotes fallback is strictly forbidden in production mode.');
       return;
     }
@@ -2844,7 +2620,7 @@ export class DatabaseManager {
     await this.initialize();
     if (this.mode === 'supabase') {
       try {
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+        const adminClient = await this.getRequiredSupabaseAdminClient('getOrders');
         if (adminClient) {
           let query = adminClient.from('orders').select('*').order('created_at', { ascending: false });
           if (userId && userEmail) {
@@ -2947,25 +2723,22 @@ export class DatabaseManager {
               };
             });
 
-            const map = new Map<string, Order>();
-            for (const o of sbOrders) map.set(o.id, o);
-            for (const o of this.orders) {
-              if (!map.has(o.id)) map.set(o.id, o);
-            }
-            const merged = Array.from(map.values()).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-            this.orders = merged;
+            const authoritativeOrders = sbOrders.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+            this.orders = authoritativeOrders;
             if (userId || userEmail) {
-              return merged.filter((o) =>
+              return authoritativeOrders.filter((o) =>
                 (userId && ((o as any).userId === userId || (o as any).user_id === userId)) ||
                 (userEmail && o.customerEmail?.toLowerCase() === userEmail.toLowerCase()) ||
                 (userId && o.customerEmail?.toLowerCase() === userId.toLowerCase())
               );
             }
-            return merged;
+            return authoritativeOrders;
           }
+          if (error) throw new Error(`SUPABASE_ORDERS_READ_FAILED: ${error.message}`);
         }
       } catch (err) {
-        console.warn('[DB] Supabase live getOrders fallback:', err);
+        if (this.productionRuntime) throw err;
+        console.warn('[DB] Supabase unavailable during local getOrders; using local fixtures:', err);
       }
     }
     if (userId || userEmail) {
@@ -2986,7 +2759,7 @@ export class DatabaseManager {
     // 1. Direct Supabase query with admin client (bypasses RLS to guarantee order persistence across lambdas)
     if (this.mode === 'supabase') {
       try {
-        const adminClient = (await this.getSupabaseAdminClient()) || this.supabase;
+        const adminClient = await this.getRequiredSupabaseAdminClient('getOrderById');
         if (adminClient) {
           const { data, error } = await adminClient
             .from('orders')
@@ -3086,13 +2859,17 @@ export class DatabaseManager {
             else this.orders.unshift(order);
             return order;
           }
+          if (error) throw new Error(`SUPABASE_ORDER_READ_FAILED: ${error.message}`);
+          return null;
         }
       } catch (err) {
-        console.warn('[DB] Supabase live getOrderById fallback:', err);
+        if (this.productionRuntime) throw err;
+        console.warn('[DB] Supabase unavailable during local getOrderById; using local fixtures:', err);
       }
     }
 
     // 2. Memory / local file lookup
+    if (this.productionRuntime) return null;
     return this.orders.find((o) =>
       o.id === clean ||
       o.trackingCode === clean ||
@@ -3313,6 +3090,18 @@ export class DatabaseManager {
 
   public async saveCoupon(coupon: DbCoupon): Promise<DbCoupon> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const adminClient = await this.getRequiredSupabaseAdminClient('saveCoupon');
+      const { error } = await adminClient.from('coupons').upsert({
+        code: coupon.code,
+        discount_percentage: coupon.discountPercentage,
+        min_order_value: coupon.minOrderValue,
+        description: coupon.description,
+        active: coupon.active,
+        data: coupon,
+      });
+      if (error) throw new Error(`SUPABASE_COUPON_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     const idx = this.coupons.findIndex((c) => c.code.toUpperCase() === coupon.code.toUpperCase());
     if (idx >= 0) {
       this.coupons[idx] = coupon;
@@ -3321,38 +3110,21 @@ export class DatabaseManager {
     }
     this.writeJsonFile(COUPONS_FILE, this.coupons);
 
-    if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('saveCoupon');
-        await adminClient.from('coupons').upsert({
-          code: coupon.code,
-          discount_percentage: coupon.discountPercentage,
-          min_order_value: coupon.minOrderValue,
-          description: coupon.description,
-          active: coupon.active,
-          data: coupon,
-        });
-      } catch (err) {
-        console.error('[DB] Supabase coupon upsert error:', err);
-      }
-    }
     return coupon;
   }
 
   public async deleteCoupon(code: string): Promise<boolean> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const adminClient = await this.getRequiredSupabaseAdminClient('deleteCoupon');
+      const { data, error } = await adminClient.from('coupons').delete().eq('code', code.toUpperCase()).select('code');
+      if (error) throw new Error(`SUPABASE_COUPON_DELETE_FAILED: ${error.message}`);
+      if (!Array.isArray(data) || data.length === 0) return false;
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     const initLen = this.coupons.length;
     this.coupons = this.coupons.filter((c) => c.code.toUpperCase() !== code.toUpperCase());
     this.writeJsonFile(COUPONS_FILE, this.coupons);
 
-    if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('deleteCoupon');
-        await adminClient.from('coupons').delete().eq('code', code.toUpperCase());
-      } catch (err) {
-        console.error('[DB] Supabase coupon delete error:', err);
-      }
-    }
     return this.coupons.length < initLen;
   }
 
@@ -3393,12 +3165,14 @@ export class DatabaseManager {
     const clean = code.trim().toLowerCase();
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase
+        const client = await this.getRequiredSupabaseAdminClient('getOrderByTracking');
+        const { data, error } = await client
           .from('orders')
           .select('*')
           .or(`tracking_code.eq.${code.trim()},id.eq.${code.trim()}`)
           .maybeSingle();
-        if (!error && data) {
+        if (error) throw new Error(`SUPABASE_ORDER_TRACKING_READ_FAILED: ${error.message}`);
+        if (data) {
           const order = data.data || data;
           const idx = this.orders.findIndex((o) => o.id === order.id);
           if (idx >= 0) this.orders[idx] = order;
@@ -3406,9 +3180,11 @@ export class DatabaseManager {
           return order;
         }
       } catch (err) {
+        if (this.productionRuntime) throw err;
         console.warn('[DB] Supabase getOrderByTracking fallback:', err);
       }
     }
+    if (this.productionRuntime) return null;
     return this.orders.find((o) => o.trackingCode?.toLowerCase() === clean || o.id.toLowerCase() === clean) || null;
   }
 
@@ -3447,8 +3223,10 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase.from('cart_items').select('*').eq('user_id', userId);
-        if (!error && Array.isArray(data)) {
+        const client = await this.getRequiredSupabaseAdminClient('getCartForUser');
+        const { data, error } = await client.from('cart_items').select('*').eq('user_id', userId);
+        if (error) throw new Error(`SUPABASE_CART_READ_FAILED: ${error.message}`);
+        if (Array.isArray(data)) {
           const nonUserItems = this.cartItems.filter((c) => c.userId !== userId);
           const sbItems = data.map((item: any) => {
             const rawSize = item.size || item.selected_size || item.data?.selectedSize || item.data?.size || 'M';
@@ -3472,6 +3250,7 @@ export class DatabaseManager {
           this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
         }
       } catch (err) {
+        if (this.productionRuntime) throw err;
         console.warn('[DB] Supabase getCartForUser notice:', err);
       }
     }
@@ -3508,6 +3287,7 @@ export class DatabaseManager {
     const cleanColorName = selectedColor?.colorName || selectedColor?.color || 'Padrão';
     const prod = this.products.find((p) => p.id === productId);
 
+    await this.getCartForUser(userId);
     const existing = this.cartItems.find(
       (c) =>
         c.userId === userId &&
@@ -3516,11 +3296,11 @@ export class DatabaseManager {
         (c.selectedColor?.colorName === cleanColorName || c.selectedColor?.color === selectedColor?.color)
     );
 
-    if (existing) {
-      existing.quantity += cleanQty;
-      existing.updatedAt = new Date().toISOString();
-    } else {
-      const newItem: DbCartItem = {
+    const itemToPersist: DbCartItem = existing ? {
+      ...existing,
+      quantity: existing.quantity + cleanQty,
+      updatedAt: new Date().toISOString(),
+    } : {
         id: `cart-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         userId,
         productId,
@@ -3535,15 +3315,10 @@ export class DatabaseManager {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      this.cartItems.push(newItem);
-    }
-
-    this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
 
     if (this.mode === 'supabase' && this.supabase) {
-      try {
-        const itemToPersist = existing || this.cartItems[this.cartItems.length - 1];
-        await this.supabase.from('cart_items').upsert({
+        const client = await this.getRequiredSupabaseAdminClient('addCartItemForUser');
+        const { error } = await client.from('cart_items').upsert({
           id: itemToPersist.id,
           user_id: itemToPersist.userId,
           product_id: itemToPersist.productId,
@@ -3558,10 +3333,15 @@ export class DatabaseManager {
             product: prod || (itemToPersist as any).product,
           },
         });
-      } catch (err) {
-        console.warn('[DB] Supabase cart upsert warning:', err);
-      }
+        if (error) throw new Error(`SUPABASE_CART_UPSERT_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) {
+      throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     }
+
+    const existingIndex = this.cartItems.findIndex((item) => item.id === itemToPersist.id);
+    if (existingIndex >= 0) this.cartItems[existingIndex] = itemToPersist;
+    else this.cartItems.push(itemToPersist);
+    this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
 
     return this.getCartForUser(userId);
   }
@@ -3577,6 +3357,7 @@ export class DatabaseManager {
     const cleanQty = parseInt(String(quantity), 10);
     const prod = this.products.find((p) => p.id === productId);
 
+    await this.getCartForUser(userId);
     const idx = this.cartItems.findIndex(
       (c) =>
         c.userId === userId &&
@@ -3588,34 +3369,34 @@ export class DatabaseManager {
     if (idx >= 0) {
       const item = this.cartItems[idx];
       if (cleanQty <= 0) {
+        if (this.mode === 'supabase' && this.supabase) {
+          const client = await this.getRequiredSupabaseAdminClient('updateCartItemQuantityForUser');
+          const { error } = await client.from('cart_items').delete().eq('id', item.id);
+          if (error) throw new Error(`SUPABASE_CART_DELETE_FAILED: ${error.message}`);
+        } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
         this.cartItems.splice(idx, 1);
-        if (this.mode === 'supabase' && this.supabase) {
-          try {
-            await this.supabase.from('cart_items').delete().eq('id', item.id);
-          } catch {}
-        }
       } else {
-        item.quantity = cleanQty;
-        item.updatedAt = new Date().toISOString();
+        const updatedItem = { ...item, quantity: cleanQty, updatedAt: new Date().toISOString() };
         if (this.mode === 'supabase' && this.supabase) {
-          try {
-            await this.supabase.from('cart_items').upsert({
-              id: item.id,
-              user_id: item.userId,
-              product_id: item.productId,
-              size: item.selectedSize || 'M',
-              color: item.selectedColor?.colorName || item.selectedColor?.color || 'Padrão',
-              selected_size: item.selectedSize,
-              selected_color: item.selectedColor,
-              quantity: item.quantity,
-              updated_at: item.updatedAt,
+          const client = await this.getRequiredSupabaseAdminClient('updateCartItemQuantityForUser');
+          const { error } = await client.from('cart_items').upsert({
+              id: updatedItem.id,
+              user_id: updatedItem.userId,
+              product_id: updatedItem.productId,
+              size: updatedItem.selectedSize || 'M',
+              color: updatedItem.selectedColor?.colorName || updatedItem.selectedColor?.color || 'Padrão',
+              selected_size: updatedItem.selectedSize,
+              selected_color: updatedItem.selectedColor,
+              quantity: updatedItem.quantity,
+              updated_at: updatedItem.updatedAt,
               data: {
-                ...item,
-                product: prod || (item as any).product,
+                ...updatedItem,
+                product: prod || (updatedItem as any).product,
               },
             });
-          } catch {}
-        }
+          if (error) throw new Error(`SUPABASE_CART_UPDATE_FAILED: ${error.message}`);
+        } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+        this.cartItems[idx] = updatedItem;
       }
       this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
     }
@@ -3630,6 +3411,7 @@ export class DatabaseManager {
     colorName: string
   ): Promise<any[]> {
     await this.initialize();
+    await this.getCartForUser(userId);
     const idx = this.cartItems.findIndex(
       (c) =>
         c.userId === userId &&
@@ -3640,13 +3422,13 @@ export class DatabaseManager {
 
     if (idx >= 0) {
       const item = this.cartItems[idx];
+      if (this.mode === 'supabase' && this.supabase) {
+        const client = await this.getRequiredSupabaseAdminClient('removeCartItemForUser');
+        const { error } = await client.from('cart_items').delete().eq('id', item.id);
+        if (error) throw new Error(`SUPABASE_CART_DELETE_FAILED: ${error.message}`);
+      } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
       this.cartItems.splice(idx, 1);
       this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
-      if (this.mode === 'supabase' && this.supabase) {
-        try {
-          await this.supabase.from('cart_items').delete().eq('id', item.id);
-        } catch {}
-      }
     }
 
     return this.getCartForUser(userId);
@@ -3654,13 +3436,13 @@ export class DatabaseManager {
 
   public async clearCartForUser(userId: string): Promise<void> {
     await this.initialize();
+    if (this.mode === 'supabase' && this.supabase) {
+      const client = await this.getRequiredSupabaseAdminClient('clearCartForUser');
+      const { error } = await client.from('cart_items').delete().eq('user_id', userId);
+      if (error) throw new Error(`SUPABASE_CART_CLEAR_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     this.cartItems = this.cartItems.filter((c) => c.userId !== userId);
     this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('cart_items').delete().eq('user_id', userId);
-      } catch {}
-    }
   }
 
   public async mergeGuestCartForUser(userId: string, guestItems: any[]): Promise<any[]> {
@@ -3675,53 +3457,7 @@ export class DatabaseManager {
       const size = item.selectedSize || 'M';
       const color = item.selectedColor || { color: 'black', colorName: 'Obsidian Black', colorHex: '#121212' };
       const qty = Math.max(1, parseInt(String(item.quantity || 1), 10));
-
-      const existing = this.cartItems.find(
-        (c) =>
-          c.userId === userId &&
-          c.productId === prodId &&
-          c.selectedSize === size &&
-          (c.selectedColor?.colorName === color.colorName || c.selectedColor?.color === color.color)
-      );
-
-      if (existing) {
-        existing.quantity += qty;
-        existing.updatedAt = new Date().toISOString();
-      } else {
-        const newItem: DbCartItem = {
-          id: `cart-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-          userId,
-          productId: prodId,
-          selectedSize: size,
-          selectedColor: color,
-          quantity: qty,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-        this.cartItems.push(newItem);
-      }
-    }
-
-    this.writeJsonFile(CART_ITEMS_FILE, this.cartItems);
-
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        const userItems = this.cartItems.filter((c) => c.userId === userId);
-        for (const item of userItems) {
-          await this.supabase.from('cart_items').upsert({
-            id: item.id,
-            user_id: item.userId,
-            product_id: item.productId,
-            size: item.selectedSize || 'M',
-            color: item.selectedColor?.colorName || item.selectedColor?.color || 'Padrão',
-            selected_size: item.selectedSize,
-            selected_color: item.selectedColor,
-            quantity: item.quantity,
-            updated_at: item.updatedAt,
-            data: item,
-          });
-        }
-      } catch {}
+      await this.addCartItemForUser(userId, prodId, size, color, qty);
     }
 
     return this.getCartForUser(userId);
@@ -3735,8 +3471,10 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase.from('favorites').select('*').eq('user_id', userId);
-        if (!error && data) {
+        const client = await this.getRequiredSupabaseAdminClient('getWishlistForUser');
+        const { data, error } = await client.from('favorites').select('*').eq('user_id', userId);
+        if (error) throw new Error(`SUPABASE_FAVORITES_READ_FAILED: ${error.message}`);
+        if (data) {
           const nonUserItems = this.wishlistItems.filter((w) => w.userId !== userId);
           const sbItems = data.map((item: any) => item.data || {
             id: item.id,
@@ -3748,6 +3486,7 @@ export class DatabaseManager {
           this.writeJsonFile(WISHLIST_ITEMS_FILE, this.wishlistItems);
         }
       } catch (err) {
+        if (this.productionRuntime) throw err;
         console.warn('[DB] Supabase getWishlistForUser notice:', err);
       }
     }
@@ -3765,17 +3504,18 @@ export class DatabaseManager {
 
   public async toggleWishlistForUser(userId: string, productId: string): Promise<{ wishlist: Product[]; isInWishlist: boolean }> {
     await this.initialize();
+    await this.getWishlistForUser(userId);
     const idx = this.wishlistItems.findIndex((w) => w.userId === userId && w.productId === productId);
     let isInWishlist = false;
 
     if (idx >= 0) {
       const item = this.wishlistItems[idx];
-      this.wishlistItems.splice(idx, 1);
       if (this.mode === 'supabase' && this.supabase) {
-        try {
-          await this.supabase.from('favorites').delete().eq('id', item.id);
-        } catch {}
-      }
+        const client = await this.getRequiredSupabaseAdminClient('toggleWishlistForUser');
+        const { error } = await client.from('favorites').delete().eq('id', item.id);
+        if (error) throw new Error(`SUPABASE_FAVORITES_DELETE_FAILED: ${error.message}`);
+      } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+      this.wishlistItems.splice(idx, 1);
       isInWishlist = false;
     } else {
       const newItem: DbWishlistItem = {
@@ -3784,18 +3524,18 @@ export class DatabaseManager {
         productId,
         createdAt: new Date().toISOString(),
       };
-      this.wishlistItems.push(newItem);
       if (this.mode === 'supabase' && this.supabase) {
-        try {
-          await this.supabase.from('favorites').upsert({
+          const client = await this.getRequiredSupabaseAdminClient('toggleWishlistForUser');
+          const { error } = await client.from('favorites').upsert({
             id: newItem.id,
             user_id: newItem.userId,
             product_id: newItem.productId,
             created_at: newItem.createdAt,
             data: newItem,
           });
-        } catch {}
-      }
+          if (error) throw new Error(`SUPABASE_FAVORITES_UPSERT_FAILED: ${error.message}`);
+      } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+      this.wishlistItems.push(newItem);
       isInWishlist = true;
     }
 
@@ -3806,29 +3546,30 @@ export class DatabaseManager {
 
   public async removeFromWishlistForUser(userId: string, productId: string): Promise<Product[]> {
     await this.initialize();
+    await this.getWishlistForUser(userId);
     const idx = this.wishlistItems.findIndex((w) => w.userId === userId && w.productId === productId);
     if (idx >= 0) {
       const item = this.wishlistItems[idx];
+      if (this.mode === 'supabase' && this.supabase) {
+        const client = await this.getRequiredSupabaseAdminClient('removeFromWishlistForUser');
+        const { error } = await client.from('favorites').delete().eq('id', item.id);
+        if (error) throw new Error(`SUPABASE_FAVORITES_DELETE_FAILED: ${error.message}`);
+      } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
       this.wishlistItems.splice(idx, 1);
       this.writeJsonFile(WISHLIST_ITEMS_FILE, this.wishlistItems);
-      if (this.mode === 'supabase' && this.supabase) {
-        try {
-          await this.supabase.from('favorites').delete().eq('id', item.id);
-        } catch {}
-      }
     }
     return this.getWishlistForUser(userId);
   }
 
   public async clearWishlistForUser(userId: string): Promise<void> {
     await this.initialize();
+    if (this.mode === 'supabase' && this.supabase) {
+      const client = await this.getRequiredSupabaseAdminClient('clearWishlistForUser');
+      const { error } = await client.from('favorites').delete().eq('user_id', userId);
+      if (error) throw new Error(`SUPABASE_FAVORITES_CLEAR_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     this.wishlistItems = this.wishlistItems.filter((w) => w.userId !== userId);
     this.writeJsonFile(WISHLIST_ITEMS_FILE, this.wishlistItems);
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('favorites').delete().eq('user_id', userId);
-      } catch {}
-    }
   }
 
   // ==========================================
@@ -3849,6 +3590,30 @@ export class DatabaseManager {
 
   public async saveReturn(returnReq: ReturnRequest): Promise<ReturnRequest> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const adminClient = await this.getRequiredSupabaseAdminClient('saveReturn');
+      const { error } = await adminClient.from('returns').upsert({
+        id: returnReq.id,
+        order_id: returnReq.orderId,
+        user_id: returnReq.userId || null,
+        customer_name: returnReq.customerName,
+        customer_email: returnReq.customerEmail,
+        customer_phone: returnReq.customerPhone || null,
+        items: returnReq.items,
+        reason: returnReq.reason,
+        description: returnReq.description,
+        photos: returnReq.photos || [],
+        status: returnReq.status,
+        tracking_code: returnReq.trackingCode || null,
+        history: returnReq.history,
+        admin_notes: returnReq.adminNotes || null,
+        refund_amount: returnReq.refundAmount || null,
+        restock_completed: returnReq.restockCompleted || false,
+        data: returnReq,
+        updated_at: new Date().toISOString(),
+      });
+      if (error) throw new Error(`SUPABASE_RETURN_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     const idx = this.returns.findIndex((r) => r.id === returnReq.id);
     if (idx >= 0) {
       this.returns[idx] = returnReq;
@@ -3857,33 +3622,6 @@ export class DatabaseManager {
     }
     this.writeJsonFile(RETURNS_FILE, this.returns);
 
-    if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('saveReturn');
-        await adminClient.from('returns').upsert({
-          id: returnReq.id,
-          order_id: returnReq.orderId,
-          user_id: returnReq.userId || null,
-          customer_name: returnReq.customerName,
-          customer_email: returnReq.customerEmail,
-          customer_phone: returnReq.customerPhone || null,
-          items: returnReq.items,
-          reason: returnReq.reason,
-          description: returnReq.description,
-          photos: returnReq.photos || [],
-          status: returnReq.status,
-          tracking_code: returnReq.trackingCode || null,
-          history: returnReq.history,
-          admin_notes: returnReq.adminNotes || null,
-          refund_amount: returnReq.refundAmount || null,
-          restock_completed: returnReq.restockCompleted || false,
-          data: returnReq,
-          updated_at: new Date().toISOString(),
-        });
-      } catch (err) {
-        console.error('[DB] Supabase return upsert error:', err);
-      }
-    }
     return returnReq;
   }
 
@@ -3900,32 +3638,29 @@ export class DatabaseManager {
 
   public async recordInventoryMovement(mov: InventoryMovement): Promise<InventoryMovement> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const adminClient = await this.getRequiredSupabaseAdminClient('recordInventoryMovement');
+      const { error } = await adminClient.from('inventory_movements').insert({
+        id: mov.id,
+        product_id: mov.productId,
+        product_title: mov.productTitle,
+        sku: mov.sku || null,
+        variant: mov.variant || {},
+        quantity_change: mov.quantityChange,
+        previous_stock: mov.previousStock,
+        new_stock: mov.newStock,
+        reason: mov.reason,
+        order_id: mov.orderId || null,
+        return_id: mov.returnId || null,
+        user_or_admin: mov.userOrAdmin,
+        note: mov.note || null,
+        data: mov,
+      });
+      if (error) throw new Error(`SUPABASE_INVENTORY_MOVEMENT_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     this.inventoryMovements.unshift(mov);
     this.writeJsonFile(INVENTORY_MOVEMENTS_FILE, this.inventoryMovements);
 
-    if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('recordInventoryMovement');
-        await adminClient.from('inventory_movements').insert({
-          id: mov.id,
-          product_id: mov.productId,
-          product_title: mov.productTitle,
-          sku: mov.sku || null,
-          variant: mov.variant || {},
-          quantity_change: mov.quantityChange,
-          previous_stock: mov.previousStock,
-          new_stock: mov.newStock,
-          reason: mov.reason,
-          order_id: mov.orderId || null,
-          return_id: mov.returnId || null,
-          user_or_admin: mov.userOrAdmin,
-          note: mov.note || null,
-          data: mov,
-        });
-      } catch (err) {
-        console.error('[DB] Supabase inventory movement insert error:', err);
-      }
-    }
     return mov;
   }
 
@@ -3939,6 +3674,22 @@ export class DatabaseManager {
 
   public async saveStoreBanner(banner: StoreBanner): Promise<StoreBanner> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const adminClient = await this.getRequiredSupabaseAdminClient('saveStoreBanner');
+      const { error } = await adminClient.from('store_banners').upsert({
+        id: banner.id,
+        title: banner.title,
+        subtitle: banner.subtitle || null,
+        button_text: banner.buttonText || null,
+        link_url: banner.linkUrl,
+        image_url: banner.imageUrl,
+        active: banner.active,
+        order: banner.order,
+        placement: banner.placement,
+        data: banner,
+      });
+      if (error) throw new Error(`SUPABASE_STORE_BANNER_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     const idx = this.storeBanners.findIndex((b) => b.id === banner.id);
     if (idx >= 0) {
       this.storeBanners[idx] = banner;
@@ -3947,42 +3698,21 @@ export class DatabaseManager {
     }
     this.writeJsonFile(STORE_BANNERS_FILE, this.storeBanners);
 
-    if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('saveStoreBanner');
-        await adminClient.from('store_banners').upsert({
-          id: banner.id,
-          title: banner.title,
-          subtitle: banner.subtitle || null,
-          button_text: banner.buttonText || null,
-          link_url: banner.linkUrl,
-          image_url: banner.imageUrl,
-          active: banner.active,
-          order: banner.order,
-          placement: banner.placement,
-          data: banner,
-        });
-      } catch (err) {
-        console.error('[DB] Supabase store banner upsert error:', err);
-      }
-    }
     return banner;
   }
 
   public async deleteStoreBanner(id: string): Promise<boolean> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const adminClient = await this.getRequiredSupabaseAdminClient('deleteStoreBanner');
+      const { data, error } = await adminClient.from('store_banners').delete().eq('id', id).select('id');
+      if (error) throw new Error(`SUPABASE_STORE_BANNER_DELETE_FAILED: ${error.message}`);
+      if (!Array.isArray(data) || data.length === 0) return false;
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     const initLen = this.storeBanners.length;
     this.storeBanners = this.storeBanners.filter((b) => b.id !== id);
     this.writeJsonFile(STORE_BANNERS_FILE, this.storeBanners);
 
-    if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getRequiredSupabaseAdminClient('deleteStoreBanner');
-        await adminClient.from('store_banners').delete().eq('id', id);
-      } catch (err) {
-        console.error('[DB] Supabase store banner delete error:', err);
-      }
-    }
     return this.storeBanners.length < initLen;
   }
 
@@ -3996,26 +3726,24 @@ export class DatabaseManager {
 
   public async saveStoreSettings(settings: Partial<StoreSettingsData>): Promise<StoreSettingsData> {
     await this.initialize();
-    this.storeSettings = { ...this.storeSettings, ...settings };
-    this.writeJsonFile(STORE_SETTINGS_FILE, this.storeSettings);
+    const nextSettings = { ...this.storeSettings, ...settings };
 
     if (this.mode === 'supabase') {
-      try {
         const adminClient = await this.getRequiredSupabaseAdminClient('saveStoreSettings');
-        await adminClient.from('store_settings').upsert({
+        const { error } = await adminClient.from('store_settings').upsert({
           id: 'default',
-          store_name: this.storeSettings.storeName,
-          contact_email: this.storeSettings.contactEmail,
-          support_phone: this.storeSettings.phone,
-          free_shipping_threshold: this.storeSettings.freeShippingThreshold,
-          banner_alert: this.storeSettings.announcementBarText,
-          data: this.storeSettings,
+          store_name: nextSettings.storeName,
+          contact_email: nextSettings.contactEmail,
+          support_phone: nextSettings.phone,
+          free_shipping_threshold: nextSettings.freeShippingThreshold,
+          banner_alert: nextSettings.announcementBarText,
+          data: nextSettings,
           updated_at: new Date().toISOString(),
         });
-      } catch (err) {
-        console.error('[DB] Supabase store settings upsert error:', err);
-      }
-    }
+        if (error) throw new Error(`SUPABASE_STORE_SETTINGS_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+    this.storeSettings = nextSettings;
+    this.writeJsonFile(STORE_SETTINGS_FILE, this.storeSettings);
     return this.storeSettings;
   }
 
@@ -4572,7 +4300,7 @@ export class DatabaseManager {
     await this.initialize();
     if (this.mode === 'supabase') {
       try {
-        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        const client = await this.getRequiredSupabaseAdminClient('deductStockAtomic');
         if (client) {
           const { data, error } = await client.rpc('deduct_inventory_atomic', {
             p_product_id: productId,
@@ -4588,9 +4316,15 @@ export class DatabaseManager {
               error: data.error,
             };
           }
+          if (error) {
+            return { success: false, previousStock: 0, newStock: 0, error: `SUPABASE_INVENTORY_DEDUCTION_FAILED: ${error.message}` };
+          }
         }
       } catch (err) {
-        console.warn('[DB] Supabase deduct_inventory_atomic fallback:', err);
+        if (this.productionRuntime) {
+          return { success: false, previousStock: 0, newStock: 0, error: err instanceof Error ? err.message : 'SUPABASE_INVENTORY_DEDUCTION_FAILED' };
+        }
+        console.warn('[DB] Local inventory RPC unavailable; using development fixtures:', err);
       }
     }
 
@@ -4626,7 +4360,7 @@ export class DatabaseManager {
     await this.initialize();
     if (this.mode === 'supabase') {
       try {
-        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        const client = await this.getRequiredSupabaseAdminClient('redeemCouponAtomic');
         if (client) {
           const { data, error } = await client.rpc('redeem_coupon_atomic', {
             p_coupon_code: couponCode,
@@ -4643,9 +4377,15 @@ export class DatabaseManager {
               error: data.error,
             };
           }
+          if (error) {
+            return { valid: false, discount: 0, error: `SUPABASE_COUPON_REDEMPTION_FAILED: ${error.message}` };
+          }
         }
       } catch (err) {
-        console.warn('[DB] Supabase redeem_coupon_atomic fallback:', err);
+        if (this.productionRuntime) {
+          return { valid: false, discount: 0, error: err instanceof Error ? err.message : 'SUPABASE_COUPON_REDEMPTION_FAILED' };
+        }
+        console.warn('[DB] Local coupon RPC unavailable; using development fixtures:', err);
       }
     }
 
@@ -4681,7 +4421,7 @@ export class DatabaseManager {
     await this.initialize();
     if (this.mode === 'supabase') {
       try {
-        const client = (await this.getSupabaseAdminClient()) || this.supabase;
+        const client = await this.getRequiredSupabaseAdminClient('processApprovedOrderAtomic');
         if (!client) {
           return {
             success: false,
@@ -5180,22 +4920,22 @@ export class DatabaseManager {
     if (existingIndex >= 0) {
       const existing = this.newsletterSubscribers[existingIndex];
       if (existing.status !== 'subscribed') {
-        existing.status = 'subscribed';
-        existing.subscribedAt = new Date().toISOString();
-        existing.updatedAt = new Date().toISOString();
-        this.writeJsonFile(NEWSLETTER_FILE, this.newsletterSubscribers);
+        const updated = { ...existing, status: 'subscribed' as const, subscribedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
         if (this.mode === 'supabase' && this.supabase) {
-          try {
-            await this.supabase.from('newsletter_subscribers').upsert({
-              id: existing.id,
+            const client = await this.getRequiredSupabaseAdminClient('subscribeNewsletter');
+            const { error } = await client.from('newsletter_subscribers').upsert({
+              id: updated.id,
               email: cleanEmail,
               status: 'subscribed',
               source,
-              subscribed_at: existing.subscribedAt,
-              data: existing,
+              subscribed_at: updated.subscribedAt,
+              data: updated,
             });
-          } catch {}
-        }
+            if (error) throw new Error(`SUPABASE_NEWSLETTER_SUBSCRIBE_FAILED: ${error.message}`);
+        } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+        this.newsletterSubscribers[existingIndex] = updated;
+        this.writeJsonFile(NEWSLETTER_FILE, this.newsletterSubscribers);
+        return { subscriber: updated, isNew: false };
       }
       return { subscriber: existing, isNew: false };
     }
@@ -5209,12 +4949,9 @@ export class DatabaseManager {
       createdAt: new Date().toISOString(),
     };
 
-    this.newsletterSubscribers.unshift(newSub);
-    this.writeJsonFile(NEWSLETTER_FILE, this.newsletterSubscribers);
-
     if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('newsletter_subscribers').upsert({
+        const client = await this.getRequiredSupabaseAdminClient('subscribeNewsletter');
+        const { error } = await client.from('newsletter_subscribers').upsert({
           id: newSub.id,
           email: cleanEmail,
           status: 'subscribed',
@@ -5222,8 +4959,11 @@ export class DatabaseManager {
           subscribed_at: newSub.subscribedAt,
           data: newSub,
         });
-      } catch {}
-    }
+        if (error) throw new Error(`SUPABASE_NEWSLETTER_SUBSCRIBE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+
+    this.newsletterSubscribers.unshift(newSub);
+    this.writeJsonFile(NEWSLETTER_FILE, this.newsletterSubscribers);
 
     return { subscriber: newSub, isNew: true };
   }
@@ -5234,22 +4974,21 @@ export class DatabaseManager {
     const sub = this.newsletterSubscribers.find((s) => s.email.toLowerCase() === cleanEmail);
     if (!sub) return false;
 
-    sub.status = 'unsubscribed';
-    sub.unsubscribedAt = new Date().toISOString();
-    sub.updatedAt = new Date().toISOString();
-    this.writeJsonFile(NEWSLETTER_FILE, this.newsletterSubscribers);
+    const updated = { ...sub, status: 'unsubscribed' as const, unsubscribedAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
 
     if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('newsletter_subscribers').upsert({
-          id: sub.id,
+        const client = await this.getRequiredSupabaseAdminClient('unsubscribeNewsletter');
+        const { error } = await client.from('newsletter_subscribers').upsert({
+          id: updated.id,
           email: cleanEmail,
           status: 'unsubscribed',
-          unsubscribed_at: sub.unsubscribedAt,
-          data: sub,
+          unsubscribed_at: updated.unsubscribedAt,
+          data: updated,
         });
-      } catch {}
-    }
+        if (error) throw new Error(`SUPABASE_NEWSLETTER_UNSUBSCRIBE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+    this.newsletterSubscribers = this.newsletterSubscribers.map((item) => item.id === updated.id ? updated : item);
+    this.writeJsonFile(NEWSLETTER_FILE, this.newsletterSubscribers);
     return true;
   }
 
@@ -5366,6 +5105,25 @@ export class DatabaseManager {
       createdAt: new Date().toISOString(),
     };
 
+    if (this.mode === 'supabase') {
+      const client = await this.getRequiredSupabaseAdminClient('createReview');
+      const { error } = await client.from('product_reviews').upsert({
+        id: newReview.id,
+        product_id: newReview.productId,
+        user_id: newReview.userId,
+        user_name: newReview.userName,
+        user_email: newReview.userEmail,
+        rating: newReview.rating,
+        title: newReview.title,
+        comment: newReview.comment,
+        verified_purchase: newReview.verifiedPurchase,
+        order_id: newReview.orderId,
+        status: newReview.status,
+        data: newReview,
+      });
+      if (error) throw new Error(`SUPABASE_REVIEW_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+
     this.productReviews.unshift(newReview);
     this.writeJsonFile(REVIEWS_FILE, this.productReviews);
 
@@ -5379,34 +5137,6 @@ export class DatabaseManager {
       await this.saveProduct(product);
     }
 
-    if (this.mode === 'supabase') {
-      try {
-        const adminClient = await this.getSupabaseAdminClient();
-        const client = adminClient || this.supabase;
-        if (client) {
-          const { error: revErr } = await client.from('product_reviews').upsert({
-            id: newReview.id,
-            product_id: newReview.productId,
-            user_id: newReview.userId,
-            user_name: newReview.userName,
-            user_email: newReview.userEmail,
-            rating: newReview.rating,
-            title: newReview.title,
-            comment: newReview.comment,
-            verified_purchase: newReview.verifiedPurchase,
-            order_id: newReview.orderId,
-            status: newReview.status,
-            data: newReview,
-          });
-          if (revErr) {
-            console.error('[DB] product_reviews authoritative upsert error:', revErr.message);
-          }
-        }
-      } catch (err: any) {
-        console.error('[DB] product_reviews upsert exception:', err.message);
-      }
-    }
-
     return newReview;
   }
 
@@ -5415,7 +5145,14 @@ export class DatabaseManager {
     const index = this.productReviews.findIndex((r) => r.id === reviewId);
     if (index === -1) return false;
 
-    const removed = this.productReviews.splice(index, 1)[0];
+    const removed = this.productReviews[index];
+    if (this.mode === 'supabase') {
+      const client = await this.getRequiredSupabaseAdminClient('deleteReview');
+      const { data, error } = await client.from('product_reviews').delete().eq('id', reviewId).select('id');
+      if (error) throw new Error(`SUPABASE_REVIEW_DELETE_FAILED: ${error.message}`);
+      if (!Array.isArray(data) || data.length === 0) return false;
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+    this.productReviews.splice(index, 1);
     this.writeJsonFile(REVIEWS_FILE, this.productReviews);
 
     // Recalculate product rating
@@ -5430,40 +5167,35 @@ export class DatabaseManager {
       await this.saveProduct(product);
     }
 
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('product_reviews').delete().eq('id', reviewId);
-      } catch {}
-    }
     return true;
   }
 
   // --- EMAIL LOGS ---
   public async logEmail(log: EmailLog): Promise<void> {
     await this.initialize();
+    if (this.mode === 'supabase') {
+      const client = await this.getRequiredSupabaseAdminClient('logEmail');
+      const { error } = await client.from('email_logs').upsert({
+        id: log.id,
+        recipient: log.recipient,
+        template: log.template,
+        subject: log.subject,
+        status: log.status,
+        error: log.error,
+        provider_message_id: log.providerMessageId,
+        order_id: log.orderId,
+        user_id: log.userId,
+        created_at: log.createdAt,
+        data: log,
+      });
+      if (error) throw new Error(`SUPABASE_EMAIL_LOG_SAVE_FAILED: ${error.message}`);
+    } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
     this.emailLogs.unshift(log);
     if (this.emailLogs.length > 500) {
       this.emailLogs = this.emailLogs.slice(0, 500);
     }
     this.writeJsonFile(EMAIL_LOGS_FILE, this.emailLogs);
 
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('email_logs').upsert({
-          id: log.id,
-          recipient: log.recipient,
-          template: log.template,
-          subject: log.subject,
-          status: log.status,
-          error: log.error,
-          provider_message_id: log.providerMessageId,
-          order_id: log.orderId,
-          user_id: log.userId,
-          created_at: log.createdAt,
-          data: log,
-        });
-      } catch {}
-    }
   }
 
   public async getEmailLogs(limit = 100): Promise<EmailLog[]> {
@@ -5478,12 +5210,9 @@ export class DatabaseManager {
       (e) => e.orderId === event.orderId && e.status === event.status && e.occurredAt === event.occurredAt
     );
     if (!isDuplicate) {
-      this.shipmentEvents.unshift(event);
-      this.writeJsonFile(SHIPMENT_EVENTS_FILE, this.shipmentEvents);
-
       if (this.mode === 'supabase' && this.supabase) {
-        try {
-          await this.supabase.from('shipment_events').upsert({
+          const client = await this.getRequiredSupabaseAdminClient('recordShipmentEvent');
+          const { error } = await client.from('shipment_events').upsert({
             id: event.id,
             order_id: event.orderId,
             shipment_id: event.shipmentId,
@@ -5494,8 +5223,10 @@ export class DatabaseManager {
             occurred_at: event.occurredAt,
             data: event,
           });
-        } catch {}
-      }
+          if (error) throw new Error(`SUPABASE_SHIPMENT_EVENT_SAVE_FAILED: ${error.message}`);
+      } else if (this.productionRuntime) throw new Error('SUPABASE_REQUIRED_IN_PRODUCTION');
+      this.shipmentEvents.unshift(event);
+      this.writeJsonFile(SHIPMENT_EVENTS_FILE, this.shipmentEvents);
     }
   }
 
@@ -5503,47 +5234,90 @@ export class DatabaseManager {
     await this.initialize();
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { data, error } = await this.supabase
+        const client = await this.getRequiredSupabaseAdminClient('getShipmentEvents');
+        const { data, error } = await client
           .from('shipment_events')
           .select('*')
           .eq('order_id', orderId)
           .order('occurred_at', { ascending: false });
-        if (!error && Array.isArray(data) && data.length > 0) {
-          return data.map((d: any) => d.data || d);
-        }
+        if (error) throw new Error(`SUPABASE_SHIPMENT_EVENTS_READ_FAILED: ${error.message}`);
+        if (Array.isArray(data)) return data.map((d: any) => d.data || d);
       } catch (err) {
+        if (this.productionRuntime) throw err;
         console.warn('[DB] Supabase getShipmentEvents fallback:', err);
       }
     }
+    if (this.productionRuntime) return [];
     return this.shipmentEvents.filter((e) => e.orderId === orderId);
   }
 
   // --- CAMPAIGNS ---
   public async saveCampaign(campaign: CampaignRecord): Promise<void> {
     await this.initialize();
+    if (this.mode === 'supabase' && this.supabase) {
+      const adminClient = await this.getRequiredSupabaseAdminClient('saveCampaign');
+      const { error } = await adminClient.from('campaign_records').upsert({
+        id: campaign.id,
+        title: campaign.title,
+        type: 'newsletter',
+        status: campaign.failedCount > 0 && campaign.sentCount === 0 ? 'failed' : 'sent',
+        discount_percentage: 0,
+        start_date: campaign.createdAt,
+        conditions: {
+          subject: campaign.subject,
+          collectionName: campaign.collectionName,
+          discountCode: campaign.discountCode,
+          recipientCount: campaign.recipientCount,
+          sentCount: campaign.sentCount,
+          failedCount: campaign.failedCount,
+          createdBy: campaign.createdBy,
+        },
+        created_at: campaign.createdAt,
+        updated_at: new Date().toISOString(),
+      });
+      if (error) throw new Error(`SUPABASE_CAMPAIGN_SAVE_FAILED: ${error.message}`);
+      this.campaignRecords = [campaign, ...this.campaignRecords.filter((item) => item.id !== campaign.id)];
+      return;
+    }
+    if (this.productionRuntime) throw new Error('CAMPAIGN_STORE_NOT_CONFIGURED: o Supabase é obrigatório em produção.');
     this.campaignRecords.unshift(campaign);
     this.writeJsonFile(CAMPAIGNS_FILE, this.campaignRecords);
-    if (this.mode === 'supabase' && this.supabase) {
-      try {
-        await this.supabase.from('campaign_records').upsert({
-          id: campaign.id,
-          title: campaign.title,
-          subject: campaign.subject,
-          collection_name: campaign.collectionName,
-          discount_code: campaign.discountCode,
-          recipient_count: campaign.recipientCount,
-          sent_count: campaign.sentCount,
-          failed_count: campaign.failedCount,
-          created_by: campaign.createdBy,
-          data: campaign,
-        });
-      } catch {}
-    }
   }
 
   public async getCampaigns(): Promise<CampaignRecord[]> {
     await this.initialize();
+    if (this.mode === 'supabase' && this.supabase) {
+      const rows = await this.loadCampaignsFromSupabase();
+      this.campaignRecords = rows;
+    }
     return this.campaignRecords;
+  }
+
+  private async loadCampaignsFromSupabase(): Promise<CampaignRecord[]> {
+    if (!this.supabase) throw new Error('SUPABASE_NOT_CONFIGURED');
+    const { data, error } = await this.supabase
+      .from('campaign_records')
+      .select('*')
+      .eq('type', 'newsletter')
+      .order('created_at', { ascending: false });
+    if (error) throw new Error(`SUPABASE_CAMPAIGNS_READ_FAILED: ${error.message}`);
+    return (data || []).map((item: any) => this.mapCampaignRow(item));
+  }
+
+  private mapCampaignRow(item: any): CampaignRecord {
+    const conditions = item?.conditions && typeof item.conditions === 'object' ? item.conditions : {};
+    return {
+      id: item.id,
+      title: item.title,
+      subject: String(conditions.subject || ''),
+      collectionName: conditions.collectionName,
+      discountCode: conditions.discountCode,
+      recipientCount: Number(conditions.recipientCount || 0),
+      sentCount: Number(conditions.sentCount || 0),
+      failedCount: Number(conditions.failedCount || 0),
+      createdBy: String(conditions.createdBy || 'system'),
+      createdAt: item.created_at,
+    };
   }
 
   // ==========================================
@@ -5798,7 +5572,8 @@ export class DatabaseManager {
 
     if (this.mode === 'supabase' && this.supabase) {
       try {
-        const { error } = await this.supabase.from('app_settings').upsert({
+        const client = await this.getRequiredSupabaseAdminClient('saveShippingSettings');
+        const { error } = await client.from('app_settings').upsert({
           key: 'shipping_settings',
           value: settings,
           updated_at: now,
@@ -5809,12 +5584,14 @@ export class DatabaseManager {
             throw new Error(`Erro ao salvar configurações de frete no Supabase: ${error.message}`);
           }
         }
+        if (!error) return;
       } catch (err: any) {
         if (isProd) throw err;
         console.warn('[DB] Supabase saveShippingSettings notice:', err);
       }
     }
 
+    this.assertLocalPersistenceAllowed('shipping settings');
     const settingsPath = path.join(process.cwd(), 'data', 'shipping_settings.json');
     const dir = path.dirname(settingsPath);
     if (!fs.existsSync(dir)) {
@@ -6427,55 +6204,69 @@ async function requireAdmin(req: any, res: express.Response, next: express.NextF
 
 // --- Health ---
 app.get(['/api/health', '/health'], async (req, res) => {
-  await db.initialize();
-  const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
-  const isSupabase = db.getMode() === 'supabase' && Boolean(supabase);
-  
-  let dbStatus = 'NOT_CONFIGURED';
-  let infinitePaySchemaStatus = 'NOT_CONFIGURED';
-  if (isSupabase && supabase) {
-    try {
-      const { error } = await supabase.from('products').select('id').limit(1);
-      dbStatus = error ? 'ERROR' : 'OK';
-      if (!error) {
-        const { error: paymentSchemaError } = await supabase
-          .from('orders')
-          .select('payment_provider_invoice_slug,checkout_url,checkout_attempt_key')
-          .limit(1);
-        infinitePaySchemaStatus = paymentSchemaError ? 'MIGRATION_REQUIRED' : 'OK';
-      }
-    } catch {
-      dbStatus = 'ERROR';
-      infinitePaySchemaStatus = 'ERROR';
+  const persistence = db.getPersistenceStatus();
+  try {
+    await db.initialize();
+    if (!persistence.production && db.getMode() !== 'supabase') {
+      return res.json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        databaseMode: db.getMode(),
+        databaseStatus: 'LOCAL_DEVELOPMENT_ONLY',
+        catalogSource: 'local',
+        productionPersistenceValid: true,
+      });
     }
+    const supabase = await db.getRequiredSupabaseAdminClient('healthcheck de persistência');
+    const { error: productError } = await supabase.from('products').select('id').limit(1);
+    if (productError) throw new Error(`SUPABASE_PRODUCTS_READ_FAILED: ${productError.message}`);
+
+    const { error: paymentSchemaError } = await supabase
+      .from('orders')
+      .select('payment_provider_invoice_slug,checkout_url,checkout_attempt_key')
+      .limit(1);
+    const infinitePaySchemaStatus = paymentSchemaError ? 'MIGRATION_REQUIRED' : 'OK';
+    const infinitePayStatus = getInfinitePayConfigurationStatus();
+    const meConfig = getMelhorEnvioConfig();
+
+    return res.status(infinitePaySchemaStatus === 'OK' ? 200 : 503).json({
+      status: infinitePaySchemaStatus === 'OK' ? 'ok' : 'degraded',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      databaseMode: db.getMode(),
+      databaseStatus: 'OK',
+      catalogSource: 'supabase',
+      productionPersistenceValid: persistence.valid && db.getMode() === 'supabase',
+      infinitePayConfigured: infinitePayStatus.configured && infinitePayStatus.handleValid,
+      infinitePaySchemaStatus,
+      infinitePayReady:
+        infinitePayStatus.configured &&
+        infinitePayStatus.handleValid &&
+        infinitePayStatus.webhookOverrideValid &&
+        infinitePaySchemaStatus === 'OK',
+      infinitePayWebhookOverrideConfigured: infinitePayStatus.webhookOverrideConfigured,
+      melhorEnvioConfigured: Boolean(meConfig.token && meConfig.token.length >= 10),
+    });
+  } catch (error: any) {
+    return res.status(503).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      databaseMode: db.getMode(),
+      databaseStatus: 'ERROR',
+      catalogSource: db.getMode() === 'supabase' ? 'supabase' : 'unavailable',
+      productionPersistenceValid: false,
+      error: error?.message || persistence.error || 'SUPABASE_REQUIRED_IN_PRODUCTION',
+    });
   }
-
-  const infinitePayStatus = getInfinitePayConfigurationStatus();
-  const meConfig = getMelhorEnvioConfig();
-
-  res.json({
-    status: dbStatus === 'OK' && infinitePaySchemaStatus === 'OK' ? 'ok' : 'degraded',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'production',
-    databaseMode: db.getMode(),
-    databaseStatus: dbStatus,
-    infinitePayConfigured: infinitePayStatus.configured && infinitePayStatus.handleValid,
-    infinitePaySchemaStatus,
-    infinitePayReady:
-      infinitePayStatus.configured &&
-      infinitePayStatus.handleValid &&
-      infinitePayStatus.webhookOverrideValid &&
-      infinitePaySchemaStatus === 'OK',
-    infinitePayWebhookOverrideConfigured: infinitePayStatus.webhookOverrideConfigured,
-    melhorEnvioConfigured: Boolean(meConfig.token && meConfig.token.length >= 10),
-  });
 });
 
 // Comprehensive Production Diagnostics & Readiness Healthcheck
 app.get('/api/admin/health', requireAdmin, async (req, res) => {
   try {
     await db.initialize();
-    const supabase = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+    const supabase = await db.getRequiredSupabaseAdminClient('healthcheck administrativo');
     const isSupabase = db.getMode() === 'supabase' && Boolean(supabase);
 
     const tablesStatus: Record<string, boolean> = {};
@@ -6709,7 +6500,9 @@ app.delete('/api/products/:id', requireAdmin, async (req: any, res) => {
 app.get('/api/categories', async (req, res) => {
   try {
     const categories = await db.getAllCategories();
-    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=120');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('CDN-Cache-Control', 'no-store');
+    res.setHeader('Vercel-CDN-Cache-Control', 'no-store');
     res.json(categories);
   } catch {
     res.status(500).json({ error: 'Erro ao buscar categorias.' });
@@ -6945,7 +6738,9 @@ app.post('/api/upload', requireAdmin, async (req, res) => {
     const storagePath = `products/${cleanProdId}/${uniqueId}.${ext}`;
 
     // Upload directly to Supabase Storage 'product-images' bucket
-    const adminClient = (await db.getSupabaseAdminClient()) || db.getSupabaseClient();
+    const adminClient = isProductionPersistenceRuntime()
+      ? await db.getRequiredSupabaseAdminClient('upload de imagem de produto')
+      : ((await db.getSupabaseAdminClient()) || db.getSupabaseClient());
     if (adminClient) {
       try {
         await adminClient.storage.createBucket('product-images', { public: true });
@@ -7870,7 +7665,7 @@ app.post(['/api/shipping/calculate', '/shipping/calculate'], requireAuth, async 
                 options: [],
               });
             }
-          } else if (process.env.NODE_ENV === 'production') {
+          } else if (isProductionPersistenceRuntime()) {
             console.error('[SHIPPING_QUOTES_FAIL_CLOSED] Supabase admin client not available for authoritative quote storage in production');
             return res.status(500).json({
               success: false,
