@@ -49,7 +49,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer className="bg-[#FAFAF8] border-t border-[#DEDEDA] text-[#18181B] pt-5 sm:pt-7 pb-6">
       {/* Newsletter Section */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 mb-10 sm:mb-12">
+      <div className="w-full max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8 mb-8 sm:mb-10">
         <div className="border border-[#D8D8D2] bg-[#F3F1E8] relative overflow-hidden">
           <div className="min-h-10 px-5 sm:px-7 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-[#D8D8D2] text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.18em]">
             <span className="flex items-center gap-2.5">
@@ -177,7 +177,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Main Footer Navigation Columns */}
-      <div className="w-full px-7 sm:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-[#E4E4E7]">
+      <div className="w-full max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-10 border-b border-[#E4E4E7]">
         {/* Brand Column */}
         <div className="lg:col-span-2 space-y-3.5">
           <div className="flex items-center gap-2 cursor-pointer select-none" onClick={() => onNavigate('home')}>
@@ -250,7 +250,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
       </div>
 
       {/* Bottom Bar Payment Seals & Copyright */}
-      <div className="w-full px-7 sm:px-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-5 text-xs text-[#71717A]">
+      <div className="w-full max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-5 text-xs text-[#71717A]">
         <div className="flex flex-wrap items-center gap-4">
           <span className="flex items-center gap-1.5 text-[#52525B] font-medium">
             <Lock className="w-3.5 h-3.5 text-[#B45309]" /> Checkout Seguro <strong className="text-[#18181B]">InfinitePay</strong>

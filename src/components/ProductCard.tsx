@@ -74,7 +74,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   return (
     <article
       id={`product-card-${product.id}`}
-      className={`group relative flex flex-col bg-white border border-black/[0.06] hover:border-black/15 transition-all duration-300 overflow-hidden select-none ${
+      className={`group relative flex flex-col bg-white border border-black/[0.06] hover:border-black/15 transition-all duration-300 overflow-hidden select-none font-sans ${
         isCompact
           ? 'rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.025)] hover:shadow-[0_8px_20px_rgba(0,0,0,0.05)]'
           : 'rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)]'
@@ -128,7 +128,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             e.stopPropagation();
             onQuickView(product);
           }}
-          className={`absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-white/95 hover:bg-white text-black flex items-center gap-1.5 shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] uppercase font-helvetica-now tracking-wider cursor-pointer ${
+          className={`absolute z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full bg-white/95 hover:bg-white text-black flex items-center gap-1.5 shadow-[0_2px_6px_rgba(0,0,0,0.06)] border border-black/[0.04] uppercase font-sans font-medium tracking-wider cursor-pointer ${
             isCompact
               ? 'top-2.5 left-2.5 h-6 px-2 text-[8.5px]'
               : 'top-3.5 left-3.5 h-7 px-2.5 text-[9.5px]'
@@ -149,7 +149,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                   key={sz}
                   type="button"
                   onClick={(e) => handleQuickAddSize(e, sz)}
-                  className={`px-1.5 py-0.5 rounded text-[9.5px] font-helvetica-now font-semibold transition-colors cursor-pointer ${
+                  className={`px-1.5 py-0.5 rounded text-[9.5px] font-sans font-semibold transition-colors cursor-pointer ${
                     addedSize === sz
                       ? 'bg-black text-white'
                       : 'text-zinc-700 hover:bg-black hover:text-white'
@@ -170,7 +170,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
       }`}>
         <div>
           {/* CATEGORIA */}
-          <p className={`font-helvetica-now font-medium uppercase tracking-[0.16em] text-[#555555] leading-none ${
+          <p className={`font-sans font-medium uppercase tracking-[0.16em] text-[#555555] leading-none ${
             isCompact ? 'text-[9px] sm:text-[9.5px] mb-1.5' : 'text-[10.5px] sm:text-[11px] mb-2'
           }`}>
             {categoryLabel}
@@ -179,7 +179,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           {/* NOME DO PRODUTO */}
           <h3
             onClick={() => onProductClick(product.slug || product.id)}
-            className={`font-helvetica-now font-bold uppercase tracking-[-0.02em] text-black hover:text-zinc-700 transition-colors cursor-pointer ${
+            className={`font-sans font-bold uppercase tracking-[-0.02em] text-black hover:text-zinc-700 transition-colors cursor-pointer ${
               isCompact
                 ? 'text-[12.5px] sm:text-[13.5px] leading-tight line-clamp-1 mb-2'
                 : 'text-[15px] sm:text-[16px] leading-[0.95] line-clamp-2 mb-3 sm:mb-3.5'
@@ -190,7 +190,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
 
           {/* PREÇO */}
           <div className={`flex items-baseline gap-2 ${isCompact ? 'mb-1' : 'mb-1.5'}`}>
-            <span className={`font-helvetica-now font-extrabold tracking-[-0.035em] text-black ${
+            <span className={`font-sans font-extrabold tracking-[-0.035em] text-black ${
               isCompact
                 ? 'text-[17px] sm:text-[18.5px] leading-tight'
                 : 'text-[21px] sm:text-[23px] leading-[0.95]'
@@ -198,21 +198,21 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               R$ {formattedPrice}
             </span>
             {product.promoPrice && product.price > product.promoPrice && (
-              <span className="font-helvetica-now text-[10px] sm:text-[11px] text-zinc-400 line-through font-normal tracking-normal">
+              <span className="font-sans text-[10px] sm:text-[11px] text-zinc-400 line-through font-normal tracking-normal">
                 R$ {product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             )}
           </div>
 
           {/* PARCELAMENTO */}
-          <p className={`font-helvetica-now font-normal text-[#555555] leading-tight mb-0.5 ${
+          <p className={`font-sans font-normal text-[#555555] leading-tight mb-0.5 ${
             isCompact ? 'text-[10px] sm:text-[10.5px]' : 'text-[11px] sm:text-[11.5px]'
           }`}>
             ou 3x de R$ {formattedInstallment} sem juros
           </p>
 
           {/* PIX */}
-          <p className={`font-helvetica-now font-normal text-[#555555] leading-tight ${
+          <p className={`font-sans font-normal text-[#555555] leading-tight ${
             isCompact ? 'text-[10px] sm:text-[10.5px] mb-2.5 sm:mb-3' : 'text-[11px] sm:text-[11.5px] mb-4 sm:mb-5'
           }`}>
             R$ {formattedPix} no Pix
@@ -262,7 +262,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             }`} />
 
             {/* Quantidade de cores */}
-            <span className={`font-helvetica-now font-normal text-[#333333] whitespace-nowrap truncate select-none ${
+            <span className={`font-sans font-normal text-[#333333] whitespace-nowrap truncate select-none ${
               isCompact ? 'text-[10px] sm:text-[10.5px]' : 'text-[11px] sm:text-[11.5px]'
             }`}>
               {colorsCountText}

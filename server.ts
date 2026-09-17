@@ -22,7 +22,14 @@ const PORT = 3000;
 
 async function startServer() {
   const publicPath = path.join(process.cwd(), 'public');
-  app.use(express.static(publicPath));
+  app.use(express.static(publicPath, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith('.woff2') || filePath.endsWith('.woff')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        res.setHeader('Access-Control-Allow-Origin', '*');
+      }
+    }
+  }));
 
   // Vite middleware for local development
   if (process.env.NODE_ENV !== 'production') {
@@ -34,7 +41,14 @@ async function startServer() {
   } else {
     // Production static serving
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, {
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.woff2') || filePath.endsWith('.woff')) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+        }
+      }
+    }));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });

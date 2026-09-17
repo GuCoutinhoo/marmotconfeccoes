@@ -205,9 +205,9 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
         #ultimos-lancamentos-drop .nr-shell {
           width: calc(100% - 32px);
-          max-width: 1672px;
+          max-width: 1820px;
           margin: 0 auto;
-          padding: clamp(18px, 2.4vh, 26px) 0 clamp(12px, 1.8vh, 18px);
+          padding: clamp(14px, 1.8vh, 20px) 0 clamp(10px, 1.4vh, 14px);
         }
 
         #ultimos-lancamentos-drop .nr-header {
@@ -233,7 +233,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
         #ultimos-lancamentos-drop .nr-eyebrow__brand,
         #ultimos-lancamentos-drop .nr-eyebrow__label {
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           font-size: 12px;
           line-height: 1;
           text-transform: uppercase;
@@ -286,7 +286,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         #ultimos-lancamentos-drop .nr-copy p {
           margin: 0;
           max-width: 365px;
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           color: #505050;
           font-size: clamp(12px, .91vw, 15px);
           line-height: 1.24;
@@ -306,7 +306,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           align-items: center;
           justify-content: space-between;
           gap: 35px;
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           font-size: 13px;
           font-weight: 800;
           letter-spacing: .14em;
@@ -493,10 +493,10 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         #ultimos-lancamentos-drop .nr-category {
           display: block;
           margin-bottom: 6px;
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           color: #626262;
           font-size: clamp(9px, .64vw, 11px);
-          font-weight: 700;
+          font-weight: 500;
           letter-spacing: .18em;
           line-height: 1;
           text-transform: uppercase;
@@ -505,9 +505,9 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         #ultimos-lancamentos-drop .nr-product-name {
           margin: 0 0 8px;
           color: #090909;
-          font-family: 'Helvetica Now Display', 'Inter', Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           font-size: clamp(16px, 1.18vw, 21px);
-          font-weight: 800;
+          font-weight: 700;
           letter-spacing: -.025em;
           line-height: 1.02;
           text-transform: uppercase;
@@ -516,7 +516,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         #ultimos-lancamentos-drop .nr-price {
           margin: 0 0 5px;
           color: #090909;
-          font-family: 'Helvetica Now Display', 'Inter', Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           font-size: clamp(20px, 1.45vw, 25px);
           font-weight: 800;
           letter-spacing: -.035em;
@@ -525,8 +525,9 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
 
         #ultimos-lancamentos-drop .nr-payment {
           color: #727272;
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           font-size: clamp(10px, .77vw, 12.5px);
+          font-weight: 400;
           line-height: 1.3;
         }
 
@@ -572,10 +573,10 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         }
 
         #ultimos-lancamentos-drop .nr-swatches__count {
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           color: #747474;
           font-size: 10px;
-          font-weight: 500;
+          font-weight: 400;
           letter-spacing: .13em;
           line-height: 1;
           text-transform: uppercase;
@@ -600,9 +601,9 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
           align-items: center;
           justify-content: center;
           gap: 24px;
-          font-family: Arial, Helvetica, sans-serif;
+          font-family: 'Marmot Sans', 'Inter', sans-serif;
           font-size: 12px;
-          font-weight: 800;
+          font-weight: 700;
           letter-spacing: .08em;
           line-height: 1;
           text-transform: uppercase;

@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
-import { motion, useReducedMotion, useInView } from 'motion/react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../../context/StoreContext';
 import {
   getStoredCategoryImage,
@@ -18,106 +18,297 @@ interface CategoryEditorialItem {
   image: string;
   fallbackImage: string;
   objectPosition: string;
+  defaultPieces: number;
 }
 
-const CATEGORY_EDITORIAL_ITEMS: CategoryEditorialItem[] = [
-  {
-    id: 'camisetas',
-    slug: 'camisetas',
-    name: 'CAMISETAS',
-    image: '/categories/categoria-camisetas.png?v=20260916_v5_new_assets',
-    fallbackImage: '/categoria camiseta.png?v=20260916_v5_new_assets',
-    objectPosition: 'center 14%',
-  },
-  {
-    id: 'moletons',
-    slug: 'moletons',
-    name: 'MOLETONS',
-    image: '/categories/categoria-moletons.png?v=20260916_v5_new_assets',
-    fallbackImage: '/categoria moletom.png?v=20260916_v5_new_assets',
-    objectPosition: 'center 8%',
-  },
-  {
-    id: 'jaquetas',
-    slug: 'jaquetas',
-    name: 'JAQUETAS',
-    image: '/categories/categoria-jaquetas.png?v=20260916_v5_new_assets',
-    fallbackImage: '/categoria jaqueta.png?v=20260916_v5_new_assets',
-    objectPosition: 'center 14%',
-  },
-  {
-    id: 'calcas',
-    slug: 'calcas',
-    name: 'CALÇAS',
-    image: '/categories/categoria-calcas.png?v=20260916_v5_new_assets',
-    fallbackImage: '/categoria calca.png?v=20260916_v5_new_assets',
-    objectPosition: 'center 35%',
-  },
-  {
-    id: 'shorts',
-    slug: 'shorts',
-    name: 'SHORTS',
-    image: '/categories/categoria-shorts.png?v=20260916_v5_new_assets',
-    fallbackImage: '/categoria shorts.png?v=20260916_v5_new_assets',
-    objectPosition: 'center 15%',
-  },
-  {
-    id: 'tenis',
-    slug: 'tenis',
-    name: 'TÊNIS',
-    image: '/categories/categoria-tenis.png?v=20260916_v5_new_assets',
-    fallbackImage: '/categoria tenis.png?v=20260916_v5_new_assets',
-    objectPosition: 'center 62%',
-  },
-  {
-    id: 'acessorios',
-    slug: 'acessorios',
-    name: 'ACESSÓRIOS',
-    image: '/categories/categoria-acessorios.png?v=20260916_v5_new_assets',
-    fallbackImage: '/categoria acessorios.png?v=20260916_v5_new_assets',
-    objectPosition: 'center 30%',
-  },
+const CATEGORY_SETS: CategoryEditorialItem[][] = [
+  // CONJUNTO 01: Jaquetas (Grande Esquerda), Shorts (Centro Sup), Calças (Direita Sup), Moletons (Centro Inf), Camisetas (Direita Inf)
+  [
+    {
+      id: 'jaquetas',
+      slug: 'jaquetas',
+      name: 'JAQUETAS',
+      image: '/categories/categoria-jaquetas.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria jaqueta.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 20%',
+      defaultPieces: 18,
+    },
+    {
+      id: 'shorts',
+      slug: 'shorts',
+      name: 'SHORTS',
+      image: '/categories/categoria-shorts.png?v=20260917_v7_clean_headroom',
+      fallbackImage: '/categoria shorts.png?v=20260917_v7_clean_headroom',
+      objectPosition: 'center 10%',
+      defaultPieces: 12,
+    },
+    {
+      id: 'calcas',
+      slug: 'calcas',
+      name: 'CALÇAS',
+      image: '/categories/categoria-calcas.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria calca.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 35%',
+      defaultPieces: 20,
+    },
+    {
+      id: 'moletons',
+      slug: 'moletons',
+      name: 'MOLETONS',
+      image: '/categories/categoria-moletons.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria moletom.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 14%',
+      defaultPieces: 16,
+    },
+    {
+      id: 'camisetas',
+      slug: 'camisetas',
+      name: 'CAMISETAS',
+      image: '/categories/categoria-camisetas.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria camiseta.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 18%',
+      defaultPieces: 24,
+    },
+  ],
+  // CONJUNTO 02: Camisetas (Grande Esquerda), Tênis (Centro Sup), Acessórios (Direita Sup), Shorts (Centro Inf), Moletons (Direita Inf)
+  [
+    {
+      id: 'camisetas',
+      slug: 'camisetas',
+      name: 'CAMISETAS',
+      image: '/categories/categoria-camisetas.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria camiseta.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 18%',
+      defaultPieces: 24,
+    },
+    {
+      id: 'tenis',
+      slug: 'tenis',
+      name: 'TÊNIS',
+      image: '/categories/categoria-tenis.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria tenis.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 62%',
+      defaultPieces: 14,
+    },
+    {
+      id: 'acessorios',
+      slug: 'acessorios',
+      name: 'ACESSÓRIOS',
+      image: '/categories/categoria-acessorios.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria acessorios.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 30%',
+      defaultPieces: 10,
+    },
+    {
+      id: 'shorts',
+      slug: 'shorts',
+      name: 'SHORTS',
+      image: '/categories/categoria-shorts.png?v=20260917_v7_clean_headroom',
+      fallbackImage: '/categoria shorts.png?v=20260917_v7_clean_headroom',
+      objectPosition: 'center 10%',
+      defaultPieces: 12,
+    },
+    {
+      id: 'moletons',
+      slug: 'moletons',
+      name: 'MOLETONS',
+      image: '/categories/categoria-moletons.png?v=20260916_v5_new_assets',
+      fallbackImage: '/categoria moletom.png?v=20260916_v5_new_assets',
+      objectPosition: 'center 14%',
+      defaultPieces: 16,
+    },
+  ],
 ];
+
+// Variantes de animação refinadas para cada card
+const cardLeftVariant = {
+  hidden: {
+    opacity: 0,
+    x: -28,
+    y: 28,
+    scale: 0.985,
+    transition: { duration: 0 },
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.82,
+      ease: [0.22, 1, 0.36, 1],
+      delay: 0,
+    },
+  },
+};
+
+const cardTopVariant = {
+  hidden: {
+    opacity: 0,
+    x: 0,
+    y: -24,
+    scale: 0.985,
+    transition: { duration: 0 },
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.82,
+      ease: [0.22, 1, 0.36, 1],
+      delay: 0.08,
+    },
+  },
+};
+
+const cardTopRightVariant = {
+  hidden: {
+    opacity: 0,
+    x: 24,
+    y: -24,
+    scale: 0.985,
+    transition: { duration: 0 },
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.82,
+      ease: [0.22, 1, 0.36, 1],
+      delay: 0.14,
+    },
+  },
+};
+
+const cardBottomVariant = {
+  hidden: {
+    opacity: 0,
+    x: 0,
+    y: 24,
+    scale: 0.985,
+    transition: { duration: 0 },
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.82,
+      ease: [0.22, 1, 0.36, 1],
+      delay: 0.20,
+    },
+  },
+};
+
+const cardBottomRightVariant = {
+  hidden: {
+    opacity: 0,
+    x: 24,
+    y: 24,
+    scale: 0.985,
+    transition: { duration: 0 },
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.82,
+      ease: [0.22, 1, 0.36, 1],
+      delay: 0.26,
+    },
+  },
+};
+
+const titleVariant = {
+  hidden: {
+    opacity: 0,
+    y: 38,
+    transition: { duration: 0 },
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.75,
+      ease: [0.16, 1, 0.3, 1],
+      delay: 0.05,
+    },
+  },
+};
 
 export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ onNavigate }) => {
   const { categories } = useStore();
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeSetIndex, setActiveSetIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
-  const shouldReduceMotion = useReducedMotion();
-  const isInView = useInView(sectionRef, { once: true, amount: 0.22 });
+  const [hasEntered, setHasEntered] = useState(false);
 
-  // Drag-to-scroll refs
-  const isMouseDownRef = useRef(false);
-  const startXRef = useRef(0);
-  const scrollLeftRef = useRef(0);
-  const hasMovedRef = useRef(false);
-
-  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
-
-  // Sincronização de imagens salvas
   useEffect(() => {
     ensureCategoryImagesStoredInLocalStorage().catch((err) => {
       console.warn('Erro ao sincronizar imagens com localStorage:', err);
     });
   }, []);
 
-  const handleScrollPosition = useCallback(() => {
-    const container = carouselRef.current;
-    if (!container) return;
+  // Monitora o scroll para disparar a animação sempre que o usuário rolar para baixo ao passar pela seção
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
 
-    const maxScroll = container.scrollWidth - container.clientWidth;
-    if (maxScroll <= 0) {
-      setActiveCategoryIndex(0);
-      return;
-    }
+    let lastScrollY = window.scrollY || document.documentElement.scrollTop;
+    let ticking = false;
 
-    const total = CATEGORY_EDITORIAL_ITEMS.length;
-    const progress = Math.min(1, Math.max(0, container.scrollLeft / maxScroll));
-    const current = Math.min(total, Math.max(1, Math.round(progress * (total - 1)) + 1));
-    setActiveCategoryIndex(current - 1);
+    const checkPosition = () => {
+      const currentScrollY = window.scrollY || document.documentElement.scrollTop;
+      const isScrollingDown = currentScrollY >= lastScrollY;
+      lastScrollY = currentScrollY;
+
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+
+      // Se a seção está abaixo da viewport (usuário rolou para cima e está acima dela):
+      // Reseta imediatamente para "hidden" para que, na próxima descida, a animação aconteça novamente
+      if (rect.top > vh * 0.85) {
+        setHasEntered(false);
+        ticking = false;
+        return;
+      }
+
+      // Ao rolar para baixo e a seção entrar no campo de visão:
+      if (isScrollingDown && rect.top <= vh * 0.85 && rect.bottom >= 60) {
+        setHasEntered(true);
+      } else if (!isScrollingDown && rect.top < vh && rect.bottom > 0) {
+        // Ao rolar para cima enquanto passa pela seção, mantém os cards visíveis
+        setHasEntered(true);
+      }
+
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(checkPosition);
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    // Verificação inicial
+    checkPosition();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
   }, []);
 
-  // Obter imagem preferencial (localStorage ou asset configurado)
   const getCardImage = useCallback(
     (item: CategoryEditorialItem) => {
       const stored = getStoredCategoryImage(item.slug);
@@ -135,258 +326,210 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     [categories]
   );
 
-  // Scroll controls
-  const handleScrollPrev = () => {
-    if (!carouselRef.current) return;
-    const card = carouselRef.current.querySelector('article');
-    const scrollAmount = card ? card.clientWidth + 16 : 450;
-    carouselRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  const handlePrevSet = () => {
+    setActiveSetIndex((prev) => (prev === 0 ? CATEGORY_SETS.length - 1 : prev - 1));
   };
 
-  const handleScrollNext = () => {
-    if (!carouselRef.current) return;
-    const card = carouselRef.current.querySelector('article');
-    const scrollAmount = card ? card.clientWidth + 16 : 450;
-    carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  const handleNextSet = () => {
+    setActiveSetIndex((prev) => (prev === CATEGORY_SETS.length - 1 ? 0 : prev + 1));
   };
 
-  // Mouse Drag to Scroll
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!carouselRef.current) return;
-    isMouseDownRef.current = true;
-    hasMovedRef.current = false;
-    startXRef.current = e.pageX - carouselRef.current.offsetLeft;
-    scrollLeftRef.current = carouselRef.current.scrollLeft;
-  };
+  const currentSet = CATEGORY_SETS[activeSetIndex];
+  const item1 = currentSet[0]; // Card Grande Vertical (Esquerda - 2 Linhas)
+  const item2 = currentSet[1]; // Card Retangular Superior Meio
+  const item3 = currentSet[2]; // Card Retangular Superior Direita
+  const item4 = currentSet[3]; // Card Retangular Inferior Meio
+  const item5 = currentSet[4]; // Card Retangular Inferior Direita
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isMouseDownRef.current || !carouselRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - carouselRef.current.offsetLeft;
-    const walk = x - startXRef.current;
-    if (Math.abs(walk) > 5) {
-      hasMovedRef.current = true;
-    }
-    carouselRef.current.scrollLeft = scrollLeftRef.current - walk;
-  };
+  // Renderizador do card individual com cantos arredondados e acabamento de alta precisão
+  const renderCategoryCard = (
+    item: CategoryEditorialItem,
+    className: string
+  ) => {
+    return (
+      <article
+        onClick={() => onNavigate('shop', item.slug)}
+        className={`group relative overflow-hidden bg-[#111113] cursor-pointer select-none rounded-xl sm:rounded-2xl border border-zinc-200/90 hover:border-zinc-400/80 shadow-sm hover:shadow-md transition-all duration-300 ${className}`}
+      >
+        {/* Imagem de Fundo (100% preservada com os assets reais) */}
+        <img
+          src={getCardImage(item)}
+          alt={item.name}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          draggable={false}
+          style={{
+            objectPosition: item.objectPosition || 'center center',
+          }}
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out select-none pointer-events-none brightness-[0.98] contrast-[1.04]"
+          onError={(e) => {
+            if (e.currentTarget.src !== item.fallbackImage) {
+              e.currentTarget.src = item.fallbackImage;
+            }
+          }}
+        />
 
-  const handleMouseUpOrLeave = () => {
-    isMouseDownRef.current = false;
-  };
+        {/* Degradê/overlay escuro na base para legibilidade dos textos */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 via-35% to-transparent pointer-events-none" />
 
-  // Touch Drag para navegação suave em smartphones/tablets
-  const touchStartXRef = useRef(0);
-  const touchStartYRef = useRef(0);
-  const touchScrollLeftRef = useRef(0);
-  const isTouchDraggingRef = useRef(false);
+        {/* Textos no canto inferior esquerdo */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 lg:p-6 z-10 flex flex-col items-start">
+          {/* Nome da categoria em Inter / negrito pesado / branco */}
+          <h3
+            style={{
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 900,
+              letterSpacing: '-0.02em',
+            }}
+            className="text-white uppercase leading-none text-xl sm:text-2xl lg:text-[26px] xl:text-[28px] mb-1.5 sm:mb-2"
+          >
+            {item.name}
+          </h3>
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (!carouselRef.current) return;
-    touchStartXRef.current = e.touches[0].clientX;
-    touchStartYRef.current = e.touches[0].clientY;
-    touchScrollLeftRef.current = carouselRef.current.scrollLeft;
-    isTouchDraggingRef.current = true;
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isTouchDraggingRef.current || !carouselRef.current) return;
-    const currentX = e.touches[0].clientX;
-    const currentY = e.touches[0].clientY;
-    const diffX = touchStartXRef.current - currentX;
-    const diffY = touchStartYRef.current - currentY;
-
-    // Se o gesto do dedo for horizontal, desliza o carrossel
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-      carouselRef.current.scrollLeft = touchScrollLeftRef.current + diffX;
-      if (Math.abs(diffX) > 6) {
-        hasMovedRef.current = true;
-      }
-    }
-  };
-
-  const handleTouchEnd = () => {
-    isTouchDraggingRef.current = false;
-  };
-
-  const handleCardClick = (slug: string) => {
-    if (hasMovedRef.current) return;
-    onNavigate('shop', slug);
+          {/* EXPLORAR discreto + pequena seta amarela */}
+          <div
+            style={{ fontFamily: '"Inter", sans-serif' }}
+            className="flex items-center gap-1.5 sm:gap-2 text-white text-[10px] sm:text-[11px] font-bold tracking-[0.2em] uppercase transition-colors"
+          >
+            <span>EXPLORAR</span>
+            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#F5C400] stroke-[2.2] transition-transform duration-200 group-hover:translate-x-1" />
+          </div>
+        </div>
+      </article>
+    );
   };
 
   return (
     <section
       ref={sectionRef}
       id="category-showcase-section"
-      className="pt-[46px] pb-[40px] bg-[#F7F7F5] border-b border-zinc-200/90 select-none overflow-hidden"
+      className="bg-[#FAFAFA] pt-[38px] pb-7 sm:pb-9 select-none overflow-hidden"
     >
       {/* ========================================================= */}
-      {/* CABEÇALHO DA SEÇÃO - IMPACTANTE E EDITORIAL               */}
+      {/* CABEÇALHO DA SEÇÃO                                         */}
       {/* ========================================================= */}
-      <div className="w-full px-7 sm:px-8 mb-8 sm:mb-10 lg:mb-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          {/* BLOCO ESQUERDO */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto mb-4 sm:mb-5">
+        <div className="flex items-start sm:items-end justify-between gap-4">
+          {/* BLOCO ESQUERDO: TÍTULO + SUBTÍTULO */}
           <div className="flex flex-col items-start text-left">
-            {/* 1. EYEBROW */}
-            <div className="mb-2.5 flex items-center gap-2">
-              <span className="text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.28em] text-black">
-                MARMOT
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F5C400] inline-block mx-1" />
-              <span className="text-[11px] sm:text-xs font-mono font-medium uppercase tracking-[0.24em] text-zinc-500">
-                COLEÇÃO
-              </span>
-            </div>
-
-            {/* 2. TÍTULO - Grande, forte e imponente */}
             <div className="overflow-hidden">
               <motion.h2
-                initial={shouldReduceMotion ? { y: 0 } : { y: '100%' }}
-                animate={isInView ? { y: 0 } : {}}
-                transition={{
-                  duration: 0.58,
-                  ease: [0.16, 1, 0.3, 1],
-                  delay: shouldReduceMotion ? 0 : 0.08,
+                variants={titleVariant}
+                initial="hidden"
+                animate={hasEntered ? "visible" : "hidden"}
+                style={{
+                  fontFamily: '"Archivo Black", sans-serif',
+                  letterSpacing: '-0.04em',
+                  fontSize: '31px',
+                  lineHeight: '31px',
+                  fontWeight: 'normal',
                 }}
-                className="font-anton text-4xl sm:text-5xl md:text-[58px] lg:text-[66px] xl:text-[72px] font-normal uppercase text-[#0B0B0E] leading-none tracking-[-0.035em] select-none whitespace-normal sm:whitespace-nowrap"
+                className="text-[31px] leading-[31px] font-normal uppercase text-black select-none will-change-transform"
               >
                 COMPRE POR CATEGORIA
               </motion.h2>
             </div>
-
-            {/* 3. SUBTÍTULO COM MAIS RESPIRO */}
-            <motion.p
-              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                duration: 0.52,
-                ease: [0.16, 1, 0.3, 1],
-                delay: shouldReduceMotion ? 0 : 0.16,
+            <p
+              style={{
+                fontFamily: '"Inter", sans-serif',
+                fontSize: '12px',
+                marginTop: '1px',
               }}
-              className="text-base sm:text-lg text-zinc-500 font-normal mt-2.5 leading-normal select-none"
+              className="text-[12px] text-zinc-400 font-normal mt-[1px] select-none tracking-normal"
             >
-              As peças que constroem a coleção.
-            </motion.p>
+              Explore a coleção e encontre seu próximo look.
+            </p>
           </div>
 
-          {/* BLOCO DIREITO: "VER TODAS AS CATEGORIAS ↗" + SEPARADOR + CONTADOR + SETAS */}
-          <motion.div
-            initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 24 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{
-              duration: 0.55,
-              ease: [0.16, 1, 0.3, 1],
-              delay: shouldReduceMotion ? 0 : 0.2,
-            }}
-            className="flex items-center gap-4 sm:gap-6 self-start md:self-end pb-1 shrink-0"
-          >
+          {/* BLOCO DIREITO: Setas superiores para alternar entre conjuntos de categorias */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
-              onClick={() => onNavigate('shop')}
-              className="text-[11.5px] sm:text-[12px] font-black uppercase tracking-[0.15em] text-black hover:text-zinc-600 underline underline-offset-4 flex items-center gap-1.5 transition-colors cursor-pointer"
+              onClick={handlePrevSet}
+              aria-label="Conjunto anterior"
+              className="w-9 h-9 sm:w-10 sm:h-10 border border-zinc-200 bg-white hover:bg-zinc-50 active:scale-95 flex items-center justify-center text-black transition-all cursor-pointer rounded-lg"
             >
-              <span>VER TODAS AS CATEGORIAS</span>
-              <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
+              <ArrowLeft className="w-4 h-4 stroke-[2]" />
             </button>
-
-            <div className="hidden sm:block w-px h-4.5 bg-zinc-300/80" />
-
-            {/* Contador: 01 — 06 */}
-            <span className="text-xs sm:text-[13px] font-mono font-medium text-zinc-600 tracking-wider">
-              {String(activeCategoryIndex + 1).padStart(2, '0')} — {String(CATEGORY_EDITORIAL_ITEMS.length).padStart(2, '0')}
-            </span>
-
-            {/* Setas de Navegação [ ← ] [ → ] */}
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <button
-                type="button"
-                onClick={handleScrollPrev}
-                aria-label="Categoria anterior"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-zinc-100 active:scale-95 border border-zinc-300/90 rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
-              >
-                <ArrowLeft className="w-4 h-4 stroke-[2.2]" />
-              </button>
-              <button
-                type="button"
-                onClick={handleScrollNext}
-                aria-label="Próxima categoria"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-[#F4C400] hover:bg-[#E5B500] active:scale-95 border border-[#E5B500] rounded-[2px] flex items-center justify-center text-black transition-all cursor-pointer shadow-2xs"
-              >
-                <ArrowRight className="w-4 h-4 stroke-[2.2]" />
-              </button>
-            </div>
-          </motion.div>
+            <button
+              type="button"
+              onClick={handleNextSet}
+              aria-label="Próximo conjunto"
+              className="w-9 h-9 sm:w-10 sm:h-10 border border-[#F5C400] bg-white hover:bg-amber-50/40 active:scale-95 flex items-center justify-center text-black transition-all cursor-pointer rounded-lg"
+            >
+              <ArrowRight className="w-4 h-4 stroke-[2]" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* ========================================================= */}
-      {/* CARROSSEL HORIZONTAL DE CATEGORIAS (520–560px ALTURA)     */}
+      {/* GRID EXATO DA IMAGEM DE REFERÊNCIA:                        */}
+      {/* - Coluna 1 (Esquerda): 1 Card Alto Vertical (2 Linhas)     */}
+      {/* - Coluna 2 e 3 (Direita): 4 Cards Retangulares em Grade 2x2*/}
       {/* ========================================================= */}
-      <div
-        ref={carouselRef}
-        onScroll={handleScrollPosition}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUpOrLeave}
-        onMouseLeave={handleMouseUpOrLeave}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        className="w-full flex items-stretch gap-5 sm:gap-6 overflow-x-auto scrollbar-none pb-5 cursor-grab active:cursor-grabbing px-7 sm:px-8"
-      >
-        {CATEGORY_EDITORIAL_ITEMS.map((item, index) => (
-          <motion.article
-            key={item.id}
-            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              duration: 0.58,
-              delay: shouldReduceMotion ? 0 : 0.22 + index * 0.09,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-            onClick={() => handleCardClick(item.slug)}
-            className="marmot-category-card group relative shrink-0 w-[310px] sm:w-[350px] md:w-[380px] lg:w-[410px] xl:w-[430px] h-[460px] sm:h-[490px] md:h-[525px] lg:h-[550px] overflow-hidden bg-[#111113] cursor-pointer select-none rounded-[4px] border border-zinc-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:border-black hover:shadow-[0_16px_40px_rgba(0,0,0,0.16)] transition-all duration-300"
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSetIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2 gap-3.5 sm:gap-4 md:gap-4.5 lg:gap-5 h-auto md:h-[580px] lg:h-[640px] xl:h-[680px]"
           >
-            {/* Imagem de Fundo com proporção preservada (object-cover) */}
-            <motion.img
-              src={getCardImage(item)}
-              alt={item.name}
-              loading="lazy"
-              decoding="async"
-              referrerPolicy="no-referrer"
-              draggable={false}
-              initial={shouldReduceMotion ? { scale: 1 } : { scale: 1.03 }}
-              animate={isInView ? { scale: 1 } : { scale: 1.03 }}
-              transition={{
-                duration: 0.62,
-                delay: shouldReduceMotion ? 0 : 0.22 + index * 0.09,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              style={{
-                objectPosition: item.objectPosition || 'center 15%',
-              }}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out select-none pointer-events-none brightness-[0.98] contrast-[1.04]"
-              onError={(e) => {
-                if (e.currentTarget.src !== item.fallbackImage) {
-                  e.currentTarget.src = item.fallbackImage;
-                }
-              }}
-            />
+            {/* 1. CARD GRANDE (ESQUERDA - ALTURA TOTAL / 2 LINHAS) */}
+            <motion.div
+              variants={cardLeftVariant}
+              initial="hidden"
+              animate={hasEntered ? "visible" : "hidden"}
+              className="sm:col-span-2 md:col-span-1 md:row-span-2 md:col-start-1 md:row-start-1 w-full h-[440px] sm:h-[480px] md:h-full will-change-transform"
+            >
+              {renderCategoryCard(item1, 'w-full h-full')}
+            </motion.div>
 
-            {/* Degradê/overlay escuro na parte inferior para contraste e legibilidade */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 via-35% to-transparent pointer-events-none" />
+            {/* 2. CARD RETANGULAR (CENTRO SUPERIOR) */}
+            <motion.div
+              variants={cardTopVariant}
+              initial="hidden"
+              animate={hasEntered ? "visible" : "hidden"}
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-1 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+            >
+              {renderCategoryCard(item2, 'w-full h-full')}
+            </motion.div>
 
-            {/* Textos no canto inferior esquerdo */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 lg:p-9 z-10">
-              <h3 className="font-anton text-2xl sm:text-[30px] lg:text-[34px] xl:text-[38px] font-black text-white uppercase tracking-wide leading-tight drop-shadow-xs">
-                {item.name}
-              </h3>
-              <div className="mt-2 flex items-center gap-2 text-[#F4C400] text-sm sm:text-[15px] font-medium transition-colors">
-                <span>Ver coleção</span>
-                <ArrowRight className="w-4.5 h-4.5 text-[#F4C400] stroke-[2] transition-transform duration-200 group-hover:translate-x-1" />
-              </div>
-            </div>
-          </motion.article>
-        ))}
+            {/* 3. CARD RETANGULAR (DIREITA SUPERIOR) */}
+            <motion.div
+              variants={cardTopRightVariant}
+              initial="hidden"
+              animate={hasEntered ? "visible" : "hidden"}
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-1 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+            >
+              {renderCategoryCard(item3, 'w-full h-full')}
+            </motion.div>
+
+            {/* 4. CARD RETANGULAR (CENTRO INFERIOR) */}
+            <motion.div
+              variants={cardBottomVariant}
+              initial="hidden"
+              animate={hasEntered ? "visible" : "hidden"}
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-2 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+            >
+              {renderCategoryCard(item4, 'w-full h-full')}
+            </motion.div>
+
+            {/* 5. CARD RETANGULAR (DIREITA INFERIOR) */}
+            <motion.div
+              variants={cardBottomRightVariant}
+              initial="hidden"
+              animate={hasEntered ? "visible" : "hidden"}
+              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-2 w-full h-[230px] sm:h-[260px] md:h-full will-change-transform"
+            >
+              {renderCategoryCard(item5, 'w-full h-full')}
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );

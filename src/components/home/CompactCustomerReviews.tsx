@@ -58,13 +58,13 @@ export const CompactCustomerReviews: React.FC = () => {
         border-b
         border-zinc-200/90
         bg-white
-        py-12
+        py-8
         text-[#0B0B0E]
-        sm:py-14
-        lg:py-16
+        sm:py-10
+        lg:py-12
       "
     >
-      <div className="mx-auto max-w-[1640px] px-4 sm:px-7 lg:px-8">
+      <div className="mx-auto max-w-[1820px] px-4 sm:px-6 lg:px-8">
 
         {/* HEADER */}
         <div

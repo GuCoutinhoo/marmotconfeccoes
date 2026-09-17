@@ -153,11 +153,11 @@ export const SingleProductSpotlight: React.FC<SingleProductSpotlightProps> = ({
       id="product-spotlight-section"
       className="bg-[#F4F4F2] select-none relative overflow-hidden border-y border-zinc-200/80"
       style={{
-        paddingTop: '44px',
-        paddingBottom: '44px',
+        paddingTop: '32px',
+        paddingBottom: '32px',
       }}
     >
-      <div className="max-w-[1780px] mx-auto px-4 sm:px-8 lg:px-10">
+      <div className="max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* ========================================================= */}
         {/* CARD CENTRAL DE DESTAQUE - ESTRUTURA HORIZONTAL SPLIT     */}
         {/* ========================================================= */}

@@ -16,10 +16,10 @@
     "test:concurrency": "node --test test/integration/financial-concurrency.test.mjs",
     "test:all": "node --test test/*.test.mjs test/integration/*.test.mjs && node --import tsx --test test/infinitepay-client.test.ts",
     "import-product-images": "node scripts/import-product-images.mjs",
-    "import-product-images:dry-run": "node scripts/import-product-images.mjs --dry-run",
-    "migrate-legacy-product-images": "node scripts/migrate-legacy-product-images.mjs"
+    "import-product-images:dry-run": "node scripts/import-product-images.mjs --dry-run"
   },
   "dependencies": {
+    "@fontsource/inter": "^5.3.0",
     "@google/genai": "^2.4.0",
     "@supabase/supabase-js": "^2.112.3",
     "@tailwindcss/vite": "^4.1.14",

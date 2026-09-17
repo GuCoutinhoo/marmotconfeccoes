@@ -55,7 +55,7 @@ export const INITIAL_8_CATEGORIES: Category[] = [
     slug: 'shorts',
     tagline: 'Shorts & Bermudas Streetwear Autênticos',
     description: 'Shorts e bermudas streetwear com modelagens baggy, parachute, denim e tech nylon.',
-    image: '/categories/categoria-shorts.png?v=20260916_v5_new_assets',
+    image: '/categories/categoria-shorts.png?v=20260917_v7_clean_headroom',
     subcategories: ['Baggy Denim', 'Cargo Baggy', 'Parachute', 'Tech Nylon'],
     productCount: 11,
     order: 4,

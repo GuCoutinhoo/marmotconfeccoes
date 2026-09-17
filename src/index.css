@@ -1,4 +1,108 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ==========================================================================
+   TIPOGRAFIA CENTRALIZADA E DETERMINÍSTICA - MARMOT SANS (SELF-HOSTED WOFF2)
+   Garante 100% de paridade entre Local, Workspace, Preview e Produção (Vercel)
+   sem depender de fontes instaladas no sistema operacional do usuário.
+   ========================================================================== */
+
+@font-face {
+  font-family: 'Marmot Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Marmot Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Marmot Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Marmot Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Marmot Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-800.woff2') format('woff2');
+}
+
+/* Fallback/Alias determinístico para 'Inter' apontando para os mesmos arquivos locais */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/marmot-sans-800.woff2') format('woff2');
+}
+
+@theme {
+  --font-sans: 'Inter', 'Marmot Sans', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-archivo-black: 'Archivo Black', sans-serif;
+  --font-helvetica-now: 'Marmot Sans', 'Inter', sans-serif;
+}
+
+.font-archivo-black {
+  font-family: 'Archivo Black', sans-serif;
+}
+
+html,
+body {
+  font-family: 'Marmot Sans', 'Inter', sans-serif;
+}
 
 @layer base {
   body {
@@ -119,7 +223,7 @@
 
 .font-helvetica-now,
 .font-haas {
-  font-family: 'Helvetica Now Display', 'Helvetica Now', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Marmot Sans', 'Inter', sans-serif !important;
 }
 
 .marmot-category-card {

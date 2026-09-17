@@ -507,7 +507,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
       }}
     >
       {/* HERO */}
-      <div className="relative mx-auto w-[calc(100%-32px)] max-w-[1494px] pt-[48px] lg:w-[89.4%] lg:pt-[54px]">
+      <div className="relative mx-auto w-full max-w-[1820px] px-4 sm:px-6 lg:px-8 pt-[36px] lg:pt-[44px]">
         {/* topo editorial */}
         <div className="relative z-20 flex h-[28px] items-center justify-between">
           <span className="relative z-10 bg-[#f2f2ef]/80 pr-5 font-mono text-[10px] font-bold uppercase tracking-[0.29em] text-black">
@@ -706,7 +706,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
 
       {/* produtos */}
       <div className="relative z-20 w-full bg-transparent">
-        <div className="mx-auto w-[calc(100%-32px)] max-w-[1494px] lg:w-[89.4%]">
+        <div className="mx-auto w-full max-w-[1820px] px-4 sm:px-6 lg:px-8">
           <div className="flex h-[50px] items-center justify-between border-t border-black/10">
             <div className="flex min-w-0 flex-1 items-center gap-[14px] pr-5">
               <span className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black">

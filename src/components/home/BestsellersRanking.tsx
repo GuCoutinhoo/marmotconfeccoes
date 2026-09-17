@@ -341,9 +341,9 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
   return (
     <section
       id="os-mais-procurados-section"
-      className="bg-[#F6F5F2] select-none relative overflow-hidden border-b border-zinc-200/90 py-16 sm:py-20 lg:py-24"
+      className="bg-[#F6F5F2] select-none relative overflow-hidden border-b border-zinc-200/90 py-10 sm:py-12 lg:py-14"
     >
-      <div className="max-w-[1640px] mx-auto px-4 sm:px-7 lg:px-8">
+      <div className="max-w-[1820px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* ========================================================= */}
         {/* HEADER DA SEÇÃO: HIERARQUIA EDITORIAL MINIMALISTA         */}
         {/* ========================================================= */}
@@ -455,7 +455,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
               <article
                 key={item.id}
                 onClick={() => onNavigate('product', item.originalProduct.slug || item.originalProduct.id)}
-                className="group relative flex flex-col bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)] hover:border-black/15 transition-all duration-300 overflow-hidden select-none cursor-pointer"
+                className="group relative flex flex-col bg-white rounded-2xl border border-black/[0.06] shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_14px_30px_rgba(0,0,0,0.06)] hover:border-black/15 transition-all duration-300 overflow-hidden select-none cursor-pointer font-sans"
               >
                 {/* 1. Imagem Grande (65% a 70% da altura visual do card, object-fit: cover) */}
                 <div className="relative aspect-[3/4] w-full overflow-hidden bg-[#F6F6F6]">
@@ -488,29 +488,29 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                 <div className="p-4 sm:p-5 lg:p-6 flex flex-col justify-between flex-1">
                   <div>
                     {/* Categoria */}
-                    <p className="font-helvetica-now font-medium uppercase text-[10.5px] sm:text-[11px] tracking-[0.16em] text-[#555555] mb-2 leading-none">
+                    <p className="font-sans font-medium uppercase text-[10.5px] sm:text-[11px] tracking-[0.16em] text-[#555555] mb-2 leading-none">
                       {item.categoryLabel}
                     </p>
 
                     {/* Nome do Produto */}
-                    <h3 className="font-helvetica-now font-bold uppercase text-[15px] sm:text-[16px] tracking-[-0.02em] leading-[0.95] text-black hover:text-zinc-700 transition-colors line-clamp-2 mb-3 sm:mb-3.5">
+                    <h3 className="font-sans font-bold uppercase text-[15px] sm:text-[16px] tracking-[-0.02em] leading-[0.95] text-black hover:text-zinc-700 transition-colors line-clamp-2 mb-3 sm:mb-3.5">
                       {item.title}
                     </h3>
 
                     {/* Preço (Sans-serif pesada, mesmo estilo visual do título, sem serif) */}
                     <div className="flex items-baseline gap-2 mb-1.5">
-                      <span className="font-helvetica-now font-extrabold text-[21px] sm:text-[23px] tracking-[-0.035em] leading-[0.95] text-black">
+                      <span className="font-sans font-extrabold text-[21px] sm:text-[23px] tracking-[-0.035em] leading-[0.95] text-black">
                         R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
 
                     {/* Parcelamento */}
-                    <p className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-0.5">
+                    <p className="font-sans font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-0.5">
                       ou 3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sem juros
                     </p>
 
                     {/* Pix */}
-                    <p className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-4 sm:mb-5">
+                    <p className="font-sans font-normal text-[11px] sm:text-[11.5px] text-[#555555] leading-tight mb-4 sm:mb-5">
                       R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} no Pix
                     </p>
                   </div>
@@ -542,7 +542,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                       <div className="h-3 w-[1px] bg-[#D4D4D4] mx-2 sm:mx-2.5 shrink-0" />
 
                       {/* Quantidade de cores */}
-                      <span className="font-helvetica-now font-normal text-[11px] sm:text-[11.5px] text-[#333333] whitespace-nowrap truncate select-none">
+                      <span className="font-sans font-normal text-[11px] sm:text-[11.5px] text-[#333333] whitespace-nowrap truncate select-none">
                         {item.colors.length} {item.colors.length === 1 ? 'cor' : 'cores'}
                       </span>
                     </div>

@@ -4,14 +4,14 @@ import { Category } from '../types';
 export const CATEGORY_IMAGE_STORAGE_KEY = '@marmot_cached_category_images';
 export const CATEGORY_STORAGE_KEY = '@marmot_cached_categories';
 export const CATEGORY_IMAGES_VERSION_KEY = '@marmot_category_images_version';
-export const CURRENT_CATEGORY_IMAGES_VERSION = '20260916_v5_new_assets';
+export const CURRENT_CATEGORY_IMAGES_VERSION = '20260917_v7_clean_headroom';
 
 export const DEFAULT_CATEGORY_IMAGE_URLS: Record<string, string> = {
   camisetas: '/categories/categoria-camisetas.png?v=20260916_v5_new_assets',
   moletons: '/categories/categoria-moletons.png?v=20260916_v5_new_assets',
   jaquetas: '/categories/categoria-jaquetas.png?v=20260916_v5_new_assets',
   calcas: '/categories/categoria-calcas.png?v=20260916_v5_new_assets',
-  shorts: '/categories/categoria-shorts.png?v=20260916_v5_new_assets',
+  shorts: '/categories/categoria-shorts.png?v=20260917_v7_clean_headroom',
   tenis: '/categories/categoria-tenis.png?v=20260916_v5_new_assets',
   acessorios: '/categories/categoria-acessorios.png?v=20260916_v5_new_assets',
 };
