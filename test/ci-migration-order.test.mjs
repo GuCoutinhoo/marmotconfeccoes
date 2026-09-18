@@ -21,6 +21,10 @@ test('workspace efêmero aplica o schema base antes das migrations datadas', asy
     assert.equal(files.length, 18);
     assert.equal(new Set(files.map((file) => file.slice(0, 14))).size, files.length);
 
+    const baseline = await fs.readFile(path.join(workdir, 'supabase', 'migrations', files[0]), 'utf8');
+    const categoriesDefinition = baseline.match(/CREATE TABLE IF NOT EXISTS public\.categories \(([\s\S]*?)\);/)?.[1] || '';
+    assert.match(categoriesDefinition, /data JSONB/, 'baseline deve reproduzir a coluna legada auditada pela migration final');
+
     const coreIndex = files.findIndex((file) => file.endsWith('20260301_001_core_schema.sql'));
     const fulfillmentIndex = files.findIndex((file) => file.endsWith('20260907140252_complete_shipping_fulfillment.sql'));
     assert.ok(coreIndex > 0, 'core_schema deve existir após o baseline');

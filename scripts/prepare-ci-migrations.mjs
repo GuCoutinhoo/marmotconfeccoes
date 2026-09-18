@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS public.categories (
   image_url TEXT,
   banner_url TEXT,
   icon TEXT,
+  data JSONB,
   display_order INTEGER DEFAULT 0,
   active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
