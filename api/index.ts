@@ -889,6 +889,7 @@ if (!isProductionPersistenceRuntime() && !fs.existsSync(DATA_DIR)) {
 export class DatabaseManager {
   private pgPool: Pool | null = null;
   private supabase: SupabaseClient | null = null;
+  private catalogSupabase: SupabaseClient | null = null;
   private supabaseAdmin: SupabaseClient | null = null;
   private supabaseAdminValidation: Promise<SupabaseClient | null> | null = null;
   private supabaseAuth: SupabaseClient | null = null;
@@ -1449,6 +1450,53 @@ export class DatabaseManager {
   }
 
   /**
+   * Public, read-only catalog client.
+   *
+   * Catalog availability must not depend on the server-side service-role key.
+   * products/categories already have explicit public SELECT policies, so the
+   * storefront can safely read them with the publishable key while all
+   * administrative mutations remain locked behind getRequiredSupabaseAdminClient().
+   */
+  private getCatalogSupabaseClient(): SupabaseClient | null {
+    if (this.catalogSupabase) return this.catalogSupabase;
+
+    const supabaseUrl = String(
+      process.env.VITE_SUPABASE_URL ||
+      process.env.SUPABASE_URL ||
+      'https://ktmkvysnjfphcfntazut.supabase.co',
+    ).trim();
+    const publicKey = String(
+      process.env.VITE_SUPABASE_ANON_KEY ||
+      process.env.SUPABASE_ANON_KEY ||
+      'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo',
+    ).trim();
+
+    if (
+      !supabaseUrl ||
+      supabaseUrl.includes('placeholder') ||
+      !publicKey ||
+      publicKey.includes('placeholder')
+    ) {
+      return null;
+    }
+
+    this.catalogSupabase = createClient(supabaseUrl, publicKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+      global: {
+        headers: {
+          'X-Client-Info': 'marmot-public-catalog',
+        },
+      },
+    });
+
+    return this.catalogSupabase;
+  }
+
+  /**
    * Dedicated anon-key client for end-user authentication operations.
    * Never authenticate a user on the cached service-role client: doing so
    * replaces its Authorization context and makes later administrative writes
@@ -1621,8 +1669,10 @@ export class DatabaseManager {
   }
 
   private async fetchAllProductsFromAuthoritativeStore(): Promise<Product[]> {
-    if (this.mode === 'supabase' && this.supabase) {
-      const { data, error } = await this.supabase
+    const catalogClient = this.getCatalogSupabaseClient();
+
+    if (catalogClient) {
+      const { data, error } = await catalogClient
         .from('products')
         .select(PRODUCT_SELECT_COLUMNS)
         .order('id', { ascending: true });
@@ -1631,16 +1681,19 @@ export class DatabaseManager {
       this.products = products;
       return products;
     }
+
     if (!this.productionRuntime) return [...this.products];
-    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
+    throw new Error('PUBLIC_CATALOG_SUPABASE_NOT_CONFIGURED: não foi possível configurar a leitura pública do catálogo.');
   }
 
   private async fetchProductFromAuthoritativeStore(idOrSlug: string): Promise<Product | null> {
     const clean = String(idOrSlug || '').trim();
     if (!clean) return null;
-    if (this.mode === 'supabase' && this.supabase) {
+
+    const catalogClient = this.getCatalogSupabaseClient();
+    if (catalogClient) {
       const readBy = async (column: 'id' | 'slug') => {
-        const { data, error } = await this.supabase!
+        const { data, error } = await catalogClient
           .from('products')
           .select(PRODUCT_SELECT_COLUMNS)
           .eq(column, clean)
@@ -1650,11 +1703,13 @@ export class DatabaseManager {
       };
       return (await readBy('id')) || (await readBy('slug'));
     }
+
     if (!this.productionRuntime) {
       const lower = clean.toLowerCase();
       return this.products.find((product) => product.id?.toLowerCase() === lower || product.slug?.toLowerCase() === lower) || null;
     }
-    throw new Error('PRODUCT_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar o catálogo.');
+
+    throw new Error('PUBLIC_CATALOG_SUPABASE_NOT_CONFIGURED: não foi possível configurar a leitura pública do catálogo.');
   }
 
   public async getProducts(filters?: any): Promise<Product[]> {
@@ -1672,7 +1727,9 @@ export class DatabaseManager {
     onSale?: boolean;
     sort?: string;
   }): Promise<Product[]> {
-    await this.initialize();
+    // Public catalog reads are intentionally independent from full backend
+    // initialization. A failure in orders/shipping/admin configuration must
+    // never make the storefront product list disappear.
     const authoritativeProducts = await this.fetchAllProductsFromAuthoritativeStore();
 
     // Never hide or rebuild persisted catalog rows implicitly. Storefront and
@@ -1742,7 +1799,6 @@ export class DatabaseManager {
   }
 
   public async getProductById(idOrSlug: string): Promise<Product | null> {
-    await this.initialize();
     return this.fetchProductFromAuthoritativeStore(idOrSlug);
   }
 
@@ -1990,17 +2046,23 @@ export class DatabaseManager {
   // CATEGORIES CRUD
   // ==========================================
   public async getAllCategories(): Promise<Category[]> {
-    await this.initialize();
-    if (this.mode === 'supabase' && this.supabase) {
-      const { data, error } = await this.supabase.from('categories').select('*').order('order', { ascending: true });
+    const catalogClient = this.getCatalogSupabaseClient();
+
+    if (catalogClient) {
+      const { data, error } = await catalogClient
+        .from('categories')
+        .select('*')
+        .order('order', { ascending: true });
       if (error) throw new Error(`SUPABASE_CATEGORIES_READ_FAILED: ${error.message}`);
       this.categories = (data || []).map((row: any) => this.mapSupabaseCategory(row));
       return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }
+
     if (!this.productionRuntime) {
       return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }
-    throw new Error('CATEGORY_STORE_NOT_CONFIGURED: o Supabase é obrigatório para acessar categorias.');
+
+    throw new Error('PUBLIC_CATALOG_SUPABASE_NOT_CONFIGURED: não foi possível configurar a leitura pública das categorias.');
   }
 
   public async getCategoryById(idOrSlug: string): Promise<Category | null> {
