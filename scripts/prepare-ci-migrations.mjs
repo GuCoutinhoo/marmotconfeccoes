@@ -323,34 +323,16 @@ files.sort((a, b) => {
   return a.localeCompare(b);
 });
 
-const dateCounters = {};
 const processed = [];
 
-for (const file of files) {
-  const matchWithSeq = file.match(/^(\d{8})_(\d{3})_(.*)$/);
-  const matchPlain = file.match(/^(\d{8})_(.*)$/);
-  let date;
-  let seq;
-  let rest;
-
-  if (matchWithSeq) {
-    date = matchWithSeq[1];
-    seq = parseInt(matchWithSeq[2], 10);
-    rest = matchWithSeq[3];
-  } else if (matchPlain) {
-    date = matchPlain[1];
-    dateCounters[date] = (dateCounters[date] || 0) + 1;
-    seq = dateCounters[date];
-    rest = matchPlain[2];
-  } else {
-    date = '20260101';
-    seq = (dateCounters[date] || 0) + 1;
-    dateCounters[date] = seq;
-    rest = file;
-  }
-
-  const seqStr = String(seq).padStart(4, '0') + '00';
-  const uniqueName = `${date}${seqStr}_${rest}`;
+for (const [index, file] of files.entries()) {
+  // Supabase applies migrations by their 14-digit version prefix. Reusing the
+  // source timestamp here is unsafe because this repository contains both
+  // YYYYMMDD and YYYYMMDDHHMMSS names. Assign a deterministic ephemeral
+  // sequence after the injected baseline so the canonical order above is the
+  // actual execution order in CI.
+  const sequence = String(index + 1).padStart(6, '0');
+  const uniqueName = `20260102${sequence}_${file}`;
 
   const srcPath = path.join(sourceDir, file);
   const dstPath = path.join(targetMigrationsDir, uniqueName);
