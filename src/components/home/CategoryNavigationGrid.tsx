@@ -22,8 +22,26 @@ interface CategoryEditorialItem {
 }
 
 const CATEGORY_SETS: CategoryEditorialItem[][] = [
-  // CONJUNTO 01: Jaquetas (Grande Esquerda), Shorts (Centro Sup), Calças (Direita Sup), Moletons (Centro Inf), Camisetas (Direita Inf)
+  // CONJUNTO 01: 4 Colunas Verticais Principais (Camisetas, Moletons, Jaquetas, Calças)
   [
+    {
+      id: 'camisetas',
+      slug: 'camisetas',
+      name: 'CAMISETAS',
+      image: '/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria camiseta.png?v=20260917_v9_novas_imagens_categoria',
+      objectPosition: 'center 18%',
+      defaultPieces: 24,
+    },
+    {
+      id: 'moletons',
+      slug: 'moletons',
+      name: 'MOLETONS',
+      image: '/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria moletom.png?v=20260917_v9_novas_imagens_categoria',
+      objectPosition: 'center 14%',
+      defaultPieces: 19,
+    },
     {
       id: 'jaquetas',
       slug: 'jaquetas',
@@ -31,16 +49,7 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       image: '/categories/categoria-jaquetas.png?v=20260917_v9_novas_imagens_categoria',
       fallbackImage: '/categoria jaqueta.png?v=20260917_v9_novas_imagens_categoria',
       objectPosition: 'center 20%',
-      defaultPieces: 18,
-    },
-    {
-      id: 'shorts',
-      slug: 'shorts',
-      name: 'SHORTS',
-      image: '/categories/categoria-shorts.png?v=20260917_v9_novas_imagens_categoria',
-      fallbackImage: '/categoria shorts.png?v=20260917_v9_novas_imagens_categoria',
-      objectPosition: 'center 10%',
-      defaultPieces: 12,
+      defaultPieces: 19,
     },
     {
       id: 'calcas',
@@ -51,54 +60,9 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       objectPosition: 'center 35%',
       defaultPieces: 20,
     },
-    {
-      id: 'moletons',
-      slug: 'moletons',
-      name: 'MOLETONS',
-      image: '/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria',
-      fallbackImage: '/categoria moletom.png?v=20260917_v9_novas_imagens_categoria',
-      objectPosition: 'center 14%',
-      defaultPieces: 16,
-    },
-    {
-      id: 'camisetas',
-      slug: 'camisetas',
-      name: 'CAMISETAS',
-      image: '/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria',
-      fallbackImage: '/categoria camiseta.png?v=20260917_v9_novas_imagens_categoria',
-      objectPosition: 'center 18%',
-      defaultPieces: 24,
-    },
   ],
-  // CONJUNTO 02: Camisetas (Grande Esquerda), Tênis (Centro Sup), Acessórios (Direita Sup), Shorts (Centro Inf), Moletons (Direita Inf)
+  // CONJUNTO 02: 4 Colunas Verticais Complementares (Shorts, Cargos, Tênis, Acessórios)
   [
-    {
-      id: 'camisetas',
-      slug: 'camisetas',
-      name: 'CAMISETAS',
-      image: '/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria',
-      fallbackImage: '/categoria camiseta.png?v=20260917_v9_novas_imagens_categoria',
-      objectPosition: 'center 18%',
-      defaultPieces: 24,
-    },
-    {
-      id: 'tenis',
-      slug: 'tenis',
-      name: 'TÊNIS',
-      image: '/categories/categoria-tenis.png?v=20260917_v9_novas_imagens_categoria',
-      fallbackImage: '/categoria tenis.png?v=20260917_v9_novas_imagens_categoria',
-      objectPosition: 'center 62%',
-      defaultPieces: 14,
-    },
-    {
-      id: 'acessorios',
-      slug: 'acessorios',
-      name: 'ACESSÓRIOS',
-      image: '/categories/categoria-acessorios.png?v=20260917_v9_novas_imagens_categoria',
-      fallbackImage: '/categoria acessorios.png?v=20260917_v9_novas_imagens_categoria',
-      objectPosition: 'center 30%',
-      defaultPieces: 10,
-    },
     {
       id: 'shorts',
       slug: 'shorts',
@@ -109,218 +73,45 @@ const CATEGORY_SETS: CategoryEditorialItem[][] = [
       defaultPieces: 12,
     },
     {
-      id: 'moletons',
-      slug: 'moletons',
-      name: 'MOLETONS',
-      image: '/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria',
-      fallbackImage: '/categoria moletom.png?v=20260917_v9_novas_imagens_categoria',
-      objectPosition: 'center 14%',
-      defaultPieces: 16,
+      id: 'cargos',
+      slug: 'cargos',
+      name: 'CARGOS',
+      image: '/categories/categoria-calcas.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/calca_cargo_baggy_preto.png?v=20260917_v9_novas_imagens_categoria',
+      objectPosition: 'center 40%',
+      defaultPieces: 12,
+    },
+    {
+      id: 'tenis',
+      slug: 'tenis',
+      name: 'TÊNIS',
+      image: '/categories/categoria-tenis.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria tenis.png?v=20260917_v9_novas_imagens_categoria',
+      objectPosition: 'center 62%',
+      defaultPieces: 10,
+    },
+    {
+      id: 'acessorios',
+      slug: 'acessorios',
+      name: 'ACESSÓRIOS',
+      image: '/categories/categoria-acessorios.png?v=20260917_v9_novas_imagens_categoria',
+      fallbackImage: '/categoria acessorios.png?v=20260917_v9_novas_imagens_categoria',
+      objectPosition: 'center 30%',
+      defaultPieces: 15,
     },
   ],
 ];
 
-// Variantes de animação refinadas para cada card
-const cardLeftVariant = {
-  hidden: {
-    opacity: 0,
-    x: -28,
-    y: 28,
-    scale: 0.985,
-    transition: { duration: 0 },
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.82,
-      ease: [0.22, 1, 0.36, 1],
-      delay: 0,
-    },
-  },
-};
-
-const cardTopVariant = {
-  hidden: {
-    opacity: 0,
-    x: 0,
-    y: -24,
-    scale: 0.985,
-    transition: { duration: 0 },
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.82,
-      ease: [0.22, 1, 0.36, 1],
-      delay: 0.08,
-    },
-  },
-};
-
-const cardTopRightVariant = {
-  hidden: {
-    opacity: 0,
-    x: 24,
-    y: -24,
-    scale: 0.985,
-    transition: { duration: 0 },
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.82,
-      ease: [0.22, 1, 0.36, 1],
-      delay: 0.14,
-    },
-  },
-};
-
-const cardBottomVariant = {
-  hidden: {
-    opacity: 0,
-    x: 0,
-    y: 24,
-    scale: 0.985,
-    transition: { duration: 0 },
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.82,
-      ease: [0.22, 1, 0.36, 1],
-      delay: 0.20,
-    },
-  },
-};
-
-const cardBottomRightVariant = {
-  hidden: {
-    opacity: 0,
-    x: 24,
-    y: 24,
-    scale: 0.985,
-    transition: { duration: 0 },
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.82,
-      ease: [0.22, 1, 0.36, 1],
-      delay: 0.26,
-    },
-  },
-};
-
-const titleVariant = {
-  hidden: {
-    opacity: 0,
-    y: 32,
-    transition: { duration: 0 },
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.75,
-      ease: [0.16, 1, 0.3, 1],
-      delay: 0.05,
-    },
-  },
-};
-
-const subtitleVariant = {
-  hidden: {
-    opacity: 0,
-    y: 18,
-    transition: { duration: 0 },
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.75,
-      ease: [0.16, 1, 0.3, 1],
-      delay: 0.12,
-    },
-  },
-};
-
 export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ onNavigate }) => {
-  const { categories } = useStore();
+  const { categories, products } = useStore();
   const [activeSetIndex, setActiveSetIndex] = useState(0);
+  const [slideDirection, setSlideDirection] = useState(1);
   const sectionRef = useRef<HTMLElement>(null);
-  const [hasEntered, setHasEntered] = useState(false);
 
   useEffect(() => {
     ensureCategoryImagesStoredInLocalStorage().catch((err) => {
       console.warn('Erro ao sincronizar imagens com localStorage:', err);
     });
-  }, []);
-
-  // Monitora a visibilidade para disparar a animação assim que o usuário entrar no site ou alcançar a seção
-  useEffect(() => {
-    const el = sectionRef.current;
-    if (!el) return;
-
-    let ticking = false;
-
-    const checkPosition = () => {
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight || document.documentElement.clientHeight;
-
-      // Se a seção estiver completamente fora da tela (abaixo da viewport):
-      if (rect.top >= vh) {
-        setHasEntered(false);
-        ticking = false;
-        return;
-      }
-
-      // Se qualquer parte da seção entrou na viewport (inclusive a prévia no rodapé ao abrir o site):
-      if (rect.top < vh && rect.bottom >= 0) {
-        setHasEntered(true);
-      }
-
-      ticking = false;
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(checkPosition);
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-
-    // Verificação imediata na entrada do usuário
-    checkPosition();
-
-    // Confirmação de segurança caso assets ou fontes terminem de carregar
-    const rafId = requestAnimationFrame(checkPosition);
-    const timer = setTimeout(checkPosition, 60);
-
-    return () => {
-      cancelAnimationFrame(rafId);
-      clearTimeout(timer);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
   }, []);
 
   const getCardImage = useCallback(
@@ -346,30 +137,50 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
     [categories]
   );
 
+  const getCategoryCount = useCallback(
+    (slug: string, defaultPieces: number) => {
+      if (!products || products.length === 0) return defaultPieces;
+      const count = products.filter(
+        (p) =>
+          p.category?.toLowerCase() === slug.toLowerCase() ||
+          p.subcategory?.toLowerCase() === slug.toLowerCase()
+      ).length;
+      return count > 0 ? count : defaultPieces;
+    },
+    [products]
+  );
+
   const handlePrevSet = () => {
+    setSlideDirection(-1);
     setActiveSetIndex((prev) => (prev === 0 ? CATEGORY_SETS.length - 1 : prev - 1));
   };
 
   const handleNextSet = () => {
+    setSlideDirection(1);
     setActiveSetIndex((prev) => (prev === CATEGORY_SETS.length - 1 ? 0 : prev + 1));
   };
 
   const currentSet = CATEGORY_SETS[activeSetIndex];
-  const item1 = currentSet[0]; // Card Grande Vertical (Esquerda - 2 Linhas)
-  const item2 = currentSet[1]; // Card Retangular Superior Meio
-  const item3 = currentSet[2]; // Card Retangular Superior Direita
-  const item4 = currentSet[3]; // Card Retangular Inferior Meio
-  const item5 = currentSet[4]; // Card Retangular Inferior Direita
 
-  // Renderizador do card individual com cantos arredondados e acabamento de alta precisão
+  // Renderizador do card individual vertical com proporção 9:15 / alta precisão
   const renderCategoryCard = (
     item: CategoryEditorialItem,
-    className: string
+    index: number
   ) => {
+    const pieces = getCategoryCount(item.slug, item.defaultPieces);
+
     return (
-      <article
+      <motion.article
+        key={item.id}
+        initial={{ opacity: 0, y: 22 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          duration: 0.55,
+          delay: index * 0.08,
+          ease: [0.22, 1, 0.36, 1],
+        }}
         onClick={() => onNavigate('shop', item.slug)}
-        className={`group relative overflow-hidden bg-[#111113] cursor-pointer select-none rounded-xl sm:rounded-2xl border border-zinc-200/90 hover:border-zinc-400/80 shadow-sm hover:shadow-md transition-all duration-300 ${className}`}
+        className="group relative overflow-hidden bg-[#111113] cursor-pointer select-none rounded-xl sm:rounded-2xl border border-zinc-200/90 hover:border-zinc-400/80 shadow-xs hover:shadow-md transition-all duration-300 aspect-[9/15] min-h-[360px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[500px] xl:min-h-[540px] w-full flex flex-col justify-end"
       >
         {/* Imagem de Fundo (100% preservada com os assets reais) */}
         <img
@@ -382,7 +193,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
           style={{
             objectPosition: item.objectPosition || 'center center',
           }}
-          className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out select-none pointer-events-none brightness-[0.98] contrast-[1.04]"
+          className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-700 ease-out select-none pointer-events-none brightness-[0.98] contrast-[1.04]"
           onError={(e) => {
             if (e.currentTarget.src !== item.fallbackImage) {
               e.currentTarget.src = item.fallbackImage;
@@ -390,19 +201,21 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
           }}
         />
 
-        {/* Degradê/overlay escuro na base para legibilidade dos textos */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 via-35% to-transparent pointer-events-none" />
+        {/* Degradê/overlay escuro na base para legibilidade máxima */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 via-40% to-transparent pointer-events-none transition-opacity duration-300 group-hover:from-black/95" />
 
         {/* Textos no canto inferior esquerdo */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-4.5 lg:p-5 z-10 flex flex-col items-start">
-          {/* Nome da categoria em Inter / negrito pesado / branco */}
+        <div className="relative p-4 sm:p-5 lg:p-5.5 z-10 flex flex-col items-start w-full">
+          <span className="text-[10px] sm:text-[11px] font-mono font-medium text-zinc-300 tracking-[0.16em] uppercase mb-1 drop-shadow-xs">
+            {pieces} PEÇAS
+          </span>
           <h3
             style={{
-              fontFamily: '"Inter", sans-serif',
+              fontFamily: '"Inter Tight", "Inter", sans-serif',
               fontWeight: 900,
               letterSpacing: '-0.02em',
             }}
-            className="text-white uppercase leading-none text-xl sm:text-2xl lg:text-[23px] xl:text-[25px] mb-1 sm:mb-1.5"
+            className="text-white uppercase leading-none text-xl sm:text-2xl lg:text-[23px] xl:text-[26px] mb-2 drop-shadow-sm"
           >
             {item.name}
           </h3>
@@ -410,13 +223,13 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
           {/* EXPLORAR discreto + pequena seta amarela */}
           <div
             style={{ fontFamily: '"Inter", sans-serif' }}
-            className="flex items-center gap-1.5 sm:gap-2 text-white text-[10px] sm:text-[11px] font-bold tracking-[0.2em] uppercase transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 text-white text-[10px] sm:text-[11px] font-bold tracking-[0.2em] uppercase transition-colors group-hover:text-[#F4C400]"
           >
             <span>EXPLORAR</span>
-            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#F5C400] stroke-[2.2] transition-transform duration-200 group-hover:translate-x-1" />
+            <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#F5C400] stroke-[2.4] transition-transform duration-200 group-hover:translate-x-1" />
           </div>
         </div>
-      </article>
+      </motion.article>
     );
   };
 
@@ -433,7 +246,7 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
       {/* ========================================================= */}
       {/* CABEÇALHO DA SEÇÃO                                         */}
       {/* ========================================================= */}
-      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto mb-3 sm:mb-4">
+      <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto mb-4 sm:mb-5">
         <div className="flex items-start sm:items-end justify-between gap-4">
           {/* BLOCO ESQUERDO: TÍTULO + SUBTÍTULO */}
           <div className="flex flex-col items-start text-left">
@@ -445,97 +258,67 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
             </p>
           </div>
 
-          {/* BLOCO DIREITO: Setas superiores para alternar entre conjuntos de categorias */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={handlePrevSet}
-              aria-label="Conjunto anterior"
-              className="w-9 h-9 sm:w-10 sm:h-10 border border-zinc-200/90 bg-white hover:bg-zinc-50 active:scale-95 flex items-center justify-center text-zinc-900 transition-all cursor-pointer rounded-[3px] shadow-2xs"
-            >
-              <ArrowLeft className="w-4 h-4 stroke-[2]" />
-            </button>
-            <button
-              type="button"
-              onClick={handleNextSet}
-              aria-label="Próximo conjunto"
-              className="w-9 h-9 sm:w-10 sm:h-10 border border-[#F4C400] bg-white hover:bg-amber-50/40 active:scale-95 flex items-center justify-center text-zinc-900 transition-all cursor-pointer rounded-[3px] shadow-2xs"
-            >
-              <ArrowRight className="w-4 h-4 stroke-[2]" />
-            </button>
+          {/* BLOCO DIREITO: Indicadores + Setas para alternar entre os conjuntos de 4 cards */}
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Indicador de página e bullets interativos */}
+            <div className="hidden sm:flex items-center gap-2.5 text-xs font-mono font-medium text-zinc-500 select-none">
+              <span>{String(activeSetIndex + 1).padStart(2, '0')} / {String(CATEGORY_SETS.length).padStart(2, '0')}</span>
+              <div className="flex items-center gap-1.5">
+                {CATEGORY_SETS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      setSlideDirection(idx > activeSetIndex ? 1 : -1);
+                      setActiveSetIndex(idx);
+                    }}
+                    aria-label={`Ir para conjunto ${idx + 1}`}
+                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      idx === activeSetIndex ? 'w-5 bg-zinc-900' : 'w-1.5 bg-zinc-300 hover:bg-zinc-400'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Setas anterior / próximo */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={handlePrevSet}
+                aria-label="Conjunto anterior"
+                className="w-9 h-9 sm:w-10 sm:h-10 border border-zinc-200/90 bg-white hover:bg-zinc-50 active:scale-95 flex items-center justify-center text-zinc-900 transition-all cursor-pointer rounded-[3px] shadow-2xs"
+              >
+                <ArrowLeft className="w-4 h-4 stroke-[2]" />
+              </button>
+              <button
+                type="button"
+                onClick={handleNextSet}
+                aria-label="Próximo conjunto"
+                className="w-9 h-9 sm:w-10 sm:h-10 border border-[#F4C400] bg-white hover:bg-amber-50/40 active:scale-95 flex items-center justify-center text-zinc-900 transition-all cursor-pointer rounded-[3px] shadow-2xs"
+              >
+                <ArrowRight className="w-4 h-4 stroke-[2]" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* ========================================================= */}
-      {/* GRID EXATO DA IMAGEM DE REFERÊNCIA:                        */}
-      {/* - Coluna 1 (Esquerda): 1 Card Alto Vertical (2 Linhas)     */}
-      {/* - Coluna 2 e 3 (Direita): 4 Cards Retangulares em Grade 2x2*/}
+      {/* GRID DE 4 COLUNAS VERTICAIS IDÊNTICAS (LAYOUT DA IMAGEM): */}
+      {/* - 4 Cards Altos Verticais lado a lado em 1 linha única    */}
       {/* ========================================================= */}
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-[1840px] mx-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeSetIndex}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -14 }}
+            initial={{ opacity: 0, x: slideDirection > 0 ? 20 : -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: slideDirection > 0 ? -20 : 20 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 md:grid-rows-2 gap-2.5 sm:gap-3 md:gap-3.5 lg:gap-4 h-auto md:h-[460px] lg:h-[495px] xl:h-[530px] 2xl:h-[550px]"
+            className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 md:gap-3.5 lg:gap-4 xl:gap-5"
           >
-            {/* 1. CARD GRANDE (ESQUERDA - ALTURA TOTAL / 2 LINHAS) */}
-            <motion.div
-              variants={cardLeftVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.05 }}
-              className="sm:col-span-2 md:col-span-1 md:row-span-2 md:col-start-1 md:row-start-1 w-full h-[350px] sm:h-[390px] md:h-full will-change-transform"
-            >
-              {renderCategoryCard(item1, 'w-full h-full')}
-            </motion.div>
-
-            {/* 2. CARD RETANGULAR (CENTRO SUPERIOR) */}
-            <motion.div
-              variants={cardTopVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.05 }}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-1 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
-            >
-              {renderCategoryCard(item2, 'w-full h-full')}
-            </motion.div>
-
-            {/* 3. CARD RETANGULAR (DIREITA SUPERIOR) */}
-            <motion.div
-              variants={cardTopRightVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.05 }}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-1 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
-            >
-              {renderCategoryCard(item3, 'w-full h-full')}
-            </motion.div>
-
-            {/* 4. CARD RETANGULAR (CENTRO INFERIOR) */}
-            <motion.div
-              variants={cardBottomVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.05 }}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-2 md:row-start-2 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
-            >
-              {renderCategoryCard(item4, 'w-full h-full')}
-            </motion.div>
-
-            {/* 5. CARD RETANGULAR (DIREITA INFERIOR) */}
-            <motion.div
-              variants={cardBottomRightVariant}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: false, amount: 0.05 }}
-              className="sm:col-span-1 md:col-span-1 md:row-span-1 md:col-start-3 md:row-start-2 w-full h-[175px] sm:h-[200px] md:h-full will-change-transform"
-            >
-              {renderCategoryCard(item5, 'w-full h-full')}
-            </motion.div>
+            {currentSet.map((item, index) => renderCategoryCard(item, index))}
           </motion.div>
         </AnimatePresence>
       </div>

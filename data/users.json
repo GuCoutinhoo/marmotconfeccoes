@@ -47,5 +47,27 @@
     ],
     "createdAt": "2026-08-17T20:25:05.384Z",
     "lastLogin": "2026-08-17T20:25:05.384Z"
+  },
+  {
+    "id": "user-legacy-001",
+    "name": "legacy",
+    "email": "legacy@marmot.com",
+    "passwordHash": "",
+    "role": "admin",
+    "isVerified": true,
+    "addresses": [],
+    "createdAt": "2026-09-18T15:42:22.455Z",
+    "lastLogin": "2026-09-18T15:42:22.455Z"
+  },
+  {
+    "id": "user-forged-001",
+    "name": "attacker",
+    "email": "attacker@evil.com",
+    "passwordHash": "",
+    "role": "admin",
+    "isVerified": true,
+    "addresses": [],
+    "createdAt": "2026-09-18T15:42:24.027Z",
+    "lastLogin": "2026-09-18T15:42:24.027Z"
   }
 ]
