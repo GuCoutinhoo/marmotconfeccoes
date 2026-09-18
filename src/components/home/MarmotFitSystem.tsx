@@ -19,6 +19,11 @@ interface LookProductItem {
   category: string;
 }
 
+interface LookDisplayItem extends LookProductItem {
+  variantKey: string;
+  colorName?: string;
+}
+
 interface LookDefinition {
   lookNumber: 1 | 2;
   lookTitle: string;
@@ -63,28 +68,12 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             category: 'CAMISETAS',
           },
           {
-            id: 'prod-cam-003',
-            slug: 'camiseta-drop-shoulder',
-            title: 'CAMISETA DROP SHOULDER',
-            price: 159.9,
-            image: '/fit_card_drop_shoulder.png',
-            category: 'CAMISETAS',
-          },
-          {
             id: 'prod-cal-002',
             slug: 'calca-cargo-baggy',
             title: 'CALÇA BAGGY',
             price: 299.9,
             image: '/fit_card_calca_baggy.png',
             category: 'CALÇAS',
-          },
-          {
-            id: 'prod-jaq-016',
-            slug: 'jaqueta-utility',
-            title: 'JAQUETA UTILITY',
-            price: 459.9,
-            image: '/fit_card_jaqueta_utility.png',
-            category: 'JAQUETAS',
           },
         ],
       },
@@ -112,22 +101,6 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             image: '/fit_card_calca_balloon.png',
             category: 'CALÇAS',
           },
-          {
-            id: 'prod-cam-004',
-            slug: 'camiseta-heavy-boxy',
-            title: 'CAMISETA HEAVY BOXY',
-            price: 189.9,
-            image: '/fit_card_boxy_branco.png',
-            category: 'CAMISETAS',
-          },
-          {
-            id: 'prod-cal-002',
-            slug: 'calca-cargo-baggy',
-            title: 'CALÇA CARGO BAGGY',
-            price: 339.9,
-            image: '/fit_card_calca_baggy.png',
-            category: 'CARGOS',
-          },
         ],
       },
     ],
@@ -143,19 +116,19 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
     looks: [
       {
         lookNumber: 1,
-        lookTitle: 'LOOK 1 // CAMISETA RAGLAN OVERSIZED',
+        lookTitle: 'LOOK 1 // SOBREPOSIÇÃO OVERSIZED',
         imageSrc: '/03_OVERSIZED_look_1_camiseta_raglan_oversized.png',
-        focusPiece: 'Camiseta Raglan Oversized',
+        focusPiece: 'Jaqueta Utility + Cargo',
         description:
-          'Mangas raglan com costuras diagonais contínuas e modelagem com volume streetwear amplo.',
+          'Composição oversized com jaqueta ampla, base neutra e calça cargo de volume relaxado.',
         products: [
           {
-            id: 'prod-cam-007',
-            slug: 'camiseta-raglan-oversized',
-            title: 'CAMISETA RAGLAN OVERSIZED',
-            price: 189.9,
-            image: '/fit_card_raglan_branco.png',
-            category: 'CAMISETAS',
+            id: 'prod-jaq-016',
+            slug: 'jaqueta-utility',
+            title: 'JAQUETA UTILITY',
+            price: 459.9,
+            image: '/fit_card_jaqueta_utility.png',
+            category: 'JAQUETAS',
           },
           {
             id: 'prod-cal-002',
@@ -164,22 +137,6 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             price: 339.9,
             image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
-          },
-          {
-            id: 'prod-cam-007',
-            slug: 'camiseta-raglan-oversized',
-            title: 'RAGLAN OVERSIZED PRETA/CINZA',
-            price: 189.9,
-            image: '/fit_card_raglan_preto.png',
-            category: 'CAMISETAS',
-          },
-          {
-            id: 'prod-cal-001',
-            slug: 'calca-balloon',
-            title: 'CALÇA BALLOON',
-            price: 319.9,
-            image: '/fit_card_calca_balloon.png',
-            category: 'CALÇAS',
           },
         ],
       },
@@ -206,22 +163,6 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             price: 339.9,
             image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
-          },
-          {
-            id: 'prod-cam-004',
-            slug: 'camiseta-heavy-boxy',
-            title: 'CAMISETA HEAVY BOXY',
-            price: 189.9,
-            image: '/fit_card_boxy_branco.png',
-            category: 'CAMISETAS',
-          },
-          {
-            id: 'prod-jaq-016',
-            slug: 'jaqueta-utility',
-            title: 'JAQUETA UTILITY PRETA',
-            price: 459.9,
-            image: '/fit_card_jaqueta_utility.png',
-            category: 'JAQUETAS',
           },
         ],
       },
@@ -260,22 +201,6 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
-          {
-            id: 'prod-cam-008',
-            slug: 'camiseta-raw-hem',
-            title: 'CAMISETA RAW HEM VERDE',
-            price: 189.9,
-            image: '/fit_card_raw_hem_verde.png',
-            category: 'CAMISETAS',
-          },
-          {
-            id: 'prod-cal-001',
-            slug: 'calca-balloon',
-            title: 'CALÇA BALLOON',
-            price: 319.9,
-            image: '/fit_card_calca_balloon.png',
-            category: 'CALÇAS',
-          },
         ],
       },
       {
@@ -301,22 +226,6 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             price: 339.9,
             image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
-          },
-          {
-            id: 'prod-cam-010',
-            slug: 'camiseta-washed-vintage',
-            title: 'WASHED VINTAGE CINZA CLARO',
-            price: 189.9,
-            image: '/fit_card_washed_claro.png',
-            category: 'CAMISETAS',
-          },
-          {
-            id: 'prod-cal-001',
-            slug: 'calca-balloon',
-            title: 'CALÇA BALLOON',
-            price: 319.9,
-            image: '/fit_card_calca_balloon.png',
-            category: 'CALÇAS',
           },
         ],
       },
@@ -356,22 +265,6 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
           },
-          {
-            id: 'prod-cam-005',
-            slug: 'camiseta-pocket-utility',
-            title: 'CAMISETA POCKET UTILITY',
-            price: 179.9,
-            image: '/fit_card_pocket_utility.png',
-            category: 'CAMISETAS',
-          },
-          {
-            id: 'prod-cal-001',
-            slug: 'calca-balloon',
-            title: 'CALÇA BALLOON',
-            price: 319.9,
-            image: '/fit_card_calca_balloon.png',
-            category: 'CALÇAS',
-          },
         ],
       },
       {
@@ -397,22 +290,6 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             price: 339.9,
             image: '/fit_card_calca_baggy.png',
             category: 'CARGOS',
-          },
-          {
-            id: 'prod-cam-004',
-            slug: 'camiseta-heavy-boxy',
-            title: 'CAMISETA HEAVY BOXY',
-            price: 189.9,
-            image: '/fit_card_heavy_boxy.png',
-            category: 'CAMISETAS',
-          },
-          {
-            id: 'prod-jaq-016',
-            slug: 'jaqueta-utility',
-            title: 'JAQUETA UTILITY',
-            price: 459.9,
-            image: '/fit_card_jaqueta_utility.png',
-            category: 'JAQUETAS',
           },
         ],
       },
@@ -497,6 +374,68 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
     };
   };
 
+
+  /*
+   * A faixa de produtos mostra SOMENTE as peças que realmente compõem o look.
+   * Quando o produto possui mais de uma cor no catálogo, cada cor vira um card.
+   * Limitamos a 2 cores por peça e a 4 cards no total:
+   * - 2 cores + 2 cores = 4 cards
+   * - 2 cores + 1 cor   = 3 cards
+   * - sem variações suficientes, não inventamos produtos extras.
+   */
+  const displayLookProducts: LookDisplayItem[] = activeLook.products
+    .flatMap((item) => {
+      const storeProduct = resolveStoreProduct(item);
+      const storeColors = storeProduct?.colors ?? [];
+
+      const seenImages = new Set<string>();
+
+      const colorCards = storeColors
+        .map((color, colorIndex) => {
+          const colorImage =
+            color.image ||
+            (Array.isArray(color.images) ? color.images[0] : undefined) ||
+            storeProduct?.image ||
+            item.image;
+
+          const colorName =
+            color.colorName || color.color || `COR ${colorIndex + 1}`;
+
+          return {
+            ...item,
+            title: storeProduct?.title || item.title,
+            price: storeProduct?.price ?? item.price,
+            image: colorImage,
+            category: storeProduct?.category || item.category,
+            colorName,
+            variantKey: `${item.id}-${colorName}-${colorIndex}`,
+          } satisfies LookDisplayItem;
+        })
+        .filter((variant) => {
+          if (!variant.image || seenImages.has(variant.image)) return false;
+          seenImages.add(variant.image);
+          return true;
+        })
+        .slice(0, 2);
+
+      if (colorCards.length > 0) return colorCards;
+
+      return [
+        {
+          ...item,
+          variantKey: `${item.id}-default`,
+        } satisfies LookDisplayItem,
+      ];
+    })
+    .slice(0, 4);
+
+  const productGridColumns =
+    displayLookProducts.length >= 4
+      ? 'lg:grid-cols-4'
+      : displayLookProducts.length === 3
+        ? 'lg:grid-cols-3'
+        : 'lg:grid-cols-2';
+
   return (
     <section
       id="marmot-fit-system"
@@ -507,9 +446,32 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
       }}
     >
       {/* HERO */}
-      <div className="relative mx-auto w-full max-w-[1820px] px-4 sm:px-6 lg:px-8 pt-7 sm:pt-9">
-        {/* topo editorial */}
-        <div className="relative z-20 flex h-[28px] items-center justify-between border-b border-zinc-200/60 pb-3">
+      <div className="relative mx-auto w-full max-w-[1720px] px-4 sm:px-6 lg:px-8 pt-7 sm:pt-8">
+        {/* topo editorial inspirado na referência */}
+        <div className="relative z-20 hidden lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
+          <div className="flex items-center gap-5">
+            <span className="shrink-0 font-mono text-[11px] font-bold uppercase tracking-[0.28em] text-zinc-700">
+              MARMOT FIT SYSTEM / {activeFit.code}
+            </span>
+            <span className="h-px flex-1 bg-black/20" />
+          </div>
+
+          <div />
+
+          <div className="flex items-center justify-end gap-5">
+            <span className="h-px flex-1 bg-black/20" />
+            <button
+              type="button"
+              onClick={() => onNavigate('shop')}
+              className="group flex shrink-0 items-center gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.26em] text-zinc-900 transition-opacity hover:opacity-60 cursor-pointer"
+            >
+              <span>GUIA DE CAIMENTO</span>
+              <ArrowUpRight className="h-3.5 w-3.5 stroke-[2] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="relative z-20 flex h-[28px] items-center justify-between border-b border-zinc-200/60 pb-3 lg:hidden">
           <span className="font-mono text-[10px] sm:text-[10.5px] font-bold uppercase tracking-[0.26em] text-zinc-600">
             MARMOT FIT SYSTEM • {activeFit.code}
           </span>
@@ -524,51 +486,50 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
           </button>
         </div>
 
-        {/* 3 colunas */}
-        <div className="relative mt-6 grid min-h-[520px] lg:min-h-[580px] grid-cols-1 items-stretch gap-8 lg:gap-0 lg:grid-cols-[38%_26%_36%]">
-          {/* esquerda: composição mais compacta e com ritmo vertical controlado */}
-          <div className="relative z-20 flex h-full flex-col justify-center pb-2 lg:pr-8">
-            <div className="flex max-w-[500px] flex-col">
-              <span className="mb-1.5 block text-xs sm:text-[12px] font-extrabold uppercase tracking-[0.28em] text-zinc-400">
+        {/* hero principal */}
+        <div className="relative mt-7 grid grid-cols-1 gap-8 lg:min-h-[580px] lg:grid-cols-[minmax(420px,1.08fr)_minmax(300px,0.82fr)_minmax(470px,1.08fr)] lg:items-center lg:gap-x-5 xl:gap-x-7">
+          {/* esquerda */}
+          <div className="relative z-20 flex flex-col justify-center lg:pr-1 xl:pr-3">
+            <div className="max-w-[560px]">
+              <span className="mb-2 block text-[12px] font-extrabold uppercase tracking-[0.3em] text-zinc-400 sm:text-[12.5px]">
                 MODELAGEM & SILHUETAS
               </span>
 
-              <h2 className="text-4xl sm:text-5xl lg:text-[60px] xl:text-[68px] font-black uppercase tracking-[-0.035em] text-zinc-950 leading-[0.9]">
-                ESCOLHA O
-                <br />
-                CAIMENTO.
+              <h2 className="font-black uppercase tracking-[-0.06em] text-zinc-950 leading-[0.86] text-[clamp(60px,5.5vw,92px)]">
+                <span className="block whitespace-nowrap">ESCOLHA O</span>
+                <span className="block whitespace-nowrap">CAIMENTO.</span>
               </h2>
 
-              <p className="mt-3.5 lg:mt-4 max-w-[470px] font-sans text-base sm:text-[16px] font-normal leading-[1.45] text-zinc-600">
-                Cada peça tem sua própria estrutura. Descubra a silhueta que melhor expressa seu estilo e presença no dia a dia.
+              <p className="mt-4 max-w-[430px] font-sans text-[17px] font-normal leading-[1.25] text-zinc-700 sm:text-[18px] lg:mt-5 lg:text-[19px] xl:max-w-[440px] xl:text-[20px]">
+                Cada peça veste de um jeito. Descubra a silhueta que melhor combina com o seu estilo.
               </p>
 
-              <div className="mt-4 lg:mt-[18px]">
+              <div className="mt-6 lg:mt-7">
                 <button
                   type="button"
                   onClick={() => onNavigate('shop')}
-                  className="group inline-flex h-12 items-center justify-center gap-3 rounded-[3px] border-2 border-zinc-950 bg-zinc-950 px-7 text-xs sm:text-[13px] font-extrabold uppercase tracking-wider text-white shadow-xs transition-all hover:bg-black active:scale-[0.98] cursor-pointer"
+                  className="group inline-flex h-[48px] items-center justify-center gap-3 rounded-[2px] border border-zinc-700 bg-transparent px-8 text-[12px] font-extrabold uppercase tracking-[0.24em] text-zinc-950 transition-all hover:border-zinc-950 hover:bg-white/80 cursor-pointer sm:h-[50px] sm:text-[13px]"
                 >
                   <span>EXPLORAR FITS</span>
-                  <ArrowRight className="h-4 w-4 stroke-[2.2] transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="h-4 w-4 stroke-[2] transition-transform group-hover:translate-x-1" />
                 </button>
 
-                <div className="mt-2.5 flex items-center gap-3 font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-500">
+                <div className="mt-5 flex items-center gap-4 font-mono text-[10px] font-bold uppercase tracking-[0.26em] text-zinc-600 sm:text-[11px]">
                   <span>BOXY</span>
-                  <span className="h-1 w-1 rounded-full bg-zinc-300" />
+                  <span className="h-1 w-1 rounded-full bg-zinc-400" />
                   <span>OVERSIZED</span>
-                  <span className="h-1 w-1 rounded-full bg-zinc-300" />
+                  <span className="h-1 w-1 rounded-full bg-zinc-400" />
                   <span>BAGGY</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* modelo + seletor de look */}
-          <div className="relative z-30 hidden h-[520px] lg:h-[550px] items-end justify-center lg:flex">
+          {/* centro */}
+          <div className="relative z-30 hidden h-[560px] items-end justify-center lg:flex xl:h-[600px]">
             <div
               aria-hidden="true"
-              className="absolute bottom-[40px] left-1/2 h-[95px] w-[400px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.075),rgba(0,0,0,0)_70%)] blur-[2px]"
+              className="absolute bottom-[34px] left-1/2 h-[92px] w-[390px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.095),rgba(0,0,0,0)_72%)] blur-[2px]"
             />
 
             <img
@@ -578,13 +539,12 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
               loading="eager"
               decoding="async"
               referrerPolicy="no-referrer"
-              className="absolute bottom-[40px] left-1/2 z-10 h-[550px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[580px] mt-0 pt-[20px]"
-              style={{ marginTop: 0, paddingTop: '20px' }}
+              className="absolute bottom-[22px] left-1/2 z-10 h-[590px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[640px]"
+              style={{ marginTop: 0 }}
             />
 
-            {/* seletor de look — ligado visualmente ao modelo */}
-            <div className="absolute bottom-[8px] left-1/2 z-20 -translate-x-1/2">
-              <div className="flex items-center gap-[15px] whitespace-nowrap">
+            <div className="absolute bottom-0 left-1/2 z-20 -translate-x-1/2">
+              <div className="flex items-center gap-[16px] whitespace-nowrap">
                 {activeFit.looks.map((look, index) => {
                   const isLookActive = selectedLookNumber === look.lookNumber;
 
@@ -599,11 +559,11 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                       <button
                         type="button"
                         onClick={() => setSelectedLookNumber(look.lookNumber)}
-                        className="group relative pb-[6px]"
+                        className="group relative pb-[8px]"
                         aria-pressed={isLookActive}
                       >
                         <span
-                          className={`font-mono text-[9px] font-semibold uppercase tracking-[0.18em] transition-colors duration-200 ${
+                          className={`font-mono text-[9px] font-semibold uppercase tracking-[0.24em] transition-colors duration-200 ${
                             isLookActive
                               ? 'text-black'
                               : 'text-black/28 group-hover:text-black/55'
@@ -627,9 +587,9 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
             </div>
           </div>
 
-          {/* direita: stack mais compacto e centralizado verticalmente */}
-          <div className="relative z-20 pt-2 lg:flex lg:h-full lg:items-center lg:pt-0 lg:pl-7">
-            <div className="flex w-full flex-col gap-2 sm:gap-2.5">
+          {/* direita */}
+          <div className="relative z-20 lg:pl-0">
+            <div className="flex flex-col gap-3.5">
               {FIT_ORDER.map((fitKey) => {
                 const fitItem = FIT_SYSTEM_DATA[fitKey];
                 const isActive = selectedFit === fitKey;
@@ -639,39 +599,44 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                     key={fitKey}
                     type="button"
                     onClick={() => handleFitSelect(fitKey)}
-                    className={`group relative flex items-center justify-between rounded-[3px] border px-3.5 py-3.5 sm:px-4 sm:py-4 lg:px-[18px] lg:py-[14px] text-left transition-all cursor-pointer ${
+                    className={`group relative grid min-h-[96px] grid-cols-[88px_1fr_1.15fr_34px] items-center rounded-[2px] border border-zinc-200/90 bg-white/70 px-6 py-5 text-left transition-all cursor-pointer backdrop-blur-[1px] ${
                       isActive
-                        ? 'border-zinc-950 bg-white shadow-xs'
-                        : 'border-zinc-200/90 bg-white/90 hover:bg-white hover:border-zinc-400'
+                        ? 'border-zinc-200 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.18)]'
+                        : 'hover:border-zinc-300 hover:bg-white'
                     }`}
                   >
                     {isActive && (
-                      <span className="absolute inset-y-0 left-0 w-1.5 bg-[#F4C400] rounded-l-[3px]" />
+                      <span className="absolute inset-y-0 left-0 w-1.5 bg-[#F4C400]" />
                     )}
 
-                    <div className="flex min-w-0 items-center gap-3 sm:gap-3.5 pl-1.5">
-                      <span className="shrink-0 font-mono text-[11px] sm:text-xs font-extrabold tracking-wider text-zinc-400 transition-colors group-hover:text-zinc-900">
+                    <div className="flex h-full items-center justify-center pr-5">
+                      <span className="font-sans text-[22px] font-black leading-none tracking-[-0.04em] text-zinc-700 lg:text-[24px] xl:text-[26px]">
                         {fitItem.code}
                       </span>
-
-                      <div className="min-w-0">
-                        <span className="block text-sm sm:text-[15px] lg:text-base font-extrabold uppercase tracking-tight text-zinc-950 leading-none">
-                          {fitItem.name}
-                        </span>
-                        <p className="mt-1 font-sans text-[11.5px] sm:text-xs lg:text-[12.5px] font-normal leading-[1.35] text-zinc-500">
-                          {fitItem.shortDescription}
-                        </p>
-                      </div>
                     </div>
 
-                    <ArrowRight className="ml-3 h-4 w-4 shrink-0 stroke-[2] text-zinc-400 transition-transform group-hover:translate-x-1 group-hover:text-zinc-950" />
+                    <div className="border-l border-black/10 pl-6 pr-6">
+                      <span className="block font-black text-[24px] uppercase tracking-[-0.03em] text-zinc-950 leading-none lg:text-[26px]">
+                        {fitItem.name}
+                      </span>
+                    </div>
+
+                    <div className="border-l border-black/10 pl-6 pr-5">
+                      <p className="font-sans text-[15px] leading-[1.22] text-zinc-800 lg:text-[16px]">
+                        {fitItem.shortDescription}
+                      </p>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <ArrowRight className="h-[22px] w-[22px] stroke-[1.8] text-zinc-700 transition-transform group-hover:translate-x-1" />
+                    </div>
                   </button>
                 );
               })}
             </div>
 
             {/* seletor de look no mobile */}
-            <div className="mt-4 border-t border-black/10 pt-3 lg:hidden">
+            <div className="mt-5 border-t border-black/10 pt-3 lg:hidden">
               <div className="flex items-center gap-4">
                 {activeFit.looks.map((look, index) => {
                   const isLookActive = selectedLookNumber === look.lookNumber;
@@ -713,11 +678,11 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
 
       {/* produtos */}
       <div className="relative z-20 w-full bg-transparent">
-        <div className="mx-auto w-full max-w-[1820px] px-4 sm:px-6 lg:px-8">
-          <div className="flex h-[50px] items-center justify-between border-t border-black/10">
+        <div className="mx-auto w-full max-w-[1720px] px-4 sm:px-6 lg:px-8">
+          <div className="flex h-[54px] items-center justify-between border-t border-black/10">
             <div className="flex min-w-0 flex-1 items-center gap-[14px] pr-5">
               <span className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black">
-                PEÇAS COM ESTE CAIMENTO
+                PEÇAS DESTE LOOK
               </span>
 
               <span className="h-px flex-1 bg-black/14" />
@@ -733,57 +698,72 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 pb-7 sm:pb-8 lg:pb-10">
-            {activeLook.products.slice(0, 4).map((item, index) => {
+          <div
+            className={`grid grid-cols-1 gap-3 pb-7 sm:grid-cols-2 sm:pb-8 lg:pb-10 ${productGridColumns}`}
+          >
+            {displayLookProducts.map((item, index) => {
               const formattedPrice = item.price.toLocaleString('pt-BR', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               });
-              const isTop =
-                !item.category?.toUpperCase().includes('CALÇ') &&
-                !item.title?.toUpperCase().includes('CALÇA');
+
+              const showColorName =
+                item.colorName &&
+                item.colorName.trim().toLowerCase() !== 'padrão' &&
+                item.colorName.trim().toLowerCase() !== 'padrao';
 
               return (
                 <div
-                  key={`${selectedFit}-${selectedLookNumber}-${item.id}-${index}`}
+                  key={`${selectedFit}-${selectedLookNumber}-${item.variantKey}-${index}`}
                   onClick={() => onNavigate('product', item.slug || item.id)}
-                  className="group relative flex h-[138px] sm:h-[146px] w-full overflow-hidden rounded-[3px] border border-zinc-200/90 bg-white transition-all duration-200 hover:border-zinc-950 hover:shadow-xs cursor-pointer select-none"
+                  className="group relative flex h-[150px] sm:h-[156px] lg:h-[160px] w-full overflow-hidden rounded-[3px] border border-zinc-200/90 bg-white transition-all duration-200 hover:border-zinc-950 hover:shadow-xs cursor-pointer select-none"
                 >
-                  {/* Imagem do Produto (à esquerda, flush) */}
-                  <div className="h-full w-[44%] sm:w-[46%] shrink-0 overflow-hidden bg-[#EEEEEC]">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      loading="lazy"
-                      decoding="async"
-                      className={`h-full w-full object-cover ${
-                        isTop ? 'object-top' : 'object-center'
-                      } transition-transform duration-500 ease-out group-hover:scale-105`}
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        if (!target.src.includes('fit_card')) {
-                          target.src = '/fit_card_heavy_boxy.png';
+                  {/* imagem da variação: inteira, sem crop */}
+                  <div className="h-full w-[46%] shrink-0 overflow-hidden bg-[#EEEEEC] sm:w-[45%]">
+                    <div className="flex h-full w-full items-center justify-center p-2 sm:p-2.5">
+                      <img
+                        src={item.image}
+                        alt={
+                          showColorName
+                            ? `${item.title} - ${item.colorName}`
+                            : item.title
                         }
-                      }}
-                    />
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-contain object-center transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (!target.src.includes('fit_card')) {
+                            target.src = '/fit_card_heavy_boxy.png';
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
 
-                  {/* Informações (à direita: Título, Preço e Seta) */}
-                  <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-4 min-w-0 bg-white">
-                    <div>
-                      <h4 className="font-bold text-xs sm:text-[13px] uppercase tracking-tight text-zinc-900 group-hover:text-black line-clamp-2 leading-snug">
+                  {/* informações */}
+                  <div className="flex min-w-0 flex-1 flex-col justify-between bg-white p-3.5 sm:p-4">
+                    <div className="min-w-0">
+                      <h4 className="line-clamp-2 font-bold text-[11px] uppercase leading-[1.15] tracking-tight text-zinc-900 transition-colors group-hover:text-black sm:text-xs">
                         {item.title}
                       </h4>
-                      <p className="mt-1.5 font-extrabold text-[13.5px] sm:text-sm tracking-tight text-zinc-950 leading-none">
+
+                      {showColorName && (
+                        <p className="mt-1 font-mono text-[8.5px] font-bold uppercase tracking-[0.16em] text-zinc-400 sm:text-[9px]">
+                          {item.colorName}
+                        </p>
+                      )}
+
+                      <p className="mt-1.5 text-[12.5px] font-extrabold leading-none tracking-tight text-zinc-950 sm:text-[13px]">
                         R$ {formattedPrice}
                       </p>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between">
-                      <span className="text-[9.5px] font-bold uppercase tracking-wider text-zinc-400 group-hover:text-zinc-900 transition-colors">
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-[8.5px] font-bold uppercase tracking-wider text-zinc-400 transition-colors group-hover:text-zinc-900 sm:text-[9px]">
                         VER PEÇA
                       </span>
-                      <ArrowRight className="h-3.5 w-3.5 stroke-[2] text-zinc-400 group-hover:text-zinc-950 transition-transform group-hover:translate-x-0.5" />
+                      <ArrowRight className="h-3.5 w-3.5 stroke-[2] text-zinc-400 transition-transform group-hover:translate-x-0.5 group-hover:text-zinc-950" />
                     </div>
                   </div>
                 </div>
