@@ -44,15 +44,16 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- 2. CATEGORIES
 CREATE TABLE IF NOT EXISTS public.categories (
   id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
-  slug TEXT UNIQUE,
+  tagline TEXT,
   description TEXT,
-  image_url TEXT,
-  banner_url TEXT,
-  icon TEXT,
-  data JSONB,
-  display_order INTEGER DEFAULT 0,
+  image TEXT,
+  subcategories TEXT[] DEFAULT '{}',
+  product_count INTEGER DEFAULT 0,
+  "order" INTEGER DEFAULT 0,
   active BOOLEAN DEFAULT TRUE,
+  data JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

@@ -24,6 +24,9 @@ test('workspace efêmero aplica o schema base antes das migrations datadas', asy
     const baseline = await fs.readFile(path.join(workdir, 'supabase', 'migrations', files[0]), 'utf8');
     const categoriesDefinition = baseline.match(/CREATE TABLE IF NOT EXISTS public\.categories \(([\s\S]*?)\);/)?.[1] || '';
     assert.match(categoriesDefinition, /data JSONB/, 'baseline deve reproduzir a coluna legada auditada pela migration final');
+    for (const column of ['tagline', 'image', 'subcategories', 'product_count', '"order"']) {
+      assert.match(categoriesDefinition, new RegExp(`\\b${column.replaceAll('"', '')}\\b|${column}`), `baseline deve conter ${column}`);
+    }
 
     const coreIndex = files.findIndex((file) => file.endsWith('20260301_001_core_schema.sql'));
     const fulfillmentIndex = files.findIndex((file) => file.endsWith('20260907140252_complete_shipping_fulfillment.sql'));
