@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminReportData } from '../../types';
+import { getAuthHeaders } from '../../lib/authHeaders';
 import {
   TrendingUp,
   DollarSign,
@@ -25,7 +26,7 @@ export const AdminReportsTab: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await fetch(`/api/admin/reports?period=${period}`, {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
+        headers: getAuthHeaders(),
       });
       if (res.ok) {
         const data = await res.json();

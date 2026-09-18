@@ -61,30 +61,25 @@ export function handleProductImageError(
 }
 
 /**
- * Retorna classes de enquadramento e zoom sob medida por categoria de produto.
- * Valoriza a peça com caimento editorial de streetwear (estilo lookbook),
- * eliminando excessos de fundo cinza distante sem cortar a cabeça do modelo.
+ * Retorna classes de enquadramento limpo por categoria de produto sem scale artificial.
+ * Mantém foco anatômico na peça respeitando a resolução 1:1 original da imagem,
+ * sem aplicar transform: scale(...) que degradaria nitidez ou textura em telas de alta densidade.
  */
 export function getProductCardImageFraming(category?: string): string {
   const cat = (category || '').toLowerCase();
   switch (cat) {
     case 'jaquetas':
-      // Imagens 9:16 de estúdio: zoom de 20% com foco na peça, mantendo respiro superior
-      return 'object-cover object-[center_top] scale-[1.20] origin-[center_10%] group-hover:scale-[1.26] transform-gpu';
+      return 'object-cover object-[center_top]';
     case 'moletons':
-      // Moletons: zoom de 12% focado no peito/capuz
-      return 'object-cover object-[center_14%] scale-[1.12] origin-[center_16%] group-hover:scale-[1.18] transform-gpu';
+      return 'object-cover object-[center_16%]';
     case 'camisetas':
-      // Camisetas: zoom de 12% focado na gola e caimento boxy
-      return 'object-cover object-[center_15%] scale-[1.12] origin-[center_18%] group-hover:scale-[1.18] transform-gpu';
+      return 'object-cover object-[center_18%]';
     case 'calcas':
-      // Calças: foco centrado da cintura à barra
-      return 'object-cover object-[center_35%] scale-[1.10] origin-[center_40%] group-hover:scale-[1.16] transform-gpu';
+      return 'object-cover object-[center_35%]';
     case 'tenis':
     case 'acessorios':
-      // Tênis e acessórios: centralização nítida
-      return 'object-cover object-center scale-[1.08] origin-center group-hover:scale-[1.14] transform-gpu';
+      return 'object-cover object-center';
     default:
-      return 'object-cover object-[center_top] scale-[1.14] origin-[center_15%] group-hover:scale-[1.20] transform-gpu';
+      return 'object-cover object-[center_top]';
   }
 }

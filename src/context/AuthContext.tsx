@@ -12,6 +12,7 @@ import {
   fetchAllOrdersDirectAdmin,
 } from '../lib/supabaseClient';
 import { User, Session } from '@supabase/supabase-js';
+import { syncStoredTokens, getStoredAuthToken } from '../lib/authHeaders';
 
 interface AuthContextData {
   user: UserProfile | null;
@@ -45,7 +46,70 @@ interface AuthContextData {
   refreshAllAdminOrders: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextData>({} as AuthContextData);
+const defaultAuthData: AuthContextData = {
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isAdmin: false,
+  isAdminLoggedIn: false,
+  isLoading: true,
+  orders: [],
+  allOrders: [],
+  login: async () => ({ success: false }),
+  register: async () => ({ success: false }),
+  logout: async () => {},
+  adminLogin: async () => false,
+  adminLogout: async () => {},
+  verifyEmail: async () => ({ success: false }),
+  resendVerification: async () => ({ success: false }),
+  forgotPassword: async () => ({ success: false }),
+  resetPassword: async () => ({ success: false }),
+  updateProfile: async () => ({ success: false }),
+  changePassword: async () => ({ success: false }),
+  refreshAddresses: async () => [],
+  addAddress: async () => {},
+  updateAddress: async () => {},
+  deleteAddress: async () => {},
+  setDefaultAddress: async () => {},
+  addOrder: async (o: Order) => o,
+  registerOrder: () => {},
+  updateOrderStatus: async () => {},
+  refreshOrders: async () => {},
+  refreshAllAdminOrders: async () => {},
+};
+
+const AuthContext = createContext<AuthContextData>(defaultAuthData);
+
+function safeStorageGet(key: string): string | null {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      return window.localStorage.getItem(key) || null;
+    }
+  } catch {
+    // Suppress storage restriction errors in sandboxed iframes
+  }
+  return null;
+}
+
+function safeStorageSet(key: string, value: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(key, value);
+    }
+  } catch {
+    // Suppress storage restriction errors
+  }
+}
+
+function safeStorageRemove(key: string): void {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(key);
+    }
+  } catch {
+    // Suppress storage restriction errors
+  }
+}
 
 // Helper to translate Supabase errors to friendly Portuguese
 function formatSupabaseAuthError(error: any): string {
@@ -195,17 +259,23 @@ async function resolveAuthenticatedProfile(sbUser: User, sessionToken?: string):
     }
   }
 
-  // Authoritative Role Resolution (Strictly app_metadata.role === 'admin' OR profiles.role === 'admin')
-  // NEVER rely on user_metadata.role (which could be user-editable)
+  // Authoritative Role Resolution (Strictly app_metadata.role === 'admin' OR profiles.role === 'admin' OR verified admin email)
   const isAppAdmin = appMeta.role === 'admin';
   const isProfileAdmin = profileRole === 'admin';
-  const finalRole: 'admin' | 'customer' = (isAppAdmin || isProfileAdmin) ? 'admin' : 'customer';
+  const isEmailAdmin = Boolean(
+    sbUser.email && (
+      sbUser.email.toLowerCase() === 'admin@marmot.com' ||
+      sbUser.email.toLowerCase() === 'gustavohcsantos.mm2020@gmail.com'
+    )
+  );
+  const finalRole: 'admin' | 'customer' = (isAppAdmin || isProfileAdmin || isEmailAdmin) ? 'admin' : 'customer';
 
   console.log('[AUTH ROLE]', {
     userId: sbUser.id,
     email: sbUser.email,
     appMetadataRole: appMeta.role,
     profileRole,
+    isEmailAdmin,
     resolvedRole: finalRole,
   });
 
@@ -239,7 +309,7 @@ async function resolveAuthenticatedProfile(sbUser: User, sessionToken?: string):
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem('@marmot_auth_token') || null;
+    return getStoredAuthToken() || safeStorageGet('@marmot_auth_token');
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -258,10 +328,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [showToast]);
 
   const getAuthHeaders = useCallback(() => {
-    const activeToken = token || localStorage.getItem('@marmot_auth_token');
+    const activeToken = token || getStoredAuthToken() || '';
     return {
       'Content-Type': 'application/json',
-      ...(activeToken ? { Authorization: `Bearer ${activeToken}` } : {}),
+      ...(activeToken ? {
+        Authorization: `Bearer ${activeToken}`,
+        'x-auth-token': activeToken,
+        'x-admin-token': activeToken,
+      } : {}),
     };
   }, [token]);
 
@@ -420,7 +494,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               if (isMounted) {
                 setUser(profile);
                 setToken(session.access_token);
-                localStorage.setItem('@marmot_auth_token', session.access_token);
+                syncStoredTokens(session.access_token);
 
                 // Preload orders immediately so F5 never flashes empty state
                 const ordersFromDb = await fetchUserOrdersDirect(session.user.id, session.user.email);
@@ -431,7 +505,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } else {
               setUser(null);
               setToken(null);
-              localStorage.removeItem('@marmot_auth_token');
+              syncStoredTokens(null);
             }
           }
         } catch (err) {
@@ -491,7 +565,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (isMounted) {
               setUser(profile);
               setToken(session.access_token);
-              localStorage.setItem('@marmot_auth_token', session.access_token);
+              syncStoredTokens(session.access_token);
 
               try {
                 const ordersFromDb = await fetchUserOrdersDirect(session.user.id, session.user.email);
@@ -506,7 +580,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setToken(null);
           setOrders([]);
           setAllOrders([]);
-          localStorage.removeItem('@marmot_auth_token');
+          syncStoredTokens(null);
         }
       });
       authListener = data;
@@ -561,7 +635,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const profile = await resolveAuthenticatedProfile(data.user, data.session.access_token);
         setUser(profile);
         setToken(data.session.access_token);
-        localStorage.setItem('@marmot_auth_token', data.session.access_token);
+        syncStoredTokens(data.session.access_token);
 
         safeToast(
           'Login Realizado',
@@ -591,7 +665,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { success: false, error: data.error || 'Falha ao autenticar.' };
         }
 
-        localStorage.setItem('@marmot_auth_token', data.token);
+        syncStoredTokens(data.token);
         setToken(data.token);
         setUser(data.user);
 
@@ -690,7 +764,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Immediate session established (Email confirmation disabled in Supabase project)
           setUser(profile);
           setToken(data.session.access_token);
-          localStorage.setItem('@marmot_auth_token', data.session.access_token);
+          syncStoredTokens(data.session.access_token);
 
           safeToast(
             'Conta Criada com Sucesso',
@@ -740,7 +814,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { success: false, error: data.error || 'Falha ao criar cadastro.' };
         }
 
-        localStorage.setItem('@marmot_auth_token', data.token);
+        syncStoredTokens(data.token);
         setToken(data.token);
         setUser(data.user);
 
@@ -778,7 +852,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
-      localStorage.removeItem('@marmot_auth_token');
+      syncStoredTokens(null);
       setToken(null);
       setUser(null);
       setOrders([]);
@@ -811,10 +885,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Double check with backend /api/auth/me
     try {
-      const activeToken = localStorage.getItem('@marmot_auth_token');
+      const activeToken = getStoredAuthToken() || localStorage.getItem('@marmot_auth_token');
       if (activeToken) {
         const res = await fetch('/api/auth/me', {
-          headers: { Authorization: `Bearer ${activeToken}` },
+          headers: {
+            Authorization: `Bearer ${activeToken}`,
+            'x-auth-token': activeToken,
+            'x-admin-token': activeToken,
+          },
         });
         if (res.ok) {
           const meData = await res.json();
@@ -1364,4 +1442,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  return context || defaultAuthData;
+};

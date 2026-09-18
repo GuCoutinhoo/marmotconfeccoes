@@ -366,7 +366,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = ({ onNavigate }) => {
   };
 
   // Active shipping fee
-  const activeShippingOption = selectedShipping || (shippingOptions.length > 0 ? shippingOptions[0] : null);
+  const activeShippingOption = selectedShipping || (shippingOptions && shippingOptions.length > 0 ? shippingOptions[0] : null);
   const rawShippingFee = activeShippingOption ? (isFreeShipping ? 0 : activeShippingOption.price) : 0;
 
   // Calculations

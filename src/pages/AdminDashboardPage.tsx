@@ -16,6 +16,7 @@ import { AdminCategoriesTab } from '../components/admin/AdminCategoriesTab';
 import { AdminInventoryTab } from '../components/admin/AdminInventoryTab';
 import { AdminCouponsTab } from '../components/admin/AdminCouponsTab';
 import { AdminBannersTab } from '../components/admin/AdminBannersTab';
+import { AdminFitSystemTab } from '../components/admin/AdminFitSystemTab';
 import { AdminReportsTab } from '../components/admin/AdminReportsTab';
 import { AdminActivityLogsTab } from '../components/admin/AdminActivityLogsTab';
 import { AdminSettingsTab } from '../components/admin/AdminSettingsTab';
@@ -49,7 +50,8 @@ import {
   Store,
   Mail,
   Star,
-  Inbox
+  Inbox,
+  Layers
 } from 'lucide-react';
 
 interface AdminDashboardPageProps {
@@ -69,6 +71,7 @@ type AdminTab =
   | 'inventory'
   | 'coupons'
   | 'banners'
+  | 'fit_system'
   | 'newsletter'
   | 'email_logs'
   | 'reports'
@@ -182,6 +185,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
         { id: 'inventory' as AdminTab, label: 'Estoque & Movimentações', icon: Boxes, badge: lowStockCount > 0 ? lowStockCount : undefined },
         { id: 'coupons' as AdminTab, label: 'Cupons', icon: Tag },
         { id: 'banners' as AdminTab, label: 'Banners & Destaques', icon: ImageIcon },
+        { id: 'fit_system' as AdminTab, label: 'Marmot Fit System', icon: Layers },
       ],
     },
     {
@@ -331,6 +335,8 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({ onNaviga
             {activeTab === 'coupons' && <AdminCouponsTab />}
 
             {activeTab === 'banners' && <AdminBannersTab />}
+
+            {activeTab === 'fit_system' && <AdminFitSystemTab />}
 
             {activeTab === 'newsletter' && <AdminNewsletterTab />}
 

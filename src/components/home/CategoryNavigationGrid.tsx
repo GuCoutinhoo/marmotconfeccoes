@@ -325,15 +325,21 @@ export const CategoryNavigationGrid: React.FC<CategoryNavigationGridProps> = ({ 
 
   const getCardImage = useCallback(
     (item: CategoryEditorialItem) => {
-      const stored = getStoredCategoryImage(item.slug);
-      if (stored) return stored;
-
+      // 1. Prioritize real database/store category image if present and valid
       const matchedStoreCat = categories?.find(
         (c) => c.slug?.toLowerCase() === item.slug.toLowerCase()
       );
-      if (matchedStoreCat?.image && !matchedStoreCat.image.includes('unsplash.com')) {
+      if (
+        matchedStoreCat?.image &&
+        !matchedStoreCat.image.includes('unsplash.com') &&
+        !matchedStoreCat.image.startsWith('data:image/')
+      ) {
         return matchedStoreCat.image;
       }
+
+      // 2. High-res stored category image (if not a compressed base64 dataUrl)
+      const stored = getStoredCategoryImage(item.slug);
+      if (stored && !stored.startsWith('data:image/')) return stored;
 
       return item.image;
     },

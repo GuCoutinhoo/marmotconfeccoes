@@ -137,61 +137,11 @@ export function saveCategoryImageToLocalStorage(slugOrId: string, imageSrc: stri
 }
 
 /**
- * Compress an image via Canvas and convert to Base64 data URL
- * This allows saving actual image bytes in localStorage reliably (< 50KB each).
+ * Returns the high-resolution image URL directly without lossy client-side canvas downsampling.
+ * Preserves the pristine original resolution and prevents 540px/0.82 compression degradation.
  */
 export function convertImageToOptimizedDataUrl(imgUrl: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        const maxDim = 540; // High clarity for thumbnail while keeping size tiny (~35KB)
-        let w = img.width;
-        let h = img.height;
-
-        if (w > maxDim || h > maxDim) {
-          if (w > h) {
-            h = Math.round((h * maxDim) / w);
-            w = maxDim;
-          } else {
-            w = Math.round((w * maxDim) / h);
-            h = maxDim;
-          }
-        }
-
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          resolve(imgUrl);
-          return;
-        }
-
-        ctx.drawImage(img, 0, 0, w, h);
-        
-        // Try webp first, fallback to jpeg
-        let dataUrl = '';
-        try {
-          dataUrl = canvas.toDataURL('image/webp', 0.82);
-          if (!dataUrl.startsWith('data:image/webp')) {
-            dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-          }
-        } catch {
-          dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        }
-
-        resolve(dataUrl || imgUrl);
-      } catch (e) {
-        resolve(imgUrl);
-      }
-    };
-    img.onerror = () => {
-      resolve(imgUrl);
-    };
-    img.src = imgUrl;
-  });
+  return Promise.resolve(imgUrl);
 }
 
 /**

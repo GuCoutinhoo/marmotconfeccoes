@@ -3,6 +3,7 @@ import { useStore } from '../../context/StoreContext';
 import { useToast } from '../../context/ToastContext';
 import { Category } from '../../types';
 import { ImageAdjustModal } from './ImageAdjustModal';
+import { uploadProductImageToStorage } from '../../lib/supabaseClient';
 import {
   getStoredCategoryImage,
   saveCategoryImageToLocalStorage,
@@ -47,7 +48,7 @@ export const AdminCategoriesTab: React.FC = () => {
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [adjustTargetImage, setAdjustTargetImage] = useState<string>('');
   const [adjustTitle, setAdjustTitle] = useState<string>('Ajustar Imagem da Categoria');
-  const [onAdjustComplete, setOnAdjustComplete] = useState<((url: string) => void) | null>(null);
+  const [onAdjustComplete, setOnAdjustComplete] = useState<((url: string, blob?: Blob) => Promise<void> | void) | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const modalFileInputRef = useRef<HTMLInputElement>(null);
@@ -153,15 +154,41 @@ export const AdminCategoriesTab: React.FC = () => {
         if (rawDataUrl) {
           setAdjustTargetImage(rawDataUrl);
           setAdjustTitle(`Ajustar Foto: ${file.name}`);
-          setOnAdjustComplete(() => (adjustedUrl: string) => {
-            if (isForQuickModal) {
-              setQuickImageUrl(adjustedUrl);
-              setQuickImagePreview(adjustedUrl);
-            } else {
-              setFormImage(adjustedUrl);
+          setOnAdjustComplete(() => async (adjustedUrl: string, blob?: Blob) => {
+            try {
+              setIsUploading(true);
+              let finalUrl = adjustedUrl;
+
+              // Upload to persistent Supabase storage to prevent base64 truncation and keep HD fidelity
+              const targetSlug = (quickImageCat?.slug || formSlug || 'category').toLowerCase().trim();
+              const filename = `category-${targetSlug}-${Date.now()}.webp`;
+
+              if (blob) {
+                finalUrl = await uploadProductImageToStorage(blob, 'category', filename);
+              } else if (adjustedUrl.startsWith('data:')) {
+                finalUrl = await uploadProductImageToStorage(adjustedUrl, 'category', filename);
+              }
+
+              if (isForQuickModal) {
+                setQuickImageUrl(finalUrl);
+                setQuickImagePreview(finalUrl);
+              } else {
+                setFormImage(finalUrl);
+              }
+              showToast('Imagem Pronta!', 'Imagem processada e salva em alta resolução.', 'success');
+            } catch (uploadErr: any) {
+              console.warn('[AdminCategoriesTab] Erro ao fazer upload persistente:', uploadErr);
+              if (isForQuickModal) {
+                setQuickImageUrl(adjustedUrl);
+                setQuickImagePreview(adjustedUrl);
+              } else {
+                setFormImage(adjustedUrl);
+              }
+              showToast('Imagem Ajustada', 'Ajuste aplicado.', 'info');
+            } finally {
+              setIsUploading(false);
+              setAdjustModalOpen(false);
             }
-            setAdjustModalOpen(false);
-            showToast('Imagem Ajustada!', 'Ajustes e enquadramento aplicados.', 'success');
           });
           setAdjustModalOpen(true);
         }
@@ -179,9 +206,13 @@ export const AdminCategoriesTab: React.FC = () => {
   // Save Quick Image Change
   const handleSaveQuickImage = async () => {
     if (!quickImageCat || (!quickImageUrl && !quickImagePreview)) return;
-    const finalUrl = quickImagePreview || quickImageUrl;
+    let finalUrl = quickImagePreview || quickImageUrl;
     setIsSavingQuickImage(true);
     try {
+      if (finalUrl.startsWith('data:')) {
+        const catSlug = quickImageCat.slug || 'category';
+        finalUrl = await uploadProductImageToStorage(finalUrl, 'category', `cat-${catSlug}-${Date.now()}.webp`);
+      }
       saveCategoryImageToLocalStorage(quickImageCat.id, finalUrl);
       saveCategoryImageToLocalStorage(quickImageCat.slug, finalUrl);
       await updateCategory(quickImageCat.id, { image: finalUrl });
@@ -206,31 +237,38 @@ export const AdminCategoriesTab: React.FC = () => {
     }
 
     try {
+      let finalFormImage = formImage.trim();
+      const targetSlug = formSlug.trim() || editingCategory?.slug || formName.toLowerCase().replace(/\s+/g, '-');
+
+      if (finalFormImage.startsWith('data:')) {
+        finalFormImage = await uploadProductImageToStorage(finalFormImage, 'category', `cat-${targetSlug}-${Date.now()}.webp`);
+      }
+
       if (editingCategory) {
-        if (formImage.trim()) {
-          saveCategoryImageToLocalStorage(formSlug.trim() || editingCategory.slug, formImage.trim());
+        if (finalFormImage) {
+          saveCategoryImageToLocalStorage(targetSlug, finalFormImage);
         }
         await updateCategory(editingCategory.id, {
           name: formName.trim(),
           slug: formSlug.trim(),
           tagline: formTagline.trim(),
           description: formDescription.trim(),
-          image: formImage.trim(),
+          image: finalFormImage,
           subcategories: formSubcategories,
           productCount: formProductCount,
         });
         showToast('Categoria Atualizada!', `${formName} foi salva com sucesso.`, 'success');
         setEditingCategory(null);
       } else {
-        if (formImage.trim()) {
-          saveCategoryImageToLocalStorage(formSlug.trim() || formName.toLowerCase().replace(/\s+/g, '-'), formImage.trim());
+        if (finalFormImage) {
+          saveCategoryImageToLocalStorage(targetSlug, finalFormImage);
         }
         await addCategory({
           name: formName.trim(),
-          slug: formSlug.trim() || formName.toLowerCase().replace(/\s+/g, '-'),
+          slug: targetSlug,
           tagline: formTagline.trim(),
           description: formDescription.trim(),
-          image: formImage.trim(),
+          image: finalFormImage,
           subcategories: formSubcategories,
           productCount: formProductCount,
         });
@@ -798,11 +836,10 @@ export const AdminCategoriesTab: React.FC = () => {
         imageSrc={adjustTargetImage}
         title={adjustTitle}
         initialAspectRatio="1:1"
-        onSave={(adjustedUrl) => {
+        onSave={(adjustedUrl, blob) => {
           if (onAdjustComplete) {
-            onAdjustComplete(adjustedUrl);
+            onAdjustComplete(adjustedUrl, blob);
           }
-          setAdjustModalOpen(false);
         }}
         onClose={() => setAdjustModalOpen(false)}
       />

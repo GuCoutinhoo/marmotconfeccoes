@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { AdminCustomer } from '../../types';
+import { getAuthHeaders } from '../../lib/authHeaders';
 import {
   Users,
   Search,
@@ -36,7 +37,7 @@ export const AdminCustomersTab: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/admin/customers', {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
+        headers: getAuthHeaders(),
       });
       if (res.ok) {
         const data = await res.json();
@@ -76,10 +77,7 @@ export const AdminCustomersTab: React.FC = () => {
     try {
       const res = await fetch(`/api/admin/customers/${customer.id}/status`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': localStorage.getItem('marmot_auth_token') || '',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ status: newStatus }),
       });
 

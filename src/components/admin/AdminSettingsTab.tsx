@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext';
 import { StoreSettings } from '../../types';
+import { getAuthHeaders } from '../../lib/authHeaders';
 import {
   Settings,
   Store,
@@ -35,11 +36,10 @@ export const AdminSettingsTab: React.FC = () => {
 
   const fetchSettingsAndHealth = async () => {
     setIsLoading(true);
-    const token = localStorage.getItem('marmot_auth_token') || '';
     try {
       const [resSettings, resHealth] = await Promise.all([
-        fetch('/api/admin/settings', { headers: { 'x-auth-token': token } }),
-        fetch('/api/admin/health', { headers: { 'x-auth-token': token } }),
+        fetch('/api/admin/settings', { headers: getAuthHeaders() }),
+        fetch('/api/admin/health', { headers: getAuthHeaders() }),
       ]);
       if (resSettings.ok) {
         const data = await resSettings.json();
@@ -66,10 +66,7 @@ export const AdminSettingsTab: React.FC = () => {
     try {
       const res = await fetch('/api/admin/settings', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': localStorage.getItem('marmot_auth_token') || '',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(settings),
       });
 

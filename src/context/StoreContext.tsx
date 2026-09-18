@@ -36,7 +36,27 @@ interface StoreContextType {
   uploadImage: (imageFileOrBase64: File | string, filename?: string) => Promise<string>;
 }
 
-const StoreContext = createContext<StoreContextType | undefined>(undefined);
+const defaultStoreContext: StoreContextType = {
+  categories: [],
+  products: [],
+  isLoading: false,
+  isInitialized: true,
+  isFetchingFreshData: false,
+  fetchStoreData: async () => {},
+  addCategory: async () => ({} as Category),
+  updateCategory: async () => ({} as Category),
+  deleteCategory: async () => false,
+  reorderCategories: async () => [],
+  getCategoryBySlug: () => undefined,
+  addProduct: async () => ({} as Product),
+  updateProduct: async () => ({} as Product),
+  updateStock: async () => {},
+  deleteProduct: async () => false,
+  getProductById: () => undefined,
+  uploadImage: async () => '',
+};
+
+const StoreContext = createContext<StoreContextType>(defaultStoreContext);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -65,24 +85,29 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // Helper to build headers with active auth token
   const getAuthHeaders = useCallback((isJson = true) => {
-    let token = localStorage.getItem('@marmot_auth_token');
-    if (!token) {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
-          try {
-            const raw = localStorage.getItem(key);
-            if (raw) {
-              const parsed = JSON.parse(raw);
-              if (parsed?.access_token) {
-                token = parsed.access_token;
-                break;
-              }
+    let token: string | null = null;
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        token = localStorage.getItem('@marmot_auth_token');
+        if (!token) {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+              try {
+                const raw = localStorage.getItem(key);
+                if (raw) {
+                  const parsed = JSON.parse(raw);
+                  if (parsed?.access_token) {
+                    token = parsed.access_token;
+                    break;
+                  }
+                }
+              } catch {}
             }
-          } catch {}
+          }
         }
       }
-    }
+    } catch {}
 
     const headers: Record<string, string> = {};
     if (isJson) {
@@ -475,8 +500,5 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 export const useStore = () => {
   const context = useContext(StoreContext);
-  if (!context) {
-    throw new Error('useStore must be used within a StoreProvider');
-  }
-  return context;
+  return context || defaultStoreContext;
 };

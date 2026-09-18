@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { Product, Category, Address, Order, CartItem, ProductVariant } from '../types';
+import { getStoredAuthToken, syncStoredTokens } from './authHeaders';
 
 const SUPABASE_PROJECT_URL = 'https://ktmkvysnjfphcfntazut.supabase.co';
 const SUPABASE_DEFAULT_ANON_KEY = 'sb_publishable_YaUc--D5wZQnHMnO2Mni8g_5QSnM3Vo';
@@ -176,7 +177,8 @@ export const SUPABASE_STORAGE_BUCKET = 'product-images';
 export async function uploadProductImageToStorage(
   source: File | Blob | string,
   productId: string = 'general',
-  customName?: string
+  customName?: string,
+  explicitToken?: string
 ): Promise<string> {
   if (typeof source === 'string' && (source.startsWith('http://') || source.startsWith('https://'))) {
     return source;
@@ -246,7 +248,7 @@ export async function uploadProductImageToStorage(
       }
 
       if (payloadDataUrl) {
-        const authHeaders = getClientAuthHeaders();
+        const authHeaders = getClientAuthHeaders(explicitToken);
         const res = await fetch('/api/upload', {
           method: 'POST',
           headers: {
@@ -353,34 +355,19 @@ export function buildProductSupabasePayload(product: Product) {
 /**
  * Helper to build headers with active auth token from local storage
  */
-function getClientAuthHeaders(): Record<string, string> {
+export function getClientAuthHeaders(explicitToken?: string): Record<string, string> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
   if (typeof window === 'undefined') return headers;
 
-  let token = localStorage.getItem('@marmot_auth_token');
-  if (!token) {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
-        try {
-          const raw = localStorage.getItem(key);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (parsed?.access_token) {
-              token = parsed.access_token;
-              break;
-            }
-          }
-        } catch {}
-      }
-    }
-  }
+  const token = getStoredAuthToken(explicitToken);
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
+    headers['x-auth-token'] = token;
     headers['x-admin-token'] = token;
+    syncStoredTokens(token);
   }
   return headers;
 }

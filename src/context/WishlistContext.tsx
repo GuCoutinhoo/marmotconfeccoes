@@ -11,7 +11,14 @@ interface WishlistContextData {
   wishlistCount: number;
 }
 
-const WishlistContext = createContext<WishlistContextData>({} as WishlistContextData);
+const defaultWishlistData: WishlistContextData = {
+  wishlist: [],
+  toggleWishlist: () => {},
+  isInWishlist: () => false,
+  wishlistCount: 0,
+};
+
+const WishlistContext = createContext<WishlistContextData>(defaultWishlistData);
 
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, token } = useAuth();
@@ -193,5 +200,8 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   );
 };
 
-export const useWishlist = () => useContext(WishlistContext);
+export const useWishlist = () => {
+  const context = useContext(WishlistContext);
+  return context || defaultWishlistData;
+};
 

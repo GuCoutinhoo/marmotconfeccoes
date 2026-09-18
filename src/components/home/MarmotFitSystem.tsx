@@ -1,14 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Product } from '../../types';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import {
+  DEFAULT_FIT_SYSTEM_CONFIG,
+  type FitSystemConfig,
+  type FitKey,
+} from '../../types/fitSystem';
+
+export type { FitKey };
 
 interface MarmotFitSystemProps {
   onNavigate: (page: string, param?: string) => void;
   onQuickView?: (product: Product) => void;
   products?: Product[];
 }
-
-export type FitKey = 'BOXY' | 'OVERSIZED' | 'BAGGY' | 'UTILITY';
 
 interface LookProductItem {
   id: string;
@@ -64,7 +69,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-heavy-boxy',
             title: 'CAMISETA HEAVY BOXY',
             price: 179.9,
-            image: '/fit_card_heavy_boxy.png',
+            image: '/Camiseta Heavy Boxy - Preto.png',
             category: 'CAMISETAS',
           },
           {
@@ -72,7 +77,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA BAGGY',
             price: 299.9,
-            image: '/fit_card_calca_baggy.png',
+            image: '/calca_cargo_baggy_preto.png',
             category: 'CALÇAS',
           },
         ],
@@ -90,7 +95,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'moletom-heavy-boxy',
             title: 'MOLETOM HEAVY BOXY',
             price: 349.9,
-            image: '/fit_card_mol_boxy.png',
+            image: '/uploads/products/prod-mol-008/2d380b21451a9f61.webp',
             category: 'MOLETONS',
           },
           {
@@ -98,7 +103,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-balloon',
             title: 'CALÇA BALLOON',
             price: 319.9,
-            image: '/fit_card_calca_balloon.png',
+            image: '/calca_balloon_preto.jpg',
             category: 'CALÇAS',
           },
         ],
@@ -127,7 +132,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'jaqueta-utility',
             title: 'JAQUETA UTILITY',
             price: 459.9,
-            image: '/fit_card_jaqueta_utility.png',
+            image: '/jaqueta_utility_preto.png',
             category: 'JAQUETAS',
           },
           {
@@ -135,7 +140,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image: '/fit_card_calca_baggy.png',
+            image: '/calca_cargo_baggy_preto.png',
             category: 'CARGOS',
           },
         ],
@@ -153,7 +158,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'jaqueta-varsity-oversized',
             title: 'JAQUETA VARSITY OVERSIZED',
             price: 489.9,
-            image: '/fit_card_varsity.png',
+            image: '/jaqueta_varsity_preto.png',
             category: 'JAQUETAS',
           },
           {
@@ -161,7 +166,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image: '/fit_card_calca_baggy.png',
+            image: '/calca_cargo_baggy_preto.png',
             category: 'CARGOS',
           },
         ],
@@ -190,7 +195,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-raw-hem',
             title: 'CAMISETA RAW HEM',
             price: 189.9,
-            image: '/fit_card_raw_hem_branco.png',
+            image: '/uploads/products/prod-cam-008/c1c4bef72959eab2.webp',
             category: 'CAMISETAS',
           },
           {
@@ -198,7 +203,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image: '/fit_card_calca_baggy.png',
+            image: '/calca_cargo_baggy_preto.png',
             category: 'CARGOS',
           },
         ],
@@ -216,7 +221,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'camiseta-washed-vintage',
             title: 'CAMISETA WASHED VINTAGE',
             price: 189.9,
-            image: '/fit_card_washed_escuro.png',
+            image: '/uploads/products/prod-cam-010/ebb62961e5bdfebc.webp',
             category: 'CAMISETAS',
           },
           {
@@ -224,7 +229,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image: '/fit_card_calca_baggy.png',
+            image: '/calca_cargo_baggy_preto.png',
             category: 'CARGOS',
           },
         ],
@@ -254,7 +259,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'jaqueta-utility',
             title: 'JAQUETA UTILITY',
             price: 459.9,
-            image: '/fit_card_jaqueta_utility.png',
+            image: '/jaqueta_utility_preto.png',
             category: 'JAQUETAS',
           },
           {
@@ -262,7 +267,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image: '/fit_card_calca_baggy.png',
+            image: '/calca_cargo_baggy_preto.png',
             category: 'CARGOS',
           },
         ],
@@ -280,7 +285,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'moletom-half-zip-utility',
             title: 'MOLETOM HALF ZIP UTILITY',
             price: 349.9,
-            image: '/fit_card_mol_utility.png',
+            image: '/uploads/products/prod-mol-007/824eb8663f330877.webp',
             category: 'MOLETONS',
           },
           {
@@ -288,7 +293,7 @@ const FIT_SYSTEM_DATA: Record<FitKey, FitCategoryDefinition> = {
             slug: 'calca-cargo-baggy',
             title: 'CALÇA CARGO BAGGY',
             price: 339.9,
-            image: '/fit_card_calca_baggy.png',
+            image: '/calca_cargo_baggy_preto.png',
             category: 'CARGOS',
           },
         ],
@@ -315,9 +320,33 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
   const [selectedFit, setSelectedFit] = useState<FitKey>('BOXY');
   const [selectedLookNumber, setSelectedLookNumber] = useState<1 | 2>(1);
 
-  const activeFit = FIT_SYSTEM_DATA[selectedFit];
+  // Dynamic configuration loaded from /api/fit-system (persisted by Admin Panel)
+  const [fitConfig, setFitConfig] = useState<FitSystemConfig>(DEFAULT_FIT_SYSTEM_CONFIG);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchConfig = async () => {
+      try {
+        const res = await fetch('/api/fit-system', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data === 'object' && isMounted) {
+            setFitConfig(data);
+          }
+        }
+      } catch (err) {
+        console.warn('[MarmotFitSystem] Usando dados locais do sistema de caimento:', err);
+      }
+    };
+    fetchConfig();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const activeFit = fitConfig[selectedFit] || DEFAULT_FIT_SYSTEM_CONFIG[selectedFit] || FIT_SYSTEM_DATA[selectedFit];
   const activeLook =
-    activeFit.looks.find((look) => look.lookNumber === selectedLookNumber) ||
+    activeFit.looks.find((look: any) => look.lookNumber === selectedLookNumber) ||
     activeFit.looks[0];
 
   const handleFitSelect = (fitKey: FitKey) => {
@@ -327,7 +356,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
     }
   };
 
-  const resolveStoreProduct = (item: LookProductItem) =>
+  const resolveStoreProduct = (item: { id?: string; slug?: string }) =>
     products.find(
       (product) => product.id === item.id || product.slug === item.slug,
     );
@@ -375,58 +404,205 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
   };
 
 
-  /*
-   * A faixa de produtos mostra SOMENTE as peças que realmente compõem o look.
-   * Quando o produto possui mais de uma cor no catálogo, cada cor vira um card.
-   * Limitamos a 2 cores por peça e a 4 cards no total:
-   * - 2 cores + 2 cores = 4 cards
-   * - 2 cores + 1 cor   = 3 cards
-   * - sem variações suficientes, não inventamos produtos extras.
+  const KNOWN_FIT_CARD_IMAGES: Record<
+    string,
+    { color1: string; color2?: string }
+  > = {
+    'prod-cam-004': {
+      color1: '/Camiseta Heavy Boxy - Preto.png',
+      color2: '/Camiseta Heavy Boxy - Branco.png',
+    },
+    'prod-cal-002': {
+      color1: '/calca_cargo_baggy_preto.png',
+    },
+    'prod-mol-008': {
+      color1: '/uploads/products/prod-mol-008/2d380b21451a9f61.webp',
+    },
+    'prod-cal-001': {
+      color1: '/calca_balloon_preto.jpg',
+    },
+    'prod-jaq-016': {
+      color1: '/jaqueta_utility_preto.png',
+    },
+    'prod-jaq-017': {
+      color1: '/jaqueta_varsity_preto.png',
+    },
+    'prod-cam-008': {
+      color1: '/uploads/products/prod-cam-008/c1c4bef72959eab2.webp',
+    },
+    'prod-cam-010': {
+      color1: '/uploads/products/prod-cam-010/ebb62961e5bdfebc.webp',
+      color2: '/uploads/products/prod-cam-010/7bea6b9c3c3cecad.webp',
+    },
+    'prod-mol-007': {
+      color1: '/uploads/products/prod-mol-007/824eb8663f330877.webp',
+    },
+  };
+
+  const isValidFitProductImage = (src?: string | null) => {
+    if (!src || typeof src !== 'string') return false;
+
+    const normalized = src.toLowerCase();
+    return (
+      !normalized.includes('unsplash.com') &&
+      !normalized.includes('fit_card') &&
+      !normalized.includes('placeholder')
+    );
+  };
+
+  /**
+   * Retorna no máximo DUAS VARIAÇÕES DE COR reais da mesma peça.
+   *
+   * IMPORTANTE:
+   * - uma segunda foto da MESMA cor não conta como COR 2;
+   * - cada entrada de `storeProduct.colors` representa uma cor;
+   * - usamos no máximo UMA imagem por cor;
+   * - a galeria geral (`storeProduct.images`) NÃO é usada para inventar outra cor.
    */
-  const displayLookProducts: LookDisplayItem[] = activeLook.products
-    .flatMap((item) => {
-      const storeProduct = resolveStoreProduct(item);
-      const storeColors = storeProduct?.colors ?? [];
+  const resolveTwoProductVariants = (
+    item: any,
+    storeProduct?: Product,
+  ): Array<{ image: string; colorKey: string }> => {
+    const known = KNOWN_FIT_CARD_IMAGES[item?.id];
 
-      const seenImages = new Set<string>();
+    const variants: Array<{ image?: string | null; colorKey: string }> = [];
 
-      const colorCards = storeColors
-        .map((color, colorIndex) => {
-          const colorImage =
-            color.image ||
-            (Array.isArray(color.images) ? color.images[0] : undefined) ||
-            storeProduct?.image ||
-            item.image;
+    const pushVariant = (image: string | undefined | null, colorKey: string) => {
+      if (!isValidFitProductImage(image)) return;
+      variants.push({ image, colorKey });
+    };
 
-          const colorName =
-            color.colorName || color.color || `COR ${colorIndex + 1}`;
+    // 1) Configuração explícita do Fit System — sempre tem prioridade.
+    pushVariant(
+      item?.color1Image || item?.color1Original,
+      String(item?.color1Name || 'fit-color-1').trim().toLowerCase(),
+    );
+    pushVariant(
+      item?.color2Image || item?.color2Original,
+      String(item?.color2Name || 'fit-color-2').trim().toLowerCase(),
+    );
 
-          return {
-            ...item,
-            title: storeProduct?.title || item.title,
-            price: storeProduct?.price ?? item.price,
-            image: colorImage,
-            category: storeProduct?.category || item.category,
-            colorName,
-            variantKey: `${item.id}-${colorName}-${colorIndex}`,
-          } satisfies LookDisplayItem;
-        })
-        .filter((variant) => {
-          if (!variant.image || seenImages.has(variant.image)) return false;
-          seenImages.add(variant.image);
-          return true;
-        })
-        .slice(0, 2);
+    // 2) Cores REAIS cadastradas no produto da loja.
+    // Pegamos somente a primeira imagem válida de CADA cor, evitando confundir
+    // fotos diferentes da mesma cor com uma segunda opção de cor.
+    const storeColors = Array.isArray((storeProduct as any)?.colors)
+      ? (storeProduct as any).colors
+      : [];
 
-      if (colorCards.length > 0) return colorCards;
+    storeColors.forEach((color: any, colorIndex: number) => {
+      const colorImage =
+        color?.image ||
+        (Array.isArray(color?.images)
+          ? color.images.find((img: string) => isValidFitProductImage(img))
+          : undefined);
 
-      return [
-        {
-          ...item,
-          variantKey: `${item.id}-default`,
-        } satisfies LookDisplayItem,
-      ];
-    })
+      const colorKey = String(
+        color?.id ||
+          color?.colorName ||
+          color?.name ||
+          color?.color ||
+          color?.colorHex ||
+          color?.hex ||
+          `store-color-${colorIndex + 1}`,
+      )
+        .trim()
+        .toLowerCase();
+
+      pushVariant(colorImage, colorKey);
+    });
+
+    // 3) Mapeamento local conhecido. Só entra como fallback de cor real.
+    pushVariant(known?.color1, 'known-color-1');
+    pushVariant(known?.color2, 'known-color-2');
+
+    // 4) Imagem principal só pode servir como OPÇÃO 1.
+    // Nunca usamos a galeria geral para criar uma falsa OPÇÃO 2.
+    pushVariant((storeProduct as any)?.image || item?.image, 'main-color');
+
+    const seenImages = new Set<string>();
+    const seenColors = new Set<string>();
+    const uniqueVariants: Array<{ image: string; colorKey: string }> = [];
+
+    for (const variant of variants) {
+      if (!variant.image) continue;
+
+      const normalizedImage = variant.image.trim();
+      const normalizedColor = variant.colorKey || normalizedImage;
+
+      if (seenImages.has(normalizedImage)) continue;
+      if (seenColors.has(normalizedColor)) continue;
+
+      seenImages.add(normalizedImage);
+      seenColors.add(normalizedColor);
+      uniqueVariants.push({
+        image: normalizedImage,
+        colorKey: normalizedColor,
+      });
+
+      if (uniqueVariants.length === 2) break;
+    }
+
+    return uniqueVariants;
+  };
+
+  /**
+   * A faixa inferior representa SOMENTE as peças presentes no look atual.
+   *
+   * OPÇÃO 1 = parte de cima na primeira cor + parte de baixo na primeira cor.
+   * OPÇÃO 2 = parte de cima na segunda cor + parte de baixo na segunda cor.
+   *
+   * A OPÇÃO 2 só existe quando TODAS as peças do look possuem uma segunda
+   * variação de cor REAL. Assim nunca repetimos a mesma cor só para preencher.
+   */
+  const sourceLookPieces: any[] =
+    Array.isArray((activeLook as any).pieces) &&
+    (activeLook as any).pieces.length > 0
+      ? (activeLook as any).pieces
+      : Array.isArray((activeLook as any).products)
+        ? (activeLook as any).products
+        : [];
+
+  const lookPieceVariants = sourceLookPieces.map((piece: any) => {
+    const storeProduct = resolveStoreProduct(piece);
+    const variants = resolveTwoProductVariants(piece, storeProduct);
+
+    return {
+      piece,
+      storeProduct,
+      variants,
+      resolvedTitle: storeProduct?.title || piece.title,
+      resolvedPrice: storeProduct?.price ?? piece.price,
+      resolvedCategory: storeProduct?.category || piece.category,
+      resolvedSlug: piece.slug || storeProduct?.slug || piece.id,
+    };
+  });
+
+  const hasCompleteOption1 =
+    lookPieceVariants.length > 0 &&
+    lookPieceVariants.every((entry) => Boolean(entry.variants[0]?.image));
+
+  const hasCompleteOption2 =
+    lookPieceVariants.length > 0 &&
+    lookPieceVariants.every((entry) => Boolean(entry.variants[1]?.image));
+
+  const optionIndexes: number[] = [
+    ...(hasCompleteOption1 ? [0] : []),
+    ...(hasCompleteOption2 ? [1] : []),
+  ];
+
+  const displayLookProducts: LookDisplayItem[] = optionIndexes
+    .flatMap((optionIndex) =>
+      lookPieceVariants.map((entry) => ({
+        id: entry.piece.id,
+        slug: entry.resolvedSlug,
+        title: entry.resolvedTitle,
+        price: entry.resolvedPrice,
+        image: entry.variants[optionIndex].image,
+        category: entry.resolvedCategory,
+        colorName: `OPÇÃO ${optionIndex + 1}`,
+        variantKey: `${entry.piece.id}-option-${optionIndex + 1}`,
+      } satisfies LookDisplayItem)),
+    )
     .slice(0, 4);
 
   const productGridColumns =
@@ -446,7 +622,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
       }}
     >
       {/* HERO */}
-      <div className="relative mx-auto w-full max-w-[1720px] px-4 sm:px-6 lg:px-8 pt-7 sm:pt-8">
+      <div className="relative mx-auto w-full max-w-[1720px] px-4 sm:px-6 lg:px-8 pt-4 sm:pt-5">
         {/* topo editorial inspirado na referência */}
         <div className="relative z-20 hidden lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
           <div className="flex items-center gap-5">
@@ -487,7 +663,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
         </div>
 
         {/* hero principal */}
-        <div className="relative mt-7 grid grid-cols-1 gap-8 lg:min-h-[580px] lg:grid-cols-[minmax(420px,1.08fr)_minmax(300px,0.82fr)_minmax(470px,1.08fr)] lg:items-center lg:gap-x-5 xl:gap-x-7">
+        <div className="relative mt-4 grid grid-cols-1 gap-6 lg:min-h-[470px] lg:grid-cols-[minmax(400px,1.08fr)_minmax(280px,0.82fr)_minmax(440px,1.08fr)] lg:items-center lg:gap-x-5 xl:gap-x-7">
           {/* esquerda */}
           <div className="relative z-20 flex flex-col justify-center lg:pr-1 xl:pr-3">
             <div className="max-w-[560px]">
@@ -495,26 +671,26 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                 MODELAGEM & SILHUETAS
               </span>
 
-              <h2 className="font-black uppercase tracking-[-0.06em] text-zinc-950 leading-[0.86] text-[clamp(60px,5.5vw,92px)]">
+              <h2 className="font-black uppercase tracking-[-0.055em] text-zinc-950 leading-[0.87] text-[clamp(54px,4.55vw,78px)]">
                 <span className="block whitespace-nowrap">ESCOLHA O</span>
                 <span className="block whitespace-nowrap">CAIMENTO.</span>
               </h2>
 
-              <p className="mt-4 max-w-[430px] font-sans text-[17px] font-normal leading-[1.25] text-zinc-700 sm:text-[18px] lg:mt-5 lg:text-[19px] xl:max-w-[440px] xl:text-[20px]">
+              <p className="mt-3 max-w-[420px] font-sans text-[16px] font-normal leading-[1.28] text-zinc-700 sm:text-[16.5px] lg:mt-4 lg:text-[17px] xl:max-w-[430px]">
                 Cada peça veste de um jeito. Descubra a silhueta que melhor combina com o seu estilo.
               </p>
 
-              <div className="mt-6 lg:mt-7">
+              <div className="mt-4 lg:mt-5">
                 <button
                   type="button"
                   onClick={() => onNavigate('shop')}
-                  className="group inline-flex h-[48px] items-center justify-center gap-3 rounded-[2px] border border-zinc-700 bg-transparent px-8 text-[12px] font-extrabold uppercase tracking-[0.24em] text-zinc-950 transition-all hover:border-zinc-950 hover:bg-white/80 cursor-pointer sm:h-[50px] sm:text-[13px]"
+                  className="group inline-flex h-[44px] items-center justify-center gap-3 rounded-[2px] border border-zinc-700 bg-transparent px-7 text-[11px] font-extrabold uppercase tracking-[0.23em] text-zinc-950 transition-all hover:border-zinc-950 hover:bg-white/80 cursor-pointer sm:h-[46px] sm:text-[12px]"
                 >
                   <span>EXPLORAR FITS</span>
                   <ArrowRight className="h-4 w-4 stroke-[2] transition-transform group-hover:translate-x-1" />
                 </button>
 
-                <div className="mt-5 flex items-center gap-4 font-mono text-[10px] font-bold uppercase tracking-[0.26em] text-zinc-600 sm:text-[11px]">
+                <div className="mt-3.5 flex items-center gap-3.5 font-mono text-[9px] font-bold uppercase tracking-[0.24em] text-zinc-600 sm:text-[10px]">
                   <span>BOXY</span>
                   <span className="h-1 w-1 rounded-full bg-zinc-400" />
                   <span>OVERSIZED</span>
@@ -526,20 +702,20 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
           </div>
 
           {/* centro */}
-          <div className="relative z-30 hidden h-[560px] items-end justify-center lg:flex xl:h-[600px]">
+          <div className="relative z-30 hidden h-[455px] items-end justify-center lg:flex xl:h-[485px]">
             <div
               aria-hidden="true"
-              className="absolute bottom-[34px] left-1/2 h-[92px] w-[390px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.095),rgba(0,0,0,0)_72%)] blur-[2px]"
+              className="absolute bottom-[30px] left-1/2 h-[74px] w-[340px] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,0.09),rgba(0,0,0,0)_72%)] blur-[2px]"
             />
 
             <img
               key={`${selectedFit}-${selectedLookNumber}`}
-              src={activeLook.imageSrc}
+              src={(activeLook as any).mainImage || activeLook.imageSrc || (activeLook as any).mainImageOriginal}
               alt={activeLook.lookTitle}
               loading="eager"
               decoding="async"
               referrerPolicy="no-referrer"
-              className="absolute bottom-[22px] left-1/2 z-10 h-[590px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[640px]"
+              className="absolute bottom-[20px] left-1/2 z-10 h-[485px] w-auto max-w-none -translate-x-1/2 object-contain object-bottom xl:h-[520px]"
               style={{ marginTop: 0 }}
             />
 
@@ -589,9 +765,9 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
 
           {/* direita */}
           <div className="relative z-20 lg:pl-0">
-            <div className="flex flex-col gap-3.5">
+            <div className="flex flex-col gap-2.5">
               {FIT_ORDER.map((fitKey) => {
-                const fitItem = FIT_SYSTEM_DATA[fitKey];
+                const fitItem = (fitConfig && fitConfig[fitKey]) || FIT_SYSTEM_DATA[fitKey];
                 const isActive = selectedFit === fitKey;
 
                 return (
@@ -599,7 +775,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                     key={fitKey}
                     type="button"
                     onClick={() => handleFitSelect(fitKey)}
-                    className={`group relative grid min-h-[96px] grid-cols-[88px_1fr_1.15fr_34px] items-center rounded-[2px] border border-zinc-200/90 bg-white/70 px-6 py-5 text-left transition-all cursor-pointer backdrop-blur-[1px] ${
+                    className={`group relative grid min-h-[78px] grid-cols-[76px_1fr_1.15fr_30px] items-center rounded-[2px] border border-zinc-200/90 bg-white/70 px-5 py-3.5 text-left transition-all cursor-pointer backdrop-blur-[1px] ${
                       isActive
                         ? 'border-zinc-200 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.18)]'
                         : 'hover:border-zinc-300 hover:bg-white'
@@ -610,25 +786,25 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                     )}
 
                     <div className="flex h-full items-center justify-center pr-5">
-                      <span className="font-sans text-[22px] font-black leading-none tracking-[-0.04em] text-zinc-700 lg:text-[24px] xl:text-[26px]">
+                      <span className="font-sans text-[20px] font-black leading-none tracking-[-0.04em] text-zinc-700 lg:text-[21px] xl:text-[22px]">
                         {fitItem.code}
                       </span>
                     </div>
 
-                    <div className="border-l border-black/10 pl-6 pr-6">
-                      <span className="block font-black text-[24px] uppercase tracking-[-0.03em] text-zinc-950 leading-none lg:text-[26px]">
+                    <div className="border-l border-black/10 pl-5 pr-5">
+                      <span className="block font-black text-[20px] uppercase tracking-[-0.03em] text-zinc-950 leading-none lg:text-[21px] xl:text-[22px]">
                         {fitItem.name}
                       </span>
                     </div>
 
-                    <div className="border-l border-black/10 pl-6 pr-5">
-                      <p className="font-sans text-[15px] leading-[1.22] text-zinc-800 lg:text-[16px]">
+                    <div className="border-l border-black/10 pl-5 pr-4">
+                      <p className="font-sans text-[13px] leading-[1.22] text-zinc-800 lg:text-[13.5px] xl:text-[14px]">
                         {fitItem.shortDescription}
                       </p>
                     </div>
 
                     <div className="flex justify-end">
-                      <ArrowRight className="h-[22px] w-[22px] stroke-[1.8] text-zinc-700 transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="h-[18px] w-[18px] stroke-[1.8] text-zinc-700 transition-transform group-hover:translate-x-1" />
                     </div>
                   </button>
                 );
@@ -679,7 +855,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
       {/* produtos */}
       <div className="relative z-20 w-full bg-transparent">
         <div className="mx-auto w-full max-w-[1720px] px-4 sm:px-6 lg:px-8">
-          <div className="flex h-[54px] items-center justify-between border-t border-black/10">
+          <div className="flex h-[44px] items-center justify-between border-t border-black/10">
             <div className="flex min-w-0 flex-1 items-center gap-[14px] pr-5">
               <span className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-black">
                 PEÇAS DESTE LOOK
@@ -699,7 +875,7 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
           </div>
 
           <div
-            className={`grid grid-cols-1 gap-3 pb-7 sm:grid-cols-2 sm:pb-8 lg:pb-10 ${productGridColumns}`}
+            className={`grid grid-cols-1 gap-2.5 pb-5 sm:grid-cols-2 sm:pb-6 lg:pb-6 ${productGridColumns}`}
           >
             {displayLookProducts.map((item, index) => {
               const formattedPrice = item.price.toLocaleString('pt-BR', {
@@ -707,54 +883,60 @@ export const MarmotFitSystem: React.FC<MarmotFitSystemProps> = ({
                 maximumFractionDigits: 2,
               });
 
-              const showColorName =
-                item.colorName &&
-                item.colorName.trim().toLowerCase() !== 'padrão' &&
-                item.colorName.trim().toLowerCase() !== 'padrao';
+              const showColorName = Boolean(item.colorName);
+              const normalizedCategory = (item.category || '').toUpperCase();
+              const normalizedTitle = (item.title || '').toUpperCase();
+              const isBottomPiece =
+                normalizedCategory.includes('CALÇ') ||
+                normalizedCategory.includes('CARGO') ||
+                normalizedTitle.includes('CALÇA') ||
+                normalizedTitle.includes('CARGO');
 
               return (
                 <div
                   key={`${selectedFit}-${selectedLookNumber}-${item.variantKey}-${index}`}
                   onClick={() => onNavigate('product', item.slug || item.id)}
-                  className="group relative flex h-[150px] sm:h-[156px] lg:h-[160px] w-full overflow-hidden rounded-[3px] border border-zinc-200/90 bg-white transition-all duration-200 hover:border-zinc-950 hover:shadow-xs cursor-pointer select-none"
+                  className="group relative flex h-[122px] sm:h-[126px] lg:h-[130px] w-full overflow-hidden rounded-[3px] border border-zinc-200/90 bg-white transition-all duration-200 hover:border-zinc-950 hover:shadow-xs cursor-pointer select-none"
                 >
-                  {/* imagem da variação: inteira, sem crop */}
-                  <div className="h-full w-[46%] shrink-0 overflow-hidden bg-[#EEEEEC] sm:w-[45%]">
-                    <div className="flex h-full w-full items-center justify-center p-2 sm:p-2.5">
-                      <img
-                        src={item.image}
-                        alt={
-                          showColorName
-                            ? `${item.title} - ${item.colorName}`
-                            : item.title
+                  {/* imagem da variação: mais presença visual, sem criar espaços mortos */}
+                  <div className="flex h-full w-[43%] shrink-0 items-center justify-center overflow-hidden bg-[#ECEAE6] sm:w-[42%]">
+                    <img
+                      src={item.image}
+                      alt={
+                        showColorName
+                          ? `${item.title} - ${item.colorName}`
+                          : item.title
+                      }
+                      loading="lazy"
+                      decoding="async"
+                      className={`h-full w-full object-contain object-center transition-transform duration-500 ease-out ${
+                        isBottomPiece
+                          ? 'scale-[1.38] group-hover:scale-[1.42]'
+                          : 'scale-[1.28] group-hover:scale-[1.32]'
+                      }`}
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes('Heavy%20Boxy') && !target.src.includes('Heavy Boxy')) {
+                          target.src = '/Camiseta Heavy Boxy - Preto.png';
                         }
-                        loading="lazy"
-                        decoding="async"
-                        className="h-full w-full object-contain object-center transition-transform duration-500 ease-out group-hover:scale-[1.025]"
-                        onError={(e) => {
-                          const target = e.currentTarget;
-                          if (!target.src.includes('fit_card')) {
-                            target.src = '/fit_card_heavy_boxy.png';
-                          }
-                        }}
-                      />
-                    </div>
+                      }}
+                    />
                   </div>
 
                   {/* informações */}
-                  <div className="flex min-w-0 flex-1 flex-col justify-between bg-white p-3.5 sm:p-4">
+                  <div className="flex min-w-0 flex-1 flex-col justify-between bg-white p-2.5 sm:p-3 lg:p-3">
                     <div className="min-w-0">
                       <h4 className="line-clamp-2 font-bold text-[11px] uppercase leading-[1.15] tracking-tight text-zinc-900 transition-colors group-hover:text-black sm:text-xs">
                         {item.title}
                       </h4>
 
                       {showColorName && (
-                        <p className="mt-1 font-mono text-[8.5px] font-bold uppercase tracking-[0.16em] text-zinc-400 sm:text-[9px]">
+                        <p className="mt-1 font-mono text-[8px] font-extrabold uppercase tracking-[0.2em] text-zinc-500 sm:text-[8.5px]">
                           {item.colorName}
                         </p>
                       )}
 
-                      <p className="mt-1.5 text-[12.5px] font-extrabold leading-none tracking-tight text-zinc-950 sm:text-[13px]">
+                      <p className="mt-1 text-[12px] font-extrabold leading-none tracking-tight text-zinc-950 sm:text-[12.5px]">
                         R$ {formattedPrice}
                       </p>
                     </div>

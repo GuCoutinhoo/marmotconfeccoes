@@ -260,7 +260,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           {/* 1. Left Column: Dominant Gallery (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Main Stage Image */}
-            <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-[#111113] border border-zinc-200/90 rounded-[2px] overflow-hidden group">
+            <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-[#F6F6F6] border border-zinc-200/90 rounded-[2px] overflow-hidden group">
               <img
                 src={images[selectedImageIndex] || images[0]}
                 alt={product.title}

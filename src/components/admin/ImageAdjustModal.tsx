@@ -181,42 +181,75 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Define Target Resolution based on image native resolution
-      const maxNatural = Math.max(imageElement.naturalWidth || 1600, imageElement.naturalHeight || 1600, 1600);
-      const baseDim = exportMode ? Math.min(maxNatural, 3200) : 800;
+      // Determine Target Resolution
+      const imgWidth = imageElement.naturalWidth || 1600;
+      const imgHeight = imageElement.naturalHeight || 1600;
 
-      let targetWidth = baseDim;
-      let targetHeight = baseDim;
+      let targetWidth: number;
+      let targetHeight: number;
 
-      if (aspectRatio === '1:1') {
-        targetWidth = baseDim;
-        targetHeight = baseDim;
-      } else if (aspectRatio === '4:5') {
-        targetWidth = baseDim;
-        targetHeight = Math.round(baseDim * 1.25);
-      } else if (aspectRatio === '16:9') {
-        targetWidth = baseDim;
-        targetHeight = Math.round((baseDim * 9) / 16);
+      if (!exportMode) {
+        // High-density preview canvas
+        const previewMax = 1200;
+        if (aspectRatio === '1:1') {
+          targetWidth = previewMax;
+          targetHeight = previewMax;
+        } else if (aspectRatio === '4:5') {
+          targetWidth = previewMax;
+          targetHeight = Math.round(previewMax * 1.25);
+        } else if (aspectRatio === '16:9') {
+          targetWidth = previewMax;
+          targetHeight = Math.round((previewMax * 9) / 16);
+        } else {
+          const origAspect = imgWidth / imgHeight;
+          targetWidth = previewMax;
+          targetHeight = Math.round(previewMax / origAspect);
+        }
       } else {
-        // Free / Original ratio
-        const origAspect = (imageElement.naturalWidth || 800) / (imageElement.naturalHeight || 800);
-        targetWidth = baseDim;
-        targetHeight = Math.round(baseDim / origAspect);
+        // High-Fidelity Export: Preserve source image native resolution up to 4096px
+        if (aspectRatio === '1:1') {
+          const nativeSide = Math.min(imgWidth, imgHeight);
+          targetWidth = Math.min(Math.max(nativeSide, 1600), 4096);
+          targetHeight = targetWidth;
+        } else if (aspectRatio === '4:5') {
+          const nativeW = Math.min(imgWidth, Math.round(imgHeight * 0.8));
+          targetWidth = Math.min(Math.max(nativeW, 1600), 4096);
+          targetHeight = Math.round(targetWidth * 1.25);
+        } else if (aspectRatio === '16:9') {
+          const nativeW = Math.min(imgWidth, Math.round(imgHeight * (16 / 9)));
+          targetWidth = Math.min(Math.max(nativeW, 1920), 4096);
+          targetHeight = Math.round((targetWidth * 9) / 16);
+        } else {
+          // Free / Original ratio: preserve exact source dimensions
+          targetWidth = Math.min(imgWidth, 4096);
+          targetHeight = Math.round(targetWidth * (imgHeight / imgWidth));
+        }
       }
 
       canvas.width = targetWidth;
       canvas.height = targetHeight;
 
-      // Clear Canvas with sleek dark background
-      ctx.fillStyle = '#0a0a0a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Enable maximum image smoothing quality
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+
+      // Clear Canvas: transparent if PNG, white for neutral studio background
+      const isPng = imageSrc.toLowerCase().includes('.png') || imageSrc.startsWith('data:image/png');
+      if (isPng) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
 
       ctx.save();
 
       // Apply CSS Filters to Canvas
       ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) grayscale(${grayscale}%) sepia(${sepia}%)`;
 
-      const scaleMultiplier = exportMode ? (baseDim / 800) : 1;
+      // Scale multiplier from preview canvas dimensions to export canvas
+      const previewBaseWidth = 1200;
+      const scaleMultiplier = exportMode ? (targetWidth / previewBaseWidth) : 1;
 
       // Move to Center of Canvas
       ctx.translate(canvas.width / 2 + offsetX * scaleMultiplier, canvas.height / 2 + offsetY * scaleMultiplier);
@@ -228,10 +261,6 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
       ctx.scale(flipH ? -1 : 1, 1);
 
       // Calculate Draw Dimensions maintaining aspect ratio
-      const imgWidth = imageElement.naturalWidth;
-      const imgHeight = imageElement.naturalHeight;
-
-      // Fit image into target canvas with "cover" behavior by default, then apply zoom
       const scaleX = canvas.width / imgWidth;
       const scaleY = canvas.height / imgHeight;
       const baseScale = Math.max(scaleX, scaleY);
@@ -239,7 +268,7 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
       const finalWidth = imgWidth * baseScale * zoom;
       const finalHeight = imgHeight * baseScale * zoom;
 
-      // Draw centered
+      // Draw centered with maximum quality
       ctx.drawImage(imageElement, -finalWidth / 2, -finalHeight / 2, finalWidth, finalHeight);
 
       ctx.restore();
@@ -350,13 +379,22 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
     console.log('[IMAGE EDIT] Canvas generated, dimensions:', exportCanvas.width, 'x', exportCanvas.height);
 
     try {
-      // 1. Generate Blob with high quality JPEG (95% quality)
+      // 1. Generate Blob with pristine fidelity (PNG for PNG, WebP/JPEG with 0.98 quality)
+      const isPng = imageSrc.toLowerCase().includes('.png') || imageSrc.startsWith('data:image/png');
+      const exportMime = isPng ? 'image/png' : 'image/webp';
+      const exportQuality = 0.98;
+
       const blob = await new Promise<Blob | null>((resolve) => {
         try {
           exportCanvas.toBlob(
-            (b) => resolve(b),
-            'image/jpeg',
-            0.95
+            (b) => {
+              if (b) resolve(b);
+              else {
+                exportCanvas.toBlob((jb) => resolve(jb), 'image/jpeg', 0.98);
+              }
+            },
+            exportMime,
+            exportQuality
           );
         } catch (e) {
           console.warn('[IMAGE EDIT] Canvas.toBlob exception (tainted?):', e);
@@ -364,10 +402,10 @@ export const ImageAdjustModal: React.FC<ImageAdjustModalProps> = ({
         }
       });
 
-      // 2. Generate dataUrl as well for compatibility
+      // 2. Generate dataUrl as well for fallback compatibility
       let dataUrl = '';
       try {
-        dataUrl = exportCanvas.toDataURL('image/jpeg', 0.95);
+        dataUrl = exportCanvas.toDataURL(exportMime, exportQuality);
       } catch (e) {
         console.warn('[IMAGE EDIT] Canvas.toDataURL exception:', e);
         if (imageSrc) dataUrl = imageSrc;

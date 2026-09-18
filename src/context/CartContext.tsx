@@ -59,7 +59,47 @@ interface CartContextData {
   triggerAuthRequired: (pendingItem?: { product: Product; size: string; color: ProductVariant; quantity: number }) => void;
 }
 
-const CartContext = createContext<CartContextData>({} as CartContextData);
+const defaultCartData: CartContextData = {
+  cart: [],
+  cartItems: [],
+  cartHydrated: false,
+  isHydrated: false,
+  addToCart: () => false,
+  removeFromCart: () => {},
+  updateQuantity: () => {},
+  clearCart: () => {},
+  isMiniCartOpen: false,
+  openMiniCart: () => {},
+  closeMiniCart: () => {},
+  appliedCoupon: null,
+  applyCoupon: () => false,
+  removeCoupon: () => {},
+  subtotal: 0,
+  cartSubtotal: 0,
+  discountAmount: 0,
+  cartDiscount: 0,
+  freeShippingThreshold: 399,
+  freeShippingRemaining: 399,
+  isFreeShippingEligible: false,
+  totalCartItems: 0,
+  recentViewed: [],
+  addRecentViewed: () => {},
+  shippingPostalCode: '',
+  selectedShipping: null,
+  shippingOptions: [],
+  isCalculatingShipping: false,
+  shippingStatus: 'idle',
+  shippingError: null,
+  calculateShipping: async () => [],
+  setSelectedShipping: () => {},
+  setShippingPostalCode: () => {},
+  resetShipping: () => {},
+  shippingFee: 0,
+  grandTotal: 0,
+  triggerAuthRequired: () => {},
+};
+
+const CartContext = createContext<CartContextData>(defaultCartData);
 
 const FREE_SHIPPING_THRESHOLD = 399.00;
 
@@ -858,5 +898,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-export const useCart = () => useContext(CartContext);
+export const useCart = () => {
+  const context = useContext(CartContext);
+  return context || defaultCartData;
+};
 

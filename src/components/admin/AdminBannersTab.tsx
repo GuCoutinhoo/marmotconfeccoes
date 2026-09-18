@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext';
 import { StoreBanner } from '../../types';
+import { getAuthHeaders } from '../../lib/authHeaders';
 import {
   Image as ImageIcon,
   Plus,
@@ -40,7 +41,7 @@ export const AdminBannersTab: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/admin/banners', {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
+        headers: getAuthHeaders(),
       });
       if (res.ok) {
         const data = await res.json();
@@ -102,10 +103,7 @@ export const AdminBannersTab: React.FC = () => {
 
       const res = await fetch('/api/admin/banners', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': localStorage.getItem('marmot_auth_token') || '',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload),
       });
 
@@ -126,7 +124,7 @@ export const AdminBannersTab: React.FC = () => {
     try {
       const res = await fetch(`/api/admin/banners/${id}`, {
         method: 'DELETE',
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
+        headers: getAuthHeaders(),
       });
       if (!res.ok) throw new Error('Erro ao remover banner.');
       showToast('Banner Removido', 'O banner foi removido com sucesso.', 'info');

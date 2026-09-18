@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AdminActivityLog } from '../../types';
+import { getAuthHeaders } from '../../lib/authHeaders';
 import {
   FileText,
   Search,
@@ -23,7 +24,7 @@ export const AdminActivityLogsTab: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/admin/logs?limit=100', {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
+        headers: getAuthHeaders(),
       });
       if (res.ok) {
         const data = await res.json();

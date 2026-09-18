@@ -239,7 +239,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
       }
     });
 
-    // 2. Se a página 1 tiver menos de 8 itens, preenche com outros produtos reais do catálogo
+    // 2. Se a página 1 tiver menos de 10 itens, preenche com outros produtos reais do catálogo
     const remainingProducts = products.filter(
       (p) => !usedIds.has(p.id) && (p.status === undefined || p.status === 'active')
     );
@@ -250,7 +250,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
       return (b.rating || 0) - (a.rating || 0);
     });
 
-    while (page1Items.length < 8 && sortedRemaining.length > 0) {
+    while (page1Items.length < 10 && sortedRemaining.length > 0) {
       const p = sortedRemaining.shift()!;
       usedIds.add(p.id);
       page1Items.push({
@@ -275,7 +275,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
     }
 
     const pages: Array<typeof page1Items> = page1Items.length > 0 ? [page1Items] : [];
-    const itemsPerPage = 8;
+    const itemsPerPage = 10;
 
     // Demais páginas extraídas dinamicamente do catálogo real
     for (let i = 0; i < sortedRemaining.length && pages.length < 7; i += itemsPerPage) {
@@ -343,11 +343,11 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
       id="os-mais-procurados-section"
       className="bg-[#FAFAFA] select-none relative overflow-hidden border-b border-zinc-200/80 pt-7 sm:pt-9 pb-7 sm:pb-9"
     >
-      <div className="max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12">
         {/* ========================================================= */}
         {/* HEADER DA SEÇÃO UNIFICADO                                 */}
         {/* ========================================================= */}
-        <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5 sm:mb-6">
+        <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4 sm:mb-5">
           <div className="flex flex-col items-start text-left">
             <div className="flex items-center gap-2 mb-1.5">
               <span className="text-[10px] sm:text-[10.5px] font-extrabold uppercase tracking-[0.24em] text-zinc-400">
@@ -371,7 +371,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
             <button
               type="button"
               onClick={() => onNavigate('shop')}
-              className="h-9 sm:h-10 px-4 rounded-[3px] border border-zinc-900 bg-zinc-900 hover:bg-black text-white font-bold text-[11px] tracking-wider uppercase flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
+              className="h-8.5 sm:h-9 px-3.5 sm:px-4 rounded-[3px] border border-zinc-900 bg-zinc-900 hover:bg-black text-white font-bold text-[10.5px] sm:text-[11px] tracking-wider uppercase flex items-center gap-2 transition-all cursor-pointer shadow-2xs"
             >
               <span>VER CATÁLOGO</span>
               <ArrowUpRight className="w-3.5 h-3.5 stroke-[2]" />
@@ -388,26 +388,26 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                 type="button"
                 onClick={handlePrev}
                 aria-label="Página anterior"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-zinc-50 active:scale-95 border border-zinc-200/90 rounded-[3px] flex items-center justify-center text-zinc-900 transition-all cursor-pointer shadow-2xs"
+                className="w-8.5 h-8.5 sm:w-9 sm:h-9 bg-white hover:bg-zinc-50 active:scale-95 border border-zinc-200/90 rounded-[3px] flex items-center justify-center text-zinc-900 transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowLeft className="w-4 h-4 stroke-[2]" />
+                <ArrowLeft className="w-3.5 h-3.5 stroke-[2]" />
               </button>
               <button
                 type="button"
                 onClick={handleNext}
                 aria-label="Próxima página"
-                className="w-9 h-9 sm:w-10 sm:h-10 bg-white hover:bg-amber-50/40 active:scale-95 border border-[#F4C400] rounded-[3px] flex items-center justify-center text-zinc-900 transition-all cursor-pointer shadow-2xs"
+                className="w-8.5 h-8.5 sm:w-9 sm:h-9 bg-white hover:bg-amber-50/40 active:scale-95 border border-[#F4C400] rounded-[3px] flex items-center justify-center text-zinc-900 transition-all cursor-pointer shadow-2xs"
               >
-                <ArrowRight className="w-4 h-4 stroke-[2]" />
+                <ArrowRight className="w-3.5 h-3.5 stroke-[2]" />
               </button>
             </div>
           </div>
         </header>
 
         {/* ========================================================= */}
-        {/* GRADE DE PRODUTOS: CARDS PADRONIZADOS NO SISTEMA         */}
+        {/* GRADE DE PRODUTOS: CARDS PADRONIZADOS E COMPACTOS         */}
         {/* ========================================================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-4.5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3 lg:gap-3.5">
           {currentItems.map((item) => {
             const activeColorIdx = selectedColorMap[item.id] ?? 0;
             const activeColor = item.colors[activeColorIdx] || item.colors[0];
@@ -421,7 +421,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
               <article
                 key={item.id}
                 onClick={() => onNavigate('product', item.originalProduct.slug || item.originalProduct.id)}
-                className="group relative flex flex-col bg-white rounded-[3px] border border-zinc-200/90 hover:border-zinc-950 transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] overflow-hidden select-none cursor-pointer"
+                className="group relative flex flex-col bg-white rounded-[3px] border border-zinc-200/90 hover:border-zinc-950 transition-all duration-300 hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] overflow-hidden select-none cursor-pointer"
               >
                 {/* 1. Imagem Aspect 4/5 com Fundo Neutro Unificado */}
                 <div className="relative aspect-[4/5] w-full overflow-hidden bg-[#EEEEEC]">
@@ -440,48 +440,48 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                     onClick={(e) => handleWishlistClick(item.originalProduct, e)}
                     aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
                     title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-                    className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/95 hover:bg-white text-zinc-900 flex items-center justify-center border border-zinc-200/60 shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+                    className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 z-20 w-7 h-7 sm:w-7.5 sm:h-7.5 rounded-full bg-white/95 hover:bg-white text-zinc-900 flex items-center justify-center border border-zinc-200/60 shadow-2xs transition-transform hover:scale-105 active:scale-95 cursor-pointer"
                   >
                     <Heart
-                      className={`w-3.5 h-3.5 transition-colors stroke-[1.5] ${
+                      className={`w-3 h-3 sm:w-3.5 sm:h-3.5 transition-colors stroke-[1.5] ${
                         isFav ? 'fill-rose-600 text-rose-600' : 'fill-transparent text-zinc-800'
                       }`}
                     />
                   </button>
                 </div>
 
-                {/* 2. Área de Informações Unificada */}
-                <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-1 bg-white">
+                {/* 2. Área de Informações Compacta e Refinada */}
+                <div className="p-2.5 sm:p-3.5 flex flex-col justify-between flex-1 bg-white">
                   <div>
                     {/* Categoria */}
-                    <span className="block text-[10px] sm:text-[10.5px] font-semibold tracking-[0.18em] text-zinc-400 uppercase mb-1 leading-none">
+                    <span className="block text-[9px] sm:text-[9.5px] font-semibold tracking-[0.16em] text-zinc-400 uppercase mb-0.5 leading-none">
                       {item.categoryLabel}
                     </span>
 
                     {/* Nome do Produto */}
-                    <h3 className="font-bold text-zinc-900 text-xs sm:text-[13.5px] tracking-tight uppercase line-clamp-1 group-hover:text-black transition-colors mb-1.5">
+                    <h3 className="font-bold text-zinc-900 text-[11.5px] sm:text-[13px] tracking-tight uppercase line-clamp-1 group-hover:text-black transition-colors mb-1">
                       {item.title}
                     </h3>
 
                     {/* Preço Principal */}
-                    <div className="font-extrabold text-zinc-950 text-base sm:text-[17px] tracking-tight leading-none mb-1">
+                    <div className="font-extrabold text-zinc-950 text-[14px] sm:text-[15.5px] tracking-tight leading-none mb-1">
                       R$ {item.price.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
 
                     {/* Parcelamento */}
-                    <div className="text-[10.5px] sm:text-[11px] text-zinc-500 font-normal leading-tight mb-0.5">
+                    <div className="text-[9.5px] sm:text-[10px] text-zinc-500 font-normal leading-tight mb-0.5">
                       3x de R$ {installmentValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sem juros
                     </div>
 
                     {/* Pix */}
-                    <div className="text-[10.5px] sm:text-[11px] text-zinc-800 font-medium leading-tight mb-2.5">
+                    <div className="text-[9.5px] sm:text-[10px] text-zinc-800 font-medium leading-tight mb-1.5 sm:mb-2">
                       R$ {pixPrice.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} no Pix
                     </div>
                   </div>
 
                   {/* Divisor + Área das Cores & Botão de Visualização */}
-                  <div className="pt-2.5 border-t border-zinc-100">
-                    <div className="flex items-center justify-between gap-2 mb-2.5">
+                  <div className="pt-2 border-t border-zinc-100">
+                    <div className="flex items-center justify-between gap-1.5 mb-1.5 sm:mb-2">
                       <div className="flex items-center gap-1.5">
                         {item.colors.slice(0, 4).map((c, idx) => {
                           const isWhite = c.hex.toLowerCase() === '#ffffff' || c.hex.toLowerCase() === '#fff';
@@ -490,7 +490,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                               key={c.name || idx}
                               type="button"
                               onClick={(e) => handleColorSelect(item.id, idx, e)}
-                              className={`w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full transition-transform duration-150 hover:scale-110 cursor-pointer ${
+                              className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-transform duration-150 hover:scale-110 cursor-pointer ${
                                 isWhite ? 'border border-black/25' : 'border border-black/10'
                               }`}
                               style={{ backgroundColor: c.hex }}
@@ -501,7 +501,7 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                         })}
                       </div>
 
-                      <span className="text-[9.5px] sm:text-[10px] font-semibold tracking-wider text-zinc-400 uppercase">
+                      <span className="text-[8.5px] sm:text-[9px] font-semibold tracking-wider text-zinc-400 uppercase">
                         {item.colors.length} {item.colors.length === 1 ? 'COR' : 'CORES'}
                       </span>
                     </div>
@@ -512,10 +512,10 @@ export const BestsellersRanking: React.FC<BestsellersRankingProps> = ({
                         e.stopPropagation();
                         onNavigate('product', item.originalProduct.slug || item.originalProduct.id);
                       }}
-                      className="w-full h-8.5 rounded-[2px] border border-zinc-900 bg-white group-hover:bg-zinc-950 group-hover:text-white text-zinc-900 font-bold text-[10.5px] tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
+                      className="w-full h-7 sm:h-7.5 rounded-[2px] border border-zinc-900 bg-white group-hover:bg-zinc-950 group-hover:text-white text-zinc-900 font-bold text-[9.5px] sm:text-[10px] tracking-wider uppercase flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer"
                     >
                       <span>VER PRODUTO</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 </div>

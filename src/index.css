@@ -245,3 +245,12 @@ body {
   }
 }
 
+/* Image Fidelity & Crisp Display Rules */
+img {
+  image-rendering: auto;
+  image-rendering: -webkit-optimize-contrast;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+

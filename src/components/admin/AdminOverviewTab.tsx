@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
+import { getAuthHeaders } from '../../lib/authHeaders';
 import {
   TrendingUp,
   DollarSign,
@@ -39,7 +40,7 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({ onNavigateTa
     setIsLoading(true);
     try {
       const res = await fetch(`/api/admin/overview?period=${period}`, {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' }
+        headers: getAuthHeaders()
       });
       if (res.ok) {
         const data = await res.json();

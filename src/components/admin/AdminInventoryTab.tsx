@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { useToast } from '../../context/ToastContext';
+import { getAuthHeaders } from '../../lib/authHeaders';
 import { Product, InventoryMovement } from '../../types';
 import {
   Package,
@@ -42,7 +43,7 @@ export const AdminInventoryTab: React.FC = () => {
     setLoadingMovements(true);
     try {
       const res = await fetch('/api/admin/inventory/movements', {
-        headers: { 'x-auth-token': localStorage.getItem('marmot_auth_token') || '' },
+        headers: getAuthHeaders(),
       });
       if (res.ok) {
         const data = await res.json();
@@ -97,10 +98,7 @@ export const AdminInventoryTab: React.FC = () => {
     try {
       const res = await fetch(`/api/admin/inventory/${selectedProduct.id}/adjust`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-auth-token': localStorage.getItem('marmot_auth_token') || '',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           quantityChange,
           reason: adjustmentReason,
