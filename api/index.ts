@@ -21,8 +21,8 @@ import {
   resolveInfinitePayWebhookUrl,
   sanitizeInfinitePayReceiptUrl,
   type InfinitePayCheckoutItem,
-} from '../src/server/infinitePayClient';
-import { IS_TEST_MODE } from '../src/server/runtime-flags';
+} from '../src/server/infinitePayClient.js';
+import { IS_TEST_MODE } from '../src/server/runtime-flags.js';
 
 export { IS_TEST_MODE };
 
