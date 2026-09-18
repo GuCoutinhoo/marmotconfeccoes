@@ -101,25 +101,56 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setIsFetchingFreshData(true);
 
     try {
-      const [prodRes, catRes] = await Promise.all([
-        fetch('/api/products', { cache: 'no-store', credentials: 'include' }),
-        fetch('/api/categories', { cache: 'no-store', credentials: 'include' }),
-      ]);
-      if (!prodRes.ok) throw new Error(`Falha ao carregar produtos (HTTP ${prodRes.status}).`);
-      if (!catRes.ok) throw new Error(`Falha ao carregar categorias (HTTP ${catRes.status}).`);
-      const productPayload = await prodRes.json();
-      const categoryPayload = await catRes.json();
-      const loadedProducts: Product[] = Array.isArray(productPayload?.products) ? productPayload.products : [];
-      const loadedCategories: Category[] = Array.isArray(categoryPayload) ? categoryPayload : [];
+      let loadedProducts: Product[] = [];
+      let loadedCategories: Category[] = [];
+      let source = 'api';
 
-      // 3. Race condition verification: if a newer request started while this one was running, discard this older result
+      try {
+        const [prodRes, catRes] = await Promise.all([
+          fetch('/api/products', { cache: 'no-store', credentials: 'include' }),
+          fetch('/api/categories', { cache: 'no-store', credentials: 'include' }),
+        ]);
+
+        if (!prodRes.ok) throw new Error(`Falha ao carregar produtos (HTTP ${prodRes.status}).`);
+        if (!catRes.ok) throw new Error(`Falha ao carregar categorias (HTTP ${catRes.status}).`);
+
+        const productPayload = await prodRes.json();
+        const categoryPayload = await catRes.json();
+        loadedProducts = Array.isArray(productPayload?.products) ? productPayload.products : [];
+        loadedCategories = Array.isArray(categoryPayload) ? categoryPayload : [];
+      } catch (apiError) {
+        // Production resilience: catalog reads are public by RLS and must keep
+        // working even if the Vercel API function has a transient/configuration
+        // failure. Administrative writes still go exclusively through /api.
+        if (!isSupabaseConfigured()) throw apiError;
+
+        console.warn('[PRODUCTS] API indisponível; usando leitura pública direta do Supabase.', apiError);
+        source = 'supabase-direct';
+
+        const [productResult, categoryResult] = await Promise.all([
+          supabase.from('products').select('*').order('id', { ascending: true }),
+          supabase.from('categories').select('*').order('order', { ascending: true }),
+        ]);
+
+        if (productResult.error) {
+          throw new Error(`SUPABASE_PRODUCTS_READ_FAILED: ${productResult.error.message}`);
+        }
+        if (categoryResult.error) {
+          throw new Error(`SUPABASE_CATEGORIES_READ_FAILED: ${categoryResult.error.message}`);
+        }
+
+        loadedProducts = (productResult.data || []).map((row) => mapSupabaseRowToProduct(row));
+        loadedCategories = (categoryResult.data || []).map((row) => mapSupabaseRowToCategory(row));
+      }
+
+      // Race condition verification: if a newer request started while this one was running, discard this older result
       if (currentReqId !== latestFetchRequestIdRef.current) {
         console.log(`[PRODUCTS] request #${currentReqId} superseded by #${latestFetchRequestIdRef.current} — discarding stale response`);
         return;
       }
 
       const uniqueProducts = validateAndDeduplicateProducts(loadedProducts);
-      console.log(`[PRODUCTS] committing ${uniqueProducts.length} authoritative rows from API`);
+      console.log(`[PRODUCTS] committing ${uniqueProducts.length} authoritative rows from ${source}`);
       setProducts(uniqueProducts);
       setCategories(loadedCategories);
     } catch (error) {
