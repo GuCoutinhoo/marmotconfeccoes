@@ -76,6 +76,7 @@ export const INITIAL_8_CATEGORIES: Category[] = [
   {
     id: 'acessorios',
     name: 'Acessórios',
+    slug: 'acessorios',
     tagline: 'Headwear, Bags & Detalhes Urbanos',
     description: 'Bonés, gorros, shoulder bags, cintos, carteiras, óculos e correntes para completar o visual streetwear.',
     image: '/categories/categoria-acessorios.png?v=20260918_acessorios_reais',
