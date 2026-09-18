@@ -73,4 +73,15 @@ export const INITIAL_8_CATEGORIES: Category[] = [
     order: 5,
     active: true,
   },
+  {
+    id: 'acessorios',
+    name: 'Acessórios',
+    tagline: 'Headwear, Bags & Detalhes Urbanos',
+    description: 'Bonés, gorros, shoulder bags, cintos, carteiras, óculos e correntes para completar o visual streetwear.',
+    image: '/categories/categoria-acessorios.png?v=20260918_acessorios_reais',
+    subcategories: ['Bonés & Gorros', 'Shoulder Bags', 'Cintos & Carteiras', 'Óculos & Correntes'],
+    productCount: 10,
+    order: 6,
+    active: true,
+  },
 ];
