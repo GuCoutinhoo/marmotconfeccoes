@@ -682,7 +682,7 @@ export interface CampaignRecord {
 // 2. EMBEDDED INITIAL DATA (Guarantees zero file dependencies)
 // =========================================================================
 
-const EXCLUDED_CATEGORY_KEYS = new Set(['tenis', 'acessorios']);
+const EXCLUDED_CATEGORY_KEYS = new Set<string>();
 const isExcludedCategoryOrProduct = (catOrSubcat?: string | null): boolean => {
   if (!catOrSubcat) return false;
   const clean = String(catOrSubcat).trim().toLowerCase();
@@ -760,6 +760,30 @@ const INITIAL_CATEGORIES: Category[] = [
     subcategories: ['Nylon Shorts', 'Cargo Shorts', 'Moletom Shorts'],
     productCount: 11,
     order: 5,
+    active: true,
+  },
+  {
+    id: 'tenis',
+    slug: 'tenis',
+    name: 'Tênis',
+    tagline: 'Sneakers & Streetwear Footwear',
+    description: 'Tênis e sneakers streetwear autênticos.',
+    image: '/categories/categoria-tenis.png?v=20260918_v11_novas_imagens_categoria',
+    subcategories: ['Chunky', 'Skate', 'Retro Runner', 'High Top'],
+    productCount: 10,
+    order: 6,
+    active: true,
+  },
+  {
+    id: 'acessorios',
+    slug: 'acessorios',
+    name: 'Acessórios',
+    tagline: 'Headwear, Bags & Detalhes Urbanos',
+    description: 'Bonés, gorros, shoulder bags, cintos, carteiras, óculos e correntes para completar o visual streetwear.',
+    image: '/categories/categoria-acessorios.png?v=20260918_acessorios_reais',
+    subcategories: ['Bonés & Gorros', 'Shoulder Bags', 'Cintos & Carteiras', 'Óculos & Correntes'],
+    productCount: 10,
+    order: 7,
     active: true,
   },
 ];
@@ -889,6 +913,7 @@ export class DatabaseManager {
   private persistenceConfigurationError: string | null = null;
   private isInitialized = false;
   private initializationPromise: Promise<void> | null = null;
+  private localProductsCache: Product[] | null = null;
 
   private products: Product[] = [];
   private categories: Category[] = [];
@@ -1137,6 +1162,30 @@ export class DatabaseManager {
 
   private mapSupabaseProduct(item: any): Product {
     if (!item) return {} as Product;
+    if (!this.localProductsCache) {
+      try {
+        if (fs.existsSync(PRODUCTS_FILE)) {
+          this.localProductsCache = JSON.parse(fs.readFileSync(PRODUCTS_FILE, 'utf-8'));
+        }
+      } catch {
+        this.localProductsCache = [];
+      }
+    }
+    const local = this.localProductsCache?.find((p) => p.id === item.id) || this.products?.find((p) => p.id === item.id);
+    let image = item.image || '';
+    let images = Array.isArray(item.images) ? item.images : [];
+    let colors = Array.isArray(item.colors) ? item.colors : [];
+
+    if (local && local.image && (local.image.startsWith('/') || local.image.startsWith('.'))) {
+      image = local.image;
+      if (Array.isArray(local.images) && local.images.length > 0) {
+        images = local.images;
+      }
+      if (Array.isArray(local.colors) && local.colors.length > 0) {
+        colors = local.colors;
+      }
+    }
+
     return this.sanitizeProduct({
       id: String(item.id || ''),
       slug: String(item.slug || ''),
@@ -1154,9 +1203,9 @@ export class DatabaseManager {
       stockCount: Math.max(0, Number(item.stock_count ?? 0)),
       sku: item.sku || '',
       sizes: Array.isArray(item.sizes) ? item.sizes : [],
-      colors: Array.isArray(item.colors) ? item.colors : [],
-      image: item.image || '',
-      images: Array.isArray(item.images) ? item.images : [],
+      colors,
+      image,
+      images,
       details: Array.isArray(item.details) ? item.details : [],
       careInstructions: Array.isArray(item.care_instructions) ? item.care_instructions : [],
       composition: Array.isArray(item.composition) ? item.composition : [],

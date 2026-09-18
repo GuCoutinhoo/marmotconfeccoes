@@ -29,7 +29,6 @@ import {
   EyeOff,
   Sparkles,
   RefreshCw,
-  Rocket,
   ArrowLeft,
 } from 'lucide-react';
 import { Address } from '../types';
@@ -564,160 +563,74 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
   // -------------------------------------------------------------
   if (!user) {
     return (
-      <div className="min-h-screen w-full bg-[#0C0C0F] lg:bg-white flex flex-col lg:flex-row selection:bg-[#F4C400] selection:text-black">
-        {/* LEFT COLUMN: Atelier Brand Identity & Editorial Showcase with Model on the Right */}
-        <div className="w-full lg:w-1/2 min-h-[480px] lg:min-h-screen relative flex flex-col justify-between bg-[#0C0C0F] text-white p-7 sm:p-10 lg:p-12 xl:p-16 2xl:p-20 select-none overflow-hidden shrink-0">
-          {/* Background Image: positioned so the model is concentrated on the right (occupying ~35-40% width) */}
-          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <img
-              src="/login_cadastro_v2.png"
-              alt="MARMOT Streetwear Editorial"
-              className="w-full h-full object-cover object-[85%_center] lg:object-[90%_center] brightness-[0.98] contrast-[1.03]"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                if (!target.src.includes('login_cadastro.png')) {
-                  target.src = '/login_cadastro.png';
-                } else if (!target.src.includes('look-1.webp')) {
-                  target.src = '/look-1.webp';
-                }
-              }}
-            />
-            
-            {/* Horizontal Gradient Overlay: Deep black on the left behind texts/cards, smoothly fading to 100% transparent in direction of the model */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0C0C0F] via-[#0C0C0F]/90 via-[42%] to-transparent to-[75%]" />
-            
-            {/* Subtle vertical vignette at the bottom for footer line and text contrast */}
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0C0C0F]/90 via-[#0C0C0F]/30 to-transparent" />
-          </div>
-
-          {/* TOP: Brand Header (Clickable to return to store) */}
-          <div 
-            onClick={() => onNavigate('home')}
-            className="relative z-10 space-y-3.5 cursor-pointer group w-fit max-w-[320px] sm:max-w-[350px]"
-            title="Voltar para a página inicial"
-          >
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-[#F4C400]/40 text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-[#F4C400] font-bold shadow-xs">
-              <Sparkles className="w-3 h-3 text-[#F4C400] shrink-0" />
-              <span>MARMOT ATELIER 2026</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tighter text-white drop-shadow-sm group-hover:text-[#F4C400] transition-colors">
-              MARMOT
-            </h2>
-
-            {/* Description */}
-            <p className="text-xs sm:text-[13px] text-[#D4D4D8] leading-relaxed">
-              Streetwear autoral com modelagens oversized, alta gramatura e tiragens limitadas.
-            </p>
-
-            {/* Subtle Divider Line */}
-            <div className="w-10 h-[1px] bg-white/25 pt-0.5" />
-          </div>
-
-          {/* MIDDLE: Member Perks (Centered vertically with generous editorial spacing) */}
-          <div className="relative z-10 my-auto py-4 sm:py-6 lg:py-8 w-full max-w-[330px] sm:max-w-[360px]">
-            <p className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-[#F4C400] font-bold flex items-center gap-2 mb-8 sm:mb-10 lg:mb-11">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F4C400]" />
-              Vantagens de Membro
-            </p>
-
-            {/* Lista Vertical Editorial com espaçamento generoso */}
-            <div className="w-full">
-              {/* Benefício 1 */}
-              <div className="flex items-start gap-4">
-                <Rocket className="w-4 h-4 text-[#F4C400] shrink-0 mt-0.5" />
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider leading-snug">
-                    Acesso Antecipado aos Drops
-                  </h4>
-                  <p className="text-[11px] sm:text-xs text-[#A1A1AA] leading-relaxed">
-                    Garanta prioridade de estoque em lançamentos limitados.
-                  </p>
-                </div>
-              </div>
-
-              {/* Divisória horizontal sutil com amplo respiro */}
-              <div className="h-[1px] bg-white/[0.08] w-full my-9 sm:my-11 lg:my-12" />
-
-              {/* Benefício 2 */}
-              <div className="flex items-start gap-4">
-                <Truck className="w-4 h-4 text-white/70 shrink-0 mt-0.5" />
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider leading-snug">
-                    Rastreio em Tempo Real
-                  </h4>
-                  <p className="text-[11px] sm:text-xs text-[#A1A1AA] leading-relaxed">
-                    Acompanhe seu envio do checkout até a entrega com segurança.
-                  </p>
-                </div>
-              </div>
-
-              {/* Divisória horizontal sutil com amplo respiro */}
-              <div className="h-[1px] bg-white/[0.08] w-full my-9 sm:my-11 lg:my-12" />
-
-              {/* Benefício 3 */}
-              <div className="flex items-start gap-4">
-                <ShieldCheck className="w-4 h-4 text-white/70 shrink-0 mt-0.5" />
-                <div className="space-y-2">
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider leading-snug">
-                    Checkout em 1-Clique
-                  </h4>
-                  <p className="text-[11px] sm:text-xs text-[#A1A1AA] leading-relaxed">
-                    Endereços, categorias e pagamento via InfinitePay.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* BOTTOM: Signature / Rodapé no fim da coluna */}
-          <div className="relative z-10 w-full flex items-center justify-between text-[11px] text-[#A1A1AA] pt-4 max-w-[330px] sm:max-w-[360px]">
-            <span className="font-mono tracking-wider text-[#A1A1AA]">MODA AUTORAL BRASIL</span>
-            <span className="font-mono text-[#F4C400] font-bold tracking-wider">ED. OFICIAL</span>
-          </div>
+      <div className="min-h-screen lg:h-screen w-full bg-[#0C0C0F] lg:bg-white flex flex-col lg:flex-row lg:overflow-hidden selection:bg-[#F4C400] selection:text-black">
+        {/* LEFT COLUMN: Editorial Image Showcase (Pure image, completely clean without text or cards) */}
+        <div className="w-full lg:w-1/2 min-h-[240px] sm:min-h-[320px] lg:h-full relative bg-[#0C0C0F] overflow-hidden shrink-0">
+          <img
+            src="/image%20login%20v2.png"
+            alt="MARMOT Streetwear Editorial"
+            className="w-full h-full object-cover object-[center_top] lg:object-center select-none"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              if (!target.src.includes('image-login-v2.png')) {
+                target.src = '/image-login-v2.png';
+              } else if (!target.src.includes('login_cadastro_v2.png')) {
+                target.src = '/login_cadastro_v2.png';
+              } else if (!target.src.includes('look-1.webp')) {
+                target.src = '/look-1.webp';
+              }
+            }}
+          />
         </div>
 
-        {/* RIGHT COLUMN: Interactive Authentication Form (Full Screen Half) */}
-        <div className="w-full lg:w-1/2 min-h-screen flex flex-col justify-between bg-white text-[#18181B] p-6 sm:p-10 md:p-12 lg:p-12 xl:p-16 2xl:p-20 relative overflow-y-auto">
-          
-          {/* Top Bar with Return to Store button & security indicator */}
-          <div className="w-full max-w-[500px] mx-auto flex items-center justify-between pb-4 border-b border-[#F4F4F5]">
+        {/* RIGHT COLUMN: Interactive Authentication Form */}
+        <div className="w-full lg:w-1/2 lg:h-full flex flex-col justify-between bg-white text-[#18181B] px-6 sm:px-10 lg:px-12 xl:px-16 py-4 sm:py-6 relative overflow-y-auto">
+          {/* Top Bar with Return to Store button, Brand & security indicator */}
+          <div className="w-full max-w-[580px] mx-auto flex items-center justify-between pb-3 sm:pb-4 border-b border-[#F4F4F5]">
             <button
               type="button"
               onClick={() => onNavigate('home')}
-              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#71717A] hover:text-[#18181B] transition-colors py-2 px-3 -ml-3 rounded-xl hover:bg-[#F4F4F5] cursor-pointer"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#71717A] hover:text-[#18181B] transition-colors py-2 px-3 -ml-3 rounded-xl hover:bg-[#F4F4F5] cursor-pointer"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>Voltar para a Loja</span>
             </button>
 
-            <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-[#71717A]">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <button
+              type="button"
+              onClick={() => onNavigate('home')}
+              className="font-black text-xl sm:text-2xl tracking-tighter text-[#18181B] hover:opacity-80 transition-opacity cursor-pointer uppercase"
+            >
+              MARMOT
+            </button>
+
+            <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-mono uppercase tracking-widest text-[#71717A]">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span className="hidden sm:inline">Ambiente Criptografado</span>
               <span className="sm:hidden">Seguro</span>
             </div>
           </div>
 
-          {/* Form Core Container */}
-          <div className="w-full max-w-[500px] mx-auto my-auto py-6 sm:py-8 space-y-6">
+          {/* Form Core Container - Compact vertical spacing with bold, enlarged elements */}
+          <div className="w-full max-w-[580px] mx-auto my-auto py-4 sm:py-5 space-y-5 sm:space-y-6">
               
               {/* Form Header & Segmented Pill Switcher */}
-              <div className="space-y-6">
-                {/* Segmented Mode Selector */}
-                <div className="grid grid-cols-3 p-1.5 bg-[#F4F4F5] border border-[#E4E4E7]/80 rounded-2xl gap-1">
+              <div className="space-y-5">
+                {/* Segmented Mode Selector - Entrar e Criar Conta */}
+                <div className="grid grid-cols-2 p-2 bg-[#F4F4F5] border border-[#E4E4E7] rounded-2xl gap-2 shadow-2xs">
                   <button
                     type="button"
                     onClick={() => {
                       setAuthMode('login');
                       setAuthError(null);
                     }}
-                    className={`py-2.5 px-2 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer select-none text-xs ${
+                    className={`py-3.5 sm:py-4 px-3 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2.5 cursor-pointer select-none text-sm sm:text-base ${
                       authMode === 'login'
-                        ? 'bg-white text-[#18181B] shadow-xs font-black'
-                        : 'text-[#71717A] hover:text-[#18181B] font-medium'
+                        ? 'bg-white text-[#18181B] shadow-sm font-black'
+                        : 'text-[#71717A] hover:text-[#18181B] font-semibold'
                     }`}
                   >
-                    <Lock className="w-3.5 h-3.5 shrink-0" />
+                    <Lock className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                     <span>Entrar</span>
                   </button>
 
@@ -727,37 +640,21 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       setAuthMode('register');
                       setAuthError(null);
                     }}
-                    className={`py-2.5 px-2 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer select-none text-xs ${
+                    className={`py-3.5 sm:py-4 px-3 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2.5 cursor-pointer select-none text-sm sm:text-base ${
                       authMode === 'register'
-                        ? 'bg-white text-[#18181B] shadow-xs font-black'
-                        : 'text-[#71717A] hover:text-[#18181B] font-medium'
+                        ? 'bg-white text-[#18181B] shadow-sm font-black'
+                        : 'text-[#71717A] hover:text-[#18181B] font-semibold'
                     }`}
                   >
-                    <User className="w-3.5 h-3.5 shrink-0" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                     <span>Criar Conta</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('forgot');
-                      setAuthError(null);
-                    }}
-                    className={`py-2.5 px-2 rounded-xl transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer select-none text-xs ${
-                      authMode === 'forgot'
-                        ? 'bg-white text-[#18181B] shadow-xs font-black'
-                        : 'text-[#71717A] hover:text-[#18181B] font-medium'
-                    }`}
-                  >
-                    <KeyRound className="w-3.5 h-3.5 shrink-0" />
-                    <span>Recuperar</span>
                   </button>
                 </div>
 
-                {/* Dynamic Title / Subtitle based on authMode */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center gap-2 text-[10px] font-mono font-bold tracking-[0.2em] text-[#71717A] uppercase">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#18181B]" />
+                {/* Dynamic Title / Subtitle based on authMode - Bigger and bolder */}
+                <div className="space-y-1.5 sm:space-y-2">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm font-mono font-bold tracking-[0.2em] text-[#71717A] uppercase">
+                    <span className="w-2 h-2 rounded-full bg-[#18181B]" />
                     {authMode === 'login' && 'Autenticação de Membro'}
                     {authMode === 'register' && 'Novo Registro no Atelier'}
                     {authMode === 'forgot' && 'Segurança & Credenciais'}
@@ -765,7 +662,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                     {authMode === 'awaiting_confirmation' && 'Link de Validação'}
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl font-black uppercase text-[#18181B] tracking-tight">
+                  <h1 className="text-3xl sm:text-4xl lg:text-[42px] font-black uppercase text-[#18181B] tracking-tight leading-tight">
                     {authMode === 'login' && 'Acessar Minha Conta'}
                     {authMode === 'register' && 'Criar Conta na Marmot'}
                     {authMode === 'forgot' && (resetStep === 1 ? 'Recuperação de Acesso' : 'Definir Nova Senha')}
@@ -773,7 +670,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                     {authMode === 'awaiting_confirmation' && 'Confirmação Pendente'}
                   </h1>
 
-                  <p className="text-xs sm:text-[13px] text-[#71717A] leading-relaxed">
+                  <p className="text-sm sm:text-[15px] text-[#71717A] leading-relaxed">
                     {authMode === 'login' && 'Insira suas credenciais para gerenciar seus pedidos, rastreios e benefícios exclusivos.'}
                     {authMode === 'register' && 'Cadastre-se em menos de 1 minuto para drops antecipados e checkout em 1-clique.'}
                     {authMode === 'forgot' && (resetStep === 1
@@ -787,10 +684,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
 
               {/* Error Message Alert */}
               {authError && (
-                <div className="bg-red-50/90 border border-red-200 text-red-700 p-3.5 rounded-2xl text-xs space-y-2 animate-in fade-in">
+                <div className="bg-red-50/90 border border-red-200 text-red-700 p-4 rounded-2xl text-sm space-y-2 animate-in fade-in">
                   <div className="flex items-start gap-2.5">
-                    <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
-                    <span className="leading-relaxed font-medium">{authError}</span>
+                    <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                    <span className="leading-relaxed font-semibold">{authError}</span>
                   </div>
                   {(authError.toLowerCase().includes('confirm') || authError.toLowerCase().includes('ativar')) && (
                     <div className="pt-1 flex items-center gap-3">
@@ -802,7 +699,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                           setAuthMode('awaiting_confirmation');
                           setAuthError(null);
                         }}
-                        className="text-xs font-bold text-[#B45309] hover:underline flex items-center gap-1 uppercase tracking-wider cursor-pointer"
+                        className="text-xs sm:text-sm font-bold text-[#B45309] hover:underline flex items-center gap-1 uppercase tracking-wider cursor-pointer"
                       >
                         Verificar E-mail / Reenviar Link &rarr;
                       </button>
@@ -813,12 +710,12 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
 
               {/* Preview Verification Code helper banner */}
               {previewCode && (
-                <div className="bg-[#FEF3C7] border border-[#FDE68A] text-[#18181B] p-4 rounded-2xl text-xs space-y-1.5">
-                  <p className="font-bold text-[#B45309] flex items-center gap-1.5 uppercase tracking-wider font-mono text-[10px]">
-                    <Sparkles className="w-4 h-4 text-[#B45309]" /> Código de Teste Emitido:
+                <div className="bg-[#FEF3C7] border border-[#FDE68A] text-[#18181B] p-4 sm:p-5 rounded-2xl text-sm space-y-2">
+                  <p className="font-bold text-[#B45309] flex items-center gap-2 uppercase tracking-wider font-mono text-xs">
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-[#B45309]" /> Código de Teste Emitido:
                   </p>
-                  <p className="text-xl font-mono font-black text-[#18181B] tracking-widest">{previewCode}</p>
-                  <p className="text-[11px] text-[#71717A]">
+                  <p className="text-2xl sm:text-3xl font-mono font-black text-[#18181B] tracking-widest">{previewCode}</p>
+                  <p className="text-xs sm:text-sm text-[#71717A]">
                     Insira o código acima para completar a validação instantânea da conta.
                   </p>
                 </div>
@@ -826,14 +723,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
 
               {/* TAB 1: LOGIN */}
               {authMode === 'login' && (
-                <form onSubmit={handleLoginSubmit} className="space-y-4">
+                <form onSubmit={handleLoginSubmit} className="space-y-4 sm:space-y-5">
                   <div>
-                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                    <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                       Endereço de E-mail
                     </label>
                     <div className="relative flex items-center group">
-                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                        <Mail className="w-4 h-4" />
+                      <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <Mail className="w-5 h-5" />
                       </div>
                       <input
                         type="email"
@@ -842,14 +739,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                         placeholder="seuemail@exemplo.com"
                         required
                         autoComplete="email"
-                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 sm:py-3.5 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-4 py-4 sm:py-4.5 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B]">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46]">
                         Senha de Acesso
                       </label>
                       <button
@@ -858,14 +755,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                           setAuthMode('forgot');
                           setAuthError(null);
                         }}
-                        className="text-[11px] font-medium text-[#71717A] hover:text-[#18181B] hover:underline cursor-pointer transition-colors"
+                        className="text-xs sm:text-sm font-semibold text-[#52525B] hover:text-[#18181B] hover:underline cursor-pointer transition-colors"
                       >
                         Esqueceu a senha?
                       </button>
                     </div>
                     <div className="relative flex items-center group">
-                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                        <Lock className="w-4 h-4" />
+                      <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <Lock className="w-5 h-5" />
                       </div>
                       <input
                         type={showPassword ? 'text' : 'password'}
@@ -874,55 +771,55 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                         placeholder="••••••••"
                         required
                         autoComplete="current-password"
-                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-11 py-3 sm:py-3.5 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-12 py-4 sm:py-4.5 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1.5 rounded-lg transition-colors cursor-pointer"
+                        className="absolute right-3.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-2 rounded-xl transition-colors cursor-pointer"
                         title={showPassword ? 'Ocultar senha' : 'Exibir senha'}
                       >
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <label className="flex items-center gap-2 text-[#71717A] hover:text-[#18181B] cursor-pointer select-none">
+                  <div className="flex items-center justify-between text-xs sm:text-sm pt-0.5">
+                    <label className="flex items-center gap-2.5 text-[#52525B] hover:text-[#18181B] cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="w-4 h-4 rounded border-[#D4D4D8] text-[#18181B] focus:ring-[#18181B] cursor-pointer accent-[#18181B]"
+                        className="w-4 h-4 sm:w-5 sm:h-5 rounded-md border-[#D4D4D8] text-[#18181B] focus:ring-[#18181B] cursor-pointer accent-[#18181B]"
                       />
-                      <span className="text-[11px] font-medium">Lembrar deste dispositivo</span>
+                      <span className="text-xs sm:text-sm font-medium">Lembrar deste dispositivo</span>
                     </label>
-                    <span className="text-[10px] font-mono text-[#71717A] flex items-center gap-1.5 bg-[#F4F4F5] px-2 py-0.5 rounded-md border border-[#E4E4E7]/60">
-                      <ShieldCheck className="w-3 h-3 text-emerald-600" /> SSL 256-bit
+                    <span className="text-[11px] sm:text-xs font-mono text-[#71717A] flex items-center gap-1.5 bg-[#F4F4F5] px-2.5 py-1 rounded-lg border border-[#E4E4E7]/60">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> SSL 256-bit
                     </span>
                   </div>
 
                   <button
                     type="submit"
                     disabled={authLoading}
-                    className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 sm:py-4 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2.5 disabled:opacity-50 cursor-pointer group"
+                    className="w-full bg-[#0C0C0F] hover:bg-black text-white font-black text-sm sm:text-base uppercase tracking-[0.18em] py-4.5 sm:py-5 rounded-2xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer group"
                   >
                     {authLoading ? (
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>AUTENTICANDO...</span>
                       </div>
                     ) : (
                       <>
                         <span>ENTRAR NA MINHA CONTA</span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                       </>
                     )}
                   </button>
 
-                  <div className="relative flex py-1.5 items-center justify-center">
+                  <div className="relative flex py-1 items-center justify-center">
                     <div className="flex-grow border-t border-[#E4E4E7]" />
-                    <span className="flex-shrink mx-3 text-[10px] font-mono text-[#A1A1AA] uppercase tracking-widest">
+                    <span className="flex-shrink mx-4 text-xs font-mono font-bold text-[#A1A1AA] uppercase tracking-widest">
                       Novo Membro?
                     </span>
                     <div className="flex-grow border-t border-[#E4E4E7]" />
@@ -934,9 +831,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       setAuthMode('register');
                       setAuthError(null);
                     }}
-                    className="w-full py-3 px-4 rounded-xl border border-[#E4E4E7] hover:border-[#18181B] bg-[#FAFAFB] hover:bg-white text-xs font-bold uppercase tracking-wider text-[#18181B] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                    className="w-full py-4 sm:py-4.5 px-4 rounded-2xl border border-[#E4E4E7] hover:border-[#18181B] bg-[#FAFAFB] hover:bg-white text-xs sm:text-sm font-black uppercase tracking-wider text-[#18181B] transition-all flex items-center justify-center gap-2.5 cursor-pointer shadow-2xs"
                   >
-                    <User className="w-3.5 h-3.5 text-[#71717A]" />
+                    <User className="w-4 h-4 sm:w-5 sm:h-5 text-[#71717A]" />
                     <span>Cadastre-se Gratuitamente</span>
                   </button>
                 </form>
@@ -944,14 +841,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
 
               {/* TAB 2: REGISTER */}
               {authMode === 'register' && (
-                <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
+                <form onSubmit={handleRegisterSubmit} className="space-y-4 sm:space-y-4.5">
                   <div>
-                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                    <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                       Nome Completo
                     </label>
                     <div className="relative flex items-center group">
-                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                        <User className="w-4 h-4" />
+                      <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <User className="w-5 h-5" />
                       </div>
                       <input
                         type="text"
@@ -959,19 +856,19 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                         onChange={(e) => setRegName(e.target.value)}
                         placeholder="Ex: Gabriel Santos"
                         required
-                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                         E-mail
                       </label>
                       <div className="relative flex items-center group">
-                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                          <Mail className="w-4 h-4" />
+                        <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Mail className="w-5 h-5" />
                         </div>
                         <input
                           type="email"
@@ -979,56 +876,56 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                           onChange={(e) => setRegEmail(e.target.value)}
                           placeholder="seuemail@exemplo.com"
                           required
-                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                         WhatsApp / Celular
                       </label>
                       <div className="relative flex items-center group">
-                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                          <Phone className="w-4 h-4" />
+                        <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Phone className="w-5 h-5" />
                         </div>
                         <input
                           type="text"
                           value={regPhone}
                           onChange={(e) => setRegPhone(e.target.value)}
                           placeholder="(11) 99999-8888"
-                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                         />
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                    <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                       CPF <span className="text-[#A1A1AA] font-normal lowercase">(opcional para nota fiscal)</span>
                     </label>
                     <div className="relative flex items-center group">
-                      <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                        <CreditCard className="w-4 h-4" />
+                      <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                        <CreditCard className="w-5 h-5" />
                       </div>
                       <input
                         type="text"
                         value={regCpf}
                         onChange={(e) => setRegCpf(e.target.value)}
                         placeholder="000.000.000-00"
-                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                        className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-4 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div>
-                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                         Senha
                       </label>
                       <div className="relative flex items-center group">
-                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                          <Lock className="w-4 h-4" />
+                        <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Lock className="w-5 h-5" />
                         </div>
                         <input
                           type={showRegPassword ? 'text' : 'password'}
@@ -1036,26 +933,26 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                           onChange={(e) => setRegPassword(e.target.value)}
                           placeholder="••••••••"
                           required
-                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-11 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                         />
                         <button
                           type="button"
                           onClick={() => setShowRegPassword(!showRegPassword)}
-                          className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                          className="absolute right-3 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1.5 rounded-lg transition-colors cursor-pointer"
                           title={showRegPassword ? 'Ocultar' : 'Exibir'}
                         >
-                          {showRegPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                      <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                         Confirmar Senha
                       </label>
                       <div className="relative flex items-center group">
-                        <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                          <Lock className="w-4 h-4" />
+                        <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                          <Lock className="w-5 h-5" />
                         </div>
                         <input
                           type={showRegConfirmPassword ? 'text' : 'password'}
@@ -1063,27 +960,27 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                           onChange={(e) => setRegConfirmPassword(e.target.value)}
                           placeholder="••••••••"
                           required
-                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                          className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-11 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                         />
                         <button
                           type="button"
                           onClick={() => setShowRegConfirmPassword(!showRegConfirmPassword)}
-                          className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                          className="absolute right-3 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1.5 rounded-lg transition-colors cursor-pointer"
                           title={showRegConfirmPassword ? 'Ocultar' : 'Exibir'}
                         >
-                          {showRegConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          {showRegConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-[11px] text-[#71717A] pt-0.5">
-                    <span className="flex items-center gap-1.5 font-mono text-[10px]">
-                      <CheckCircle2 className={`w-3.5 h-3.5 ${regPassword.length >= 6 ? 'text-emerald-600' : 'text-[#A1A1AA]'}`} />
+                  <div className="flex items-center gap-4 text-xs text-[#71717A] pt-0.5">
+                    <span className="flex items-center gap-1.5 font-mono text-xs">
+                      <CheckCircle2 className={`w-4 h-4 ${regPassword.length >= 6 ? 'text-emerald-600' : 'text-[#A1A1AA]'}`} />
                       MÍN. 6 CARACTERES
                     </span>
-                    <span className="flex items-center gap-1.5 font-mono text-[10px]">
-                      <CheckCircle2 className={`w-3.5 h-3.5 ${regPassword && regPassword === regConfirmPassword ? 'text-emerald-600' : 'text-[#A1A1AA]'}`} />
+                    <span className="flex items-center gap-1.5 font-mono text-xs">
+                      <CheckCircle2 className={`w-4 h-4 ${regPassword && regPassword === regConfirmPassword ? 'text-emerald-600' : 'text-[#A1A1AA]'}`} />
                       SENHAS COINCIDEM
                     </span>
                   </div>
@@ -1091,14 +988,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                   <button
                     type="submit"
                     disabled={authLoading}
-                    className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer group"
+                    className="w-full bg-[#0C0C0F] hover:bg-black text-white font-black text-sm sm:text-base uppercase tracking-[0.18em] py-4.5 sm:py-5 rounded-2xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-50 cursor-pointer group"
                   >
                     {authLoading ? 'CADASTRANDO...' : 'CRIAR MINHA CONTA MARMOT'}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                   </button>
 
                   <div className="text-center pt-1">
-                    <p className="text-xs text-[#71717A]">
+                    <p className="text-xs sm:text-sm text-[#71717A]">
                       Já possui uma conta na MARMOT?{' '}
                       <button
                         type="button"
@@ -1119,14 +1016,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
               {authMode === 'forgot' && (
                 <div>
                   {resetStep === 1 ? (
-                    <form onSubmit={handleForgotSubmit} className="space-y-4">
+                    <form onSubmit={handleForgotSubmit} className="space-y-4 sm:space-y-5">
                       <div>
-                        <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                        <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                           E-mail Cadastrado
                         </label>
                         <div className="relative flex items-center group">
-                          <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                            <Mail className="w-4 h-4" />
+                          <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                            <Mail className="w-5 h-5" />
                           </div>
                           <input
                             type="email"
@@ -1134,7 +1031,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                             onChange={(e) => setForgotEmail(e.target.value)}
                             placeholder="seuemail@exemplo.com"
                             required
-                            className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3.5 rounded-xl text-xs sm:text-[13px] font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                            className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-4 py-4 sm:py-4.5 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                           />
                         </div>
                       </div>
@@ -1142,10 +1039,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       <button
                         type="submit"
                         disabled={authLoading}
-                        className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 sm:py-4 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer group"
+                        className="w-full bg-[#0C0C0F] hover:bg-black text-white font-black text-sm sm:text-base uppercase tracking-[0.18em] py-4.5 sm:py-5 rounded-2xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-3 cursor-pointer group"
                       >
                         {authLoading ? 'ENVIANDO CÓDIGO...' : 'ENVIAR CÓDIGO DE RECUPERAÇÃO'}
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                       </button>
 
                       <div className="text-center pt-2">
@@ -1155,22 +1052,22 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                             setAuthMode('login');
                             setAuthError(null);
                           }}
-                          className="text-xs font-bold text-[#71717A] hover:text-[#18181B] hover:underline cursor-pointer flex items-center justify-center gap-1 mx-auto"
+                          className="text-xs sm:text-sm font-bold text-[#71717A] hover:text-[#18181B] hover:underline cursor-pointer flex items-center justify-center gap-1.5 mx-auto"
                         >
-                          <ArrowLeft className="w-3.5 h-3.5" />
+                          <ArrowLeft className="w-4 h-4" />
                           <span>Lembrou seus dados? Voltar ao login</span>
                         </button>
                       </div>
                     </form>
                   ) : (
-                    <form onSubmit={handleResetSubmit} className="space-y-4">
+                    <form onSubmit={handleResetSubmit} className="space-y-4 sm:space-y-5">
                       <div>
-                        <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                        <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                           Código de 6 Dígitos
                         </label>
                         <div className="relative flex items-center group">
-                          <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                            <KeyRound className="w-4 h-4" />
+                          <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                            <KeyRound className="w-5 h-5" />
                           </div>
                           <input
                             type="text"
@@ -1179,19 +1076,19 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                             placeholder="000000"
                             maxLength={6}
                             required
-                            className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-4 py-3.5 rounded-xl text-center text-lg font-mono font-black text-[#18181B] tracking-widest transition-all outline-none shadow-2xs"
+                            className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-4 py-4 sm:py-4.5 rounded-2xl text-center text-xl sm:text-2xl font-mono font-black text-[#18181B] tracking-widest transition-all outline-none shadow-2xs"
                           />
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                         <div>
-                          <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                          <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                             Nova Senha
                           </label>
                           <div className="relative flex items-center group">
-                            <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                              <Lock className="w-4 h-4" />
+                            <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                              <Lock className="w-5 h-5" />
                             </div>
                             <input
                               type={showResetPassword ? 'text' : 'password'}
@@ -1199,26 +1096,26 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                               onChange={(e) => setNewPassword(e.target.value)}
                               placeholder="Mín. 6 caracteres"
                               required
-                              className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                              className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-11 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                             />
                             <button
                               type="button"
                               onClick={() => setShowResetPassword(!showResetPassword)}
-                              className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                              className="absolute right-3 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1.5 rounded-lg transition-colors cursor-pointer"
                               title={showResetPassword ? 'Ocultar' : 'Exibir'}
                             >
-                              {showResetPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                              {showResetPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
                         </div>
 
                         <div>
-                          <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                          <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                             Confirmar Nova Senha
                           </label>
                           <div className="relative flex items-center group">
-                            <div className="absolute left-3.5 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
-                              <Lock className="w-4 h-4" />
+                            <div className="absolute left-4 text-[#A1A1AA] group-focus-within:text-[#18181B] pointer-events-none transition-colors">
+                              <Lock className="w-5 h-5" />
                             </div>
                             <input
                               type={showResetConfirmPassword ? 'text' : 'password'}
@@ -1226,15 +1123,15 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                               onChange={(e) => setConfirmNewPassword(e.target.value)}
                               placeholder="••••••••"
                               required
-                              className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-10 pr-10 py-3 rounded-xl text-xs font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
+                              className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 pl-12 pr-11 py-3.5 sm:py-4 rounded-2xl text-sm sm:text-base font-medium text-[#18181B] transition-all placeholder:text-[#A1A1AA] outline-none shadow-2xs"
                             />
                             <button
                               type="button"
                               onClick={() => setShowResetConfirmPassword(!showResetConfirmPassword)}
-                              className="absolute right-2.5 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1 rounded-md transition-colors cursor-pointer"
+                              className="absolute right-3 text-[#A1A1AA] hover:text-[#18181B] hover:bg-[#F4F4F5] p-1.5 rounded-lg transition-colors cursor-pointer"
                               title={showResetConfirmPassword ? 'Ocultar' : 'Exibir'}
                             >
-                              {showResetConfirmPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                              {showResetConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </button>
                           </div>
                         </div>
@@ -1243,10 +1140,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       <button
                         type="submit"
                         disabled={authLoading}
-                        className="w-full bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-[0.16em] py-3.5 sm:py-4 rounded-xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer group"
+                        className="w-full bg-[#0C0C0F] hover:bg-black text-white font-black text-sm sm:text-base uppercase tracking-[0.18em] py-4.5 sm:py-5 rounded-2xl transition-all shadow-md hover:shadow-xl active:scale-[0.99] flex items-center justify-center gap-3 cursor-pointer group"
                       >
                         {authLoading ? 'ATUALIZANDO...' : 'CONFIRMAR NOVA SENHA'}
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                       </button>
                     </form>
                   )}
@@ -1255,14 +1152,14 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
 
               {/* TAB 4: EMAIL VERIFICATION (MANUAL CODE) */}
               {authMode === 'verify' && (
-                <form onSubmit={handleVerifySubmit} className="space-y-4">
-                  <p className="text-xs text-[#71717A] leading-relaxed">
+                <form onSubmit={handleVerifySubmit} className="space-y-4 sm:space-y-5">
+                  <p className="text-sm text-[#71717A] leading-relaxed">
                     Insira o código de 6 dígitos para validar a titularidade da conta para{' '}
                     <strong className="text-[#18181B]">{verifyTargetEmail}</strong>.
                   </p>
 
                   <div>
-                    <label className="text-[10px] font-mono uppercase font-bold tracking-[0.14em] text-[#52525B] block mb-1.5">
+                    <label className="text-xs sm:text-sm font-mono uppercase font-bold tracking-[0.15em] text-[#3F3F46] block mb-2">
                       Código de Validação
                     </label>
                     <input
@@ -1272,7 +1169,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       placeholder="000000"
                       maxLength={6}
                       required
-                      className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 px-4 py-3.5 rounded-xl text-center text-2xl font-mono font-black text-[#18181B] tracking-widest outline-none transition-all shadow-2xs"
+                      className="w-full bg-[#FAFAFB] hover:bg-white focus:bg-white border border-[#E4E4E7] focus:border-[#18181B] focus:ring-4 focus:ring-[#18181B]/5 px-4 py-4 sm:py-4.5 rounded-2xl text-center text-2xl sm:text-3xl font-mono font-black text-[#18181B] tracking-widest outline-none transition-all shadow-2xs"
                     />
                   </div>
 
@@ -1280,7 +1177,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                     <button
                       type="button"
                       onClick={handleResend}
-                      className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase px-5 py-3.5 rounded-xl cursor-pointer transition-colors"
+                      className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs sm:text-sm uppercase px-5 py-4 rounded-2xl cursor-pointer transition-colors"
                     >
                       Reenviar Código
                     </button>
@@ -1288,10 +1185,10 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                     <button
                       type="submit"
                       disabled={authLoading}
-                      className="flex-1 bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                      className="flex-1 bg-[#0C0C0F] hover:bg-black text-white font-black text-xs sm:text-sm uppercase tracking-widest py-4 rounded-2xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                     >
                       {authLoading ? 'VERIFICANDO...' : 'CONFIRMAR E-MAIL'}
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-5 h-5" />
                     </button>
                   </div>
                 </form>
@@ -1300,27 +1197,27 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
               {/* TAB 5: AWAITING SUPABASE EMAIL CONFIRMATION LINK */}
               {authMode === 'awaiting_confirmation' && (
                 <div className="space-y-6 py-2">
-                  <div className="mx-auto w-16 h-16 bg-[#FEF3C7] border border-[#FDE68A] rounded-2xl flex items-center justify-center text-[#B45309] shadow-xs">
-                    <Mail className="w-8 h-8" />
+                  <div className="mx-auto w-16 h-16 sm:w-20 sm:h-20 bg-[#FEF3C7] border border-[#FDE68A] rounded-2xl flex items-center justify-center text-[#B45309] shadow-xs">
+                    <Mail className="w-8 h-8 sm:w-10 sm:h-10" />
                   </div>
 
                   <div className="text-center space-y-2.5">
-                    <h3 className="text-xl sm:text-2xl font-black uppercase text-[#18181B] tracking-tight">
+                    <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#18181B] tracking-tight">
                       Verifique seu e-mail
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#71717A]">
+                    <p className="text-sm sm:text-base text-[#71717A]">
                       Enviamos um link de confirmação para:
                     </p>
-                    <div className="bg-[#F8F9FA] border border-[#E4E4E7] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-mono font-bold text-[#18181B] break-all max-w-sm mx-auto">
+                    <div className="bg-[#F8F9FA] border border-[#E4E4E7] py-3 px-5 rounded-2xl text-sm sm:text-base font-mono font-bold text-[#18181B] break-all max-w-sm mx-auto">
                       {pendingConfirmEmail || regEmail}
                     </div>
-                    <p className="text-xs text-[#71717A] pt-1">
+                    <p className="text-xs sm:text-sm text-[#71717A] pt-1">
                       Clique no link enviado para ativar sua conta na MARMOT.
                     </p>
                   </div>
 
                   {resendStatusMsg && (
-                    <div className={`p-3.5 rounded-xl text-xs text-center font-mono border ${
+                    <div className={`p-4 rounded-2xl text-xs sm:text-sm text-center font-mono border ${
                       resendStatusMsg.includes('sucesso') 
                         ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
                         : 'bg-red-50 border-red-200 text-red-700'
@@ -1334,7 +1231,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       type="button"
                       onClick={handleResendPendingConfirm}
                       disabled={authLoading || resendCooldown > 0}
-                      className="w-full bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] hover:border-[#18181B]/50 text-[#18181B] disabled:opacity-50 font-bold text-xs uppercase py-3.5 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
+                      className="w-full bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] hover:border-[#18181B]/50 text-[#18181B] disabled:opacity-50 font-bold text-xs sm:text-sm uppercase py-4 rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed"
                     >
                       {authLoading ? (
                         <span>Reenviando link...</span>
@@ -1345,9 +1242,9 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                       )}
                     </button>
 
-                    <div className="pt-2 border-t border-[#E4E4E7] text-center space-y-2">
-                      <p className="text-xs text-[#71717A]">Já confirmou seu e-mail?</p>
-                      <div className="flex gap-2">
+                    <div className="pt-3 border-t border-[#E4E4E7] text-center space-y-2.5">
+                      <p className="text-xs sm:text-sm text-[#71717A]">Já confirmou seu e-mail?</p>
+                      <div className="flex gap-2.5">
                         <button
                           type="button"
                           onClick={() => {
@@ -1355,7 +1252,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                             setLoginEmail(pendingConfirmEmail || regEmail);
                             setAuthError(null);
                           }}
-                          className="flex-1 bg-[#0C0C0F] hover:bg-black text-white font-extrabold text-xs uppercase py-3.5 rounded-xl transition-all cursor-pointer shadow-xs"
+                          className="flex-1 bg-[#0C0C0F] hover:bg-black text-white font-black text-xs sm:text-sm uppercase py-4 rounded-2xl transition-all cursor-pointer shadow-xs"
                         >
                           Ir para o Login
                         </button>
@@ -1366,7 +1263,7 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
                             setAuthMode('register');
                             setAuthError(null);
                           }}
-                          className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs uppercase px-4 py-3.5 rounded-xl transition-all cursor-pointer"
+                          className="bg-[#F8F9FA] hover:bg-[#F4F4F5] border border-[#E4E4E7] text-[#71717A] hover:text-[#18181B] font-bold text-xs sm:text-sm uppercase px-5 py-4 rounded-2xl transition-all cursor-pointer"
                         >
                           Alterar E-mail
                         </button>
@@ -1377,26 +1274,25 @@ export const AccountPage: React.FC<AccountPageProps> = ({ initialTab = 'orders',
               )}
             </div>
 
-            {/* Bottom Security Assurance Badges */}
-            <div className="w-full max-w-[500px] mx-auto pt-4 border-t border-[#F4F4F5] grid grid-cols-3 gap-2 text-center text-[10px] sm:text-[11px] font-mono text-[#71717A]">
-              <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#FAFAFB] border border-[#E4E4E7]/60">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="truncate">SSL 256-bit</span>
-              </div>
-              <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#FAFAFB] border border-[#E4E4E7]/60">
-                <Lock className="w-3.5 h-3.5 text-[#71717A] shrink-0" />
-                <span className="truncate">Supabase Auth</span>
-              </div>
-              <div className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-[#FAFAFB] border border-[#E4E4E7]/60">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span className="truncate">InfinitePay</span>
-              </div>
+        {/* Bottom Security Assurance Badges */}
+          <div className="w-full max-w-[580px] mx-auto pt-3 sm:pt-4 border-t border-[#F4F4F5] grid grid-cols-3 gap-2.5 text-center text-xs sm:text-sm font-mono text-[#71717A]">
+            <div className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#FAFAFB] border border-[#E4E4E7]/60">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="truncate font-semibold">SSL 256-bit</span>
             </div>
-
+            <div className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#FAFAFB] border border-[#E4E4E7]/60">
+              <Lock className="w-4 h-4 text-[#71717A] shrink-0" />
+              <span className="truncate font-semibold">Supabase Auth</span>
+            </div>
+            <div className="flex items-center justify-center gap-2 py-2 px-3 rounded-xl bg-[#FAFAFB] border border-[#E4E4E7]/60">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span className="truncate font-semibold">InfinitePay</span>
+            </div>
           </div>
         </div>
-      );
-    }
+      </div>
+    );
+  }
 
   // -------------------------------------------------------------
   // VIEW: AUTHENTICATED USER DASHBOARD (MINHA CONTA)

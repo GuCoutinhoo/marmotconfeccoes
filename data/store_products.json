@@ -1465,26 +1465,27 @@
         "color": "black",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/8badc748448e13dc193a5209.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/8badc748448e13dc193a5209.webp",
+        "image": "/Camiseta Contrast Stitch - Preto.png",
+        "featuredImage": "/Camiseta Contrast Stitch - Preto.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/8badc748448e13dc193a5209.webp"
+          "/Camiseta Contrast Stitch - Preto.png"
         ]
       },
       {
         "color": "bege",
         "colorName": "Bege",
         "colorHex": "#f2daa6",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/facb5821a8042d4fbc81c943.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/facb5821a8042d4fbc81c943.webp",
+        "image": "/Camiseta Contrast Stitch - Bege.png",
+        "featuredImage": "/Camiseta Contrast Stitch - Bege.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/facb5821a8042d4fbc81c943.webp"
+          "/Camiseta Contrast Stitch - Bege.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/c2ba729e5e82964fef853ca8.webp",
+    "image": "/Camiseta Contrast Stitch - Preto.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-001/legacy/c2ba729e5e82964fef853ca8.webp"
+      "/Camiseta Contrast Stitch - Preto.png",
+      "/Camiseta Contrast Stitch - Bege.png"
     ],
     "details": [],
     "careInstructions": [],
@@ -1501,7 +1502,7 @@
     "featured": false,
     "status": "active",
     "createdAt": "2026-08-24T23:04:17.547+00:00",
-    "updatedAt": "2026-09-14T21:05:19.094+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-002",
@@ -1532,26 +1533,27 @@
         "color": "bege-marrom",
         "colorName": "Bege + Marrom",
         "colorHex": "#6c5145",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/a5522548598423d71a8bdada.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/a5522548598423d71a8bdada.webp",
+        "image": "/Camiseta Double Layer - Bege e Marrom.png",
+        "featuredImage": "/Camiseta Double Layer - Bege e Marrom.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/a5522548598423d71a8bdada.webp"
+          "/Camiseta Double Layer - Bege e Marrom.png"
         ]
       },
       {
         "color": "preto-cinza",
         "colorName": "Preto + Cinza",
         "colorHex": "#F5F5F0",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/586452f90d8ecfc881c15577.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/586452f90d8ecfc881c15577.webp",
+        "image": "/Camiseta Double Layer - Cinza e Preto.png",
+        "featuredImage": "/Camiseta Double Layer - Cinza e Preto.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/586452f90d8ecfc881c15577.webp"
+          "/Camiseta Double Layer - Cinza e Preto.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/2ee03cad62dbcb11ed3d975c.webp",
+    "image": "/Camiseta Double Layer - Bege e Marrom.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-002/legacy/2ee03cad62dbcb11ed3d975c.webp"
+      "/Camiseta Double Layer - Bege e Marrom.png",
+      "/Camiseta Double Layer - Cinza e Preto.png"
     ],
     "details": [],
     "careInstructions": [],
@@ -1568,7 +1570,7 @@
     "featured": false,
     "status": "active",
     "createdAt": "2026-08-24T23:04:18.181+00:00",
-    "updatedAt": "2026-09-14T21:05:19.922+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-003",
@@ -1599,26 +1601,27 @@
         "color": "marrom",
         "colorName": "Marrom",
         "colorHex": "#4d3232",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/c1f755065549ad314cf326c7.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/c1f755065549ad314cf326c7.webp",
+        "image": "/Camiseta Drop Shoulder - Marrom.png",
+        "featuredImage": "/Camiseta Drop Shoulder - Marrom.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/c1f755065549ad314cf326c7.webp"
+          "/Camiseta Drop Shoulder - Marrom.png"
         ]
       },
       {
         "color": "cinza",
         "colorName": "Cinza",
         "colorHex": "#6c6c6a",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/026a7f18048dc996cb2a42db.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/026a7f18048dc996cb2a42db.webp",
+        "image": "/Camiseta Drop Shoulder - Cinza.png",
+        "featuredImage": "/Camiseta Drop Shoulder - Cinza.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/026a7f18048dc996cb2a42db.webp"
+          "/Camiseta Drop Shoulder - Cinza.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/2d08398641530f5d58976f97.webp",
+    "image": "/Camiseta Drop Shoulder - Marrom.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-003/legacy/2d08398641530f5d58976f97.webp"
+      "/Camiseta Drop Shoulder - Marrom.png",
+      "/Camiseta Drop Shoulder - Cinza.png"
     ],
     "details": [],
     "careInstructions": [],
@@ -1635,7 +1638,7 @@
     "featured": false,
     "status": "active",
     "createdAt": "2026-08-24T23:04:18.499+00:00",
-    "updatedAt": "2026-09-14T21:05:20.992+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-004",
@@ -1666,26 +1669,27 @@
         "color": "black",
         "colorName": "Preto",
         "colorHex": "#121212",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/0d85b7b907b3e3d0369321df.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/0d85b7b907b3e3d0369321df.webp",
+        "image": "/Camiseta Heavy Boxy - Preto.png",
+        "featuredImage": "/Camiseta Heavy Boxy - Preto.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/0d85b7b907b3e3d0369321df.webp"
+          "/Camiseta Heavy Boxy - Preto.png"
         ]
       },
       {
-        "color": "offwhite",
-        "colorName": "Off White",
+        "color": "branco",
+        "colorName": "Branco",
         "colorHex": "#F5F5F0",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/aaf2bb9ad8922b81dbaeceaa.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/aaf2bb9ad8922b81dbaeceaa.webp",
+        "image": "/Camiseta Heavy Boxy - Branco.png",
+        "featuredImage": "/Camiseta Heavy Boxy - Branco.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/aaf2bb9ad8922b81dbaeceaa.webp"
+          "/Camiseta Heavy Boxy - Branco.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/fecdc39daafdab619256557e.webp",
+    "image": "/Camiseta Heavy Boxy - Preto.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-004/legacy/fecdc39daafdab619256557e.webp"
+      "/Camiseta Heavy Boxy - Preto.png",
+      "/Camiseta Heavy Boxy - Branco.png"
     ],
     "details": [],
     "careInstructions": [],
@@ -1702,7 +1706,7 @@
     "featured": false,
     "status": "active",
     "createdAt": "2026-08-24T23:04:18.722+00:00",
-    "updatedAt": "2026-09-14T21:05:21.834+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-005",
@@ -1733,26 +1737,27 @@
         "color": "bege-marrom",
         "colorName": "Bege + Marrom",
         "colorHex": "#6c5a4e",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/7a5ad641582cf8444b9243db.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/7a5ad641582cf8444b9243db.webp",
+        "image": "/Camiseta Panel - Bege e Marrom.png",
+        "featuredImage": "/Camiseta Panel - Bege e Marrom.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/7a5ad641582cf8444b9243db.webp"
+          "/Camiseta Panel - Bege e Marrom.png"
         ]
       },
       {
         "color": "preto-cinza",
         "colorName": "Preto + Cinza",
         "colorHex": "#4b4b49",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/2387cc21d799d59f2ba30c82.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/2387cc21d799d59f2ba30c82.webp",
+        "image": "/Camiseta Panel - Preto e Cinza.png",
+        "featuredImage": "/Camiseta Panel - Preto e Cinza.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/2387cc21d799d59f2ba30c82.webp"
+          "/Camiseta Panel - Preto e Cinza.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/7a5ad641582cf8444b9243db.webp",
+    "image": "/Camiseta Panel - Bege e Marrom.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-005/legacy/7a5ad641582cf8444b9243db.webp"
+      "/Camiseta Panel - Bege e Marrom.png",
+      "/Camiseta Panel - Preto e Cinza.png"
     ],
     "details": [],
     "careInstructions": [],
@@ -1769,7 +1774,7 @@
     "featured": false,
     "status": "active",
     "createdAt": "2026-08-24T23:04:18.972+00:00",
-    "updatedAt": "2026-09-14T21:05:22.283+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-006",
@@ -1800,26 +1805,27 @@
         "color": "verde",
         "colorName": "Verde",
         "colorHex": "#55533b",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/bac1a7710a7d73753a3df417.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/bac1a7710a7d73753a3df417.webp",
+        "image": "/Camiseta Pocket Utility - Verde.png",
+        "featuredImage": "/Camiseta Pocket Utility - Verde.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/bac1a7710a7d73753a3df417.webp"
+          "/Camiseta Pocket Utility - Verde.png"
         ]
       },
       {
         "color": "preto",
         "colorName": "Preto",
         "colorHex": "#000000",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/4dd464f81933c3d35c1a204b.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/4dd464f81933c3d35c1a204b.webp",
+        "image": "/Camiseta Pocket Utility - Preto.png",
+        "featuredImage": "/Camiseta Pocket Utility - Preto.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/4dd464f81933c3d35c1a204b.webp"
+          "/Camiseta Pocket Utility - Preto.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/7e4b14b09d2417bb40fdcac3.webp",
+    "image": "/Camiseta Pocket Utility - Verde.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-006/legacy/7e4b14b09d2417bb40fdcac3.webp"
+      "/Camiseta Pocket Utility - Verde.png",
+      "/Camiseta Pocket Utility - Preto.png"
     ],
     "details": [
       "Modelagem exclusiva Marmot",
@@ -1844,7 +1850,7 @@
     "featured": true,
     "status": "active",
     "createdAt": "2026-08-24T23:04:19.193+00:00",
-    "updatedAt": "2026-09-14T21:05:23.028+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-007",
@@ -1872,29 +1878,30 @@
     ],
     "colors": [
       {
-        "color": "preto-branco",
-        "colorName": "Preto + Branco",
+        "color": "branco-preto",
+        "colorName": "Branco + Preto",
         "colorHex": "#ffffff",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/e073eb3eda2a88aded69fec3.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/e073eb3eda2a88aded69fec3.webp",
+        "image": "/Camiseta Raglan Oversized - Branco e Preto.png",
+        "featuredImage": "/Camiseta Raglan Oversized - Branco e Preto.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/e073eb3eda2a88aded69fec3.webp"
+          "/Camiseta Raglan Oversized - Branco e Preto.png"
         ]
       },
       {
         "color": "preto-cinza",
         "colorName": "Preto + Cinza",
         "colorHex": "#000000",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/8280c0389e1fd1083eb7cd2e.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/8280c0389e1fd1083eb7cd2e.webp",
+        "image": "/Camiseta Raglan Oversized - Preto e Cinza.png",
+        "featuredImage": "/Camiseta Raglan Oversized - Preto e Cinza.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/8280c0389e1fd1083eb7cd2e.webp"
+          "/Camiseta Raglan Oversized - Preto e Cinza.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/8b8ec6914f7fb0fd6d22cdab.webp",
+    "image": "/Camiseta Raglan Oversized - Branco e Preto.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-007/legacy/8b8ec6914f7fb0fd6d22cdab.webp"
+      "/Camiseta Raglan Oversized - Branco e Preto.png",
+      "/Camiseta Raglan Oversized - Preto e Cinza.png"
     ],
     "details": [],
     "careInstructions": [],
@@ -1911,7 +1918,7 @@
     "featured": false,
     "status": "active",
     "createdAt": "2026-08-24T23:04:19.427+00:00",
-    "updatedAt": "2026-09-14T21:05:23.75+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-008",
@@ -1939,28 +1946,30 @@
     ],
     "colors": [
       {
-        "id": "cam-008-blk",
-        "color": "Preto",
-        "colorName": "Off-Black",
-        "colorHex": "#1A1A1A",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-008/legacy/c1c4bef72959eab20497bfa4.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-008/legacy/c1c4bef72959eab20497bfa4.webp",
+        "color": "branco",
+        "colorName": "Branco",
+        "colorHex": "#F5F5F0",
+        "image": "/Camiseta Raw Hem - Branco.png",
+        "featuredImage": "/Camiseta Raw Hem - Branco.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-008/legacy/c1c4bef72959eab20497bfa4.webp"
-        ],
-        "sku": "MAR-CAM-008-BLK",
-        "stockCount": 15,
-        "sizes": [
-          "P",
-          "M",
-          "G",
-          "GG"
+          "/Camiseta Raw Hem - Branco.png"
+        ]
+      },
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#62654A",
+        "image": "/Camiseta Raw Hem - Verde.png",
+        "featuredImage": "/Camiseta Raw Hem - Verde.png",
+        "images": [
+          "/Camiseta Raw Hem - Verde.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-008/legacy/c1c4bef72959eab20497bfa4.webp",
+    "image": "/Camiseta Raw Hem - Branco.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-008/legacy/c1c4bef72959eab20497bfa4.webp"
+      "/Camiseta Raw Hem - Branco.png",
+      "/Camiseta Raw Hem - Verde.png"
     ],
     "details": [],
     "careInstructions": [],
@@ -1977,7 +1986,7 @@
     "featured": false,
     "status": "active",
     "createdAt": "2026-08-24T23:04:19.647+00:00",
-    "updatedAt": "2026-09-14T21:05:24+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-009",
@@ -2005,29 +2014,30 @@
     ],
     "colors": [
       {
-        "color": "branco-e-preto",
-        "colorName": "Branco e Preto",
+        "color": "preto-branco",
+        "colorName": "Preto + Branco",
         "colorHex": "#121212",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/d07496552d7ba2e00ca4b225.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/d07496552d7ba2e00ca4b225.webp",
+        "image": "/Camiseta Striped Heavy - Preto e Branco.png",
+        "featuredImage": "/Camiseta Striped Heavy - Preto e Branco.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/d07496552d7ba2e00ca4b225.webp"
+          "/Camiseta Striped Heavy - Preto e Branco.png"
         ]
       },
       {
-        "color": "marrom-e-bege",
-        "colorName": "Marrom e Bege",
-        "colorHex": "#540707",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/75b4ae2a5c1b1a8b9eb844df.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/75b4ae2a5c1b1a8b9eb844df.webp",
+        "color": "bege-marrom",
+        "colorName": "Bege + Marrom",
+        "colorHex": "#6b4c3b",
+        "image": "/Camiseta Striped Heavy - Bege e Marrom.png",
+        "featuredImage": "/Camiseta Striped Heavy - Bege e Marrom.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/75b4ae2a5c1b1a8b9eb844df.webp"
+          "/Camiseta Striped Heavy - Bege e Marrom.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/d07496552d7ba2e00ca4b225.webp",
+    "image": "/Camiseta Striped Heavy - Preto e Branco.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-009/legacy/d07496552d7ba2e00ca4b225.webp"
+      "/Camiseta Striped Heavy - Preto e Branco.png",
+      "/Camiseta Striped Heavy - Bege e Marrom.png"
     ],
     "details": [
       "Modelagem exclusiva Marmot",
@@ -2052,7 +2062,7 @@
     "featured": true,
     "status": "active",
     "createdAt": "2026-08-24T23:04:19.866+00:00",
-    "updatedAt": "2026-09-14T21:05:24.871+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-cam-010",
@@ -2083,26 +2093,27 @@
         "color": "cinza-escuro",
         "colorName": "Cinza Escuro",
         "colorHex": "#403b3b",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/ebb62961e5bdfebcf07bb55f.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/ebb62961e5bdfebcf07bb55f.webp",
+        "image": "/Camiseta Washed Vintage - Cinza escuro.png",
+        "featuredImage": "/Camiseta Washed Vintage - Cinza escuro.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/ebb62961e5bdfebcf07bb55f.webp"
+          "/Camiseta Washed Vintage - Cinza escuro.png"
         ]
       },
       {
-        "color": "cinza",
-        "colorName": "Cinza",
+        "color": "cinza-claro",
+        "colorName": "Cinza Claro",
         "colorHex": "#bab5b5",
-        "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/7bea6b9c3c3cecad0b480e3f.webp",
-        "featuredImage": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/7bea6b9c3c3cecad0b480e3f.webp",
+        "image": "/Camiseta Washed Vintage - Cinza Claro.png",
+        "featuredImage": "/Camiseta Washed Vintage - Cinza Claro.png",
         "images": [
-          "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/7bea6b9c3c3cecad0b480e3f.webp"
+          "/Camiseta Washed Vintage - Cinza Claro.png"
         ]
       }
     ],
-    "image": "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/1a251b40becc51f19431f46c.webp",
+    "image": "/Camiseta Washed Vintage - Cinza escuro.png",
     "images": [
-      "https://ktmkvysnjfphcfntazut.supabase.co/storage/v1/object/public/product-images/products/prod-cam-010/legacy/1a251b40becc51f19431f46c.webp"
+      "/Camiseta Washed Vintage - Cinza escuro.png",
+      "/Camiseta Washed Vintage - Cinza Claro.png"
     ],
     "details": [
       "Modelagem exclusiva Marmot",
@@ -2127,7 +2138,7 @@
     "featured": true,
     "status": "active",
     "createdAt": "2026-08-24T23:04:20.088+00:00",
-    "updatedAt": "2026-09-14T21:05:25.647+00:00"
+    "updatedAt": "2026-09-18T19:16:45.137545+00:00"
   },
   {
     "id": "prod-crg-010",
@@ -2158,19 +2169,30 @@
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6B4A35",
+        "image": "/Calça Cargo Tactical - Marrom.png",
+        "featuredImage": "/Calça Cargo Tactical - Marrom.png",
         "images": [
-          "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
+          "/Calça Cargo Tactical - Marrom.png"
+        ]
+      },
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#556B4D",
+        "image": "/Calça Cargo Tactical - Verde.png",
+        "featuredImage": "/Calça Cargo Tactical - Verde.png",
+        "images": [
+          "/Calça Cargo Tactical - Verde.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
+    "image": "/Calça Cargo Tactical - Marrom.png",
     "images": [
-      "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
+      "/Calça Cargo Tactical - Marrom.png",
+      "/Calça Cargo Tactical - Verde.png"
     ],
     "details": [
       "Bolsos modulares",
@@ -2198,7 +2220,7 @@
     "featured": true,
     "status": "active",
     "createdAt": "2026-08-25T17:47:35.274+00:00",
-    "updatedAt": "2026-08-25T17:47:35.274+00:00"
+    "updatedAt": "2026-09-18T19:33:09.665511+00:00"
   },
   {
     "id": "prod-jaq-001",
@@ -4873,7 +4895,7 @@
       "lançamento"
     ],
     "rating": 5,
-    "reviewCount": 2,
+    "reviewCount": 3,
     "stockCount": 25,
     "sku": "MM-MOL-016",
     "sizes": [

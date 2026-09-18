@@ -226,8 +226,8 @@ export function AppContent() {
         </Suspense>
       </main>
 
-      {/* Clube Marmot - Seção Separada de Newsletter e Acesso Antecipado */}
-      {!isLoginPage && <NewsletterClubSection />}
+      {/* Clube Marmot - Seção Separada de Newsletter e Acesso Antecipado (Oculta no login e no painel admin) */}
+      {!isLoginPage && currentPage !== 'admin' && <NewsletterClubSection />}
 
       {/* Rodapé Oficial da Loja - Seção Separada de Navegação, Institucional e Legal */}
       {!isLoginPage && <Footer onNavigate={handleNavigate} />}

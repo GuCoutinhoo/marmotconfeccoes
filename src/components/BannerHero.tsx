@@ -55,41 +55,6 @@ export const BannerHero: React.FC<BannerHeroProps> = ({ onNavigate }) => {
             </button>
           </div>
 
-          {/* RIGHT: Discreet Editorial Spec Columns (Non-intrusive) */}
-          <div className="hidden lg:flex flex-col items-end text-right space-y-6 max-w-[320px] select-none pr-2">
-            <div className="space-y-1">
-              <div className="flex items-center justify-end gap-2 text-[10.5px] font-mono tracking-[0.25em] text-[#F4C400] uppercase font-bold">
-                <span className="w-1.5 h-1.5 bg-[#F4C400] rotate-45" />
-                <span>NOVO DROP • 2026</span>
-              </div>
-              <p className="text-xs font-bold text-white tracking-[0.18em] uppercase">
-                LIMITED EDITION ARCHIVE
-              </p>
-            </div>
-
-            <div className="w-16 h-px bg-white/20" />
-
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-zinc-400 block">
-                MATÉRIA-PRIMA & FIT
-              </span>
-              <p className="text-[11.5px] text-zinc-200 font-medium leading-snug uppercase tracking-wide">
-                Algodão pesado 260g a 400g/m². Cortes amplos com peso e presença autoral.
-              </p>
-            </div>
-
-            <div className="w-16 h-px bg-white/20" />
-
-            <div className="space-y-1">
-              <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-zinc-400 block">
-                LOGÍSTICA
-              </span>
-              <p className="text-[11px] font-mono text-zinc-300 tracking-wider uppercase">
-                DESPACHO EM ATÉ 24H • BRASIL
-              </p>
-            </div>
-          </div>
-
         </div>
 
         {/* Scroll down indicator */}

@@ -245,7 +245,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
   return (
     <div className="bg-[#FAFAFA] text-[#0B0B0E] min-h-screen py-6 sm:py-8 select-none">
-      <div className="w-full px-7 sm:px-8">
+      <div className="w-full max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         <Breadcrumb
           items={[
             { label: 'Início', onClick: () => onNavigate('home') },
@@ -255,22 +255,22 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
           ]}
         />
 
-        {/* Product Main Display Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mt-6 mb-10 items-start">
-          {/* 1. Left Column: Dominant Gallery (7 cols) */}
-          <div className="lg:col-span-7 space-y-4">
-            {/* Main Stage Image */}
-            <div className="relative aspect-[3/4] sm:aspect-[4/5] bg-[#F6F6F6] border border-zinc-200/90 rounded-[2px] overflow-hidden group">
+        {/* Product Main Display Grid - Balanced Gallery (~54%) / Info Panel (~46%) */}
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,570px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,610px)_minmax(0,1fr)] gap-8 lg:gap-10 xl:gap-14 mt-6 mb-10 items-start">
+          {/* 1. Left Column: Gallery */}
+          <div className="w-full space-y-3.5">
+            {/* Main Stage Image - Completely fills container with zero empty space or bars */}
+            <div className="relative w-full aspect-[3/4.2] max-h-[750px] min-h-[440px] sm:min-h-[500px] bg-[#ECECED] border border-zinc-200/90 rounded-[2px] overflow-hidden group flex items-center justify-center">
               <img
                 src={images[selectedImageIndex] || images[0]}
                 alt={product.title}
                 referrerPolicy="no-referrer"
                 onError={(e) => handleProductImageError(e, product.category, `${product.id}-${selectedImageIndex}`)}
-                className="w-full h-full object-cover object-top sm:object-center transition-transform duration-500 ease-out group-hover:scale-[1.02] select-none"
+                className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.015] select-none"
               />
 
               {/* Minimal Badges */}
-              <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
+              <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 z-10 pointer-events-none">
                 {product.isNewRelease && (
                   <MarmotBadge variant="new">NOVO DROP</MarmotBadge>
                 )}
@@ -285,7 +285,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
               <button
                 type="button"
                 onClick={handleShare}
-                className="absolute top-4 right-4 p-2.5 bg-white/90 hover:bg-[#0B0B0E] hover:text-white rounded-full border border-zinc-200 text-[#0B0B0E] transition-all backdrop-blur-xs shadow-xs cursor-pointer"
+                className="absolute top-3.5 right-3.5 p-2.5 bg-white/90 hover:bg-[#0B0B0E] hover:text-white rounded-full border border-zinc-200 text-[#0B0B0E] transition-all backdrop-blur-xs shadow-xs cursor-pointer z-10"
                 title="Compartilhar Peça"
               >
                 <Share2 className="w-4 h-4" />
@@ -294,13 +294,13 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
 
             {/* Thumbnail Navigation */}
             {images.length > 1 && (
-              <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-none">
+              <div className="w-full flex gap-2.5 overflow-x-auto pb-1 scrollbar-none pt-0.5">
                 {images.map((img, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setSelectedImageIndex(idx)}
-                    className={`relative w-20 h-24 sm:w-24 sm:h-28 rounded-[2px] overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-zinc-100 ${
+                    className={`relative w-16 h-20 sm:w-20 sm:h-24 rounded-[2px] overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-zinc-100 ${
                       selectedImageIndex === idx
                         ? 'border-[#0B0B0E] shadow-xs'
                         : 'border-zinc-200 opacity-60 hover:opacity-100'
@@ -311,7 +311,7 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
                       alt={`Miniatura ${idx + 1}`}
                       referrerPolicy="no-referrer"
                       onError={(e) => handleProductImageError(e, product.category, `${product.id}-thumb-${idx}`)}
-                      className="w-full h-full object-cover object-top"
+                      className="w-full h-full object-contain object-center bg-[#ECECED]"
                     />
                   </button>
                 ))}
@@ -319,8 +319,8 @@ export const ProductDetailPage: React.FC<ProductDetailPageProps> = ({
             )}
           </div>
 
-          {/* 2. Right Column: Buy Box & Specs (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
+          {/* 2. Right Column: Buy Box & Specs (~46% width, aligned to top) */}
+          <div className="w-full space-y-6">
             <div>
               {/* Category & Collection */}
               <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-2">

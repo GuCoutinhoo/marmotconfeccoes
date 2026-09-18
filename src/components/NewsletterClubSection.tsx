@@ -57,7 +57,7 @@ export const NewsletterClubSection: React.FC = () => {
         <div className="w-full h-full bg-[radial-gradient(#18181B_1px,transparent_1px)] [background-size:24px_24px]" />
       </div>
 
-      <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-14 relative z-10">
+      <div className="w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1.15fr_minmax(460px,0.85fr)] items-center gap-12 lg:gap-16 xl:gap-24">
           
           {/* Coluna Esquerda: Comunicação Editorial de Lançamento */}

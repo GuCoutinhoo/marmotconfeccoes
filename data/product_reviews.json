@@ -1,5 +1,19 @@
 [
   {
+    "id": "rev-1789760722401-8jii",
+    "productId": "prod-mol-016",
+    "userId": "user-legacy-001",
+    "userName": "legacy",
+    "userEmail": "legacy@marmot.com",
+    "rating": 5,
+    "title": "Fake Review",
+    "comment": "Attempting to post review with legacy token.",
+    "verifiedPurchase": false,
+    "likes": 0,
+    "status": "published",
+    "createdAt": "2026-09-18T19:45:22.401Z"
+  },
+  {
     "id": "rev-1789750083488-h92l",
     "productId": "prod-mol-016",
     "userId": "user-legacy-001",

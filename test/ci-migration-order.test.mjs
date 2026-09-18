@@ -16,9 +16,10 @@ test('workspace efêmero aplica o schema base antes das migrations datadas', asy
     });
     assert.equal(result.status, 0, result.stderr || result.stdout);
 
+    const sourceMigrations = (await fs.readdir(path.join(process.cwd(), 'supabase', 'migrations'))).filter((f) => f.endsWith('.sql'));
     const files = (await fs.readdir(path.join(workdir, 'supabase', 'migrations'))).sort();
     assert.equal(files[0], '20260101000000_000_local_baseline_compatibility.sql');
-    assert.equal(files.length, 18);
+    assert.equal(files.length, sourceMigrations.length + 1);
     assert.equal(new Set(files.map((file) => file.slice(0, 14))).size, files.length);
 
     const baseline = await fs.readFile(path.join(workdir, 'supabase', 'migrations', files[0]), 'utf8');

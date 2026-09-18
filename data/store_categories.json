@@ -108,6 +108,24 @@
     "createdAt": "2026-08-15T17:16:26.168372+00:00"
   },
   {
+    "id": "tenis",
+    "slug": "tenis",
+    "name": "Tênis",
+    "tagline": "Sneakers & Streetwear Footwear",
+    "description": "Tênis e sneakers streetwear autênticos.",
+    "image": "/categories/categoria-tenis.png?v=20260918_v11_novas_imagens_categoria",
+    "subcategories": [
+      "Chunky",
+      "Skate",
+      "Retro Runner",
+      "High Top"
+    ],
+    "productCount": 10,
+    "order": 6,
+    "active": true,
+    "createdAt": "2026-08-15T17:16:26.500000+00:00"
+  },
+  {
     "id": "acessorios",
     "slug": "acessorios",
     "name": "Acessórios",
@@ -121,8 +139,8 @@
       "Óculos & Correntes"
     ],
     "productCount": 10,
-    "order": 6,
+    "order": 7,
     "active": true,
-    "createdAt": "2026-09-18T18:31:00.000Z"
+    "createdAt": "2026-08-15T17:16:27.000000+00:00"
   }
 ]

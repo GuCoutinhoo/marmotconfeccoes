@@ -2636,19 +2636,30 @@ export const CATALOG_90_PRODUCTS_PART1: Product[] = [
     ],
     "colors": [
       {
-        "color": "black",
-        "colorName": "Pitch Black",
-        "colorHex": "#121212",
-        "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
-        "featuredImage": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
+        "color": "marrom",
+        "colorName": "Marrom",
+        "colorHex": "#6B4A35",
+        "image": "/Calça Cargo Tactical - Marrom.png",
+        "featuredImage": "/Calça Cargo Tactical - Marrom.png",
         "images": [
-          "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
+          "/Calça Cargo Tactical - Marrom.png"
+        ]
+      },
+      {
+        "color": "verde",
+        "colorName": "Verde",
+        "colorHex": "#556B4D",
+        "image": "/Calça Cargo Tactical - Verde.png",
+        "featuredImage": "/Calça Cargo Tactical - Verde.png",
+        "images": [
+          "/Calça Cargo Tactical - Verde.png"
         ]
       }
     ],
-    "image": "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80",
+    "image": "/Calça Cargo Tactical - Marrom.png",
     "images": [
-      "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&w=1000&q=80"
+      "/Calça Cargo Tactical - Marrom.png",
+      "/Calça Cargo Tactical - Verde.png"
     ],
     "details": [
       "Bolsos modulares",
