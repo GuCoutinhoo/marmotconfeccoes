@@ -8,7 +8,6 @@ import { Pool } from 'pg';
 import { waitUntil } from '@vercel/functions';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
-import sharp from 'sharp';
 import {
   assertInfinitePayConfiguration,
   checkInfinitePayPayment,

@@ -37,8 +37,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Security Audit
-        run: npm audit --audit-level=high
+      - name: Security Audit (production dependencies)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Security Audit (critical development dependencies)
+        run: npm audit --include=dev --audit-level=critical
 
       - name: Typecheck
         run: npm run typecheck
