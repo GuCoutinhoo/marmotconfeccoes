@@ -6,7 +6,7 @@ import { ToastProvider } from './context/ToastContext';
 import { StoreProvider, useStore } from './context/StoreContext';
 
 import { Header } from './components/Header';
-import { Footer } from './components/Footer';
+import { Footer, NewsletterClubSection } from './components/Footer';
 import { MiniCart } from './components/MiniCart';
 import { HomePage } from './pages/HomePage';
 
@@ -226,7 +226,10 @@ export function AppContent() {
         </Suspense>
       </main>
 
-      {/* Persistent Footer - Hidden on dedicated login / auth page */}
+      {/* Clube Marmot - Seção Separada de Newsletter e Acesso Antecipado */}
+      {!isLoginPage && <NewsletterClubSection />}
+
+      {/* Rodapé Oficial da Loja - Seção Separada de Navegação, Institucional e Legal */}
       {!isLoginPage && <Footer onNavigate={handleNavigate} />}
 
       {/* Global Slide-Over MiniCart */}

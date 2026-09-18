@@ -200,16 +200,17 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
       id="ultimos-lancamentos-drop"
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: false, amount: 0.1 }}
+      viewport={{ once: true, amount: 0.08 }}
       transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-      className="bg-[#FAFAFA] text-[#18181B] w-full overflow-hidden border-b border-zinc-200/80 pt-7 sm:pt-9 pb-7 sm:pb-9"
+      className="bg-[#FAFAFA] text-[#18181B] w-full overflow-hidden border-b border-zinc-200/80 pt-7 sm:pt-9 pb-7 sm:pb-9 touch-pan-y"
+      style={{ touchAction: 'pan-y' }}
     >
       <div className="w-full max-w-[1840px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* CABEÇALHO UNIFICADO */}
         <motion.header
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-4 sm:mb-5"
         >
@@ -266,7 +267,8 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
         {/* GRADE / CARROSSEL DE CARDS UNIFICADOS */}
         <div
           ref={scrollContainerRef}
-          className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4 xl:gap-4.5 pb-2 lg:pb-0 scrollbar-none snap-x snap-mandatory"
+          className="flex overflow-x-auto lg:grid lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-4 xl:gap-4.5 pb-2 lg:pb-0 scrollbar-none snap-x snap-mandatory touch-pan-y"
+          style={{ overscrollBehaviorX: 'contain', overscrollBehaviorY: 'auto' }}
         >
           {spotlightItems.map((item, index) => {
             const isWishlisted = isInWishlist(item.id);
@@ -276,7 +278,7 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                 key={item.id}
                 initial={{ opacity: 0, y: 28, scale: 0.98 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: false, amount: 0.08 }}
+                viewport={{ once: true, amount: 0.08 }}
                 transition={{
                   duration: 0.55,
                   delay: index * 0.07,
@@ -284,7 +286,8 @@ export const NewReleasesCarousel: React.FC<NewReleasesCarouselProps> = ({
                 }}
                 whileHover={{ y: -4, transition: { duration: 0.22 } }}
                 onClick={() => handleProductNavigate(item)}
-                className="group relative flex flex-col flex-shrink-0 w-[270px] sm:w-[290px] md:w-[310px] lg:w-auto snap-center bg-white border border-zinc-200/90 hover:border-zinc-950 rounded-[3px] overflow-hidden transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer select-none"
+                className="group relative flex flex-col flex-shrink-0 w-[270px] sm:w-[290px] md:w-[310px] lg:w-auto snap-center bg-white border border-zinc-200/90 hover:border-zinc-950 rounded-[3px] overflow-hidden transition-all duration-300 hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer select-none touch-pan-y"
+                style={{ touchAction: 'pan-y', willChange: 'opacity, transform' }}
               >
                 {/* TOPO: Imagem com Proporção 4/5 e Fundo Neutro Unificado */}
                 <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#EEEEEC]">

@@ -40,7 +40,7 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
 
   if (!isOpen) return null;
 
-  const popularTerms = ['Hoodie Heavyweight', 'Calça Cargo', 'Puffer', 'Oversized', '5 Panel', 'Chunky Runner'];
+  const popularTerms = ['Hoodie Heavyweight', 'Calça Cargo', 'Puffer', 'Oversized', 'Acid Wash', 'Baggy Denim'];
 
   return (
     <div className="fixed inset-0 z-[120] flex items-start justify-center pt-16 px-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
@@ -52,7 +52,7 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar por moletons, cargos, oversized, tênis..."
+            placeholder="Buscar por moletons, cargos, oversized, jaquetas..."
             autoFocus
             className="flex-1 bg-transparent text-[#18181B] placeholder-[#71717A] text-sm font-medium focus:outline-none"
           />
@@ -93,8 +93,8 @@ export const LiveSearchModal: React.FC<LiveSearchModalProps> = ({
               {/* Quick Categories */}
               <div>
                 <p className="text-xs font-bold uppercase text-[#71717A] tracking-wider mb-3">Navegar por Categoria</p>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  {['camisetas', 'moletons', 'jaquetas', 'calcas', 'cargos', 'shorts', 'tenis'].map((cat) => (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                  {['camisetas', 'moletons', 'jaquetas', 'calcas', 'cargos', 'shorts'].map((cat) => (
                     <button
                       key={cat}
                       onClick={() => {

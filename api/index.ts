@@ -682,6 +682,13 @@ export interface CampaignRecord {
 // 2. EMBEDDED INITIAL DATA (Guarantees zero file dependencies)
 // =========================================================================
 
+const EXCLUDED_CATEGORY_KEYS = new Set(['tenis', 'acessorios']);
+const isExcludedCategoryOrProduct = (catOrSubcat?: string | null): boolean => {
+  if (!catOrSubcat) return false;
+  const clean = String(catOrSubcat).trim().toLowerCase();
+  return EXCLUDED_CATEGORY_KEYS.has(clean);
+};
+
 const INITIAL_CATEGORIES: Category[] = [
   {
     id: 'camisetas',
@@ -689,7 +696,7 @@ const INITIAL_CATEGORIES: Category[] = [
     name: 'Camisetas',
     tagline: 'Heavyweight 260g & Boxy Fit',
     description: 'Camisetas streetwear confeccionadas em algodão penteado 260g/m² com caimento estruturado.',
-    image: '/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria',
+    image: '/categories/categoria-camisetas.png?v=20260918_v11_novas_imagens_categoria',
     subcategories: ['Heavyweight 260g', 'Boxy Fit', 'Graphic Tees', 'Oversized'],
     productCount: 10,
     order: 0,
@@ -701,7 +708,7 @@ const INITIAL_CATEGORIES: Category[] = [
     name: 'Moletons',
     tagline: '400g Felpado & Capuz Duplo',
     description: 'Hoodies e crewnecks de alta gramatura com toque ultra macio e acabamento premium.',
-    image: '/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria',
+    image: '/categories/categoria-moletons.png?v=20260918_v11_novas_imagens_categoria',
     subcategories: ['Hoodies', 'Crewnecks', 'Zip-Ups'],
     productCount: 19,
     order: 1,
@@ -713,7 +720,7 @@ const INITIAL_CATEGORIES: Category[] = [
     name: 'Jaquetas',
     tagline: 'Techwear & Puffer Outerwear',
     description: 'Jaquetas corta-vento, puffers térmicas e bombers utilitárias.',
-    image: '/categories/categoria-jaquetas.png?v=20260917_v9_novas_imagens_categoria',
+    image: '/categories/categoria-jaquetas.png?v=20260918_v11_novas_imagens_categoria',
     subcategories: ['Puffer Jackets', 'Windbreakers', 'Bombers'],
     productCount: 19,
     order: 2,
@@ -725,34 +732,10 @@ const INITIAL_CATEGORIES: Category[] = [
     name: 'Calças',
     tagline: 'Cargo Multi-Pocket & Wide Leg',
     description: 'Modelagens amplas, tecidos ripstop e detalhes funcionais.',
-    image: '/categories/categoria-calcas.png?v=20260917_v9_novas_imagens_categoria',
+    image: '/categories/categoria-calcas.png?v=20260918_v11_novas_imagens_categoria',
     subcategories: ['Cargo Pants', 'Wide Leg', 'Parachute Pants', 'Sweatpants'],
     productCount: 18,
     order: 3,
-    active: true,
-  },
-  {
-    id: 'shorts',
-    slug: 'shorts',
-    name: 'Shorts & Bermudas',
-    tagline: 'Nylon Taslan & Moletom',
-    description: 'Shorts leves com secagem rápida e bermudas de moletom encorpado.',
-    image: '/categories/categoria-shorts.png?v=20260917_v9_novas_imagens_categoria',
-    subcategories: ['Nylon Shorts', 'Cargo Shorts', 'Moletom Shorts'],
-    productCount: 15,
-    order: 4,
-    active: true,
-  },
-  {
-    id: 'tenis',
-    slug: 'tenis',
-    name: 'Tênis',
-    tagline: 'Sneakers Chunky & Solados Tratorados',
-    description: 'Silhuetas chunky, solados tratorados, slides e sneakers exclusivos para o lifestyle urbano.',
-    image: '/categories/categoria-tenis.png?v=20260917_v9_novas_imagens_categoria',
-    subcategories: ['Chunky Platform', 'Retro Runner', 'Skate Leather', 'Chunky Slides'],
-    productCount: 10,
-    order: 5,
     active: true,
   },
   {
@@ -761,22 +744,22 @@ const INITIAL_CATEGORIES: Category[] = [
     name: 'Cargos',
     tagline: 'Utilitário & Multi-Pocket',
     description: 'Calças cargo com construção funcional, tecidos resistentes e modelagem streetwear.',
-    image: '/categories/categoria-cargos.png?v=20260917_v9_novas_imagens_categoria',
+    image: '/categories/categoria-calcas.png?v=20260918_v11_novas_imagens_categoria',
     subcategories: ['Cargo Pants', 'Ripstop', 'Parachute'],
-    productCount: 0,
-    order: 6,
+    productCount: 12,
+    order: 4,
     active: true,
   },
   {
-    id: 'acessorios',
-    slug: 'acessorios',
-    name: 'Acessórios',
-    tagline: 'Detalhes & Utilidade Urbana',
-    description: 'Bolsas, bonés, meias, cintos e acessórios para completar a composição.',
-    image: '/categories/categoria-acessorios.png?v=20260917_v9_novas_imagens_categoria',
-    subcategories: ['Bolsas', 'Bonés', 'Meias', 'Cintos'],
-    productCount: 0,
-    order: 7,
+    id: 'shorts',
+    slug: 'shorts',
+    name: 'Shorts & Bermudas',
+    tagline: 'Nylon Taslan & Moletom',
+    description: 'Shorts leves com secagem rápida e bermudas de moletom encorpado.',
+    image: '/categories/categoria-shorts.png?v=20260918_v11_novas_imagens_categoria',
+    subcategories: ['Nylon Shorts', 'Cargo Shorts', 'Moletom Shorts'],
+    productCount: 11,
+    order: 5,
     active: true,
   },
 ];
@@ -1193,13 +1176,18 @@ export class DatabaseManager {
 
   private mapSupabaseCategory(item: any): Category {
     if (!item) return {} as Category;
+    let image = item.image || '';
+    if (image.startsWith('/categories/') || image.startsWith('/categoria')) {
+      const clean = image.split('?')[0];
+      image = `${clean}?v=20260918_v11_novas_imagens_categoria`;
+    }
     return {
       id: String(item.id || ''),
       slug: String(item.slug || '').toLowerCase().trim(),
       name: item.name || '',
       tagline: item.tagline || '',
       description: item.description || '',
-      image: item.image || '',
+      image,
       subcategories: Array.isArray(item.subcategories) ? item.subcategories : [],
       productCount: Number(item.product_count ?? 0),
       order: Number(item.order ?? 0),
@@ -1315,10 +1303,13 @@ export class DatabaseManager {
 
   private loadFromFiles() {
     this.assertLocalPersistenceAllowed('loadFromFiles');
-    this.categories = this.readJsonFile(CATEGORIES_FILE, INITIAL_CATEGORIES);
+    this.categories = this.readJsonFile(CATEGORIES_FILE, INITIAL_CATEGORIES)
+      .filter((c: Category) => !isExcludedCategoryOrProduct(c.id) && !isExcludedCategoryOrProduct(c.slug));
     const rawProds = this.readJsonFile(PRODUCTS_FILE, []);
     let neededSanitization = false;
-    this.products = rawProds.map((p: any) => {
+    this.products = rawProds
+      .filter((p: any) => !isExcludedCategoryOrProduct(p.category) && !isExcludedCategoryOrProduct(p.subcategory))
+      .map((p: any) => {
       const sanitized = this.sanitizeProduct(p);
       if (sanitized.image !== p.image || sanitized.images?.length !== p.images?.length) {
         neededSanitization = true;
@@ -1684,12 +1675,16 @@ export class DatabaseManager {
         .select(PRODUCT_SELECT_COLUMNS)
         .order('id', { ascending: true });
       if (error) throw new Error(`SUPABASE_PRODUCTS_READ_FAILED: ${error.message}`);
-      const products = (data || []).map((row: any) => this.mapSupabaseProduct(row));
+      const products = (data || [])
+        .map((row: any) => this.mapSupabaseProduct(row))
+        .filter((p: Product) => !isExcludedCategoryOrProduct(p.category) && !isExcludedCategoryOrProduct(p.subcategory));
       this.products = products;
       return products;
     }
 
-    if (!this.productionRuntime) return [...this.products];
+    if (!this.productionRuntime) {
+      return [...this.products].filter((p: Product) => !isExcludedCategoryOrProduct(p.category) && !isExcludedCategoryOrProduct(p.subcategory));
+    }
     throw new Error('PUBLIC_CATALOG_SUPABASE_NOT_CONFIGURED: não foi possível configurar a leitura pública do catálogo.');
   }
 
@@ -1706,14 +1701,23 @@ export class DatabaseManager {
           .eq(column, clean)
           .maybeSingle();
         if (error) throw new Error(`SUPABASE_PRODUCT_READ_FAILED: ${error.message}`);
-        return data ? this.mapSupabaseProduct(data) : null;
+        if (!data) return null;
+        const mapped = this.mapSupabaseProduct(data);
+        if (isExcludedCategoryOrProduct(mapped.category) || isExcludedCategoryOrProduct(mapped.subcategory)) {
+          return null;
+        }
+        return mapped;
       };
       return (await readBy('id')) || (await readBy('slug'));
     }
 
     if (!this.productionRuntime) {
       const lower = clean.toLowerCase();
-      return this.products.find((product) => product.id?.toLowerCase() === lower || product.slug?.toLowerCase() === lower) || null;
+      const p = this.products.find((product) => product.id?.toLowerCase() === lower || product.slug?.toLowerCase() === lower) || null;
+      if (p && (isExcludedCategoryOrProduct(p.category) || isExcludedCategoryOrProduct(p.subcategory))) {
+        return null;
+      }
+      return p;
     }
 
     throw new Error('PUBLIC_CATALOG_SUPABASE_NOT_CONFIGURED: não foi possível configurar a leitura pública do catálogo.');
@@ -2061,18 +2065,28 @@ export class DatabaseManager {
         .select('*')
         .order('order', { ascending: true });
       if (error) throw new Error(`SUPABASE_CATEGORIES_READ_FAILED: ${error.message}`);
-      this.categories = (data || []).map((row: any) => this.mapSupabaseCategory(row));
+      this.categories = (data || [])
+        .map((row: any) => this.mapSupabaseCategory(row))
+        .filter((c: Category) => !isExcludedCategoryOrProduct(c.id) && !isExcludedCategoryOrProduct(c.slug));
+      this.categories.forEach((c, idx) => {
+        c.order = idx;
+      });
       return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }
 
     if (!this.productionRuntime) {
-      return [...this.categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+      const filtered = this.categories.filter((c: Category) => !isExcludedCategoryOrProduct(c.id) && !isExcludedCategoryOrProduct(c.slug));
+      filtered.forEach((c, idx) => {
+        c.order = idx;
+      });
+      return [...filtered].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }
 
     throw new Error('PUBLIC_CATALOG_SUPABASE_NOT_CONFIGURED: não foi possível configurar a leitura pública das categorias.');
   }
 
   public async getCategoryById(idOrSlug: string): Promise<Category | null> {
+    if (isExcludedCategoryOrProduct(idOrSlug)) return null;
     const categories = await this.getAllCategories();
     return categories.find((c) => c.id === idOrSlug || c.slug === idOrSlug) || null;
   }

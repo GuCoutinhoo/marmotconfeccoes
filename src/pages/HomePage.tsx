@@ -39,15 +39,15 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate, onQuickView }) =
         products={products}
       />
 
-      {/* 5. Destaque de Ateliê - Peça em Foco */}
-      <SingleProductSpotlight
+      {/* 5. Os Mais Procurados (Ranking com Prova Social) */}
+      <BestsellersRanking
         products={products}
         onQuickView={onQuickView}
         onNavigate={onNavigate}
       />
 
-      {/* 6. Os Mais Procurados (Ranking com Prova Social) */}
-      <BestsellersRanking
+      {/* 6. Destaque de Ateliê - Peça em Foco */}
+      <SingleProductSpotlight
         products={products}
         onQuickView={onQuickView}
         onNavigate={onNavigate}

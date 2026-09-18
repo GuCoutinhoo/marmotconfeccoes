@@ -5,7 +5,7 @@
     "name": "Camisetas",
     "tagline": "Heavyweight 260g & Boxy Fit",
     "description": "Camisetas streetwear com cortes ajustados e estampas exclusivas em silk-screen.",
-    "image": "/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria",
+    "image": "/categories/categoria-camisetas.png?v=20260918_v11_novas_imagens_categoria",
     "subcategories": [
       "Graphic Tees",
       "Basic Essential",
@@ -23,7 +23,7 @@
     "name": "Moletons",
     "tagline": "Hoodies Densos 400g/m²",
     "description": "Hoodies pesados 400g, toucas duplas, bordados em alto relevo e bolso canguru reforçado.",
-    "image": "/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria",
+    "image": "/categories/categoria-moletons.png?v=20260918_v11_novas_imagens_categoria",
     "subcategories": [
       "Hoodie Heavy 400g",
       "Zip Hoodie",
@@ -41,7 +41,7 @@
     "name": "Jaquetas",
     "tagline": "Puffers & Windbreakers",
     "description": "Puffers, windbreakers impermeáveis e work jackets para sobreposições de alto impacto.",
-    "image": "/categories/categoria-jaquetas.png?v=20260917_v9_novas_imagens_categoria",
+    "image": "/categories/categoria-jaquetas.png?v=20260918_v11_novas_imagens_categoria",
     "subcategories": [
       "Puffer Jacket",
       "Windbreaker",
@@ -59,7 +59,7 @@
     "name": "Calças",
     "tagline": "Baggy Denim & Wide Leg",
     "description": "Jeans com lavagens vintage, calças wide leg e baggy fit com caimento solto.",
-    "image": "/categories/categoria-calcas.png?v=20260917_v9_novas_imagens_categoria",
+    "image": "/categories/categoria-calcas.png?v=20260918_v11_novas_imagens_categoria",
     "subcategories": [
       "Baggy Denim",
       "Wide Leg Pants",
@@ -77,7 +77,7 @@
     "name": "Cargos",
     "tagline": "Utilitárias Ripstop Multi-bolsos",
     "description": "Cargos táticas multi-bolsos em ripstop, fit utilitário e barras com ajustador em cordão.",
-    "image": "/categories/categoria-calcas.png?v=20260917_v9_novas_imagens_categoria",
+    "image": "/categories/categoria-calcas.png?v=20260918_v11_novas_imagens_categoria",
     "subcategories": [
       "Ripstop Tactical",
       "Parachute Cargo",
@@ -95,7 +95,7 @@
     "name": "Shorts",
     "tagline": "Mesh Basketball & Sweat Shorts",
     "description": "Shorts em mesh respirável, denim utilitário e moletom pesado para os dias quentes.",
-    "image": "/categories/categoria-shorts.png?v=20260917_v9_novas_imagens_categoria",
+    "image": "/categories/categoria-shorts.png?v=20260918_v11_novas_imagens_categoria",
     "subcategories": [
       "Basketball Mesh Shorts",
       "Cargo Shorts",
@@ -106,41 +106,5 @@
     "order": 5,
     "active": true,
     "createdAt": "2026-08-15T17:16:26.168372+00:00"
-  },
-  {
-    "id": "tenis",
-    "slug": "tenis",
-    "name": "Tênis",
-    "tagline": "Sneakers Chunky & Solados Tratorados",
-    "description": "Silhuetas chunky, solados tratorados, slides e sneakers exclusivos para o lifestyle urbano.",
-    "image": "/categories/categoria-tenis.png?v=20260917_v9_novas_imagens_categoria",
-    "subcategories": [
-      "Chunky Platform",
-      "Retro Runner",
-      "Skate Leather",
-      "Chunky Slides"
-    ],
-    "productCount": 10,
-    "order": 6,
-    "active": true,
-    "createdAt": "2026-08-15T17:16:26.408423+00:00"
-  },
-  {
-    "id": "acessorios",
-    "slug": "acessorios",
-    "name": "Acessórios",
-    "tagline": "Shoulder Bags, Correntes & Headwear",
-    "description": "Shoulder bags, correntes em aço inoxidável 316L, meias de algodão atoalhado e cintos.",
-    "image": "/categories/categoria-acessorios.png?v=20260917_v9_novas_imagens_categoria",
-    "subcategories": [
-      "Shoulder & Chest Bags",
-      "Correntes & Colares",
-      "Meias Atoalhadas",
-      "Cintos & Carteiras"
-    ],
-    "productCount": 15,
-    "order": 7,
-    "active": true,
-    "createdAt": "2026-08-15T17:16:26.618103+00:00"
   }
 ]

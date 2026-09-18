@@ -4,16 +4,15 @@ import { Category } from '../types';
 export const CATEGORY_IMAGE_STORAGE_KEY = '@marmot_cached_category_images';
 export const CATEGORY_STORAGE_KEY = '@marmot_cached_categories';
 export const CATEGORY_IMAGES_VERSION_KEY = '@marmot_category_images_version';
-export const CURRENT_CATEGORY_IMAGES_VERSION = '20260917_v9_novas_imagens_categoria';
+export const CURRENT_CATEGORY_IMAGES_VERSION = '20260918_v12_remover_tenis_acessorios';
 
 export const DEFAULT_CATEGORY_IMAGE_URLS: Record<string, string> = {
-  camisetas: '/categories/categoria-camisetas.png?v=20260917_v9_novas_imagens_categoria',
-  moletons: '/categories/categoria-moletons.png?v=20260917_v9_novas_imagens_categoria',
-  jaquetas: '/categories/categoria-jaquetas.png?v=20260917_v9_novas_imagens_categoria',
-  calcas: '/categories/categoria-calcas.png?v=20260917_v9_novas_imagens_categoria',
-  shorts: '/categories/categoria-shorts.png?v=20260917_v9_novas_imagens_categoria',
-  tenis: '/categories/categoria-tenis.png?v=20260917_v9_novas_imagens_categoria',
-  acessorios: '/categories/categoria-acessorios.png?v=20260917_v9_novas_imagens_categoria',
+  camisetas: '/categories/categoria-camisetas.png?v=20260918_v12_remover_tenis_acessorios',
+  moletons: '/categories/categoria-moletons.png?v=20260918_v12_remover_tenis_acessorios',
+  jaquetas: '/categories/categoria-jaquetas.png?v=20260918_v12_remover_tenis_acessorios',
+  calcas: '/categories/categoria-calcas.png?v=20260918_v12_remover_tenis_acessorios',
+  cargos: '/categories/categoria-calcas.png?v=20260918_v12_remover_tenis_acessorios',
+  shorts: '/categories/categoria-shorts.png?v=20260918_v12_remover_tenis_acessorios',
 };
 
 // Normalize slug/id for consistent key lookup

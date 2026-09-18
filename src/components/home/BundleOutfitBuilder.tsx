@@ -17,7 +17,7 @@ export const BundleOutfitBuilder: React.FC<BundleOutfitBuilderProps> = ({
   // Select 3 items for the outfit bundle
   const bundleItem1 = products.find((p) => p.category === 'moletons' || p.category === 'jaquetas');
   const bundleItem2 = products.find((p) => p.category === 'cargos' || p.category === 'calcas');
-  const bundleItem3 = products.find((p) => p.category === 'camisetas' || p.category === 'acessorios');
+  const bundleItem3 = products.find((p) => p.category === 'camisetas' || p.category === 'shorts');
 
   const bundleItems = [bundleItem1, bundleItem2, bundleItem3].filter(Boolean) as Product[];
 
